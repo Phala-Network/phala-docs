@@ -1,6 +1,4 @@
-# Runtime Bridge v2
-
-## Deployment Guide for Latest Version
+# Deployment Guide for PRBv2
 
 ## Understanding Runtime Bridge <a href="#understanding-runtime-bridge" id="understanding-runtime-bridge"></a>
 

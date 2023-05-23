@@ -31,7 +31,19 @@ If your hard disk has more than 2T space and you want to install the complete Ku
 You will be prompted to set:
 
 * the number of CPU cores to use
-  *
+
+<details>
+
+<summary>How to look up your CPU Cores</summary>
+
+If you do not know your CPUs utilizable cores, you may look them up by executing the following command:
+
+```
+lscpu | grep -E '^Thread|^Core|^Socket|^CPU\('
+```
+
+</details>
+
 * node name
 * gas fee account mnemonic
 * the pool owner account

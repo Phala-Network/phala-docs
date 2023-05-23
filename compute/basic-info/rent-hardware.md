@@ -1,6 +1,6 @@
 # Rent Hardware
 
-## Khala Worker on Vultr <a href="#khala-worker-on-vultr" id="khala-worker-on-vultr"></a>
+## Worker on Vultr <a href="#khala-worker-on-vultr" id="khala-worker-on-vultr"></a>
 
 > This guide will show you how to set up your worker on the `VULTR Bare Metal Simplified™ Intel E-2286G` Instance. For mining on your own hardware check our guide here.
 
@@ -35,4 +35,4 @@ Once your new instance is displayed as ‘Running,’ there are currently no add
 You can get the correct drivers from our guide here under the Ubuntu 21.10 tab.
 
 Once the drivers are installed, you may now turn your instance into a Phala worker.\
-👉 [Get mining scripts](quick-start.md)
+👉 [Get mining scripts](broken-reference)
