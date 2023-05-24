@@ -1,6 +1,6 @@
 # Governance Mechanism
 
-> Go to the [Governance](../../maintain/governance/) section for more detailed tutorials on voting and Treasury application.
+> Go to the [Governance](../../governance/governance/) section for more detailed tutorials on voting and Treasury application.
 
 The early Khala network will use a governance mechanism consistent with Polkadot and Kusama, enabling it to evolve gracefully over time at the ultimate behest of its assembled stakeholders. The stated goal is to ensure that the majority of the stake can always command the network.
 

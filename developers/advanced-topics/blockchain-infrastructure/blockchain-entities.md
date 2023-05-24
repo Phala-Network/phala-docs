@@ -12,7 +12,7 @@ In Phala Network, there are three kinds of entities:
 
 The image below visualizes the interaction between Phala’s entities.
 
-<figure><img src="../../.gitbook/assets/phala-design.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/phala-design.png" alt=""><figcaption></figcaption></figure>
 
 The basic design of Phala Network is meant to ensure the security and confidentiality of the blockchain and its Phat Contract. However, with more security improvements, Phala Network can defend against advanced attacks.
 

@@ -1,11 +1,4 @@
-# Support
-
-## Get questions answered <a href="#get-questions-answered" id="get-questions-answered"></a>
-
-You can post your questions to
-
-* [Substrate and Polkadot StackExchange](https://substrate.stackexchange.com/), remember to add the `phat-contract` tag;
-* or join our [Discord server](https://discord.gg/phala) and get an immediate response in the `#dev` channel.
+# FAQ
 
 ## Question List <a href="#question-list" id="question-list"></a>
 
@@ -45,7 +38,3 @@ If your JSON document contains FP numbers, you can skip this section and go to [
     [patch.crates-io]
     serde = { git = "https://github.com/kvinwang/serde.git", branch = "pink" }
     ```
-
-### How to do Floating Point Calculations <a href="#do-fp" id="do-fp"></a>
-
-TODO

@@ -17,7 +17,7 @@ We strongly agree that Web3 will be the most powerful innovation-driving force i
 
 ## How to use Phala Cloud <a href="#how-to-use-phala-cloud" id="how-to-use-phala-cloud"></a>
 
-Through [Phat Contract](build/phat-contract/).
+Through [Phat Contract](developers/phat-contract/).
 
 <figure><img src=".gitbook/assets/Phat Contract_Standard Logo_wht_02.svg" alt=""><figcaption></figcaption></figure>
 

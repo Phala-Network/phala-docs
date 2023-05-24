@@ -6,29 +6,8 @@ An asset id of type _uint32_ is allocated for each registered asset. Each asset 
 
 * Assets on Khala network
 
-| Name | Location                                     | Asset ID | Parachains | Ethereum | Moonriver EVM |
-| ---- | -------------------------------------------- | -------- | ---------- | -------- | ------------- |
-| PHA  | (1, X1(Parachain(2004)))                     | null     | ✅          | ✅        | ❌             |
-| KSM  | (1, Here)                                    | 0        | ✅          | ❌        | ❌             |
-| KAR  | (1, X2(Parachain(2000), GeneralKey(0x0080))) | 1        | ✅          | ❌        | ❌             |
-| BNC  | (1, X2(Parachain(2001), GeneralKey(0x0001))) | 2        | ✅          | ❌        | ❌             |
-| ZLK  | (1, X2(Parachain(2001), GeneralKey(0x0207))) | 3        | ✅          | ❌        | ✅             |
-| AUSD | (1, X2(Parachain(2000), GeneralKey(0x0081))) | 4        | ✅          | ❌        | ❌             |
-| MOVR | (1, X2(Parachain(2023), PalletInstance(10))) | 6        | ✅          | ❌        | ❌             |
-| HKO  | (1, X2(Parachain(2085), GeneralKey(“HKO”)))  | 7        | ✅          | ❌        | ❌             |
-| KMA  | (1, X1(Parachain(2084)                       | 8        | ✅          | ❌        | ❌             |
-| BSX  | (1, X2(Parachain(2090), GeneralIndex(0)))    | 9        | ✅          | ❌        | ❌             |
-| TUR  | (1, X1(Parachain(2114)                       | 10       | ✅          | ❌        | ❌             |
-| CRAB | (1, X2(Parachain(2105), PalletInstance(5)))  | 11       | ✅          | ❌        | ❌             |
+<table><thead><tr><th>Name</th><th width="229">Location</th><th>Asset ID</th><th>Parachains</th><th>Ethereum</th><th>Moonriver EVM</th></tr></thead><tbody><tr><td>PHA</td><td>(1, X1(Parachain(2004)))</td><td>null</td><td>✅</td><td>✅</td><td>❌</td></tr><tr><td>KSM</td><td>(1, Here)</td><td>0</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>KAR</td><td>(1, X2(Parachain(2000), GeneralKey(0x0080)))</td><td>1</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>BNC</td><td>(1, X2(Parachain(2001), GeneralKey(0x0001)))</td><td>2</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>ZLK</td><td>(1, X2(Parachain(2001), GeneralKey(0x0207)))</td><td>3</td><td>✅</td><td>❌</td><td>✅</td></tr><tr><td>AUSD</td><td>(1, X2(Parachain(2000), GeneralKey(0x0081)))</td><td>4</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>MOVR</td><td>(1, X2(Parachain(2023), PalletInstance(10)))</td><td>6</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>HKO</td><td>(1, X2(Parachain(2085), GeneralKey(“HKO”)))</td><td>7</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>KMA</td><td>(1, X1(Parachain(2084)</td><td>8</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>BSX</td><td>(1, X2(Parachain(2090), GeneralIndex(0)))</td><td>9</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>TUR</td><td>(1, X1(Parachain(2114)</td><td>10</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>CRAB</td><td>(1, X2(Parachain(2105), PalletInstance(5)))</td><td>11</td><td>✅</td><td>❌</td><td>❌</td></tr></tbody></table>
 
 * Assets on Phala network
 
-| Name | Location                                     | Asset ID | Parachains | Ethereum | Moonriver EVM |
-| ---- | -------------------------------------------- | -------- | ---------- | -------- | ------------- |
-| PHA  | (1, X1(Parachain(2035)))                     | null     | ✅          | ✅        | ❌             |
-| DOT  | (1, Here)                                    | 0        | ✅          | ❌        | ❌             |
-| GLMR | (1, X2(Parachain(2004), PalletInstance(10))) | 1        | ✅          | ❌        | ❌             |
-| PARA | (1, X2(Parachain(2012), GeneralKey(“PARA”))) | 2        | ✅          | ❌        | ❌             |
-| AUSD | (1, X2(Parachain(2000), GeneralKey(0x0001))) | 3        | ✅          | ❌        | ❌             |
-| LDOT | (1, X2(Parachain(2000), GeneralKey(0x0003))) | 4        | ✅          | ❌        | ❌             |
-| ACA  | (1, X2(Parachain(2000), GeneralKey(0x0000))) | 5        | ✅          | ❌        | ❌             |
+<table><thead><tr><th>Name</th><th width="219">Location</th><th>Asset ID</th><th>Parachains</th><th>Ethereum</th><th>Moonriver EVM</th></tr></thead><tbody><tr><td>PHA</td><td>(1, X1(Parachain(2035)))</td><td>null</td><td>✅</td><td>✅</td><td>❌</td></tr><tr><td>DOT</td><td>(1, Here)</td><td>0</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>GLMR</td><td>(1, X2(Parachain(2004), PalletInstance(10)))</td><td>1</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>PARA</td><td>(1, X2(Parachain(2012), GeneralKey(“PARA”)))</td><td>2</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>AUSD</td><td>(1, X2(Parachain(2000), GeneralKey(0x0001)))</td><td>3</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>LDOT</td><td>(1, X2(Parachain(2000), GeneralKey(0x0003)))</td><td>4</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>ACA</td><td>(1, X2(Parachain(2000), GeneralKey(0x0000)))</td><td>5</td><td>✅</td><td>❌</td><td>❌</td></tr></tbody></table>

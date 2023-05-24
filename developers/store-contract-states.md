@@ -6,10 +6,7 @@
 
 A Phat contract can utilize three kinds of storage solutions: local cache, contract state, and any external storage services with HTTP requests. We list the differences between the two native storage solutions in Phat Contract as follows.
 
-|                | Persistent | Consistent | Transparently Encrypted | Cost    |
-| -------------- | ---------- | ---------- | ----------------------- | ------- |
-| Local Cache    | ❌          | ❌          | ✅                       | Zero    |
-| Contract State | ✅          | ✅          | ✅                       | Gas fee |
+<table><thead><tr><th width="157"></th><th width="109">Persistent</th><th width="113">Consistent</th><th width="221">Transparently Encrypted</th><th>Cost</th></tr></thead><tbody><tr><td>Local Cache</td><td>❌</td><td>❌</td><td>✅</td><td>Zero</td></tr><tr><td>Contract State</td><td>✅</td><td>✅</td><td>✅</td><td>Gas fee</td></tr></tbody></table>
 
 ### Local Cache <a href="#local-cache" id="local-cache"></a>
 

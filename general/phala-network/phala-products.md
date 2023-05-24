@@ -21,7 +21,7 @@ The Phat Contract is designed for the following use cases:
 * _**Privacy-preserving**_ scenarios like a decentralized exchange and others where privacy matters;
 * _**Composable**_ applications including Oracle, bots, and other applications involving one or more Web2/Web3 services;
 
-> Learn [more](../../build/phat-contract/) about Phat Contract’s unique features and use cases, or start building with it right now following our [tutorial](../../build/getting-started/).
+> Learn [more](../../developers/phat-contract/) about Phat Contract’s unique features and use cases, or start building with it right now following our [tutorial](../../developers/getting-started/).
 
 ## SubBridge <a href="#subbridge" id="subbridge"></a>
 
