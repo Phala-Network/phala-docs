@@ -7,6 +7,17 @@ The Phat Contract uses Rust-based ink! language, and is finally compiled to WebA
 * You can get your contract compiled on both macOS and Linux distributions (we use Ubuntu 22.04 as the default Linux distribution);
 * For Windows users, we recommend to setup a Linux development environment with virtual machine ([video tutorial](https://www.youtube.com/watch?v=x5MhydijWmc)).
 
+> **Note**
+>
+> If you are deploying a local testnet on your development machine, the Mac M1/M2 chips are not supported at this time. In this case, you will have to deploy to the live testnet at through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](../getting-started/swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
+>
+> Information to connect to the Phala Live Testnet PoC5
+>
+> * RPC Endpoint: wss://poc5.phala.network/ws
+> * Cluster ID: 0x0000000000000000000000000000000000000000000000000000000000000001
+> * Worker: 0x94a2ded4c7...2ffd4bae9b63
+> * pRuntime URL: [https://poc5.phala.network/tee-api-1](https://poc5.phala.network/tee-api-1)
+
 ## Install Toolchains
 
 Phat Contract shares exactly the same toolchains as ink!.
