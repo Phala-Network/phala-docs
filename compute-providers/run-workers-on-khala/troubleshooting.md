@@ -2,10 +2,15 @@
 
 ## Quick Links <a href="#quick-links" id="quick-links"></a>
 
-[General](https://github.com/Phala-Network/solo-mining-scripts#navigate) [Investigate](https://github.com/Phala-Network/solo-mining-scripts#investigating-the-issue) [Confidence Level](broken-reference) [Stuck Worker](https://github.com/Phala-Network/solo-mining-scripts/tree/main#khala-node-stops-synching) [Forum](https://forum.phala.network/c/mai/42-category/42)
+[General](https://github.com/Phala-Network/solo-mining-scripts#navigate) | [Investigate](https://github.com/Phala-Network/solo-mining-scripts#investigating-the-issue) | [Confidence Level](https://wiki.phala.network/en-us/mine/solo/4-0-faq/#confidence-level) | [Stuck Worker](https://github.com/Phala-Network/solo-mining-scripts/tree/main#khala-node-stops-synching) | [Forum](https://forum.phala.network/c/mai/42-category/42)
 
 \
 👇 You can also join our Discord or Telegram worker group to discuss your issue. 👇
+
+* [Discord](https://discord.gg/C6E4hQjk)
+* [Telegram](https://t.me/phalaworker)
+* [Forum](https://forum.phala.network/c/mai/42-category/42)
+* [GitHub](https://github.com/Phala-Network/solo-mining-scripts)
 
 ## General <a href="#general" id="general"></a>
 
@@ -37,7 +42,7 @@ In case your node is stuck, a typical scenario would look like the following:
 
 (image showing stuck node on the worker)
 
-With the symptom in the scenario above, the right method to solve the issue would be restarting the `node` container only, with the commands mentioned [here](<../../.gitbook/assets/stop docker separately>), and restarting the containers.
+With the symptom in the scenario above, the right method to solve the issue would be restarting the `node` container only, with the commands mentioned [here](troubleshooting.md#general), and restarting the containers.
 
 Now check the status of the node again.
 
@@ -59,8 +64,10 @@ To get the most recent logs of each container, you may execute:
 docker logs <container_ID/container_name> -n 100 -f
 ```
 
-Note that `<container_ID/container_name>` must be replaced with the container you wish the receive the logs from. In the example above the `container_ID` is `8dc34f63861e` and `container_name` would be `phala-pherry`.\
-If you attempt to post on the phala forum and do not know where the issue lies, please post [the logs](broken-reference) of all three docker containers. Copy-paste the container logs from the terminal into the forum post.
+Note that `<container_ID/container_name>` must be replaced with the container you wish the receive the logs from. In the example above the `container_ID` is `8dc34f63861e` and `container_name` would be `phala-pherry`.
+
+\
+If you attempt to post on the phala forum and do not know where the issue lies, please post the logs of all three docker containers. Copy-paste the container logs from the terminal into the forum post.
 
 ### < 3 running containers <a href="#3-running-containers" id="3-running-containers"></a>
 

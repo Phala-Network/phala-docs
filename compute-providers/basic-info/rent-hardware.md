@@ -2,7 +2,7 @@
 
 ## Worker on Vultr <a href="#khala-worker-on-vultr" id="khala-worker-on-vultr"></a>
 
-> This guide will show you how to set up your worker on the `VULTR Bare Metal Simplified™ Intel E-2286G` Instance. For mining on your own hardware check our guide here.
+> This guide will show you how to set up your worker on the `VULTR Bare Metal Simplified™ Intel E-2286G` Instance. For mining on your own hardware check our guide [here](requirements-in-phala-khala.md).
 
 ## Before Getting Started <a href="#before-getting-started" id="before-getting-started"></a>
 
@@ -30,9 +30,9 @@ After successfully signing up and increasing your credit limit, it is time to pi
 
 Once your new instance is displayed as ‘Running,’ there are currently no additional steps required to adjust the machine’s BIOS. The instance works out of the box.
 
-> _Optional:_ To optimize the worker’s score, you can reboot the instance, head over to the console, and enter the BIOS with F11, to adjust the BIOS settings mentioned in this guide.
+> _Optional:_ To optimize the worker’s score, you can reboot the instance, head over to the console, and enter the BIOS with F11, to adjust the BIOS settings mentioned in this [guide](requirements-in-phala-khala.md#os-requirements).
 
 You can get the correct drivers from our guide here under the Ubuntu 21.10 tab.
 
 Once the drivers are installed, you may now turn your instance into a Phala worker.\
-👉 [Get mining scripts](broken-reference)
+👉 [Get mining scripts](../run-workers-on-khala/installing-phala-mining-tools.md)

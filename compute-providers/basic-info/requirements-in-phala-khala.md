@@ -10,7 +10,7 @@ Running a worker requires SGX-capable CPU. Please choose a device that supports 
 
 ## Stable Network
 
-The network of the worker should be as stable as possible with more than 1 GB bandwidth. and it's best to have a public IP address.
+The network of the worker should be as stable as possible with more than 1GB bandwidth. and it's best to have a public IP address.
 
 ## OS Requirements
 
@@ -20,7 +20,7 @@ We strongly recommend that you use Ubuntu 22.04.2 LTS, download [link](https://u
 
 > **NOTE**
 >
-> Make sure that the kernel version is 5.13 or above.
+> Make sure that the kernel version is **5.13** or above.
 
 ## Device Hardware Specifications
 
@@ -36,7 +36,7 @@ The following describes the device requirements for a solo-worker, and different
 | Hard Disk Space | 2 TB+        |
 | Cores           | 4 Cores+     |
 
-> If you have a batch of workers that need to run on Phala, please visit here for more information.
+> If you have a batch of workers that need to run on Phala, please visit here for more [information](../run-workers-on-phala/prbv3-deployment.md).
 
 ### For Khala Workers
 

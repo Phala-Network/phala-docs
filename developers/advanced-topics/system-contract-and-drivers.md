@@ -4,7 +4,7 @@
 
 The system contract is responsible for the access control of each cluster. Only the cluster owner is able to implement and deploy the system contract during the creation of the cluster.
 
-Also, the enable the flexible management of the future features of Phat Contract, we refer to the design of the Linux kernel and enable cluster owner to dynamically register drivers to system contract to different things. For example, the [Phat Contract tokenomics](../../general/phala-network/pay-for-cloud-service.md) is implemented as a [driver](https://github.com/Phala-Network/phala-blockchain/tree/master/crates/pink-drivers/tokenomic) so each cluster owner can replace it with his/her own tokenomics in the future.
+Also, the enable the flexible management of the future features of Phat Contract, we refer to the design of the Linux kernel and enable cluster owner to dynamically register drivers to system contract to different things. For example, the [Phat Contract tokenomics](../../introduction/readme/pay-for-cloud-service.md) is implemented as a [driver](https://github.com/Phala-Network/phala-blockchain/tree/master/crates/pink-drivers/tokenomic) so each cluster owner can replace it with his/her own tokenomics in the future.
 
 > This feature is not finalized yet so can be changed any time.
 

@@ -1,3 +1,0 @@
-# Khala Worker Rewards
-
-After [Gemini Upgrade](https://khala.subsquare.io/democracy/referendum/27), Khala and Phala share 70% PHA tokens of the total supply for workers' subsidy allocation. You can learn about the Supply-end Tokenomics details here.

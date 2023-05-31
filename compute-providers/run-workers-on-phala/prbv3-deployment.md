@@ -14,7 +14,7 @@ The PRB management server needs to run 2 main components, Node and PRB. The requ
 
 | Components  | RAM Space | Harddisk Space | Remark                                                         |
 | ----------- | --------- | -------------- | -------------------------------------------------------------- |
-| Node        | 4GB+      | 900GB+ NVME    | harddisk requirement increasing, 2t will be best               |
+| Node        | 4GB+      | 900GB+ NVME    | harddisk requirement increasing, 2TB will be best              |
 | PRB         | 4GB+      | 0              | RAM requirement depends on worker number, 16GB+ will be better |
 | **Totally** | 32GB+     | 2TB            | -                                                              |
 
@@ -46,11 +46,11 @@ Then create a folder locally, and create a docker-compose document and other nec
 ```bash
 mkdir prb-deployment
 cd ./prb-deployment
-mkdir docker-compose.yml
-mkdir wm.yml
+touch docker-compose.yml
+touch wm.yml
 mkdir prb-wm-data
 cd ./prb-wm-data
-mkdir ds.yml
+touch ds.yml
 cd ..
 ```
 

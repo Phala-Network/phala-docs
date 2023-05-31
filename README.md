@@ -1,26 +1,41 @@
-# Phala Network
+---
+description: Computation as it’s meant to be.
+cover: .gitbook/assets/Phala-Network-Intro-Page.png
+coverY: -232
+---
 
-<figure><img src=".gitbook/assets/banner.jpg" alt=""><figcaption></figcaption></figure>
+# What is Phala Network?
 
-## Phala Network: Web3 Computing Cloud <a href="#phala-network-web3-computing-cloud" id="phala-network-web3-computing-cloud"></a>
+## Our Mission <a href="#phala-network-web3-computing-cloud" id="phala-network-web3-computing-cloud"></a>
 
-The vision of our Phala is to become the world’s largest P2P computing network, a standard decentralized computing cloud based on Web3. Compared with centralized solutions like Amazon Web Services, Microsoft Azure and Google Cloud Platform, trustless is not only the first feature of Phala recognized by the community but also the cornerstone of Phala becoming a reliable distributed computing network.
+Phala Network is revolutionizing the world of Web3 development by empowering dApp builders with decentralized off-chain compute infrastructure. By connecting Smart Contracts to off-chain programs, developers can supercharge their dApps with seamless cross-chain integrations, connectivity to the internet, and heavy computation. With [Phat Contract](developers/phat-contract/), the off-chain programming model running on Phala Network, developers have an easy-to-use solution for creating robust and cross-chain capable dApps. Phat Contracts make your Smart Contracts even smarter, and can be integrated in minutes using our no code developer experience.
 
-When we say Phala Network is _trustless_, it means the following features:
+Web3 developers are constantly pushing up against the technical limitations of building on-chain. Modern dApps need more than just Smart Contracts to support rich feature sets, and as Web3 has evolved and matured, it has become clear that efficient off-chain computation will be vital for a number of standard dApp use cases. Phala gives dApp developers access to powerful off-chain services without sacrificing on decentralization or trustlessness. **This is Computation as it’s Meant to Be.**
 
-* Phala does not own any servers, and anyone with qualified hardware is allowed to join the network to be a _worker_ and share the computing power. The live statistic is available [here](https://app.phala.network/delegate/vault);
-* All Phala codebases are open-source for review, check our [Github repositories](https://github.com/Phala-Network);
-* Phala assumes no trust in the worker operators (the human), so any worker must run Secure-Enclave-based hardware, and needs to prove its integrity during worker registration. This provides the hardware-based promise of the correctness of execution and data privacy. Phala further designs its [Supply-end Tokenomics](general/phala-network/worker-rewards.md) to encourage high-quality services of both performance and stability;
-* All the workers are managed by the blockchain, which is governed by the on-chain Council. Phala Network follows [democratic governance](general/phala-network/governance-mechanism.md);
+Furthermore, in a digital landscape that is becoming increasingly centralized, Phala Network seeks to go against the grain by building a compute network that anybody can provide for or build on-top of, trustlessly. In other words, Phala is a **Public Good Network**.
 
-We strongly agree that Web3 will be the most powerful innovation-driving force in the next 20–30 years. Web3 and the evolution of artificial intelligence coexist, otherwise, the world might fall into a worse situation. Therefore, we cannot stop and be constrained by previous designs or “fundamentalism” because there is still a long way to go till the success of the Web3 revolution. We will replace any centralized services used by the Crypto world step by step to fulfill our vision, which is also the evolutionary goal of Phala Network.
+## Trustless Computation. Verifiable Results.
 
-## How to use Phala Cloud <a href="#how-to-use-phala-cloud" id="how-to-use-phala-cloud"></a>
+Phala Network is designed with multiple layers of security guarantees to provide fully verifiable computation. Anybody with the correct hardware can become a compute providing “[Worker](broken-reference)” for the network and earn rewards, and Phala has an array of mechanisms in place to ensure Workers always carry out computation faithfully and securely. [Tokenomic incentives](introduction/readme/pay-for-cloud-service.md), hardware-based assurances, and cryptographic evidence of execution published and verified on the Phala blockchain enable Phat Contract to seamlessly extend blockchain-level security to the off-chain realm.
 
-Through [Phat Contract](developers/phat-contract/).
+## Supercharge Your dApps with Phat Contract
 
-<figure><img src=".gitbook/assets/Phat Contract_Standard Logo_wht_02.svg" alt=""><figcaption></figcaption></figure>
+Developers can use Phala Network by writing and deploying Phat Contracts, programs which run on Phala Network’s Off-Chain Workers that can interface with Smart Contracts on any-chain.
 
-You can do serverless computing on Phala by programming and deploying Phat contracts. With “serverless” we mean that you do not need to care about the setup of underlying hardware anymore, and the network will allocate the computing power for you proportional to the PHA token you stake, i.e., _stake-to-compute_.
+Our no-code experience, Phat Bricks, allows developers to pick and choose from a library of pre-written, audited Phat Contracts to integrate with their Smart Contracts in minutes.
 
-> Learn about other [Phala’s products](general/phala-network/phala-products.md).
+Developers with experience with Rust, ink!, JavaScript, or TypeScript can jump into Native Phat Contract and write their own custom programs to service any number of use-cases.
+
+You can use Phat Contracts to:
+
+* Connect your Smart Contract to any API
+* Interface with any S3 storage platform
+* Compute over data
+* Automate Smart Contracts
+* etc.
+
+You can read more about Phat Contract use-cases here.
+
+## Join the People’s Network and Earn Rewards
+
+If you want to help power the decentralized internet, you can become a compute providing Worker for Phala network and earn rewards allowing Web3 applications to run on your hardware. To view hardware requirements and our Worker onboarding guide, click here.

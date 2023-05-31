@@ -1,31 +1,23 @@
 # Table of contents
 
-## General
+## Introduction
 
-* [Phala Network](README.md)
-  * [Phala Products](general/phala-network/phala-products.md)
-  * [Governance Mechanism](general/phala-network/governance-mechanism.md)
-  * [Pay for Cloud Service](general/phala-network/pay-for-cloud-service.md)
-  * [Worker Rewards](general/phala-network/worker-rewards.md)
-* [Khala Network](general/khala-network/README.md)
-  * [Khala Governance](general/khala-network/khala-governance.md)
-  * [Khala Worker Rewards](general/khala-network/khala-worker-rewards.md)
-* [Basic Guidance](general/basic-guidance/README.md)
-  * [Setup Account Identity](general/basic-guidance/setup-account-identity.md)
-  * [Get PHA and Transfer](general/basic-guidance/get-pha-and-transfer.md)
-* [SubBridge](general/subbridge/README.md)
-  * [Cross-chain Transfer](general/subbridge/cross-chain-transfer.md)
-  * [Supported Assets](general/subbridge/supported-assets.md)
-  * [Asset Integration Guide](general/subbridge/asset-integration-guide.md)
-  * [Technical Details](general/subbridge/technical-details.md)
-* [Delegation](general/delegation/README.md)
-  * [Delegate to StakePool](general/delegation/delegate-to-stakepool.md)
-  * [What's vault](general/delegation/whats-vault.md)
-  * [What's share](general/delegation/whats-share.md)
-  * [WrappedBalances & W-PHA](general/delegation/wrappedbalances-and-w-pha.md)
-  * [Examples of Delegation](general/delegation/examples-of-delegation.md)
-  * [Use Phala App to Delegate](general/delegation/use-phala-app-to-delegate.md)
-  * [Estimate Your Reward](general/delegation/estimate-your-reward.md)
+* [What is Phala Network?](README.md)
+  * [Phala Products](introduction/readme/phala-products.md)
+  * [Governance Mechanism](introduction/readme/governance-mechanism.md)
+  * [Pay for Cloud Service](introduction/readme/pay-for-cloud-service.md)
+  * [Worker Rewards](introduction/readme/worker-rewards.md)
+* [Khala Network](introduction/khala-network/README.md)
+  * [Khala Governance](introduction/khala-network/khala-governance.md)
+  * [Khala Worker Rewards](introduction/khala-network/khala-worker-rewards.md)
+* [Basic Guidance](introduction/basic-guidance/README.md)
+  * [Setup Account Identity](introduction/basic-guidance/setup-account-identity.md)
+  * [Get PHA and Transfer](introduction/basic-guidance/get-pha-and-transfer.md)
+* [SubBridge](introduction/subbridge/README.md)
+  * [Cross-chain Transfer](introduction/subbridge/cross-chain-transfer.md)
+  * [Supported Assets](introduction/subbridge/supported-assets.md)
+  * [Asset Integration Guide](introduction/subbridge/asset-integration-guide.md)
+  * [Technical Details](introduction/subbridge/technical-details.md)
 
 ## Developers
 
@@ -46,6 +38,7 @@
   * [Build Stateless Backend](developers/build-on-phat-contract/build-stateless-backend.md)
   * [Environment Setup](developers/build-on-phat-contract/environment-setup.md)
   * [Create Contract](developers/build-on-phat-contract/create-contract.md)
+  * [Deploy Contract](developers/build-on-phat-contract/deploy-contract.md)
   * [Language Basics](developers/build-on-phat-contract/language-basics.md)
   * [Call Your Contract](developers/build-on-phat-contract/call-your-contract.md)
   * [Use Pink Extension](developers/build-on-phat-contract/use-pink-extension.md)
@@ -73,6 +66,7 @@
   * [Error Summary](compute-providers/basic-info/error-summary.md)
 * [Run Workers on Phala](compute-providers/run-workers-on-phala/README.md)
   * [Phala node](compute-providers/run-workers-on-phala/phala-node.md)
+  * [Run a Phala Node](compute-providers/run-workers-on-phala/run-a-phala-node.md)
   * [Solo Worker Deployment](compute-providers/run-workers-on-phala/solo-worker-deployment.md)
   * [PRBv3 Deployment](compute-providers/run-workers-on-phala/prbv3-deployment.md)
   * [Using PRBv3 UI](compute-providers/run-workers-on-phala/using-prbv3-ui.md)
@@ -80,6 +74,7 @@
   * [Switch Workers from Solo to PRB Mode](compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode.md)
 * [Run Workers on Khala](compute-providers/run-workers-on-khala/README.md)
   * [Khala node](compute-providers/run-workers-on-khala/khala-node.md)
+  * [Run a Khala Node](compute-providers/run-workers-on-khala/run-a-khala-node.md)
   * [Installing Phala Mining Tools](compute-providers/run-workers-on-khala/installing-phala-mining-tools.md)
   * [Worker Confidence Level](compute-providers/run-workers-on-khala/worker-confidence-level.md)
   * [Configure the Worker](compute-providers/run-workers-on-khala/configure-the-worker.md)
@@ -95,13 +90,21 @@
   * [Collator](compute-providers/gatekeeper/collator.md)
   * [Gatekeeper](compute-providers/gatekeeper/gatekeeper.md)
 
-## Governance
+## PHA Token
 
-* [Governance](governance/governance/README.md)
-  * [Join the Council](governance/governance/join-the-council.md)
-  * [Voting for Councillors](governance/governance/voting-for-councillors.md)
-  * [Khala Treasury](governance/governance/khala-treasury.md)
-  * [Apply for Project Funding](governance/governance/apply-for-project-funding.md)
+* [Delegation](pha-token/delegation/README.md)
+  * [Delegate to StakePool](pha-token/delegation/delegate-to-stakepool.md)
+  * [What is Vault](pha-token/delegation/whats-vault.md)
+  * [What is Share](pha-token/delegation/whats-share.md)
+  * [WrappedBalances & W-PHA](pha-token/delegation/wrappedbalances-and-w-pha.md)
+  * [Examples of Delegation](pha-token/delegation/examples-of-delegation.md)
+  * [Use Phala App to Delegate](pha-token/delegation/use-phala-app-to-delegate.md)
+  * [Estimate Your Reward](pha-token/delegation/estimate-your-reward.md)
+* [Governance](pha-token/governance/README.md)
+  * [Join the Council](pha-token/governance/join-the-council.md)
+  * [Voting for Councillors](pha-token/governance/voting-for-councillors.md)
+  * [Khala Treasury](pha-token/governance/khala-treasury.md)
+  * [Apply for Project Funding](pha-token/governance/apply-for-project-funding.md)
 
 ## Web Directory
 

@@ -2,6 +2,10 @@
 
 ## Create and Compile Your First Contract <a href="#create-and-compile-your-first-contract" id="create-and-compile-your-first-contract"></a>
 
+There are a couple ways to get you started.
+
+{% tabs %}
+{% tab title="GitHub" %}
 In order to initialize a new Phat Contract project you can use our hello world template:
 
 ```
@@ -21,6 +25,36 @@ In order to build the contract just execute this command in the `phat-hello` fol
 ```
 cargo contract build
 ```
+{% endtab %}
+
+{% tab title="Swanky Phala" %}
+> If you have not installed `swanky phala` CLI tool, follow these [steps](../getting-started/swanky-phala-cli-tool.md) to get started.
+
+Go to your development workspace and initialize a new project. For this tutorial, we will name the project `Norwhich` and choose the `phat_hello` template.
+
+```bash
+swanky phala init Norwhich
+```
+
+Here is a video example of the creating the new project called `Norwhich`.
+
+{% embed url="https://youtu.be/gAPV01e9Ljs" %}
+swanky phala init
+{% endembed %}
+
+Next, `cd` into the `Norwhich` directory and compile the `phat_hello` Phat Contract that was generated with the following command:
+
+```
+swanky phala contract compile -c phat_hello
+```
+
+Here is a short clip of compiling the `phat_hello` contract.
+
+{% embed url="https://youtu.be/pHQOk69OOYA" %}
+swanky phala contract compile
+{% endembed %}
+{% endtab %}
+{% endtabs %}
 
 As a result, you’ll get the following files in the `target/ink` folder of your contract: `phat_hello.wasm`, `metadata.json`, and `phat_hello.contract`. The `.contract` file combines the WASM and metadata into one file and needs to be used when instantiating the contract.
 

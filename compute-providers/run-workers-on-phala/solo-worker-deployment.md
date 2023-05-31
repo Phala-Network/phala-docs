@@ -2,7 +2,7 @@
 
 Currently, there is no one-click deployment script for workers on Phala Network. Computation providers need to run docker compose manually for solo worker deployment.
 
-## Base Requirements
+## Basic Requirements
 
 ### SGX Function
 
@@ -10,14 +10,14 @@ Running Phala worker requires SGX-capable CPU. Please choose a device that suppo
 
 ### Device Configuration
 
-Solo workers on Phala need to run 3 components: **Node, pherry,** and **pRuntime**. The requirements for each component are as follows:
+Solo workers on Phala need to run 3 components: **Node**, **pherry**, and **pRuntime**. The requirements for each component are as follows:
 
-| Components | RAM Space | Hard Disk Space | Remark                                                |
-| ---------- | --------- | --------------- | ----------------------------------------------------- |
-| Node       | 4 GB+     | 900 GB+ NVME    | Hard disk requirement increasing, 2 TB is recommended |
-| pherry     | 2 GB      | 0               | -                                                     |
-| pRuntime   | 2 GB      | 500 MB          | Increase slowly                                       |
-| **Total**  | **8 GB+** | **2 TB**        | -                                                     |
+| Components  | RAM Space | Harddisk Space | Remark                                           |
+| ----------- | --------- | -------------- | ------------------------------------------------ |
+| Node        | 4GB+      | 900GB+ NVME    | harddisk requirement increasing, 2t will be best |
+| pherry      | 2GB       | 0              | -                                                |
+| pRuntime    | 2GB       | 500MB          | increase slowly                                  |
+| **Totally** | 8GB+      | 2TB            | -                                                |
 
 > The number of cores of the worker needs to be **4 or more**, the stronger the CPU computing power of the worker, the better the rewards in reward calculation. For details, please refer to: [Gemini Tokenomics](https://wiki.phala.network/en-us/general/phala-network/tokenomics/)
 
@@ -33,7 +33,7 @@ And please make sure that the kernel version is 5.13 or above.
 
 After the OS is installed, we strongly recommend that you remotely connect and deploy the worker through SSH or other methods. This will help you with document input and maintenance.
 
-## Deployment of Components
+## Deployment of Components <a href="#deployment-of-components" id="deployment-of-components"></a>
 
 ### Preparations
 
@@ -49,7 +49,7 @@ Then create a folder locally, and create a docker-compose document within it.
 ```bash
 mkdir phala-deployment
 cd ./phala-deployment
-mkdir docker-compose.yml
+touch docker-compose.yml
 ```
 
 ### Document Editing
@@ -145,7 +145,7 @@ After entering, complete the following steps to finish the text editing and save
 3、Click "Enter"，quit the editing page
 ```
 
-#### Program Execution
+### Program Execution
 
 Inside the newly created folder, run docker-compose, and the essential components for Solo worker will run successfully.
 
@@ -153,9 +153,9 @@ Inside the newly created folder, run docker-compose, and the essential component
 sudo docker-compose up -d
 ```
 
-### Status Check
+## Status Check
 
-#### Node Check
+### Node Check
 
 Enter the following command to get the last 100 lines of node log information
 
@@ -177,7 +177,7 @@ Determine whether the parachain and relaychain are synchronizing normally by jud
 * Polkadot chain (relaychain) produces a block every 6 seconds.
 * Phala chain (parachain) produces a block every 12 seconds.
 
-#### Pherry Check
+### Pherry Check
 
 Enter the following command to get the most recent 100 lines of Pherry log information:
 
@@ -268,7 +268,7 @@ A typical pherry log will look like this:
 
 You can search for issues in these logs and confirm whether the synchronization is going normally. Also, you can obtain the worker’s public key and the real-time calculated P-value (score) from them.
 
-#### pRuntime Check
+### pRuntime Check
 
 Enter the following command to get the most recent 100 lines of pRuntime log information:
 

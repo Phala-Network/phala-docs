@@ -15,7 +15,7 @@ The Phat Contract uses Rust-based ink! language, and is finally compiled to WebA
 >
 > * RPC Endpoint: wss://poc5.phala.network/ws
 > * Cluster ID: 0x0000000000000000000000000000000000000000000000000000000000000001
-> * Worker: 0x94a2ded4c7...2ffd4bae9b63
+> * Worker: 0x94a2ded4c77fbb910943f7e452e4d243ee5b60bf1a838a911acf2ffd4bae9b63
 > * pRuntime URL: [https://poc5.phala.network/tee-api-1](https://poc5.phala.network/tee-api-1)
 
 ## Install Toolchains

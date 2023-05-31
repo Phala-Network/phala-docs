@@ -11,6 +11,10 @@ Workers and pool owners can use the Phala App to manage Workers/ Workers and Sta
 
 If you do not have a wallet yet, [create one](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala-api.phala.network%2Fws#/accounts) (+ Add account) and install the [Polkadot{.js} extension](https://polkadot.js.org/extension) for your browser.
 
+* [Khala Wallet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala-api.phala.network%2Fws#/accounts)
+* [Polkadot{.js} extension](https://polkadot.js.org/extension)
+* [Khala App](https://app.phala.network/mining/)
+
 ## Phala App Operations <a href="#phala-app-operations" id="phala-app-operations"></a>
 
 ### Create a Pool <a href="#create-a-pool" id="create-a-pool"></a>
@@ -40,7 +44,7 @@ If you do not have a wallet yet, [create one](https://polkadot.js.org/apps/?rpc=
 
 ### Add a Worker <a href="#add-a-worker" id="add-a-worker"></a>
 
-* Select `...` (next to “Info”) “Add Worker” (highlited red) in the target pool;
+* Select `...` (next to “Info”) “Add Worker” (highlighted red) in the target pool;
 * Copy & paste your `worker public key` of your worker in the pop-up window;
 * Submit the transaction;
 * Your worker will now be listed;
