@@ -2,6 +2,9 @@
 
 ## Overview <a href="#overview" id="overview"></a>
 
+> **Note**
+> It is recommended to use [devphase](https://github.com/l00k/devphase) or [swanky phala](https://github.com/Phala-Network/swanky-plugin-phala) CLI developer tools instead.
+
 In this tutorial, we’re going to set up a development environment. We are going to deploy a full stack of the core blockchain and connect the Web UI to the blockchain. By the end of the tutorial, you will be able to:
 
 * Send confidential Commands and Queries
