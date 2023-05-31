@@ -1,4 +1,4 @@
-# Phat Contract Offchain Rollup
+# Cross-Chain Solutions
 
 The Phat Contract Offchain Rollup documentation is located in our GitHub Repository [here](https://github.com/Phala-Network/phat-offchain-rollup).
 

@@ -57,7 +57,7 @@
     * [Blockchain Entities](developers/advanced-topics/blockchain-infrastructure/blockchain-entities.md)
     * [Cluster of Workers](developers/advanced-topics/blockchain-infrastructure/cluster-of-workers.md)
     * [Secret Key Hierarchy](developers/advanced-topics/blockchain-infrastructure/secret-key-hierarchy.md)
-  * [Phat Contract Offchain Rollup](developers/advanced-topics/phat-contract-offchain-rollup.md)
+  * [Cross Chain Solutions](developers/advanced-topics/cross-chain-solutions.md)
   * [System Contract and Drivers](developers/advanced-topics/system-contract-and-drivers.md)
   * [Run Local Testnet](developers/advanced-topics/run-local-testnet.md)
   * [SideVM](developers/advanced-topics/sidevm.md)
