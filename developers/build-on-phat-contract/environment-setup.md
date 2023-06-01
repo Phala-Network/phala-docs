@@ -2,14 +2,14 @@
 
 ## Supported Operating Systems <a href="#supported-operating-systems" id="supported-operating-systems"></a>
 
-The Phat Contract uses Rust-based ink! language, and is finally compiled to WebAssembly (WASM for short).
+The Phat Contract uses the Rust-based ink! language, and is ultimately compiled to WebAssembly (WASM for short).
 
-* You can get your contract compiled on both macOS and Linux distributions (we use Ubuntu 22.04 as the default Linux distribution);
-* For Windows users, we recommend to setup a Linux development environment with virtual machine ([video tutorial](https://www.youtube.com/watch?v=x5MhydijWmc)).
+* You compile your contract on both macOS and Linux distributions (we use Ubuntu 22.04 as the default Linux distribution);
+* For Windows users, we recommend setting up a Linux development environment with a virtual machine ([video tutorial](https://www.youtube.com/watch?v=x5MhydijWmc)).
 
 > **Note**
 >
-> If you are deploying a local testnet on your development machine, the Mac M1/M2 chips are not supported at this time. In this case, you will have to deploy to the live testnet at through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](../getting-started/swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
+> The Mac M1/M2 chips do not support the deployment of a local testnet at this time. If you are using a machine with these chips, you will have to deploy to the live testnet through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](../swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
 >
 > Information to connect to the Phala Live Testnet PoC5
 >
@@ -20,13 +20,13 @@ The Phat Contract uses Rust-based ink! language, and is finally compiled to WebA
 
 ## Install Toolchains
 
-Phat Contract shares exactly the same toolchains as ink!.
+Phat Contract shares the same toolchains as ink!.
 
 ### Rust <a href="#rust" id="rust"></a>
 
 A prerequisite for compiling Phat Contracts is to have Rust and Cargo (Rust’s project manager) installed.
 
-The Rust official recommends using `rustup` tool to install and manage different Rust versions. Here’s [an installation guide](https://doc.rust-lang.org/cargo/getting-started/installation.html).
+Rust officially recommends using `rustup` tool to install and manage different Rust versions. Here’s [an installation guide](https://doc.rust-lang.org/cargo/getting-started/installation.html).
 
 ### ink! <a href="#ink" id="ink"></a>
 

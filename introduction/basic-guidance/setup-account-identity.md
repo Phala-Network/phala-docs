@@ -1,8 +1,8 @@
-# Setup Account Identity
+# Setting Up an Account Identity
 
 Phala Network provides a naming system that allows participants to add personal information to their on-chain account and subsequently ask for verification of this information by [registrars](broken-reference).
 
-After your identity is added, it can be used in many applications in Phala or Khala ecosystem. For example, in Secure Worker Mining, this will help you attract delegators to trust and vote for you.
+After your identity is added, it can be used in many applications in Phala or Khala ecosystem. For example, in Secure Worker, this will help you attract delegators to trust and vote for you.
 
 
 
@@ -14,7 +14,7 @@ Users can set an identity by registering through default fields including:
 * display name
 * website
 * Twitter handle
-* Element (formerly known as Riot) handle
+* Element handle
 
 You can also add extra custom fields to which you can attest. Personalized fields are elaborated in the [judgements](broken-reference) section.
 
@@ -30,11 +30,7 @@ You can also add extra custom fields to which you can attest. Personalized field
 
 2. Click the gear icon next to your account and select “Set on-chain identity”.
 
-
-
 A popup will appear, offering the default fields.
-
-
 
 #### **Adding Custom Fields**
 

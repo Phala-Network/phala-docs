@@ -1,31 +1,30 @@
+---
+description: >-
+  Phat Contract is the program running off-chain on Phala Network that
+  developers can use to implement a broad range of features for their dApps.
+cover: ../../.gitbook/assets/phat-contract-banner.png
+coverY: 0
+---
+
 # Phat Contract
 
-## What is Phat Contract <a href="#what-is-phat-contract" id="what-is-phat-contract"></a>
+## Why bring computation Off-Chain?
 
-Phat Contract is an innovative programming model enabling [_Off-chain Computation_](https://medium.com/phala-network/fat-contract-introduce-off-chain-computation-to-smart-contract-dfc5839d5fb8). It’s also known as Fat Contract as a practice of the “Fat Protocol & Thin Application” concept, and for its rich functionalities compared with existing smart contracts. Phat Contract uses Rust-based [ink! language](https://paritytech.github.io/ink/).
+Performing computation on-chain is difficult and expensive, and for robust dApp use-cases the level of computation needed is often simply impossible to do on-chain. Smart Contracts are an essential component of any decentralized application, but the challenges posed by doing work on-chain limit their functionality. For example, Smart Contracts cannot easily perform actions across different blockchains, nor can they interface directly with the internet hence the need for bridges and oracles. Furthermore, Smart Contracts are incredibly limited in the intensity of the computation they can perform, and any program running on-chain can’t produce results until consensus is reached.
 
-> **Hint**
->
-> Every Phat contract is naturally a _distributed_ program since it has multiple instances across every worker in a cluster. All these instances can handle the users' requests concurrently, but they can also cause troubles when they try to update the contract state at the same time.
->
-> This is why we recommend beginners to start with building stateless applications which is free of the problems above.
+## Phat Contracts vs. Smart Contracts
 
-<figure><img src="../../.gitbook/assets/phat-offchain-comp.png" alt=""><figcaption></figcaption></figure>
+Given the stark technical constraints of building on-chain, it’s generally optimal to keep the on-chain contracts as small and compact as possible, and implement the more robust logic off-chain.
 
-Although with the name of “contract”, Phat Contract is more like the Web3 version of [Amazon Lambda](https://aws.amazon.com/lambda/) backed by the decentralized Phala computing cloud and meant to support complex computation with low latency and cost.
+Phat Contracts are run on a tamper-proof distributed network that uses the Phala blockchain to always ensure the fidelity of deployed contracts and their execution. This allows Phat Contracts to circumvent the limitations of Smart Contracts _**while retaining**_ trustlessness, verifiability, and permisionlessness.
 
-You can easily deploy your Phat contract to multiple workers in Phala Network, with each instance handling users' requests in parallel. The contract is running in Secure Enclave, and all its states and input/output are transparently encrypted.
+Phat Contracts are not meant to replace Smart Contracts, instead, they are the missing decentralized computation unit for decentralized applications. Explore all of Phat Contracts features here.
 
-Phat Contract is not meant to replace the smart contracts, instead, it tries to be the missing decentralized computation unit for them. For example, instead of implementing an [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) token with Phat Contract (whose balance has to be stored on-chain), we recommend deploying your ERC-20 contract on Ethereum and using Phat Contract to operate it.
+## A Developer Experience for Everyone
 
-## When will you need it <a href="#when-will-you-need-it" id="when-will-you-need-it"></a>
+Users can build and deploy Phat Contract in a few different ways.
 
-> When a single smart contract is not ENOUGH for your DApp, implement the rest logic with Phat Contract.
-
-Since the on-chain storage and execution can be expensive (from both monetary and performance perspectives), it’s reasonable to keep the on-chain contract small and compact and implement the other logic elsewhere. The existing DApps usually implement their own backend logic as normal programs and deploy them to centralized services like AWS (Amazon Web Services).
-
-<figure><img src="../../.gitbook/assets/web2-stack.png" alt=""><figcaption></figcaption></figure>
-
-With the computing service from Phala and its Phat Contract, you can run your backend programs on a decentralized infrastructure with privacy, performance, and low cost.
-
-<figure><img src="../../.gitbook/assets/web3-stack.png" alt=""><figcaption></figcaption></figure>
+* [**Phat Bricks**](bricks-and-blueprints.md)
+  * Our no-code experience for Phat Contract, developers can choose from a library of pre-fabricated solutions to deploy and integrate with their dApp in minutes.
+* [**Native Phat Contact**](../build-on-phat-contract/)
+  * For developers with a background in Rust, ink!, typescript, or Javascript looking for a more customizable developer experience, Native Phat Contract is the tool for you.

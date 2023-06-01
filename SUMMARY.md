@@ -3,38 +3,23 @@
 ## Introduction
 
 * [What is Phala Network?](README.md)
-  * [Phala Products](introduction/readme/phala-products.md)
-  * [Governance Mechanism](introduction/readme/governance-mechanism.md)
-  * [Pay for Cloud Service](introduction/readme/pay-for-cloud-service.md)
-  * [Worker Rewards](introduction/readme/worker-rewards.md)
-* [Khala Network](introduction/khala-network/README.md)
-  * [Khala Governance](introduction/khala-network/khala-governance.md)
-  * [Khala Worker Rewards](introduction/khala-network/khala-worker-rewards.md)
-* [Basic Guidance](introduction/basic-guidance/README.md)
-  * [Setup Account Identity](introduction/basic-guidance/setup-account-identity.md)
-  * [Get PHA and Transfer](introduction/basic-guidance/get-pha-and-transfer.md)
-* [SubBridge](introduction/subbridge/README.md)
-  * [Cross-chain Transfer](introduction/subbridge/cross-chain-transfer.md)
-  * [Supported Assets](introduction/subbridge/supported-assets.md)
-  * [Asset Integration Guide](introduction/subbridge/asset-integration-guide.md)
-  * [Technical Details](introduction/subbridge/technical-details.md)
+* [Setting Up a Wallet on Phala](introduction/basic-guidance/README.md)
+  * [Setting Up an Account Identity](introduction/basic-guidance/setup-account-identity.md)
+  * [Acquiring PHA](introduction/basic-guidance/get-pha-and-transfer.md)
 
 ## Developers
 
 * [Phat Contract](developers/phat-contract/README.md)
+  * [Bricks and Blueprints](developers/phat-contract/bricks-and-blueprints.md)
   * [Features](developers/phat-contract/features.md)
   * [Use Cases](developers/phat-contract/use-cases.md)
+  * [Stake to Compute](developers/phat-contract/pay-for-cloud-service.md)
   * [Builders Program](developers/phat-contract/builders-program.md)
-* [Getting Started](developers/getting-started/README.md)
+* [Getting Started with Native Phat Contract](developers/getting-started/README.md)
   * [Generate Test Account](developers/getting-started/generate-test-account.md)
   * [Phat Contract Console](developers/getting-started/phat-contract-console.md)
-  * [Swanky Phala CLI Tool](developers/getting-started/swanky-phala-cli-tool.md)
   * [Next Step](developers/getting-started/next-step.md)
-* [Support](developers/support/README.md)
-  * [Resource Limits](developers/support/resource-limits.md)
-  * [Compatibility Matrix](developers/support/compatibility-matrix.md)
-  * [FAQ](developers/support/faq.md)
-* [Build on Phat Contract](developers/build-on-phat-contract/README.md)
+* [Build on Native Phat Contract](developers/build-on-phat-contract/README.md)
   * [Build Stateless Backend](developers/build-on-phat-contract/build-stateless-backend.md)
   * [Environment Setup](developers/build-on-phat-contract/environment-setup.md)
   * [Create Contract](developers/build-on-phat-contract/create-contract.md)
@@ -54,11 +39,17 @@
   * [System Contract and Drivers](developers/advanced-topics/system-contract-and-drivers.md)
   * [Run Local Testnet](developers/advanced-topics/run-local-testnet.md)
   * [SideVM](developers/advanced-topics/sidevm.md)
+* [Swanky Phala CLI Tool](developers/swanky-phala-cli-tool.md)
+* [Support](developers/support/README.md)
+  * [Resource Limits](developers/support/resource-limits.md)
+  * [Compatibility Matrix](developers/support/compatibility-matrix.md)
+  * [Common Issues](developers/support/faq.md)
 
 ## Compute Providers
 
 * [Basic Info](compute-providers/basic-info/README.md)
   * [Introduction](compute-providers/basic-info/introduction.md)
+  * [Worker Rewards](compute-providers/basic-info/worker-rewards.md)
   * [Staking Mechanism](compute-providers/basic-info/staking-mechanism.md)
   * [Requirements in Phala/Khala](compute-providers/basic-info/requirements-in-phala-khala.md)
   * [Confidence Level & SGX Function](compute-providers/basic-info/confidence-level-and-sgx-function.md)
@@ -85,6 +76,7 @@
   * [Manage the Worker](compute-providers/run-workers-on-khala/manage-the-worker.md)
   * [Deployment Guide for PRBv2](compute-providers/run-workers-on-khala/deployment-guide-for-prbv2.md)
   * [How to switch from Solo mining to PRB mining](compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining.md)
+  * [Khala Worker Rewards](compute-providers/run-workers-on-khala/khala-worker-rewards.md)
   * [Troubleshooting](compute-providers/run-workers-on-khala/troubleshooting.md)
 * [Gatekeeper](compute-providers/gatekeeper/README.md)
   * [Collator](compute-providers/gatekeeper/collator.md)
@@ -101,10 +93,20 @@
   * [Use Phala App to Delegate](pha-token/delegation/use-phala-app-to-delegate.md)
   * [Estimate Your Reward](pha-token/delegation/estimate-your-reward.md)
 * [Governance](pha-token/governance/README.md)
+  * [Governance Mechanism](pha-token/governance/governance-mechanism.md)
   * [Join the Council](pha-token/governance/join-the-council.md)
   * [Voting for Councillors](pha-token/governance/voting-for-councillors.md)
-  * [Khala Treasury](pha-token/governance/khala-treasury.md)
   * [Apply for Project Funding](pha-token/governance/apply-for-project-funding.md)
+  * [Khala Treasury](pha-token/governance/khala-treasury.md)
+  * [Khala Governance](pha-token/governance/khala-governance.md)
+
+## Other Products
+
+* [SubBridge](other-products/subbridge/README.md)
+  * [Cross-chain Transfer](other-products/subbridge/cross-chain-transfer.md)
+  * [Supported Assets](other-products/subbridge/supported-assets.md)
+  * [Asset Integration Guide](other-products/subbridge/asset-integration-guide.md)
+  * [Technical Details](other-products/subbridge/technical-details.md)
 
 ## Web Directory
 

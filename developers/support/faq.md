@@ -1,13 +1,11 @@
-# FAQ
+# Common Issues
 
-## Question List <a href="#question-list" id="question-list"></a>
+### How can I set arguments when instantiating the contract in Phat Contract UI? <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
 
-### How to set arguments when instantiating the contract in Phat Contract UI? <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
-
-* Now the Phat Contract Console does not support specifying arguments during contract instantiation
+* Currently the Phat Contract Console does not support specifying arguments during contract instantiation
 * **Workaround**: you can implement a `config(&mut self, argument0, ...)` function and set the contract state with transactions after the instantiation
 
-### Phat UI reports an error before deploying the contract <a href="#phat-ui-reports-an-error-before-deploying-the-contract" id="phat-ui-reports-an-error-before-deploying-the-contract"></a>
+### Phat UI reports an error before deploying the contract. <a href="#phat-ui-reports-an-error-before-deploying-the-contract" id="phat-ui-reports-an-error-before-deploying-the-contract"></a>
 
 The Phat UI checks the contract’s validity before uploading it to the cluster. However, sometimes the contract output by `cargo-contract` may be invalid. We’ve listed common errors and solutions below:
 
