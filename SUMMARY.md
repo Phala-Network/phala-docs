@@ -49,7 +49,8 @@
 
 * [Basic Info](compute-providers/basic-info/README.md)
   * [Introduction](compute-providers/basic-info/introduction.md)
-  * [Worker Rewards](compute-providers/basic-info/worker-rewards.md)
+  * [Gemini Tokenomics (Worker Rewards)](compute-providers/basic-info/worker-rewards.md)
+  * [Budget balancer](compute-providers/basic-info/budget-balancer.md)
   * [Staking Mechanism](compute-providers/basic-info/staking-mechanism.md)
   * [Requirements in Phala/Khala](compute-providers/basic-info/requirements-in-phala-khala.md)
   * [Confidence Level & SGX Function](compute-providers/basic-info/confidence-level-and-sgx-function.md)
