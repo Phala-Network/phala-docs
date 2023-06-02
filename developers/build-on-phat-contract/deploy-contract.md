@@ -5,30 +5,6 @@
 Now that you have created and compiled your `phat_hello` contract, let's deploy the contract to the [PoC5 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). There are a couple ways to get you started.
 
 {% tabs %}
-{% tab title="Phat UI" %}
-Go to the [Phat UI](https://phat.phala.network) website where you will see a landing page.
-
-<figure><img src="../../.gitbook/assets/Phat-UI-landing-page.png" alt=""><figcaption><p>Phat UI Landing Page</p></figcaption></figure>
-
-Next, you will connect your Polkadot wallet ([Talisman](https://talisman.xyz/download), [SubWallet](https://chrome.google.com/webstore/detail/subwallet-polkadot-extens/onhogfjeacnfoofkfgppdlbmlmnplgbn?hl=en\&authuser=0), or [Polkadot.js](https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd/related))
-
-<figure><img src="../../.gitbook/assets/Select-Polkadot-Wallet.png" alt=""><figcaption><p>Select a Polkadot Wallet</p></figcaption></figure>
-
-For more info on these steps, check out the [Phat Contract Console ](../getting-started/phat-contract-console.md)section. Now that your account has PHA testnet tokens, upload the compile contract file `phat_hello.contract`
-
-Here is a video example of the process. After the contract is deployed and instantiated into a cluster, choose any ETH address and query the balance.
-
-{% embed url="https://youtu.be/NkLHXNEK8iI" %}
-Deploy and Call your Phat Contract
-{% endembed %}
-
-The query of an ETH balance will look like this:
-
-<figure><img src="../../.gitbook/assets/Query-ETH-Balance-Step1.png" alt=""><figcaption><p>Choose ETH Account to Query</p></figcaption></figure>
-
-<figure><img src="../../.gitbook/assets/Query-ETH-Balance.png" alt=""><figcaption><p>Query ETH Balance</p></figcaption></figure>
-{% endtab %}
-
 {% tab title="Swanky Phala" %}
 > If you have not installed `swanky phala` CLI tool, follow these [steps](../swanky-phala-cli-tool.md) to get started.
 
@@ -147,5 +123,29 @@ Call result:
   storageDeposit: { charge: 2047 }
 }
 ```
+{% endtab %}
+
+{% tab title="Phat UI" %}
+Go to the [Phat UI](https://phat.phala.network) website where you will see a landing page.
+
+<figure><img src="../../.gitbook/assets/Phat-UI-landing-page.png" alt=""><figcaption><p>Phat UI Landing Page</p></figcaption></figure>
+
+Next, you will connect your Polkadot wallet ([Talisman](https://talisman.xyz/download), [SubWallet](https://chrome.google.com/webstore/detail/subwallet-polkadot-extens/onhogfjeacnfoofkfgppdlbmlmnplgbn?hl=en\&authuser=0), or [Polkadot.js](https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd/related))
+
+<figure><img src="../../.gitbook/assets/Select-Polkadot-Wallet.png" alt=""><figcaption><p>Select a Polkadot Wallet</p></figcaption></figure>
+
+For more info on these steps, check out the [Phat Contract Console ](../getting-started/phat-contract-console.md)section. Now that your account has PHA testnet tokens, upload the compile contract file `phat_hello.contract`
+
+Here is a video example of the process. After the contract is deployed and instantiated into a cluster, choose any ETH address and query the balance.
+
+{% embed url="https://youtu.be/NkLHXNEK8iI" %}
+Deploy and Call your Phat Contract
+{% endembed %}
+
+The query of an ETH balance will look like this:
+
+<figure><img src="../../.gitbook/assets/Query-ETH-Balance-Step1.png" alt=""><figcaption><p>Choose ETH Account to Query</p></figcaption></figure>
+
+<figure><img src="../../.gitbook/assets/Query-ETH-Balance.png" alt=""><figcaption><p>Query ETH Balance</p></figcaption></figure>
 {% endtab %}
 {% endtabs %}
