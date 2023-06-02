@@ -41,6 +41,7 @@
   * [SideVM](developers/advanced-topics/sidevm.md)
 * [Swanky Phala CLI Tool](developers/swanky-phala-cli-tool.md)
 * [Support](developers/support/README.md)
+  * [Available Chains](developers/support/endpoints.md)
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
   * [Common Issues](developers/support/faq.md)
