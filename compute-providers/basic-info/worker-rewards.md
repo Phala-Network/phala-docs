@@ -1,6 +1,8 @@
-# Worker Rewards
+# Gemini Tokenomics (Worker Rewards)
 
 This document contains the _Supply-end Tokenomics_ for Phala Network, which defines how workers get their rewards by sharing the computing power.
+
+To read about how Demand-end users can stake PHA to use the network, see [Stake to Compute](../../developers/phat-contract/pay-for-cloud-service.md).
 
 > After the approval of the “Gemini Tokenomics upgrade" democratic referendum on the block height #1,467,069, we have updated the content of the Supply-end Tokenomics as follows:
 

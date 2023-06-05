@@ -4,7 +4,9 @@
 
 Phat Bricks are prefabricated, audited Phat Contracts that perform common functions. These can be bundled together to form a Blueprint, a pre defined one click deployable solution to a common industry problem.
 
-Developers can deploy Blueprints and integrate them with their dApps in minutes via the app, bringing complex functionality to Smart Contracts without needing to write a single line of code.
+Developers can deploy Blueprints and integrate them with their dApps in minutes via the [app](http://bricks.phala.network/), bringing complex functionality to Smart Contracts without needing to write a single line of code.
+
+To deploy a Blueprint now click [here](http://bricks.phala.network/)!
 
 ## Example Use-Case
 

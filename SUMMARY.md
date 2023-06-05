@@ -85,6 +85,7 @@
 
 ## PHA Token
 
+* [Introduction](pha-token/introduction.md)
 * [Delegation](pha-token/delegation/README.md)
   * [Delegate to StakePool](pha-token/delegation/delegate-to-stakepool.md)
   * [What is Vault](pha-token/delegation/whats-vault.md)

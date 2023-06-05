@@ -1,8 +1,8 @@
-# Pay for Cloud Service
+# Stake to Compute
 
 ## Introduction <a href="#introduction" id="introduction"></a>
 
-This version is written by [Samuel Häfner](https://samuelhaefner.github.io/). It complements Phala Supply-end Tokenomics v0.9 and defines the _Demand-End Tokenomics_ in Phala Network, e.g, how developers and end-users pay for the computing services. It will be released as Phat Contract goes live. The exact problems addressed by this tokenomics are:
+This version is written by [Samuel Häfner](https://samuelhaefner.github.io/). It complements [Phala Supply-end Tokenomics v0.9](../../compute-providers/basic-info/worker-rewards.md) and defines the _Demand-End Tokenomics_ in Phala Network, e.g, how developers and end-users pay for the computing services. It will be released as Phat Contract goes live. The exact problems addressed by this tokenomics are:
 
 * Computing power allocations among contract clusters and their end-users (contract deployers);
 * The algorithm for clusters-workers matching;
