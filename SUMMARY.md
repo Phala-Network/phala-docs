@@ -12,6 +12,7 @@
 * [Phat Contract](developers/phat-contract/README.md)
   * [Bricks and Blueprints](developers/phat-contract/bricks-and-blueprints.md)
   * [Features](developers/phat-contract/features.md)
+  * [Supported Chains](developers/phat-contract/supported-chains.md)
   * [Use Cases](developers/phat-contract/use-cases.md)
   * [Stake to Compute](developers/phat-contract/pay-for-cloud-service.md)
   * [Builders Program](developers/phat-contract/builders-program.md)
