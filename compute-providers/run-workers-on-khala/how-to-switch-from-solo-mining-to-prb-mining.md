@@ -1,4 +1,8 @@
-# How to switch from Solo mining to PRB mining
+---
+description: worker
+---
+
+# How to switch from Solo scripts to PRB worker
 
 ## How Solo Worker Works <a href="#how-solo-worker-works" id="how-solo-worker-works"></a>
 

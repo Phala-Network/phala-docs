@@ -26,7 +26,7 @@ And attempt a restart with
 sudo phala start
 ```
 
-If you still have issues attempt to [update the script](update-your-workers-node.md).
+If you still have issues attempt to [update the script](solo-scripts-guidance/update-your-workers-node.md).
 
 ## Investigating the Issue <a href="#investigating-the-issue" id="investigating-the-issue"></a>
 

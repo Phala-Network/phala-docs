@@ -35,4 +35,4 @@ Once your new instance is displayed as ‘Running,’ there are currently no add
 You can get the correct drivers from our guide here under the Ubuntu 21.10 tab.
 
 Once the drivers are installed, you may now turn your instance into a Phala worker.\
-👉 [Get mining scripts](../run-workers-on-khala/installing-phala-mining-tools.md)
+👉 [Get mining scripts](../run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools.md)

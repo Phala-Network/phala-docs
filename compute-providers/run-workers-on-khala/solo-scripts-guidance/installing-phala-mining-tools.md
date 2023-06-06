@@ -1,12 +1,12 @@
-# Installing Phala Mining Tools
+# Installing Khala Solo Scripts
 
 ## Prerequisites <a href="#prerequisites" id="prerequisites"></a>
 
 Before you go further, please ensure that your have correct setup your hardware, BIOS and operating system according to the previous section.
 
-## Download the Phala Scripts <a href="#download-the-phala-scripts" id="download-the-phala-scripts"></a>
+## Download the Khala Scripts <a href="#download-the-phala-scripts" id="download-the-phala-scripts"></a>
 
-The Phala mining tools are available on our [Phala Mining Script](https://github.com/Phala-Network/solo-mining-scripts/) repository on GitHub, it can be downloaded with `wget` by executing the following commands in the terminal:
+The Khala Solo Scripts are available on our [Phala Mining Script](https://github.com/Phala-Network/solo-mining-scripts/) repository on GitHub, it can be downloaded with `wget` by executing the following commands in the terminal:
 
 ```
 sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y

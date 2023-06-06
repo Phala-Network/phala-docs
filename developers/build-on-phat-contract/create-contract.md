@@ -42,7 +42,7 @@ git clone https://github.com/Phala-Network/phat-hello
 
 > **Contract Examples**
 >
-> More Phat contract examples can be found in [phat-contract-examples](https://github.com/Phala-Network/phat-contract-examples) and [awesome-phat-contracts](<../../.gitbook/assets/awesome phat contracts>) repositories.
+> More Phat contract examples can be found in [phat-contract-examples](https://github.com/Phala-Network/phat-contract-examples) and [awesome-phat-contracts](<../../.gitbook/assets/deploy contract>) repositories.
 
 This will create a folder `phat-hello` in your work directory. The folder contains a scaffold `Cargo.toml` and a `lib.rs`, which both contain the necessary building blocks for using Phat Contract.
 

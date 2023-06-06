@@ -1,4 +1,4 @@
-# PRBv3 Deployment
+# PRBv3 Deployment Guide
 
 ## Basic Requirements
 
@@ -14,9 +14,9 @@ The PRB management server needs to run 2 main components, Node and PRB. The requ
 
 | Components  | RAM Space | Harddisk Space | Remark                                                         |
 | ----------- | --------- | -------------- | -------------------------------------------------------------- |
-| Node        | 4GB+      | 900GB+ NVME    | harddisk requirement increasing, 2TB will be best              |
+| Node        | 4GB+      | 3TB+ NVME      | harddisk requirement increasing, 8TB will be best              |
 | PRB         | 4GB+      | 0              | RAM requirement depends on worker number, 16GB+ will be better |
-| **Totally** | 32GB+     | 2TB            | -                                                              |
+| **Totally** | 32GB+     | 4TB            | -                                                              |
 
 > You also need to ensure good network connectivity between the management server and PRB workers, and the network of the PRB management server needs to have more than 10TB of traffic space per month.
 
@@ -82,7 +82,7 @@ At this point, enter `a` and you will start editing the document. Paste the foll
 version: "3"
 services:
   node:
-    image: phalanetwork/phala-node-with-launcher:latest
+    image: phalanetwork/khala-node:latest
     container_name: node
     hostname: node
     restart: always
@@ -96,12 +96,10 @@ services:
     environment:
      - NODE_NAME=PNODE
      - NODE_ROLE=MINER
-     - RELAYCHAIN_DB=rocksdb
-     - PARACHAIN_DB=rocksdb
      - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8
      - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8
     volumes:
-     - /var/phala/node-data:/root/data
+     - /var/khala/node-data:/root/data
      
   wm:
     image: phalanetwork/prb3:dev
