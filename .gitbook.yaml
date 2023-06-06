@@ -1,4 +1,4 @@
 root: ./
 
 redirects:
-    en-us/build/general/intro: introduction/basic-guidance/setup-account-identity.md
+    en-us/build/general/intro: README.md
