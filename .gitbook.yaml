@@ -1,4 +1,29 @@
 root: ./
 
 redirects:
-    en-us/build/general/intro: README.md
+    en-us/general/phala-network/intro: README.md
+    en-us/general/phala-network/products: other-products/subbridge/README.md
+    en-us/general/phala-network/governance: pha-token/governance/governance-mechanism.md
+    en-us/general/phala-network/phat-contract-fee: developers/phat-contract/pay-for-cloud-service.md
+    en-us/general/phala-network/tokenomics: compute-providers/basic-info/worker-rewards.md
+    en-us/general/khala-network/intro: compute-providers/basic-info/introduction.md
+    en-us/general/khala-network/governance: pha-token/governance/khala-governance.md
+    en-us/general/khala-network/tokenomics: compute-providers/run-workers-on-khala/khala-worker-rewards.md
+    en-us/general/applications/extension-wallet: introduction/basic-guidance/README.md
+    en-us/general/applications/setup-identity: introduction/basic-guidance/setup-account-identity.md
+    en-us/general/applications/get-pha: introduction/basic-guidance/get-pha-and-transfer.md
+    en-us/general/subbridge/intro: other-products/subbridge/README.md
+    en-us/general/subbridge/tutorial: other-products/subbridge/cross-chain-transfer.md
+    en-us/general/subbridge/supported-assets: other-products/subbridge/supported-assets.md
+    en-us/general/subbridge/asset-integration: other-products/subbridge/asset-integration-guide.md
+    en-us/general/subbridge/technical-details: other-products/subbridge/technical-details.md
+    en-us/general/applications/stake-pha: pha-token/delegation/README.md
+    en-us/general/applications/stakepool: pha-token/delegation/delegate-to-stakepool.md
+    en-us/general/applications/vault: pha-token/delegation/whats-vault.md
+    en-us/general/applications/share: pha-token/delegation/whats-share.md
+    en-us/general/applications/wpha: pha-token/delegation/wrappedbalances-and-w-pha.md
+    en-us/general/applications/delegation-example: pha-token/delegation/examples-of-delegation.md
+    en-us/general/applications/phala-app: pha-token/delegation/use-phala-app-to-delegate.md
+    en-us/general/applications/reward-calculation: pha-token/delegation/estimate-your-reward.md
+    en-us/general/applications/use-delegation-to-vote: pha-token/delegation/wrappedbalances-and-w-pha.md
+
