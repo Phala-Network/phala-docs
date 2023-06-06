@@ -26,4 +26,29 @@ redirects:
     en-us/general/applications/phala-app: pha-token/delegation/use-phala-app-to-delegate.md
     en-us/general/applications/reward-calculation: pha-token/delegation/estimate-your-reward.md
     en-us/general/applications/use-delegation-to-vote: pha-token/delegation/wrappedbalances-and-w-pha.md
-
+    en-us/build/general/intro: developers/phat-contract/README.md
+    en-us/build/general/features: developers/phat-contract/features.md
+    en-us/build/general/usecases: developers/phat-contract/use-cases.md
+    en-us/build/general/builders-program: developers/phat-contract/builders-program.md
+    en-us/build/getting-started/prep: developers/getting-started/README.md
+    en-us/build/getting-started/account-prep: developers/getting-started/generate-test-account.md
+    en-us/build/getting-started/deploy-contract: developers/getting-started/phat-contract-console.md
+    en-us/build/getting-started/next-step: developers/getting-started/next-step.md
+    en-us/build/support/faq: developers/support/faq.md
+    en-us/build/support/resource-limits: developers/support/resource-limits.md
+    en-us/build/stateless/intro: developers/build-on-phat-contract/build-stateless-backend.md
+    en-us/build/stateless/setup: developers/build-on-phat-contract/environment-setup.md
+    en-us/build/stateless/create-contract: developers/build-on-phat-contract/create-contract.md
+    en-us/build/stateless/language-basic: developers/build-on-phat-contract/language-basics.md
+    en-us/build/stateless/query-and-tx: developers/build-on-phat-contract/call-your-contract.md
+    en-us/build/stateless/pink-extension: developers/build-on-phat-contract/use-pink-extension.md
+    en-us/build/stateless/rust-crates: developers/build-on-phat-contract/use-rust-crates.md
+    en-us/build/stateless/unittest: developers/build-on-phat-contract/unit-tests.md
+    en-us/build/stateful/storage-hierarchy: developers/store-contract-states.md
+    en-us/build/infrastructure/blockchain-detail: developers/advanced-topics/blockchain-infrastructure/README.md
+    en-us/build/infrastructure/blockchain-entities: developers/advanced-topics/blockchain-infrastructure/blockchain-entities.md
+    en-us/build/infrastructure/cluster: developers/advanced-topics/blockchain-infrastructure/cluster-of-workers.md
+    en-us/build/infrastructure/key-management: developers/advanced-topics/blockchain-infrastructure/secret-key-hierarchy.md
+    en-us/build/advanced/system-contract: developers/advanced-topics/system-contract-and-drivers.md
+    en-us/build/advanced/run-a-local-development-network: developers/advanced-topics/run-local-testnet.md
+    en-us/build/advanced/sidevm: developers/advanced-topics/sidevm.md
