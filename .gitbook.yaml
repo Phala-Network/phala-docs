@@ -1,4 +1,4 @@
 root: ./
 
 redirects:
-    en-us/build/general/intro/: introduction/readme
+    en-us/build/general/intro/: introduction/basic-guidance/README.md
