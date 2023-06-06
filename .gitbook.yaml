@@ -1,0 +1,4 @@
+root: ./
+
+redirects:
+    en-us/build/general/intro: README.md
