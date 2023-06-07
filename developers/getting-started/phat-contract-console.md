@@ -1,9 +1,6 @@
 # Phat Contract Console
 
-Phat Contract UI provides an easy way to upload your contract, instantiate it and interact with it.
-
-* For public testnet, visit [https://phat.phala.network](https://phat.phala.network/)
-* For Closed Beta, visit [https://phat-cb.phala.network](https://phat-cb.phala.network/)
+[Phat Contract UI](https://phat.phala.network/) provides an easy way to upload your contract, instantiate it and interact with it.
 
 ## Connect Your Wallet <a href="#connect-wallet" id="connect-wallet"></a>
 
@@ -19,10 +16,7 @@ Clicking the green dot beside your account will tell you the information about t
 
 <figure><img src="../../.gitbook/assets/phat-ui-connection-info.png" alt=""><figcaption></figcaption></figure>
 
-By default, the UI will connect to
-
-* [PoC-5 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer)
-* or [Closed Beta Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphat-beta.phala.network%2Fkhala%2Fws#/explorer)
+By default, the UI will connect to [Phala PoC-5 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). Check the full [chain list](../support/endpoints.md).
 
 You can connect to other chains by filling in the RPC Endpoint and clicking _Connect_. The UI will automatically read the cluster information from the chain and fill in the PRuntime for you, but you can always set it to other workers manually.
 
@@ -38,10 +32,6 @@ To connect to our mainnet or your local testnet, you need to specify two endpoin
 ## Claim Test Tokens <a href="#claim-test-tokens" id="claim-test-tokens"></a>
 
 Once the account is connected, you can find the _Get Test-PHA_ button on the right side of the page and request 100 test tokens by clicking it. The operations below require tokens as the transaction fee.
-
-> **For Closed Beta**
->
-> The button will lead you to the `#faucet` channel in our Discord server. Post your account there to get the test tokens.
 
 ## Uploading and Instantiating the Contract <a href="#upload-and-instantiate-the-contract" id="upload-and-instantiate-the-contract"></a>
 
