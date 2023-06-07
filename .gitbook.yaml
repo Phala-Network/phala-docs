@@ -74,3 +74,12 @@ redirects:
     en-us/mine/prb2/deployment-guide: compute-providers/run-workers-on-khala/deployment-guide-for-prbv2.md
     en-us/mine/prb2/switch-from-solo-to-prb: compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining.md
     en-us/mine/solo/4-0-faq: compute-providers/run-workers-on-khala/troubleshooting.md
+    en-us/maintain/governance/1-participate-in-democracy: pha-token/governance/README.md
+    en-us/maintain/governance/2-join-the-council: pha-token/governance/join-the-council.md
+    en-us/maintain/governance/3-voting-for-councillors: pha-token/governance/voting-for-councillors.md
+    en-us/maintain/governance/4-treasury: pha-token/governance/khala-treasury.md
+    en-us/maintain/governance/5-bounty-project: pha-token/governance/apply-for-project-funding.md
+    en-us/maintain/gatekeeper/collator: compute-providers/gatekeeper/collator.md
+    en-us/maintain/gatekeeper/gatekeeper: compute-providers/gatekeeper/gatekeeper.md
+    en-us/maintain/node/run-a-khala-node: compute-providers/run-workers-on-khala/run-a-khala-node.md
+    en-us/maintain/node/run-a-phala-node: compute-providers/run-workers-on-phala/run-a-phala-node.md
