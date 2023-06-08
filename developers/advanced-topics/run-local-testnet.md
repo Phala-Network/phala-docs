@@ -118,7 +118,7 @@ By default you get the Phala blockchain node at ws://localhost:9944 and the prun
 
 ## Connect the Phat UI to the local testnet <a href="#connect-the-phat-ui-to-the-local-testnet" id="connect-the-phat-ui-to-the-local-testnet"></a>
 
-We have a client-side application at [https://phat.phala.network/](https://phat.phala.network/), you can follow the instructions from [Phat Contract Console](<../../.gitbook/assets/awesome phat contracts (1)>) to connect the application to the local testnet.
+We have a client-side application at [https://phat.phala.network/](https://phat.phala.network/), you can follow the instructions from [Phat Contract Console](<../../.gitbook/assets/awesome phat contracts (1) (1)>) to connect the application to the local testnet.
 
 <figure><img src="../../.gitbook/assets/phat-ui-to-testnet.png" alt=""><figcaption></figcaption></figure>
 

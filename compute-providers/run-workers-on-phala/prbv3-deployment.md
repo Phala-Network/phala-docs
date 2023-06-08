@@ -181,10 +181,7 @@ parachain:
 
 > There are 2 parameters here that need to be user-defined: ws://{node-ip}:9945 & ws://{node-ip}:9944;
 >
-> You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, the easiest way is to replace both with 127.0.0.1, for example:
->
-> * ws://127.0.0.1:9945;
-> * ws://127.0.0.1:9944;
+> You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
 
 After entering the content, save and return to the previous directory.
 

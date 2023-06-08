@@ -147,4 +147,4 @@ You can find your public or private IP after each `inet`.
 
 ## Create a connection between Worker and PRB <a href="#create-a-connection-between-worker-and-prb" id="create-a-connection-between-worker-and-prb"></a>
 
-For more details, please refer to the [Using PRBv3](../run-workers-on-phala/using-prbv3-ui.md)
+For more details, please refer to the [Using PRBv3](using-prbv3-ui.md)
