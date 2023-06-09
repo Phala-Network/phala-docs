@@ -83,4 +83,4 @@ redirects:
     en-us/maintain/gatekeeper/gatekeeper: compute-providers/gatekeeper/gatekeeper.md
     en-us/maintain/node/run-a-khala-node: compute-providers/run-workers-on-khala/run-a-khala-node.md
     en-us/maintain/node/run-a-phala-node: compute-providers/run-workers-on-phala/run-a-phala-node.md
-    v1/*: ./*
+    v1/.*: .*
