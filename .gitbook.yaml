@@ -83,3 +83,9 @@ redirects:
     en-us/maintain/gatekeeper/gatekeeper: compute-providers/gatekeeper/gatekeeper.md
     en-us/maintain/node/run-a-khala-node: compute-providers/run-workers-on-khala/run-a-khala-node.md
     en-us/maintain/node/run-a-phala-node: compute-providers/run-workers-on-phala/run-a-phala-node.md
+    v1/developers/getting-started: developers/getting-started/README.md
+    v1/developers/phat-contract/builders-program: developers/phat-contract/builders-program.md
+    v1/compute-providers/basic-info/budget-balancer: compute-providers/basic-info/budget-balancer.md
+    v1/developers/phat-contract/features: developers/phat-contract/features.md
+    v1/developers/phat-contract/bricks-and-blueprints: developers/phat-contract/bricks-and-blueprints.md
+    v1/developers/phat-contract: developers/phat-contract/README.md
