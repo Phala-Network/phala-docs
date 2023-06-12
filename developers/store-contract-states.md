@@ -15,7 +15,7 @@ The local cache is stored in the worker’s memory. As its name, it should only 
 The cache can be easily accessed in [Pink extension](build-on-phat-contract/use-pink-extension.md). You can read and write cache in query handlers, but reading cache in transaction handlers is forbidden: the result of cache reading is nondeterministic.
 
 ```rust
-use pink::chain_extension::pink_extension_insusttance as ext;
+use pink::chain_extension::pink_extension_instance as ext;
 
 #[ink(message)]
 pub fn test(&self) {
