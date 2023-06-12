@@ -14,8 +14,8 @@ The local cache is stored in the worker’s memory. As its name, it should only 
 
 The cache can be easily accessed in [Pink extension](build-on-phat-contract/use-pink-extension.md). You can read and write cache in query handlers, but reading cache in transaction handlers is forbidden: the result of cache reading is nondeterministic.
 
-```
-use pink::chain_extension::pink_extension_instance as ext;
+```rust
+use pink::chain_extension::pink_extension_insusttance as ext;
 
 #[ink(message)]
 pub fn test(&self) {
@@ -30,7 +30,7 @@ pub fn test(&self) {
 
 Here is how you store simple values as your contract state:
 
-```
+```rust
 #[ink(storage)]
 pub struct MyContract {
     // Store a bool
@@ -50,7 +50,7 @@ With its HTTP support, you can connect to any storage services you like in your 
 
 For simple key-value storage, [pink-s3](https://crates.io/crates/pink-s3) enables you to store data in any storage service with S3-API support.
 
-```
+```rust
 fn s3_example() {
 
     use pink_s3 as s3;
