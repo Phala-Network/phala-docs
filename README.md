@@ -39,3 +39,5 @@ You can read more about Phat Contract use-cases here.
 ## Join the People’s Network and Earn Rewards
 
 If you want to help power the decentralized internet, you can become a compute providing Worker for Phala network and earn rewards allowing Web3 applications to run on your hardware. To view hardware requirements and our Worker onboarding guide, click here.
+
+TEST
