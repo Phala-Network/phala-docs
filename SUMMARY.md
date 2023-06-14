@@ -79,6 +79,7 @@
     * [Update your Worker's Node](compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node.md)
   * [PRBv3 Deployment Guide](compute-providers/run-workers-on-khala/prbv3-deployment.md)
   * [Using PRBv3 UI](compute-providers/run-workers-on-khala/using-prbv3-ui.md)
+  * [Migration from PRBv2 to v3](compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3.md)
   * [PRBv2 Deployment Guide](compute-providers/run-workers-on-khala/deployment-guide-for-prbv2.md)
   * [PRB Worker Deployment](compute-providers/run-workers-on-khala/prb-worker-deployment.md)
   * [How to switch from Solo scripts to PRB worker](compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining.md)
