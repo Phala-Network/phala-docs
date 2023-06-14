@@ -16,43 +16,31 @@ The PRB management server needs to run 2 main components, Node and PRB. The requ
 | ----------- | --------- | -------------- | -------------------------------------------------------------- |
 | Node        | 4GB+      | 900GB+ NVME    | harddisk requirement increasing, 2TB will be best              |
 | PRB         | 4GB+      | 0              | RAM requirement depends on worker number, 16GB+ will be better |
-| **Totally** | 32GB+     | 2TB            | -                                                              |
+| **Total** | 32GB+     | 2TB            | -                                                              |
 
-> You also need to ensure good network connectivity between the management server and PRB workers, and the network of the PRB management server needs to have more than 10TB of traffic space per month.
-
-### PRB Worker requirements
-
-PRB’s worker only needs to run a pRuntime, so the requirements for running a PRB worker are:
-
-* Support for SGX features
-* Ubuntu 22.04.2 LTS operating system and a system kernel of 5.13 or higher
-* At least 4 CPU cores
-* 8GB of memory
-* 128GB NVME
+{% hint style="info" %}
+You will also need to ensure you maintain a stable network connectivity between the management server and PRB workers, as the network of the PRB management server needs to have more than 10TB of traffic space per month.
+{% endhint %}
 
 ## PRB Components Deployment
 
-### Preparations
+### Preparing the Environment
 
 After installing the Ubuntu OS, first install the necessary Docker program.
 
-```undefined
-sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
-sudo apt install docker-compose
+{% code title="" overflow="wrap" lineNumbers="false" %}
+```bash
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y && sudo apt install docker-compose
 ```
+{% endcode %}
 
 Then create a folder locally, and create a docker-compose document and other necessary documents within it.
 
+{% code title="" overflow="wrap" lineNumbers="false" %}
 ```bash
-mkdir prb-deployment
-cd ./prb-deployment
-touch docker-compose.yml
-touch wm.yml
-mkdir prb-wm-data
-cd ./prb-wm-data
-touch ds.yml
-cd ..
+cd /root && mkdir prb-deployment && cd ./prb-deployment && touch docker-compose.yml && touch wm.yml && mkdir prb-wm-data && cd ./prb-wm-data && touch ds.yml && cd ..
 ```
+{% endcode %}
 
 The relationship of the file path is like：
 
@@ -199,4 +187,4 @@ Inside the newly created folder `prb-deployment`, run the docker-compose, and th
 sudo docker-compose up -d
 ```
 
-\
+
