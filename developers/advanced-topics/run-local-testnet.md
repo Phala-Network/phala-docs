@@ -53,7 +53,7 @@ It takes approximately 20 minutes to complete the building process on a laptop e
 
 ### Start the local testnet <a href="#start-the-local-testnet" id="start-the-local-testnet"></a>
 
-We have a dedicate set of scripts to get the blockchain to run, checkout out [this page](https://github.com/Phala-Network/phala-blockchain/tree/master/scripts/run) for full details. For simplicity we can start as simple as follows:
+We have a dedicated set of scripts to get the blockchain to run, checkout out [this page](https://github.com/Phala-Network/phala-blockchain/tree/master/scripts/run) for full details. For simplicity we can start as simple as follows:
 
 We might want to clean up runtime data to have to clean starting environment, from the root of the `phala-blockchain` project, run this to clean things up:
 
