@@ -84,8 +84,8 @@ services:
      - NODE_ROLE=MINER
      - RELAYCHAIN_DB=rocksdb
      - PARACHAIN_DB=rocksdb
-     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8
-     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8
+     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
+     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
     volumes:
      - /var/phala/node-data:/root/data
 
@@ -105,6 +105,7 @@ services:
         "--pruntime-endpoint=http://{pruntime ip}:8000",
         "--operator={owner address}",
         "--fetch-blocks=512",
+        "--fast-sync",
         "--auto-restart"
       ]
 
