@@ -8,7 +8,7 @@ Now that you have created and compiled your `phat_hello` contract, let's deploy 
 {% tab title="Swanky Phala" %}
 > If you have not installed `swanky phala` CLI tool, follow these [steps](../swanky-phala-cli-tool.md) to get started.
 
-Go to your development workspace and ensure that you have updated your `devphase.config.json` file to include the PoC5 Testnet info. Within`networks` , add the following:
+Go to your development workspace and ensure that you have updated your `devphase.config.json` file to include the PoC5 Testnet info. Within `networks`, add the following:
 
 ```bash
 "networks": {
