@@ -35,7 +35,7 @@ Building with `oclif` allows for the `swanky-cli` to be extended through the [pl
 
 ### Installation
 
-> _Currently `swanky phala` will only support Ubuntu Linux. Other Linux operating systems are support, but this requires downloading and compiling `phala-node`, `pherry` and `pruntime` binaries locally. Then copy the binaries to the `stacks/` folder._
+> _Currently `swanky phala` will only support Ubuntu Linux. Other Linux operating systems are supported, but this requires downloading and compiling `phala-node`, `pherry` and `pruntime` binaries locally. Then copy the binaries to the `stacks/` folder._
 
 #### Install Swanky CLI
 
@@ -132,7 +132,7 @@ This will initiate a round of questions to get your Phat Contract template confi
 
 At this moment, `pink` is the only contract language option at this time. `pink` is the Phala `ink` library to support rust-based [ink! language](https://paritytech.github.io/ink/) in Phala’s `pRuntime` workers.
 
-Next you’ll be asked the what contract template to use (`blank`, `http_client`, or `phat_hello` more to come!).
+Next you’ll be asked what contract template to use (`blank`, `http_client`, or `phat_hello` more to come!).
 
 ```bash
 ? Which contract template should we use? (Use arrow keys)
@@ -248,7 +248,7 @@ drwxr-xr-x. 1 hashwarlock hashwarlock       36 Apr  4 16:27 ..
   * `pruntime`
   * `pherry`
 
-Once verified file are downloaded and there is not an instance running currently, the local testnet will start.
+Once verified files are downloaded and there is not an instance running currently, the local testnet will start.
 
 ```bash
 swanky phala node start
@@ -344,7 +344,7 @@ Create type bindings for contracts
 
 #### Validate Your Compiled WASM Contract
 
-Sometimes there are difficult to find errors that lie within a succesfully compiled wasm blob. The command `swanky phala contract validate -c [CONTRACT_NAME]` will do a preliminary check to verify if the compiled contract is valid for deployment.
+Sometimes there are difficult to find errors that lie within a successfully compiled wasm blob. The command `swanky phala contract validate -c [CONTRACT_NAME]` will do a preliminary check to verify if the compiled contract is valid for deployment.
 
 ```
 └─[$]> swanky phala contract validate -c phat_hello
