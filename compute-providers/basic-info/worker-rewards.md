@@ -125,7 +125,7 @@ Each individual’s $$V$$ is updated at every block:
 
 When a worker gets a payout $$w(V_t)$$, they will receive the amount immediately in their Phala wallet. The payout follows _**Payout Schedule**_ and cannot exceed the _**Subsidy Budget**_.
 
-Finally, once the worker decides to stop mining, they will wait for a Cooling Down period $\delta$. They will receive an one-time final payout after the cooldown.
+Finally, once the worker decides to stop mining, they will wait for a Cooling Down period $\delta$. They will receive a one-time final payout after the cooldown.
 
 | Block number  | $t$          | $t+1$         | $\dots$ | $T$          | $\dots$                         | $T+\delta$               |
 | ------------- | ------------ | ------------- | ------- | ------------ | ------------------------------- | ------------------------ |
