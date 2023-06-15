@@ -80,7 +80,7 @@ Your confidence level, referred to as the “Tier” in the table below, will ap
 
 The confidence level measures how secure the SGX Enclave execution environment is. It’s determined by the Remote Attestation report from Intel. Among them, `isvEnclaveQuoteStatus` indicates if the platform is vulnerable to some known problems, and `advisoryIDs` indicates the actual affected problems.
 
-Not all the `advisoryIDs` are problematic. Some advisories doesn’t affect Phala’s security assumption, and therefore are whitelisted:
+Not all the `advisoryIDs` are problematic. Some advisories don’t affect Phala’s security assumption, and therefore are whitelisted:
 
 * INTEL-SA-00219
 * INTEL-SA-00334
@@ -93,7 +93,7 @@ Tier 1, 2, 3 are considered with the best security level because they are either
 * Secret key management: wallet, node KMS, password manager
 * Phala Gatekeeper
 
-Tier 4, 5 are considered with reduced security, because these machines requires some configuration fix in the BIOS or BIOS firmware (CONFIGURATION\_NEEDED, CONFIGURATION\_AND\_SW\_HARDENING\_NEEDED), or their microcode or the corresponding BIOS firmware are out-of-date (GROUP\_OUT\_OF\_DATE). Therefore we cannot assume the platform is suitable for highest security scenarios. However it’s still good to run batch processing jobs, apps dealing with ephemeral privacy data, and traditional blockchain apps:
+Tier 4, 5 are considered with reduced security, because these machines require some configuration fix in the BIOS or BIOS firmware (CONFIGURATION\_NEEDED, CONFIGURATION\_AND\_SW\_HARDENING\_NEEDED), or their microcode or the corresponding BIOS firmware are out-of-date (GROUP\_OUT\_OF\_DATE). Therefore we cannot assume the platform is suitable for highest security scenarios. However it’s still good to run batch processing jobs, apps dealing with ephemeral privacy data, and traditional blockchain apps:
 
 * Data analysis jobs (e.g. Web3 Analytics)
 * On-chain PvP games
