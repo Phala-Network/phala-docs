@@ -18,7 +18,7 @@ And SubBridge can simplify both steps for you:
 
 SubBridge supports both parachain assets and EVM assets, making it possible to transfer them between parachains and EVM chains. All supported assets are whitelisted, which means it would be failed if you transfer assets through SubBridge without registration. Refer to Supported Assets to check the asset list we have integrated.
 
-* A parachain asset means the asset is reserved on a parachain. For example, both KAR and aUSD are reserved on Karura.
+* A parachain asset means the asset is reserved on a parachain. For example, GLMR is reserved on Moonbeam.
 * An EVM asset means the asset is reserved on an EVM chain, in general, it’s an ERC-20 smart contract deployed on EVM. **Note we currently only support assets deployed on Ethereum and Moonriver EVM.**
 
 You need to do the following steps to finish integration with SubBridge:
@@ -140,6 +140,12 @@ Since the HRMP channel already opened between our two parachains, the last thing
 
 If the smart contract of your asset is ERC20 compatible, we can easily integrate it into SubBridge. Currently, we have integrated [ChainBridge](https://chainbridge.chainsafe.io/) as our EVM bridge. It already deployed on both Ethereum mainnet and Moonriver EVM, here is the deployed ChainBridge contracts information:
 
+- SygmaBridge smart contract info
+
+Head to [Sygma shared repo](https://github.com/sygmaprotocol/sygma-shared-configuration/blob/main/mainnet/shared-config-mainnet.json) for the contract deployment information and more.
+
+- ChainBridge smart contract info
+
 **Ethereum mainnet:**
 
 | Contract      | Address                                    |
@@ -175,60 +181,44 @@ It’s better to integrate SubBridge into your App if you’d like to let your u
 
 For example, when issuing a crosschain transfer to the Khala network or EVM chains from Karura, you should use the [xtoken»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkarura.polkawallet.io#/extrinsics), while issuing a crosschain transfer to other parachains or EVM chains from Khala, you should use the [xtransfer»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/extrinsics). So interfaces may be different between different parachains depends on its implementation.
 
-* Issuing crosschain transfer on EVM chains with ChainBridge
+* Issuing crosschain transfer on EVM chains with SygmaBridge
 
-So far we only support ChainBridge as an EVM bridge(will integrate more EVM bridges in the future), so the following is based on interaction with our ChainBridge contract. According to the mechanism of the ERC20 protocol, before calling `Bridge.deposit` which is the interface to issue crosschain transfer we need to call [ERC20 approve](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) method to let user approve the specific amount of assets to our `ERC20Handler` contract. This operation will allow `ERC20Handler` to spend up to the specific number of assets from the user account. According to the `deposit` method defined in our [bridge contract](https://github.com/Phala-Network/chainbridge-solidity/blob/5eef3073ccc75b48e06ce44eee522c2023da974e/contracts/Bridge.sol#L312), there are three parameters you need to provide:
+So far we have already supported SygmaBridge and ChainBridge as EVM bridge, and we will integrate more EVM bridges in the future. The following is based on interaction with SygmaBridge, with less fee being paied compared with ChainBridge. According to the mechanism of the ERC20 protocol, before calling `Bridge.deposit` which is the interface to issue crosschain transfer we need to call [ERC20 approve](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) method to let user approve the specific amount of assets to `ERC20Handler` contract of SygmaBridge. This operation will allow `ERC20Handler` to spend up to the specific number of assets from the user account. After approval done, we can deposit asset through SygmaBridge contract. Luckily, Sygma has provided SDK to handle all of these stuffs, head to their [SDK repo](https://github.com/sygmaprotocol/sygma-sdk) for more details.
 
-> The first one is `destinationChainID`, so far you can only transfer to the Khala network from EVM, the value would always be `1`.
+We prepared the following 5 examples that almost covered all of the scenarios. If the transaction is issued on parachain, we have provided an encoded call you can decode on https://polkadot.js.app, and if the transaction is issued on EVM chains, we have provided a code snippet.
 
-> The second one is `resourceID`, this is a 32 bytes indentation representing the EVM asset on a specific chain, which means the same asset with a different chain will have a different `resourceId`. The way we generate the `resourceId` can be found at [here](https://github.com/Phala-Network/khala-parachain/blob/5ab4f77163c811fb4a02d337791ce669b41481ad/pallets/assets-registry/src/lib.rs#L141).
+**Example1: transfer an asset from Phala network to other parachain**
 
-> The third one is `data`, it is a combination of 32 bytes transfer `amount` and dynamic recipient bytes. The recipient should be an encoded `MultiLocation`.
-
-We prepared the following 6 examples that almost covered all of the scenarios. If the transaction is issued on parachain, we have provided an encoded call you can decode on https://polkadot.js.app, and if the transaction is issued on EVM chains, we have provided a code snippet.
-
-**Example1: transfer an asset from Khala network to other parachain**
-
-An example of transferring 100 PHA from the Khala network to Karura, the recipient is `Alice`:
+An example of transferring 100 PHA from the Phala network to Moonbeam, the recipient address is `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20`:
 
 ```
-0x5200000000000b00407a10f35a010200411f0100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0100bca06501000000
+0x5200000000000b00407a10f35a010200511f0300a29d4e0f035cb50c0d78c8cebb56ca292616ab20010700f2052a0102127a00
 ```
 
-**Example2: transfer an asset from Khala network to another EVM chain**
+**Example2: transfer an asset from Phala network to another EVM chain**
 
-An example of transferring 400 PHA from Khala network to Ethereum, recipient is `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20`. Note 300 PHA will be deducted as the fee of ChainBridge:
+An example of transferring 100 PHA from Khala network to Ethereum with Sygma bridge, recipient is `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20`. Note small amount of PHA will be deducted as the fee of SygmaBridge:
 
 ```
-0x5200000000000b00407a10f35a00030608636205000650a29d4e0f035cb50c0d78c8cebb56ca292616ab2000
+0x5200000000000b00407a10f35a000306057379676d6100000000000000000000000000000000000000000000000000000005000614a29d4e0f035cb50c0d78c8cebb56ca292616ab2000000000000000000000000000
 ```
 
-**Example3: transfer an asset from parachain to Khala network**
+**Example3: transfer an asset from Moonbeam to Phala network**
 
 An example of transferring 100 PHA from Karura to Khala network, the recipient is `Alice`. Karura XCM transfer based on the implementation of \[xtoken pallet]https://github.com/open-web3-stack/open-runtime-module-library/tree/master/xtokens):
 
 ```
-0x360000aa00407a10f35a0000000000000000000001010200511f0100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d00bca06501000000
+0x6a010300010100cd1f000b00407a10f35a03010200511f01007804e66ec9eea3d8daf6273ffbe0a8af25a8879cf43f14d0ebbb30941f578242010700f2052a0102127a00
 ```
 
-**Example4: transfer an asset from parachain to EVM chain**
+**Example4: transfer an asset from any parachain to EVM chain**
 
-An example of transferring 400 PHA from Karura to Ethereum, recipient is `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20`. Note 300 PHA will be deducted as the fee of ChainBridge:
-
-[View snippet code](https://gist.github.com/tolak/20d71a78ae650cb9f54dc7d4eaaab11f)
-
-**Example5: transfer an asset from EVM to Khala network**
-
-An example of transferring 100 PHA from Ethereum to the Khala network, the recipient is Alice. Note example code is interact with Bridge contract deployed on Kovan test net. Check the \[ChainBridge deployment] for more information.
+An example of transferring 100 PHA from Moonbeam to Ethereum with SygmaBridge, recipient is `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20`. Note small amount of PHA will be deducted as the fee of SygmaBridge:
 
 ```
-0x360000aa00407a10f35a0000000000000000000001010400511f0608636205000650a29d4e0f035cb50c0d78c8cebb56ca292616ab2000bca06501000000
+0x6a010300010100cd1f000b00407a10f35a03010400cd1f06057379676d6100000000000000000000000000000000000000000000000000000005000614a29d4e0f035cb50c0d78c8cebb56ca292616ab20000000000000000000000000010700f2052a0102127a00
 ```
 
-**Example6: transfer an asset from EVM chain to parachain**
+**Example5: transfer an asset from EVM to substrate parachain**
 
-An example of transferring 100 PHA from Ethereum to Karura, the recipient is `Alice`.
-
-[View snippet code](https://gist.github.com/tolak/ce6b12af0a22b994ed65b533edf4a4ce)
-
-> 💡 🥳Cheer! After all of these steps, your asset is ready to be transferred between parachains and EVM chains.
+Sygma SDK provided us example code of transfer fungible token from Goerli testnet to Substrate chain, head to [here](https://github.com/sygmaprotocol/sygma-sdk/tree/main/examples/evm-to-substrate-fungible-transfer) for the details.
