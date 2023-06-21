@@ -18,6 +18,22 @@ In August 2021, Phala launched the first parachain-Ethereum smart contract bridg
 
 SygmaBridge is the updated version of ChainBridge, which use an MPC-based relayer forward messages between chains, while ChainBridge is based on multiple voters confirming crosschain transaction on destchain. Compared with ChainBridge, SygmaBridge distinctly decreased the fee cost, because now we only need to send one transaction to destchain to complete the whole operation.
 
+**Destination of using SygmaBridge**
+
+Since currently both SygmaBridge and ChainBridge exist, users can choose which bridge to use, even SubBridge UI always uses SygmaBridge for PHA transfer. The difference between using ChainBridge and SygmaBridge only detdetermd by the way we construct the `MultiLocation` of the destination.
+
+- For using SygmaBridge
+
+```rust
+MultiLocation::new(1, X4(Parachain(2035), GeneralKey('sygma'), GeneralIndex(ethereumChainId), GeneralKey(recipientAddress))
+```
+
+- For using ChainBridge
+
+```rust
+MultiLocation::new(1, X4(Parachain(2035), GeneralKey('cb'), GeneralIndex(ethereumChainId), GeneralKey(recipientAddress))
+```
+
 ## Security Concern <a href="#security-concern" id="security-concern"></a>
 
 The security of the SubBridge is of prior concern. In terms of EVM compatibility, SubBridge has its own solution with the following security advantages:
