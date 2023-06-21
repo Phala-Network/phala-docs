@@ -57,7 +57,7 @@ The second part is to enable the corresponding EVM bridge. This part is only for
 
 The steps to do the registration stuff are as follow:
 
-*   Step1, we schedule a call of `pallet-registry::forceRegisterAsset` with given registration informations. When the technical committee enacted the call, an asset instance will be created by `pallet-assets`, and some extra registration information will be saved in `pallet-registry`.
+*   Step1, we schedule a call of `pallet-registry::forceRegisterAsset` with given registration informations. When the council enacted the call, an asset instance will be created by `pallet-assets`, and some extra registration information will be saved in `pallet-registry`.
 
     There are several things we need to pay attention to. The first one is that each asset has a bunch of metadata defined in `pallet-assets`, like `name`, `symbol`, etc. We have provided an extrinsic called `forceSetMetadata` in `pallet-registry` which can be used to update the metadata of an asset. Another one is that each asset has some privileged accounts used to manage the asset, like `Issuer`, `Admin`, etc. Different account has different permission. In `asset-registry`, we set all the privileged accounts of each asset to an account derived by `PalletId(b"phala/ar")`. This means no external account has permission to do things beyond authority.
 
@@ -68,7 +68,7 @@ The steps to do the registration stuff are as follow:
 
 > Note: For assets on Phala, also can be found on `Assets` tab in polkadot.js app
 
-*   Step2\[optional], after the asset was registered, by default all assets will enable XCM crosschain transfer. If the asset is going to enable SygmaBridge or ChainBridge, another call named `assetRegistry::forceEnabledSygmaBridge` or `assetRegistry::forceEnabledChainbridge` should be enacted by the technical committee. This will enable the crosschain transfer to a specific EVM chain. And `assetRegistry::forceDisableSygmaBridge` or `assetRegistry::forceDisableChainBridge` is used to disable it. When SygmaBridge or ChainBridge was enabled for the asset, you will see we have new data being added to the returned registration information. For example, the enabled-bridges information of ZLK is shown below:
+*   Step2\[optional], after the asset was registered, by default all assets will enable XCM crosschain transfer. If the asset is going to enable SygmaBridge or ChainBridge, another call named `assetRegistry::forceEnabledSygmaBridge` or `assetRegistry::forceEnabledChainbridge` should be enacted by the council. This will enable the crosschain transfer to a specific EVM chain. And `assetRegistry::forceDisableSygmaBridge` or `assetRegistry::forceDisableChainBridge` is used to disable it. When SygmaBridge or ChainBridge was enabled for the asset, you will see we have new data being added to the returned registration information. For example, the enabled-bridges information of ZLK is shown below:
 
     ```
     enabledBridges: [
