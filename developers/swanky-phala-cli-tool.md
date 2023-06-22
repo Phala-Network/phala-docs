@@ -2,6 +2,17 @@
 
 > **Note:** Feedback and contributions are welcome. Please add issues for any features or bugs found. Join our [discord](https://discord.gg/phala) and jump in our `#dev` channel to speak with our devs.
 
+## Contract Build Requirements
+
+Ensure your rust toolchain requirements are installed correctly to ensure your contracts can be built correctly.
+
+| Rust Toolchain | Requirement                                 |
+| -------------- | ------------------------------------------- |
+| cargo          | <= `cargo 1.69.0 (6e9a83356 2023-04-12)`    |
+| cargo-contract | <= `3.0.1-unknown-x86_64-unknown-linux-gnu` |
+| target         | `wasm32-unknown-unknown`                    |
+| component      | `rust-src`                                  |
+
 ## Swanky Suite
 
 [Swanky Suite](https://docs.astar.network/docs/wasm/sc-dev/swanky/) aims to be an "all-in-one" tool for Wasm smart contract developers. It is modeled on existing tools like `cargo contract CLI` and `polkadot.js`. The `swanky-cli` tool is built with the `oclif` (Open CLI Framework [repo](https://oclif.io/docs/introduction)).

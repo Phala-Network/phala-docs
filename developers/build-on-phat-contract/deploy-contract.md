@@ -12,20 +12,20 @@ Go to your development workspace and ensure that you have updated your `devphase
 
 ```bash
 "networks": {
-    "phatUi": {
+    "poc5": {
       "nodeUrl": "wss://poc5.phala.network/ws",
       "workerUrl": "https://poc5.phala.network/tee-api-1"
     }
   },
 ```
 
-`phatUi` will be the `-n` flag value in the `swanky phala contract deploy` command.&#x20;
+`poc5` will be the `-n` flag value in the `swanky phala contract deploy` command.&#x20;
 
 Next, you will execute the following command to deploy your `phat_hello` compiled contract.
 
 {% code overflow="wrap" %}
 ```bash
-swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n phatUi -o new
+swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc5 -o new
 ```
 {% endcode %}
 
@@ -58,7 +58,7 @@ EXAMPLES
 Here is an expected output after executing the `swanky phala contract deploy` command.
 
 ```bash
-➜  Norwhich git:(master) swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n phatUi -o new
+➜  Norwhich git:(master) swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc5 -o new
 Deploy contract
 Validating compiled WASM of phat_hello contract...
 phat_hello.wasm validated successfully!
@@ -101,7 +101,7 @@ To call the `phat_hello` contract we will need the following:
 
 * `-i` Contract Id: `0xac22b0163a70f1213d58b3891f20c5b493ca7a7802e2b0ee204a7c4994a4bb27`
 * `-l` Cluster Id: `0x0000000000000000000000000000000000000000000000000000000000000001`
-* `-n` Network: `phatUi`
+* `-n` Network: `poc5`
 * `-m` Method Name (Camel Case): `getEthBalance`
 * `-p` Method Argument Parameters: `0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634`
   * Note that this is the value of `stringToHex(0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464)`
@@ -109,7 +109,7 @@ To call the `phat_hello` contract we will need the following:
 Now that we can compose a `swanky phala contract call` command, this would be an expected output:
 
 ```bash
-➜  phala-wiki-next git:(master) ✗ swanky phala contract call -c phat_hello -i 0xac22b0163a70f1213d58b3891f20c5b493ca7a7802e2b0ee204a7c4994a4bb27 -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n phatUi -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
+➜  phala-wiki-next git:(master) ✗ swanky phala contract call -c phat_hello -i 0xac22b0163a70f1213d58b3891f20c5b493ca7a7802e2b0ee204a7c4994a4bb27 -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc5 -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
 Executing call to Phat Contract
 Call result:
 {
