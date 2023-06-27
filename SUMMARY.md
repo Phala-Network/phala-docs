@@ -46,6 +46,8 @@
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
   * [Common Issues](developers/support/faq.md)
+* [Featured Blueprints](developers/featured-blueprints/README.md)
+  * [LensAPI Oracle](developers/featured-blueprints/lensapi-oracle.md)
 
 ## Compute Providers
 
