@@ -46,7 +46,13 @@ Finally, the LensAPI Oracle Phat Contract operates on a stake-to-compute model, 
 
 ### Step 3: Connect Oracle to Your Smart Contract
 
-Connecting your smart contracts on Polygon to the Oracle you just deployed can be done in a few lines of code. Below is a code snippet demonstrating how to request and receive data from the LensAPI Oracle in Solidity, and you can find the full sample [here](https://github.com/Phala-Network/phat-bricks/blob/master/evm/contracts/TestLensOracle.sol):
+Connecting your smart contracts on Polygon to the Oracle you just deployed can be done in a few lines of code.
+
+The identity of Oracle is shown in the Project Details page as the `Oracle Endpoint` field.
+
+<figure><img src="../../.gitbook/assets/bricks-oracle-endpoint.png" alt=""></figure>
+
+Below is a code snippet demonstrating how to request and receive data from the LensAPI Oracle in Solidity, and you can find the full sample [here](https://github.com/Phala-Network/phat-bricks/blob/master/evm/contracts/TestLensOracle.sol):
 
 ```solidity
     function request(string calldata profileId) public {
@@ -75,7 +81,13 @@ Connecting your smart contracts on Polygon to the Oracle you just deployed can b
 
 ### Step 4: Connect Smart Contract to Oracle
 
-Once your consumer contract is deployed, don't forget to turn back to the Oracle project detail page, and configure your Polygon consumer contract address to authorize the access.
+A deployed Oracle is meant to serve one smart contract client at a time. You can configure the client contract address in the Project Details page.
+
+<figure><img src="../../.gitbook/assets/bricks-config-client.png" alt=""></figure>
+
+This address can be updated any time.
+
+> The Oracle will respond to all unanswered requests sent by the smart contract, this may cause unexpected gas fee cost.
 
 ### Links
 
