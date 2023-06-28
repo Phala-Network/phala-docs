@@ -2,9 +2,9 @@
 
 ### Introduction
 
-The Lens Protocol is a modular web3 social graph on Polygon that allows creators to own their community links and user-generated content while maintaining immutability. This protocol enables users to own and migrate their data across platforms, freeing them from being locked to a specific network.
+The Lens Protocol is a Web3 social graph on the Polygon blockchain. It is designed to empower creators to own the links between themselves and their community, forming a fully composable, user-owned social graph. The protocol is built from the ground up with modularity in mind, allowing new features and fixes to be added while ensuring immutable user-owned content and social relationships.
 
-With the rise of SocialFi, there is an increasing need for web3 oracles that can read data from APIs. The LensAPI Oracle, powered by the Phala Network, is a solution designed to meet this demand. It provides developers with a programmable web3 oracle that can deploy custom, no-code oracles in just five minutes.
+With the rise of SocialFi, there is an increasing need for web3 oracles that can bring data of all types on-chain via APIs. Phala Network's LensAPI Oracle is a solution designed to meet this demand, providing developers with a programmable oracle template that can deploy custom, no-code oracles in minutes.
 
 ### Prerequisites
 
@@ -15,7 +15,9 @@ Before you begin, make sure you have the following:
 
 ### Step 1: Define your oracle
 
-The LensAPI Oracle allows your smart contract to query a Lens profile stats data with the profile id. To begin with, navigate to the [LensAPI Oracle deployment page](https://bricks.phala.network/blueprint/lens-oracle/deployment) on the Phat Bricks App. Define the stats field you want to request from the Lens API. The supported data fields are:
+The LensAPI Oracle allows your smart contract to query Lens user and post stats using profile IDs. To begin, navigate to the [LensAPI Oracle deployment page](https://bricks.phala.network/blueprint/lens-oracle/deployment) on the Phat Bricks App.&#x20;
+
+Define the fields you want to request from the Lens API. The supported data fields are:
 
 * User Stats API
   * Total followers
@@ -27,21 +29,21 @@ The LensAPI Oracle allows your smart contract to query a Lens profile stats data
   * Total publications
   * Total collects
 
-You can also add custom Javascript expressions if necessary.
+You can also add custom Javascript expressions to enhance your query if necessary. &#x20;
 
 <figure><img src="../../.gitbook/assets/1_DLLIeuw8zXGV3I7pUtRL-g.gif" alt=""><figcaption><p>Configure the oracle</p></figcaption></figure>
 
 ### Step 2: Deploy the Oracle
 
-Next, follow the instruction to deploy the LensAPI Oracle. If it's your first time to use Phat Bricks, you will need to create a Bricks user profile to manage your deployed projects. You will need some $PHA token to pay the gas fee on the Phala Blockchain. This step will be skipped if you already have a user profile.
+If it's your first time using Phat Bricks, you will need to create a Bricks user profile to manage your deployed projects. You will also need some $PHA token to pay the gas fee on the Phala Blockchain.&#x20;
 
-The oracle sends data back to Polygon. So if you haven't done before, the UI ask you to charge a pre-generated Polygon gas fee account with some MATIC to pay the gas fee for your oracle.
+The oracle sends data to Polygon via on-chain transactions so the UI will ask you to fund a pre-generated Polygon gas fee account with some MATIC to pay the gas fees for your oracle.
 
-Finally, the LensAPI Oracle Phat Contract operates on a stake-to-compute model, where a minimum amount of 10 $PHA tokens are required for staking to deploy the oracle on the Phala Network.
+Finally, the LensAPI Oracle Phat Contract operates on a stake-to-compute model, where a minimum amount of 10 $PHA tokens are required for staking to deploy the oracle on Phala Network.
 
 ### Step 3: Connect Your Smart Contract
 
-Connect your smart contracts on Polygon to request the oracle you just deployed. This can be done in a few lines of code. Below is a code snippet demonstrating how to request and receive data from the LensAPI Oracle in Solidity, and you can find the full sample [here](https://github.com/Phala-Network/phat-bricks/blob/master/evm/contracts/TestLensOracle.sol):
+Connecting your smart contracts on Polygon to the oracle you just deployed can be done in a few lines of code. Below is a code snippet demonstrating how to request and receive data from the LensAPI Oracle in Solidity, and you can find the full sample [here](https://github.com/Phala-Network/phat-bricks/blob/master/evm/contracts/TestLensOracle.sol):
 
 ```solidity
     function request(string calldata profileId) public {
