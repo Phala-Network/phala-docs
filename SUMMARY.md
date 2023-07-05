@@ -9,13 +9,15 @@
 
 ## Developers
 
-* [Phat Contract](developers/phat-contract/README.md)
-  * [Bricks and Blueprints](developers/phat-contract/bricks-and-blueprints.md)
+* [Phat Contract Introduction](developers/phat-contract/README.md)
   * [Features](developers/phat-contract/features.md)
   * [Supported Chains](developers/phat-contract/supported-chains.md)
   * [Use Cases](developers/phat-contract/use-cases.md)
   * [Stake to Compute](developers/phat-contract/pay-for-cloud-service.md)
   * [Builders Program](developers/phat-contract/builders-program.md)
+* [Phat Bricks](developers/bricks-and-blueprints/README.md)
+  * [Featured Blueprints](developers/bricks-and-blueprints/featured-blueprints/README.md)
+    * [LensAPI Oracle](developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle.md)
 * [Getting Started with Native Phat Contract](developers/getting-started/README.md)
   * [Generate Test Account](developers/getting-started/generate-test-account.md)
   * [Phat Contract Console](developers/getting-started/phat-contract-console.md)
@@ -46,8 +48,6 @@
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
   * [Common Issues](developers/support/faq.md)
-* [Featured Blueprints](developers/featured-blueprints/README.md)
-  * [LensAPI Oracle](developers/featured-blueprints/lensapi-oracle.md)
 
 ## Compute Providers
 

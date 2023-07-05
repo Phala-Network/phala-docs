@@ -90,7 +90,7 @@ The Phala Builders Program is a unique opportunity to receive funding and suppor
 
 If you have questions about the Phala Builders Program or application process, please reach out to us at \[email protected] or in our [Discord](https://discord.gg/phala).
 
-***
+
 
 If you’d like to learn more about Phat Contract and our developer tooling, please explore our developer library below:
 

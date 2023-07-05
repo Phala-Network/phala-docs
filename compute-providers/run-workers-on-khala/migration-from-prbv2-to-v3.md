@@ -41,7 +41,7 @@ To stop the PRBv2 and to run the migration script.
 
 Now the migration is done, click `Restart All`  button on the Worker Status page of the monitor, then wait for 15 seconds for the worker's beginning to start.
 
-<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Limitations of Migration
 

@@ -2,7 +2,7 @@
 
 <figure><img src="../../.gitbook/assets/phat-contract-features.png" alt=""><figcaption></figcaption></figure>
 
-By combining on-chain verification with off-chain capabilities, Phat Contracts brings a plethora of features to decentralized applications.
+By combining on-chain verification with off-chain capabilities, Phat Contracts bring a plethora of features to decentralized applications.
 
 1. **Connect your smart contract anywhere**
    * Universal compatibility across EVM and Substrate Blockchains means you can easily connect Phat Contracts to any blockchain without the need for a bridge, expanding your Smart Contract’s capabilities.

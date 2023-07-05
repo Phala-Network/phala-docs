@@ -1,12 +1,12 @@
 ---
 description: >-
-  Phat Contract is the program running off-chain on Phala Network that
+  Phat Contracts are the programs running off-chain on Phala Network that
   developers can use to implement a broad range of features for their dApps.
 cover: ../../.gitbook/assets/phat-contract-banner.png
 coverY: 0
 ---
 
-# Phat Contract
+# Phat Contract Introduction
 
 ## Why bring computation Off-Chain?
 
@@ -24,7 +24,7 @@ Phat Contracts are not meant to replace Smart Contracts, instead, they are the m
 
 Users can build and deploy Phat Contract in a few different ways.
 
-* [**Phat Bricks**](bricks-and-blueprints.md)
+* [**Phat Bricks**](../bricks-and-blueprints/)
   * Our no-code experience for Phat Contract, developers can choose from a library of pre-fabricated solutions to deploy and integrate with their dApp in minutes.
 * [**Native Phat Contact**](../build-on-phat-contract/)
   * For developers with a background in Rust, ink!, typescript, or Javascript looking for a more customizable developer experience, Native Phat Contract is the tool for you.
