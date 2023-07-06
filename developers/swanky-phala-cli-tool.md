@@ -15,7 +15,7 @@ Ensure your rust toolchain requirements are installed correctly to ensure your c
 
 ## Swanky Suite
 
-[Swanky Suite](https://docs.astar.network/docs/wasm/sc-dev/swanky/) aims to be an "all-in-one" tool for Wasm smart contract developers. It is modeled on existing tools like `cargo contract CLI` and `polkadot.js`. The `swanky-cli` tool is built with the `oclif` (Open CLI Framework [repo](https://oclif.io/docs/introduction)).
+[Swanky Suite](https://docs.astar.network/docs/build/wasm/swanky-suite/) aims to be an "all-in-one" tool for Wasm smart contract developers. It is modeled on existing tools like `cargo contract CLI` and `polkadot.js`. The `swanky-cli` tool is built with the `oclif` (Open CLI Framework [repo](https://oclif.io/docs/introduction)).
 
 Building with `oclif` allows for the `swanky-cli` to be extended through the [plugin-plugin](https://github.com/oclif/plugin-plugins) feature. Now the `swanky-phala-plugin` plugin can be added to the `swanky-cli` (note: must install `swanky-cli`first) with the command `swanky plugins:link [PATH_TO_REPO]`. Specific installation instructions and examples will be displayed later, so do not worry about getting this set up now.
 
@@ -50,7 +50,7 @@ Building with `oclif` allows for the `swanky-cli` to be extended through the [pl
 
 #### Install Swanky CLI
 
-Follow the instructions from Astar Network wiki [here](https://docs.astar.network/docs/wasm/sc-dev/swanky#installing).
+Follow the instructions from Astar Network wiki [here](https://docs.astar.network/docs/build/wasm/swanky-suite/cli/#installing).
 
 #### Install Swanky Phala Plugin
 
