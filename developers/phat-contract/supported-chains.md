@@ -4,10 +4,6 @@ Phat Contract can technically connect to any blockchain for reading and writing 
 
 ### EVM blockchains
 
-Phat Contract fully supports EVM blockchains. At the blueprint level, the first blueprint LensAPI Oracle offers support for:
-
-* Polygon: provided out-of-the-box
-
 At the Native Phat Contract level, it is possible to interact with any EVM-compatible blockchains through their RPC nodes, including:
 
 * Ethereum
@@ -15,35 +11,29 @@ At the Native Phat Contract level, it is possible to interact with any EVM-compa
 * Arbitrum
 * BSC
 * Optimism
-* and any EVM-compatible blockchains
+* any other EVM-compatible blockchains
 
-Learn more in the advanced topic.
-
-{% content-ref url="../advanced-topics/cross-chain-solutions.md" %}
-[cross-chain-solutions.md](../advanced-topics/cross-chain-solutions.md)
-{% endcontent-ref %}
+Learn more in the advanced topic section.
 
 ### Substrate blockchains
 
-Native Phat Contract fully supports Substrate-based blockchains, such as:
+Native Phat Contract fully supports Substrate-based blockchains, including:
 
 * Polkadot
 * Kusama
 * Phala Network
 * Astar
-* and any Substrate-based blockchains
+* any other Substrate-based blockchains
 
-However, there are currently no blueprints targeting Substrate. The introduction of Substrate-targeted blueprints is anticipated in the near future.
-
-Learn more in the advanced topic.
+You can learn more about Phat Contract's cross-chain capabilities and how to implement them in the advanced topics section:
 
 {% content-ref url="../advanced-topics/cross-chain-solutions.md" %}
 [cross-chain-solutions.md](../advanced-topics/cross-chain-solutions.md)
 {% endcontent-ref %}
 
-### Add more blockchain
+### Expanding Support to Additional Blockchains
 
-Supporting additional blockchains does not necessitate any changes to the Phala Network infrastructure. Developers can independently implement their RPC client, serialization, and signing libraries in Native Phat Contract and share them with the community.
+Supporting additional blockchains does not necessitate any changes to Phala Network's infrastructure. Developers can independently implement their RPC client, serialization, and signing libraries in Native Phat Contract and share them with the community.
 
 The following blockchains are expected to receive support soon:
 

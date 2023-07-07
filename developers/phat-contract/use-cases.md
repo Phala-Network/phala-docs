@@ -1,6 +1,6 @@
 # Use Cases
 
-The Phat Contract is designed for the following use cases, and remember: _all these features come with Phala’s trustless and decentralized infrastructure_.
+Phat Contract is designed for the following use cases, and remember: _all these features come with Phala’s trustless and decentralized infrastructure_.
 
 ## Low-latency <a href="#low-latency" id="low-latency"></a>
 

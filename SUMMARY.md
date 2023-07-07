@@ -4,7 +4,6 @@
 
 * [What is Phala Network?](README.md)
 * [Setting Up a Wallet on Phala](introduction/basic-guidance/README.md)
-  * [Setting Up an Account Identity](introduction/basic-guidance/setup-account-identity.md)
   * [Acquiring PHA](introduction/basic-guidance/get-pha-and-transfer.md)
 
 ## Developers
@@ -107,6 +106,7 @@
   * [Apply for Project Funding](pha-token/governance/apply-for-project-funding.md)
   * [Khala Treasury](pha-token/governance/khala-treasury.md)
   * [Khala Governance](pha-token/governance/khala-governance.md)
+  * [Setting Up an Account Identity](pha-token/governance/setup-account-identity.md)
 
 ## Other Products
 

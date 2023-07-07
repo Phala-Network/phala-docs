@@ -1,8 +1,10 @@
 # Acquiring PHA
 
+PHA token is the native token of Phala Network. Its uses include paying gas fees on the blockchain, performing governance, and staking. To learn more about PHA's uses and utility, head to the [PHA Token](broken-reference) section of the docs.&#x20;
+
 ## Get your Phala Tokens (PHA) <a href="#get-your-phala-tokens-pha" id="get-your-phala-tokens-pha"></a>
 
-If you do not hold any PHA yet, you can purchase PHA from any of the following exchanges:
+If you do not hold any PHA, you can purchase PHA from any of the following exchanges:
 
 * <img src="../../.gitbook/assets/1-Binance.png" alt="" data-size="line"> [Binance](https://www.binance.com/en)
 * <img src="../../.gitbook/assets/kraken.jpeg" alt="" data-size="line"> [Kraken](https://www.kraken.com/prices/pha-phala-price-chart/eur-euro?interval=1m)

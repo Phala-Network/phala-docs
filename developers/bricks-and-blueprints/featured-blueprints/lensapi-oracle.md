@@ -10,11 +10,13 @@ description: >-
 
 The Lens Protocol is a Web3 social graph on the Polygon blockchain. It is designed to empower creators to own the links between themselves and their community, forming a fully composable, user-owned social graph. The protocol is built from the ground up with modularity in mind, allowing new features and fixes to be added while ensuring immutable user-owned content and social relationships.
 
-With the rise of SocialFi platforms like Lens, there is an increasing need for Web3 Oracles that can bring data of all types on-chain via APIs. Phala Network's LensAPI Oracle is a solution designed to meet this demand, providing developers with a programmable Oracle template that can deploy customizable, no-code Oracles in minutes.
+With the rise of SocialFi platforms like Lens, there is an increasing need for Oracles that can bring data of all types on-chain via APIs. Phala Network's LensAPI Oracle is a solution designed to meet this demand, providing developers with a programmable Oracle template that can deploy customizable, no-code Oracles in minutes.&#x20;
 
-<figure><img src="../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Simple overview of how the Oracle works. </p></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Simple overview of how the LensAPI Oracle works. </p></figcaption></figure>
 
 ## How to Use the LensAPI Oracle&#x20;
+
+_We have a full demo of the deployment process available on our youtube channel, which you can find_ [_here_](https://www.youtube.com/watch?v=C6kCpItmT6o)_._&#x20;
 
 ### Prerequisites
 
@@ -25,6 +27,7 @@ Before you begin, make sure you have the following:
 * A balance of Phala Network's native token $PHA to
   * pay for the gas fee to upload your Oracle's Phat Contracts to the Phala Blockchain
   * stake to access compute to run your Oracle&#x20;
+* A balance of MATIC to pay for the transaction fees involved in running your Oracle
 
 ### Step 1: Get Started and Select your Data Fields&#x20;
 
@@ -97,15 +100,8 @@ A deployed Oracle is meant to serve one smart contract client at a time. Input t
 
 <figure><img src="../../../.gitbook/assets/bricks-config-client.png" alt=""><figcaption></figcaption></figure>
 
-This address can be updated any time.
+This address can be updated at any time. Please note that the Oracle will respond to all unanswered requests sent by the smart contract, this may cause unexpected gas fee costs.
 
-> The Oracle will respond to all unanswered requests sent by the smart contract, this may cause unexpected gas fee cost.
-
-Congratulations! You've just deployed your LensAPI Oracle!
+**Congratulations! You've just deployed your LensAPI Oracle!**
 
 If you need any technical support with your Oracle, please reach out to us on [Discord](https://discord.gg/phala).
-
-### Links
-
-* [Video tutorial](https://www.youtube.com/watch?v=C6kCpItmT6o)
-* [LensAPI Oracle deployment page](https://bricks.phala.network/blueprint/lens-oracle/deployment) on Phat Bricks App
