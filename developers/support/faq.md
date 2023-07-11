@@ -2,10 +2,23 @@
 
 ### How can I set arguments when instantiating the contract in Phat Contract UI? <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
 
+<details>
+
+<summary>Answer</summary>
+
 * Currently the Phat Contract Console does not support specifying arguments during contract instantiation
+
+<!---->
+
 * **Workaround**: you can implement a `config(&mut self, argument0, ...)` function and set the contract state with transactions after the instantiation
 
+</details>
+
 ### Phat UI reports an error before deploying the contract. <a href="#phat-ui-reports-an-error-before-deploying-the-contract" id="phat-ui-reports-an-error-before-deploying-the-contract"></a>
+
+<details>
+
+<summary>Answer</summary>
 
 The Phat UI checks the contract’s validity before uploading it to the cluster. However, sometimes the contract output by `cargo-contract` may be invalid. We’ve listed common errors and solutions below:
 
@@ -22,7 +35,15 @@ This error occurs when the contract or its dependencies use floating point opera
 
 Upgrade cargo-contract to version 1.5.2 or higher once [this PR](https://github.com/paritytech/cargo-contract/pull/904) has been merged.
 
+</details>
+
 ### Avoiding FP Instructions in JSON Parsing <a href="#avoiding-fp-instructions-in-json-parsing" id="avoiding-fp-instructions-in-json-parsing"></a>
+
+<details>
+
+<summary>Answer</summary>
+
+
 
 A common case that introduces FP instructions is parsing JSON in a contract. Either serde or serde\_json are designed to be able to handle FP numbers. In theory, if you don’t use it to deal with FP data, the compiler and wasm-opt should be able to optimize the FP instructions away for many cases. However, in practice, if you use serde\_json, it always emits FP instructions in the final output wasm file.
 
@@ -36,3 +57,31 @@ If your JSON document contains FP numbers, you can skip this section and go to [
     [patch.crates-io]
     serde = { git = "https://github.com/kvinwang/serde.git", branch = "pink" }
     ```
+
+</details>
+
+### Cannot compile with "lib name not found" error.
+
+<details>
+
+<summary>Answer</summary>
+
+{% code overflow="wrap" %}
+```shell
+2023-07-11T09:42:45.848016Z INFO cargo_contract::crate_metadata: Fetching cargo metadata for Cargo.toml thread 'main' panicked at 'lib name not found', /home/USER/.cargo/registry/src/github.com-1ecc6299db9ec823/cargo-contract-1.5.0/src/crate_metadata.rs:65:25 note: run with RUST_BACKTRACE=1 environment variable to display a backtrace
+```
+{% endcode %}
+
+After checking the version, it shows:
+
+```shell
+$ cargo contract --version cargo-contract 1.5.0-unknown-x86_64-unknown-linux-gnu
+```
+
+Solution: upgrade to the latest cargo contract. [Reference](https://github.com/paritytech/cargo-contract#installation):
+
+```shell
+cargo install --force --locked cargo-contract
+```
+
+</details>
