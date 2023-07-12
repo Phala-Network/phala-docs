@@ -17,7 +17,7 @@ Ensure your rust toolchain requirements are installed correctly to ensure your c
 
 [Swanky Suite](https://docs.astar.network/docs/build/wasm/swanky-suite/) aims to be an "all-in-one" tool for Wasm smart contract developers. It is modeled on existing tools like `cargo contract CLI` and `polkadot.js`. The `swanky-cli` tool is built with the `oclif` (Open CLI Framework [repo](https://oclif.io/docs/introduction)).
 
-Building with `oclif` allows for the `swanky-cli` to be extended through the [plugin-plugin](https://github.com/oclif/plugin-plugins) feature. Now the `swanky-phala-plugin` plugin can be added to the `swanky-cli` (note: must install `swanky-cli`first) with the command `swanky plugins:link [PATH_TO_REPO]`. Specific installation instructions and examples will be displayed later, so do not worry about getting this set up now.
+Building with `oclif` allows for the `swanky-cli` to be extended through the [plugin-plugin](https://github.com/oclif/plugin-plugins) feature. Now the `swanky-plugin-phala` plugin can be added to the `swanky-cli` (note: must install `swanky-cli`first) with the command `swanky plugins:link [PATH_TO_REPO]`. Specific installation instructions and examples will be displayed later, so do not worry about getting this set up now.
 
 ## DevPHAse
 
@@ -57,18 +57,18 @@ Follow the instructions from Astar Network wiki [here](https://docs.astar.networ
 **npm**
 
 ```bash
-npm install -g @phala/swanky-phala-plugin
+npm install -g @phala/swanky-plugin-phala
 ```
 
 or
 
 ```bash
-npx @phala/swanky-phala-plugin
+npx @phala/swanky-plugin-phala
 ```
 
 **locally**
 
-Clone the `swanky-phala-plugin` GitHub repository.
+Clone the `swanky-plugin-phala` GitHub repository.
 
 ```bash
 git clone git@github.com:Phala-Network/swanky-plugin-phala.git
@@ -77,12 +77,12 @@ yarn install
 yarn build
 ```
 
-#### Add `swanky-phala-plugin` to `swanky` CLI
+#### Add `swanky-plugin-phala` to `swanky` CLI
 
 Use `plugins:install` for **npm**
 
 ```bash
-swanky plugins:install @phala/swanky-phala-plugin
+swanky plugins:install @phala/swanky-plugin-phala
 ```
 
 or **GitHub URL**
@@ -91,7 +91,7 @@ or **GitHub URL**
 swanky plugins:install https://github.com/Phala-Network/swanky-plugin-phala.git
 ```
 
-If installed and built **locally** then use `plugins:link` to link `swanky` to the local path to `swanky-phala-plugin`
+If installed and built **locally** then use `plugins:link` to link `swanky` to the local path to `swanky-plugin-phala`
 
 ```bash
 swanky plugins:link [PATH_TO_REPO]
@@ -100,7 +100,7 @@ swanky plugins:link [PATH_TO_REPO]
 example:
 
 ```bash
-swanky plugins:link ~/Projects/swanky-phala-plugin
+swanky plugins:link ~/Projects/swanky-plugin-phala
 
 @astar-network/swanky-cli: linking plugin @phala/swanky-plugin-phala... done
 ```
