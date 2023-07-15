@@ -105,7 +105,7 @@ yarn devphase init
 Then start the local testnet with:
 
 ```
-yarn devphase stack
+yarn devphase stack run
 ```
 
 Open a separate terminal, run the following command to setup the local testnet:
