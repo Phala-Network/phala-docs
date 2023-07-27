@@ -89,3 +89,4 @@ redirects:
     v1/developers/phat-contract/features: developers/phat-contract/features.md
     v1/developers/phat-contract/bricks-and-blueprints: developers/phat-contract/bricks-and-blueprints.md
     v1/developers/phat-contract: developers/phat-contract/README.md
+    en-us/general/applications/extension-wallet/: introduction/basic-guidance/README.md
