@@ -12,7 +12,7 @@ The Lens Protocol is a Web3 social graph on the Polygon blockchain. It is design
 
 With the rise of SocialFi platforms like Lens, there is an increasing need for Oracles that can bring data of all types on-chain via APIs. Phala Network's LensAPI Oracle is a solution designed to meet this demand, providing developers with a programmable Oracle template that can deploy customizable, no-code Oracles in minutes.&#x20;
 
-<figure><img src="../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Simple overview of how the LensAPI Oracle works. </p></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Simple overview of how the LensAPI Oracle works. </p></figcaption></figure>
 
 ## How to Use the LensAPI Oracle&#x20;
 
@@ -23,7 +23,7 @@ _We have a full demo of the deployment process available on our youtube channel,
 Before you begin, make sure you have the following:
 
 * Familiarity with Solidity and the Lens Protocol
-* A [Phala wallet](../../../introduction/basic-guidance/)
+* A [Phala wallet](../../../../introduction/basic-guidance/)
 * A balance of Phala Network's native token $PHA to
   * pay for the gas fee to upload your Oracle's Phat Contracts to the Phala Blockchain
   * stake to access compute to run your Oracle&#x20;
@@ -47,7 +47,7 @@ The LensAPI Oracle allows your smart contract to query Lens user and post stats 
 
 You can also add custom Javascript expressions to enhance your query if necessary by selecting the "Customize your transform function" box.
 
-<figure><img src="../../../.gitbook/assets/1_DLLIeuw8zXGV3I7pUtRL-g.gif" alt=""><figcaption><p>Getting Started Demo</p></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/1_DLLIeuw8zXGV3I7pUtRL-g.gif" alt=""><figcaption><p>Getting Started Demo</p></figcaption></figure>
 
 ### Step 2: Deploy the Oracle
 
@@ -65,7 +65,7 @@ Connecting your smart contracts on Polygon to the Oracle you just deployed can b
 
 The identity of Oracle is shown in the Project Details page as the `Oracle Endpoint` field.
 
-<figure><img src="../../../.gitbook/assets/bricks-oracle-endpoint.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/bricks-oracle-endpoint.png" alt=""><figcaption></figcaption></figure>
 
 Below is a code snippet demonstrating how to request and receive data from the LensAPI Oracle in Solidity. You can find the full sample [here](https://github.com/Phala-Network/phat-bricks/blob/master/evm/contracts/TestLensOracle.sol).
 
@@ -98,7 +98,7 @@ Below is a code snippet demonstrating how to request and receive data from the L
 
 A deployed Oracle is meant to serve one smart contract client at a time. Input the client contract address in the "Configure Client" field on the Project Details page.
 
-<figure><img src="../../../.gitbook/assets/bricks-config-client.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/bricks-config-client.png" alt=""><figcaption></figcaption></figure>
 
 This address can be updated at any time. Please note that the Oracle will respond to all unanswered requests sent by the smart contract, this may cause unexpected gas fee costs.
 

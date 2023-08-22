@@ -4,6 +4,20 @@ description: >-
   developers can use to implement a broad range of features for their dApps.
 cover: ../../.gitbook/assets/phat-contract-banner.png
 coverY: 0
+layout:
+  cover:
+    visible: true
+    size: full
+  title:
+    visible: true
+  description:
+    visible: true
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
 ---
 
 # Phat Contract Introduction
