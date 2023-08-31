@@ -13,7 +13,8 @@ The Phat Contract uses the Rust-based ink! language, and is ultimately compiled 
 >
 > Information to connect to the Phala Live Testnet PoC5
 >
-> * RPC Endpoint: wss://poc5.phala.network/ws
+> * RPC WS Endpoint: wss://poc5.phala.network/ws
+> * RPC HTTP Endpoint: https:/poc5.phala.network/rpc
 > * Cluster ID: 0x0000000000000000000000000000000000000000000000000000000000000001
 > * Worker: 0x94a2ded4c77fbb910943f7e452e4d243ee5b60bf1a838a911acf2ffd4bae9b63
 > * pRuntime URL: [https://poc5.phala.network/tee-api-1](https://poc5.phala.network/tee-api-1)
