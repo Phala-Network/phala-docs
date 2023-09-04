@@ -27,7 +27,7 @@ We strongly recommend that you use Ubuntu 22.04.2 LTS, download link: https://ub
 
 > The desktop version of the OS is less stable than Server version, so we strongly recommend using the server version.
 
-And please make sure that the kernel version is 5.13 or above.
+And please make sure that the kernel version is linux-image-5.15.0-82-generic or above, the intel-microcode should be 20230808 or above.
 
 > If you do not want to update the current Ubuntu system version, please be sure to check the kernel version. Because pRuntime will use the SGX driver built into the kernel.
 
@@ -291,4 +291,4 @@ A typical pRuntime log in sync will look like this:
 2023-05-10T11:55:38.482881Z  INFO prpc_measuring: POST /prpc/PhactoryAPI.DispatchBlocks cost 18221 microseconds, status: 200   
 ```
 
-You can determine whether the synchronization is proceeding normally by checking the synchronized height and progress.\
+You can determine whether the synchronization is proceeding normally by checking the synchronized height and progress.\\
