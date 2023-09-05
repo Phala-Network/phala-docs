@@ -16,7 +16,7 @@ cargo install patron --git https://github.com/brushfam/patron-backend
 
 It might take a few minutes to finish. Once it is done, you need to call `patron auth` for initialization. This step only requires you to sign an authentication message once at zero cost.
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled.png)
+![Connect wallet for Patron](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-01.jpg)
 
 After that, you will see a message said “Authentication completed” in the terminal. Congrats, that’s all you need on preparation!
 
@@ -24,7 +24,7 @@ After that, you will see a message said “Authentication completed” in the te
 
 You need create a `Deploy.toml` file along side with your `cargo.toml`. You will get similar results like the screenshot below:
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%201.png)
+![Folder structure for Phat Contract with Patron](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-02.jpg)
 
 There are two lines in the `Deploy.toml` file:
 
@@ -43,17 +43,15 @@ After setting up the `Deploy.toml` file, you just perform the `patron build` in 
 
 When you see a message like this in the terminal, you now have successfully created a verifiable build.
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%202.png)
+![Message when your Phat Contract compiled successfully on Patron](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-03.jpg)
 
 You can get a link on Patron as well. Let’s open this link in browser, you will see the code hash, build log, also details of source code on screen. You can click the “Deploy with Phala”.
 
-![If you want deploy this example project, visit here: [https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a](https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a)](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%203.png)
-
-If you want deploy this example project, visit here: [https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a](https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a)
+![If you want deploy this example project, visit here: [https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a](https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a)](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-04.jpg)
 
 Clicking on the button, will navigate to the Phat Contract UI:
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%204.png)
+![The landing page when you deploy Phat Contract via Patron](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-05.jpg)
 
 Because we can find the verified build on Patron via code hash, we don’t need update the artifact manually. You can just click “fetch”, “upload”, then the contract bytecode will upload to Phala Blockchain automatically.
 
@@ -61,11 +59,11 @@ The next step is to instantiate. Click “Instantiate”, and a signing request 
 
 You can follow the steps annotation on the screenshot.
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%205.png)
+![Step guide of deploying Phat Contract](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-06.jpg)
 
 Click the “go next” button and you can interact with your Phat Contract instance now. You can see the “Verified by Patron” label beside the code hash.
 
-![Untitled](Step-by-Step%20Guide%20Verifying%20Your%20Phat%20Contract%20wi%2004227dc7288e4b4c8f145073111cd036/Untitled%206.png)
+![Sceenshot of Phat Contract Deploy successfully](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-07.jpg)
 
 ## Final Words
 
