@@ -67,6 +67,6 @@ Click the “go next” button and you can interact with your Phat Contract inst
 
 ## Final Words
 
-You can checkout the example project here: https://github.com/Leechael/phalaworld-phat-contract-build
+You can checkout the example project here: [https://github.com/Leechael/phalaworld-phat-contract-build](https://github.com/Leechael/phalaworld-phat-contract-build)
 
 For more discussion about this topic, and you stuck into some issues, you can reach us on Discord.
