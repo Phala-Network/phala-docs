@@ -1,10 +1,10 @@
-# Phat Contract Verification
+# Verify Your Contract
 
-Contract Verification is an important piece of decentralized world, as we already talk about that on Unlocking the Importance and Nuances of Verified Smart Contract. This section will give you a glance of how to build verified Phat Contract and upload to Patron, then share it over the Internet.
+Contract Verification is an important piece of decentralized world, as we already talk about that on [Unlocking the Importance and Nuances of Verified Smart Contract](https://phala.network/posts/unlocking-the-importance-and-nuances-of-verified-smart-contract). This section will give you a glance of how to build verified Phat Contract and upload to Patron, then share it over the Internet.
 
 ## What is Patron?
 
-Patron is a smart contract verification service offered by the Brushfam team. It features a command-line interface (CLI) tool that allows for seamless verification of smart contract builds with a single command. To learn more about how to get started with Patron, visit **[here](https://patron.works/getting-started)**.
+Patron is a smart contract verification service offered by the Brushfam team. It features a command-line interface (CLI) tool that allows for seamless verification of smart contract builds with a single command. To learn more about how to get started with Patron, visit [**here**](https://patron.works/getting-started).
 
 ## Installation
 
