@@ -47,7 +47,9 @@ When you see a message like this in the terminal, you now have successfully crea
 
 You can get a link on Patron as well. Let’s open this link in browser, you will see the code hash, build log, also details of source code on screen. You can click the “Deploy with Phala”.
 
-![If you want deploy this example project, visit here: [https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a](https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a)](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-04.jpg)
+![Example project on Patron](../../.gitbook/assets/verifiying-your-phat-contract-with-patron-04.jpg)
+
+If you want deploy this example project, visit [here](https://patron.works/codeHash/ec87cd09b3546a55c17f6252d1efac00c201c6c32130875c5504a1eb0f45556a).
 
 Clicking on the button, will navigate to the Phat Contract UI:
 
