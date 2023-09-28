@@ -4,7 +4,7 @@ description: >-
   Polygon Consumer Smart Contract.
 ---
 
-# Polygon Consumer Contract for LensAPI Oracle
+# 🧑🚀 Polygon Consumer Contract for LensAPI Oracle
 
 ## Overview
 
@@ -185,6 +185,6 @@ Done
 
 ### Closing
 
-Once you have stored, the deployed address of the Consumer Contract and set the value in the "Configure Client" section of the deployed LensAPI Oracle, you will now have a basic boilerplate example of how to connect your Polygon dApp to a LensAPI Oracle Blueprint. Execute a new requests and check if your configuration is correct like below:&#x20;
+Once you have stored, the deployed address of the Consumer Contract and set the value in the "Configure Client" section of the deployed LensAPI Oracle, you will now have a basic boilerplate example of how to connect your Polygon dApp to a LensAPI Oracle Blueprint. Execute a new requests and check if your configuration is correct like below:
 
 <figure><img src="../../../../.gitbook/assets/polygonscan-ex.png" alt=""><figcaption></figcaption></figure>

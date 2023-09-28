@@ -1,2 +1,2 @@
-# Build on Native Phat Contract
+# 🦾 Build on Phat Contract Rust SDK
 

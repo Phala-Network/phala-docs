@@ -24,7 +24,7 @@ layout:
 
 ## Why bring computation Off-Chain?
 
-On-chain computation has severe limitations and is often prohibitively expensive. For example, Smart Contracts cannot easily perform actions across different blockchains, nor can they interface directly with off-chain data sources hence the need for bridges and oracles. Furthermore, use cases like Smart Contract automation require input from programs running off-chain. For these reasons, robust dApp use cases generally demand that a significant portion of the stack be off-chain.&#x20;
+On-chain computation has severe limitations and is often prohibitively expensive. For example, Smart Contracts cannot easily perform actions across different blockchains, nor can they interface directly with off-chain data sources hence the need for bridges and oracles. Furthermore, use cases like Smart Contract automation require input from programs running off-chain. For these reasons, robust dApp use cases generally demand that a significant portion of the stack be off-chain.
 
 ## Phat Contracts vs. Smart Contracts
 
@@ -32,16 +32,16 @@ Given the stark technical constraints of building on-chain, it’s generally opt
 
 Phat Contracts are run on a tamper-proof distributed network that uses the Phala blockchain to always ensure the fidelity of deployed contracts and their execution. This allows Phat Contracts to circumvent the limitations of Smart Contracts _**while retaining**_ trustlessness, verifiability, and permisionlessness.
 
-Phat Contracts are not meant to replace Smart Contracts, instead, they are the missing decentralized computation unit for decentralized applications.&#x20;
+Phat Contracts are not meant to replace Smart Contracts, instead, they are the missing decentralized computation unit for decentralized applications.
 
 ## A Developer Experience for Everyone
 
-Users can build and deploy Phat Contract in a few different ways depending on their needs and ability.&#x20;
+Users can build and deploy Phat Contract in a few different ways depending on their needs and ability.
 
-### [**Phat Bricks**](../bricks-and-blueprints/)
+### [**Phat Contract 2.0**](../bricks-and-blueprints/)
 
-The no-code experience for Phat Contract, Phat Bricks allows developers can choose from a library of pre-fabricated solutions to deploy and integrate with their dApp in minutes.
+Phat Contract 2.0 allows developers to write scripts to deploy as a Phat Contract in TypeScript. This allows for your deployed script to respond to data requests initiated from the on-chain smart contract side. The request is transparently sent to your script for processing. You are free to call any APIs to fulfill the request. Finally, you can freely define the response data structure that will be replied to your smart contract.
 
-### [**Native Phat Contact**](../build-on-phat-contract/)
+### [**Phat Contract Rust SDK**](../build-on-phat-contract/)
 
-For developers with a background in Rust, ink!, typescript, or Javascript looking for a more customizable developer experience, Native Phat Contract is the tool for you.
+For developers with a background in Rust, [ink!](https://use.ink) looking for a more customizable developer experience, the Phat Contract Rust SDK is the tool for you.

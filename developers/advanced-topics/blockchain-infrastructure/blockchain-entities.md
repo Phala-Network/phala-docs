@@ -76,6 +76,6 @@ A client communicates with a worker only for contract invocation. An invocation 
 
 ## Serialization <a href="#serialization" id="serialization"></a>
 
-> ### `EcdhKey` Rotation <a href="#ecdhkey-rotation" id="ecdhkey-rotation"></a>
+> #### `EcdhKey` Rotation <a href="#ecdhkey-rotation" id="ecdhkey-rotation"></a>
 >
 > Unlike the `IdentityKey` which shows the identity of a worker or gatekeeper thus should not be changed, we recommend a regular rotation of the `EcdhKey` to ensure the security of the communication channels between different entities. In the future, `pRuntime` will automatically rotate the managed `EcdhKey` key after certain time interval.
