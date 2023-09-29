@@ -49,6 +49,10 @@ yarn build-function
 
 To simulate the expected result locally, run the Phala Oracle function now with this command.
 
+```
+yarn run-function -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
+```
+
 > **What are the ingredients for the yarn run-function command?**
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
@@ -69,12 +73,6 @@ To simulate the expected result locally, run the Phala Oracle function now with 
 >   // ...
 > }
 > ```
-
-Let's start the simulated execution.
-
-```
-yarn run-function -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
-```
 
 Finally, run the local end-to-end tests with this command. Here we will simulate locally the interaction between the Phat Contract and the Consumer Contract with hardhat.
 
