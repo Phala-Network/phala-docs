@@ -19,6 +19,7 @@
     * [🏃♂ Quick Start](developers/bricks-and-blueprints/featured-blueprints/quick-start.md)
     * [⚔ Connect Phat Contract to EVM Consumer Contract](developers/bricks-and-blueprints/featured-blueprints/connect-phat-contract-to-evm-consumer-contract.md)
     * [🏗 Customizing Your Phat Contract](developers/bricks-and-blueprints/featured-blueprints/customizing-your-phat-contract.md)
+    * [🤫 Handling Secrets](developers/bricks-and-blueprints/featured-blueprints/handling-secrets.md)
   * [🪴 LensAPI Oracle](developers/bricks-and-blueprints/lensapi-oracle/README.md)
     * [🧑🚀 Polygon Consumer Contract for LensAPI Oracle](developers/bricks-and-blueprints/lensapi-oracle/polygon-consumer-contract-for-lensapi-oracle.md)
 * [⚒ Phat Contract Rust SDK](developers/getting-started/README.md)
