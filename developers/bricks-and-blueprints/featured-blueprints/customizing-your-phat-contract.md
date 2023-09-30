@@ -1,6 +1,6 @@
 # 🏗 Customizing Your Phat Contract
 
-## [What Can You Do With Your Phat Contract?](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#what-can-you-do-with-your-function) <a href="#user-content-what-can-you-do-with-your-function" id="user-content-what-can-you-do-with-your-function"></a>
+## What Can You Do With Your Phat Contract? <a href="#user-content-what-can-you-do-with-your-function" id="user-content-what-can-you-do-with-your-function"></a>
 
 In the `README.md` [link](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/GETTING\_STARTED.md), you learned how to generate a new default function template and execute the 3 separate ways to test and validate your the results of the function. Now we will dive into what you can do with your function to extend the capabilities.
 
@@ -22,9 +22,9 @@ What you will learn:
 * Customize Your Default Function and Test Locally.
 * Encode the response data and update your consumer contract to handle the abi decoding.
 
-## [Getting Started](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#getting-started) <a href="#user-content-getting-started" id="user-content-getting-started"></a>
+## Getting Started <a href="#user-content-getting-started" id="user-content-getting-started"></a>
 
-First you will need to install the [@phala/fn](https://www.npmjs.com/package/@phala/fn) CLI tool using your node package manager (`npm`) or use node package execute (`npx`). In this tutorial we use `npx`.
+First you will need to install the `@phala/fn` CLI tool using your node package manager (`npm`) or use node package execute (`npx`). In this tutorial we use `npx`.
 
 Now create your first template with the CLI tool command:
 
@@ -73,9 +73,9 @@ Lastly, we will `cd` into `./src` where the `index.ts` file resides. This file w
 cd src
 ```
 
-## [Available Capabilities of `@phala/pink-env`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#available-capabilities-of-phalapink-env) <a href="#user-content-available-capabilities-of-phalapink-env" id="user-content-available-capabilities-of-phalapink-env"></a>
+## Available Capabilities of `@phala/pink-env` <a href="#user-content-available-capabilities-of-phalapink-env" id="user-content-available-capabilities-of-phalapink-env"></a>
 
-In the [`GETTING_STARTED.md`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/GETTING\_STARTED.md) we introduced the basic functionality of making a single HTTP request to Lens API. The example code can be seen below:
+In the `GETTING_STARTED.md` we introduced the basic functionality of making a single HTTP request to Lens API. The example code can be seen below:
 
 ```typescript
 function fetchApiStats(lensApi: string, profileId: string): any {
@@ -134,7 +134,7 @@ function fetchApiStats(lensApi: string, profileId: string): any {
 
 Here we utilize the `pink.batchHttpRequest()` function, but we only use a single HTTP request. Before going any further, let's clarify what is available with `@phala/pink-env`.
 
-### [`pink.invokeContract()` & `pink.invokeContractDelegate()`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#pinkinvokecontract--pinkinvokecontractdelegate) <a href="#user-content-pinkinvokecontract--pinkinvokecontractdelegate" id="user-content-pinkinvokecontract--pinkinvokecontractdelegate"></a>
+### `pink.invokeContract()` & `pink.invokeContractDelegate()` <a href="#user-content-pinkinvokecontract--pinkinvokecontractdelegate" id="user-content-pinkinvokecontract--pinkinvokecontractdelegate"></a>
 
 * `pink.invokeContract()` allows for a call to a specified address of a Phat contract deployed on Phala's Mainnet or PoC5 Testnet depending on where you deploy your function.
 * `pink.invokeContractDelegate()` is similar but instead the call on a Phat Contract is targeted by the code hash.
@@ -166,7 +166,7 @@ const contractOutput = pink.invokeContract({
 
 </details>
 
-### [`pink.httpRequest()`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#pinkhttprequest) <a href="#user-content-pinkhttprequest" id="user-content-pinkhttprequest"></a>
+### `pink.httpRequest()` <a href="#user-content-pinkhttprequest" id="user-content-pinkhttprequest"></a>
 
 The `pink.httpRequest()` allows for you to make a single HTTP request from your function to an HTTP endpoint. You will have to define your args:
 
@@ -194,7 +194,7 @@ const response = pink.httpRequest({
 console.log(response.body);
 ```
 
-### [`pink.batchHttpRequest()`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#pinkbatchhttprequest) <a href="#user-content-pinkbatchhttprequest" id="user-content-pinkbatchhttprequest"></a>
+### `pink.batchHttpRequest()` <a href="#user-content-pinkbatchhttprequest" id="user-content-pinkbatchhttprequest"></a>
 
 Now you may need to call multiple APIs at once, this would require you to use the `pink.batchHttpRequest()` function to ensure you do not timeout (timeouts for Phat Contract is 10 seconds) on your response. The `args` and returned `Object` are the same as `pink.httpRequest()`, but instead you can create an array of HTTP requests within the function. Since we have an example above of how to use a `pink.batchHttpRequest()`, before an examples let's look at the syntax. You will have to define your **array** of args:
 
@@ -272,7 +272,7 @@ Here are the expected result of executing this:
 
 Pretty nifty, right? This is the power of the customized function with the ability to make single or batch HTTP requests. However, this example is missing some error handling which is our next topic.
 
-### [Error Handling](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#error-handling) <a href="#user-content-error-handling" id="user-content-error-handling"></a>
+### Error Handling <a href="#user-content-error-handling" id="user-content-error-handling"></a>
 
 To add some error handling to an HTTP request, you can check the default example with the query to Lens API above.
 
@@ -297,7 +297,7 @@ This would send an error to the logserver:
 JS: Some error ocurred: TypeError: invalid value for field 'method'
 ```
 
-### [`pink.deriveSecret()`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#pinkderivesecret) <a href="#user-content-pinkderivesecret" id="user-content-pinkderivesecret"></a>
+### `pink.deriveSecret()` <a href="#user-content-pinkderivesecret" id="user-content-pinkderivesecret"></a>
 
 `pink.deriveSecret()` takes in a salt of either `UInt8Array | string` and generates a secret key response of type `UInt8Array`.
 
@@ -322,7 +322,7 @@ Here is the result :stuck\_out\_tongue\_winking\_eye:
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/Secret-TG.png" alt=""><figcaption></figcaption></figure>
 
-### [`pink.hash()`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/src/JS\_API\_DOC.md#pinkhash) <a href="#user-content-pinkhash" id="user-content-pinkhash"></a>
+### `pink.hash()` <a href="#user-content-pinkhash" id="user-content-pinkhash"></a>
 
 `pink.hash()` generates a hash based on the following params:
 
@@ -389,7 +389,7 @@ Let's see how the results look.
 
 ## Handle Response Encoding & Decoding
 
-In the [`index.ts`](https://github.com/Phala-Network/phat-contract-starter-kit/blob/37e7ee2fa96c42f90f4418d45a9c47be570d59f5/src/index.ts#L6) file of your Phat Contract starter kit, there is an npm package available called `@phala/ethers` and your file will import `Coders` which has the following types available.
+In the `index.ts` file of your Phat Contract starter kit, there is an npm package available called `@phala/ethers` and your file will import `Coders` which has the following types available.
 
 ```typescript
 // From https://github.com/Phala-Network/phat-contract-starter-kit/blob/37e7ee2fa96c42f90f4418d45a9c47be570d59f5/src/index.ts#L6

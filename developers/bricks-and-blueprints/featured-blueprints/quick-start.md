@@ -4,7 +4,7 @@
 
 To kickstart your journey with the Phat Contract Starter Kit, you have 2 options:
 
-1.  Create a template from the [`phat-contract-starter-kit`](https://github.com/Phala-Network/phat-contract-starter-kit) template repo. Click on the "**Use this template**" button in the top right corner of the webpage. Then skip the `npx @phala/fn init example` step.&#x20;
+1.  Create a template from the [`phat-contract-starter-kit`](https://bit.ly/46wkeY0) template repo. Click on the "**Use this template**" button in the top right corner of the webpage. Then skip the `npx @phala/fn init example` step.&#x20;
 
     <div>
 
@@ -31,19 +31,19 @@ Once you have the CLI tool installed, you can create your first Phala Oracle tem
 
 Let's continue by initializing a new project with `@phala/fn`.
 
-```
+```sh
 npx @phala/fn init example
 ```
 
 After creating a Phala Oracle template, `cd` into the new project and install the package dependencies. You can do this with the following command:
 
-```
+```sh
 yarn install
 ```
 
 Now, build the default Phala Oracle function with this command:
 
-```
+```sh
 yarn build-function
 ```
 
@@ -74,12 +74,58 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
 > }
 > ```
 
+<details>
+
+<summary>How the query looks under the hood</summary>
+
+* HTTP Endpoint: [https://api-mumbai.lens.dev](https://api-mumbai.lens.dev/)
+* Profile ID: `0x01`
+* Expected Graphql Query:
+
+```graphql
+query Profile {
+  profile(request: { profileId: "0x01" }) {
+    stats {
+        totalFollowers
+        totalFollowing
+        totalPosts
+        totalComments
+        totalMirrors
+        totalPublications
+        totalCollects
+    }
+  }
+}
+```
+
+* Expected Output:
+
+```graphql
+{
+  "data": {
+    "profile": {
+      "stats": {
+        "totalFollowers": 3361,
+        "totalFollowing": 0,
+        "totalPosts": 3,
+        "totalComments": 0,
+        "totalMirrors": 0,
+        "totalPublications": 3,
+        "totalCollects": 1597
+      }
+    }
+  }
+}
+```
+
+</details>
+
 Finally, run the local end-to-end tests with this command. Here we will simulate locally the interaction between the Phat Contract and the Consumer Contract with hardhat.
 
-```
+```sh
 yarn hardhat test
 ```
 
-Congratulations! You have successfully completed the quick start. For the next steps, you will learn how to deploy your Phala Oracle and connect to the consumer contract for the EVM testnet chain to start testing the request-response model live.
+:tada: Congratulations! You have successfully completed the quick start. For the next steps, you will learn how to deploy your Phala Oracle and connect to the consumer contract for the EVM testnet chain to start testing the request-response model live.
 
 For a deeper dive into the details, click [here](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/GETTING\_STARTED.md), or continue reading to learn about the valuable features the Phala Oracle can offer to your on-chain consumer contract.
