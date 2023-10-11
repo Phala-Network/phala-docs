@@ -20,7 +20,7 @@ layout:
     visible: true
 ---
 
-# Phat Contract Introduction
+# 🟩 Phat Contract Introduction
 
 ## Why bring computation Off-Chain?
 

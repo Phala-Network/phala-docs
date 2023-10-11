@@ -1,2 +1,2 @@
-# Run Workers on Phala
+# 🦿 Run Workers on Phala
 

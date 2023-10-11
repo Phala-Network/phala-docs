@@ -1,4 +1,4 @@
-# Support
+# 🆘 Support
 
 ## Have questions about Phat Contract? <a href="#get-questions-answered" id="get-questions-answered"></a>
 

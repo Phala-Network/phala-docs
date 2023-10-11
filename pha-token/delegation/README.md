@@ -1,4 +1,4 @@
-# Delegation
+# 👐 Delegation
 
 ## Start Delegating <a href="#start-delegating" id="start-delegating"></a>
 

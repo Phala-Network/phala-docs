@@ -15,7 +15,7 @@ Implementing a stateless backend also brings immediate benefits at no developing
 
 Phat Contract still supports the vanilla on-chain states and transaction processing!
 
-What’s more, all the contract states are encrypted and stored. But when you use these states, Phat Contract will still become subject to gas fees and low performance just like smart contracts. We explain contract states in the [storage section](../store-contract-states.md).
+What’s more, all the contract states are encrypted and stored. But when you use these states, Phat Contract will still become subject to gas fees and low performance just like smart contracts. We explain contract states in the [storage section](store-contract-states.md).
 
 For off-chain computation, the recommended way to store your states is to use external storage services. Phat Contract can easily connect to S3-compatible storage services and use them as cheaper and faster off-chain state storage. Explore how to do this in the following section.
 

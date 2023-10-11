@@ -2,13 +2,13 @@
 
 ## Introduction
 
-* [What is Phala Network?](README.md)
-* [Setting Up a Wallet on Phala](introduction/basic-guidance/README.md)
+* [🤔 What is Phala Network?](README.md)
+* [🔐 Setting Up a Wallet on Phala](introduction/basic-guidance/README.md)
   * [Acquiring PHA](introduction/basic-guidance/get-pha-and-transfer.md)
 
 ## Developers
 
-* [Phat Contract Introduction](developers/phat-contract/README.md)
+* [🟩 Phat Contract Introduction](developers/phat-contract/README.md)
   * [Features](developers/phat-contract/features.md)
   * [Supported Chains](developers/phat-contract/supported-chains.md)
   * [Use Cases](developers/phat-contract/use-cases.md)
@@ -28,6 +28,7 @@
   * [Next Step](developers/getting-started/next-step.md)
 * [🦾 Build on Phat Contract Rust SDK](developers/build-on-phat-contract/README.md)
   * [Environment Setup](developers/build-on-phat-contract/environment-setup.md)
+  * [Swanky Phala CLI Tool](developers/build-on-phat-contract/swanky-phala-cli-tool.md)
   * [Create Contract](developers/build-on-phat-contract/create-contract.md)
   * [Deploy Contract](developers/build-on-phat-contract/deploy-contract.md)
   * [Language Basics](developers/build-on-phat-contract/language-basics.md)
@@ -37,8 +38,8 @@
   * [Use Pink Extension](developers/build-on-phat-contract/use-pink-extension.md)
   * [Use Rust Crates](developers/build-on-phat-contract/use-rust-crates.md)
   * [Unit Tests](developers/build-on-phat-contract/unit-tests.md)
-* [Store Contract States](developers/store-contract-states.md)
-* [Advanced Topics](developers/advanced-topics/README.md)
+  * [Store Contract States](developers/build-on-phat-contract/store-contract-states.md)
+* [🤯 Advanced Topics](developers/advanced-topics/README.md)
   * [Blockchain Infrastructure](developers/advanced-topics/blockchain-infrastructure/README.md)
     * [Blockchain Entities](developers/advanced-topics/blockchain-infrastructure/blockchain-entities.md)
     * [Cluster of Workers](developers/advanced-topics/blockchain-infrastructure/cluster-of-workers.md)
@@ -47,16 +48,15 @@
   * [System Contract and Drivers](developers/advanced-topics/system-contract-and-drivers.md)
   * [Run Local Testnet](developers/advanced-topics/run-local-testnet.md)
   * [SideVM](developers/advanced-topics/sidevm.md)
-* [Swanky Phala CLI Tool](developers/swanky-phala-cli-tool.md)
-* [Support](developers/support/README.md)
+* [🆘 Support](developers/support/README.md)
   * [Available Chains](developers/support/endpoints.md)
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
-  * [Common Issues](developers/support/faq.md)
+* [⁉ FAQ](developers/faq.md)
 
 ## Compute Providers
 
-* [Basic Info](compute-providers/basic-info/README.md)
+* [🙃 Basic Info](compute-providers/basic-info/README.md)
   * [Introduction](compute-providers/basic-info/introduction.md)
   * [Gemini Tokenomics (Worker Rewards)](compute-providers/basic-info/worker-rewards.md)
   * [Budget balancer](compute-providers/basic-info/budget-balancer.md)
@@ -65,14 +65,14 @@
   * [Confidence Level & SGX Function](compute-providers/basic-info/confidence-level-and-sgx-function.md)
   * [Rent Hardware](compute-providers/basic-info/rent-hardware.md)
   * [Error Summary](compute-providers/basic-info/error-summary.md)
-* [Run Workers on Phala](compute-providers/run-workers-on-phala/README.md)
+* [🦿 Run Workers on Phala](compute-providers/run-workers-on-phala/README.md)
   * [Run a Phala Node](compute-providers/run-workers-on-phala/run-a-phala-node.md)
   * [Solo Worker Deployment](compute-providers/run-workers-on-phala/solo-worker-deployment.md)
   * [PRBv3 Deployment](compute-providers/run-workers-on-phala/prbv3-deployment.md)
   * [Using PRBv3 UI](compute-providers/run-workers-on-phala/using-prbv3-ui.md)
   * [PRB Worker Deployment](compute-providers/run-workers-on-phala/prb-worker-deployment.md)
   * [Switch Workers from Solo to PRB Mode](compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode.md)
-* [Run Workers on Khala](compute-providers/run-workers-on-khala/README.md)
+* [🏃♀ Run Workers on Khala](compute-providers/run-workers-on-khala/README.md)
   * [Run a Khala Node](compute-providers/run-workers-on-khala/run-a-khala-node.md)
   * [Solo Scripts Guidance](compute-providers/run-workers-on-khala/solo-scripts-guidance/README.md)
     * [Installing Khala Solo Scripts](compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools.md)
@@ -96,8 +96,8 @@
 
 ## PHA Token
 
-* [Introduction](pha-token/introduction.md)
-* [Delegation](pha-token/delegation/README.md)
+* [🪙 Introduction](pha-token/introduction.md)
+* [👐 Delegation](pha-token/delegation/README.md)
   * [Delegate to StakePool](pha-token/delegation/delegate-to-stakepool.md)
   * [What is Vault](pha-token/delegation/whats-vault.md)
   * [What is Share](pha-token/delegation/whats-share.md)
@@ -105,7 +105,7 @@
   * [Examples of Delegation](pha-token/delegation/examples-of-delegation.md)
   * [Use Phala App to Delegate](pha-token/delegation/use-phala-app-to-delegate.md)
   * [Estimate Your Reward](pha-token/delegation/estimate-your-reward.md)
-* [Governance](pha-token/governance/README.md)
+* [🗳 Governance](pha-token/governance/README.md)
   * [Governance Mechanism](pha-token/governance/governance-mechanism.md)
   * [Join the Council](pha-token/governance/join-the-council.md)
   * [Voting for Councillors](pha-token/governance/voting-for-councillors.md)
@@ -116,7 +116,7 @@
 
 ## Other Products
 
-* [SubBridge](other-products/subbridge/README.md)
+* [🌉 SubBridge](other-products/subbridge/README.md)
   * [Cross-chain Transfer](other-products/subbridge/cross-chain-transfer.md)
   * [Supported Assets](other-products/subbridge/supported-assets.md)
   * [Asset Integration Guide](other-products/subbridge/asset-integration-guide.md)

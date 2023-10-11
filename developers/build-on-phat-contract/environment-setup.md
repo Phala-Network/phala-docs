@@ -9,7 +9,7 @@ The Phat Contract uses the Rust-based ink! language, and is ultimately compiled 
 
 > **Note**
 >
-> The Mac M1/M2 chips do not support the deployment of a local testnet at this time. If you are using a machine with these chips, you will have to deploy to the live testnet through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](../swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
+> The Mac M1/M2 chips do not support the deployment of a local testnet at this time. If you are using a machine with these chips, you will have to deploy to the live testnet through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
 >
 > Information to connect to the Phala Live Testnet PoC5
 >

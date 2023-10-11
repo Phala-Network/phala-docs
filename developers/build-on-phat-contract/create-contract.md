@@ -6,7 +6,7 @@ There are a couple ways to get you started.
 
 {% tabs %}
 {% tab title="Swanky Phala" %}
-> If you have not installed `swanky phala` CLI tool, follow these [steps](../swanky-phala-cli-tool.md) to get started.
+> If you have not installed `swanky phala` CLI tool, follow these [steps](swanky-phala-cli-tool.md) to get started.
 
 Go to your development workspace and initialize a new project. For this tutorial, we will name the project `Norwhich` and choose the `phat_hello` template.
 
@@ -42,7 +42,7 @@ git clone https://github.com/Phala-Network/phat-hello
 
 > **Contract Examples**
 >
-> More Phat contract examples can be found in [phat-contract-examples](https://github.com/Phala-Network/phat-contract-examples) and [awesome-phat-contracts](<../../.gitbook/assets/awesome phat contracts>) repositories.
+> More Phat contract examples can be found in [phat-contract-examples](https://github.com/Phala-Network/phat-contract-examples) and [awesome-phat-contracts](../../.gitbook/assets/awesome%20phat%20contracts/) repositories.
 
 This will create a folder `phat-hello` in your work directory. The folder contains a scaffold `Cargo.toml` and a `lib.rs`, which both contain the necessary building blocks for using Phat Contract.
 

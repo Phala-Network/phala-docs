@@ -1,4 +1,4 @@
-# Governance
+# 🗳 Governance
 
 ## Participate in Democracy <a href="#participate-in-democracy" id="participate-in-democracy"></a>
 

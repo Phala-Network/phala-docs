@@ -6,7 +6,7 @@ Now that you have created and compiled your `phat_hello` contract, let's deploy 
 
 {% tabs %}
 {% tab title="Swanky Phala" %}
-> If you have not installed `swanky phala` CLI tool, follow these [steps](../swanky-phala-cli-tool.md) to get started.
+> If you have not installed `swanky phala` CLI tool, follow these [steps](swanky-phala-cli-tool.md) to get started.
 
 Go to your development workspace and ensure that you have updated your `devphase.config.json` file to include the PoC5 Testnet info. Within`networks` , add the following:
 
@@ -19,7 +19,7 @@ Go to your development workspace and ensure that you have updated your `devphase
   },
 ```
 
-`poc5` will be the `-n` flag value in the `swanky phala contract deploy` command.&#x20;
+`poc5` will be the `-n` flag value in the `swanky phala contract deploy` command.
 
 Next, you will execute the following command to deploy your `phat_hello` compiled contract.
 

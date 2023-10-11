@@ -1,4 +1,4 @@
-# SubBridge
+# 🌉 SubBridge
 
 ## What is SubBridge? <a href="#what-is-subbridge" id="what-is-subbridge"></a>
 
@@ -22,13 +22,13 @@ SygmaBridge is the updated version of ChainBridge, which use an MPC-based relaye
 
 Since currently both SygmaBridge and ChainBridge exist, users can choose which bridge to use, even SubBridge UI always uses SygmaBridge for PHA transfer. The difference between using ChainBridge and SygmaBridge only detdetermd by the way we construct the `MultiLocation` of the destination.
 
-- For using SygmaBridge
+* For using SygmaBridge
 
 ```rust
 MultiLocation::new(1, X4(Parachain(2035), GeneralKey('sygma'), GeneralIndex(ethereumChainId), GeneralKey(recipientAddress))
 ```
 
-- For using ChainBridge
+* For using ChainBridge
 
 ```rust
 MultiLocation::new(1, X4(Parachain(2035), GeneralKey('cb'), GeneralIndex(ethereumChainId), GeneralKey(recipientAddress))

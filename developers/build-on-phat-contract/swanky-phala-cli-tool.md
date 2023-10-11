@@ -8,8 +8,8 @@ Ensure your rust toolchain requirements are installed correctly to ensure your c
 
 | Rust Toolchain | Requirement                                 |
 | -------------- | ------------------------------------------- |
-| cargo          | <= `cargo 1.69.0 (6e9a83356 2023-04-12)`    |
-| cargo-contract | <= `3.0.1-unknown-x86_64-unknown-linux-gnu` |
+| cargo          | <= `cargo 1.72.0`                           |
+| cargo-contract | <= `3.2.0-unknown-x86_64-unknown-linux-gnu` |
 | target         | `wasm32-unknown-unknown`                    |
 | component      | `rust-src`                                  |
 

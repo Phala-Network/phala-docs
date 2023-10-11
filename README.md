@@ -4,7 +4,7 @@ cover: .gitbook/assets/Phala-Network-Intro-Page.png
 coverY: -178
 ---
 
-# What is Phala Network?
+# 🤔 What is Phala Network?
 
 ## Our Mission <a href="#phala-network-web3-computing-cloud" id="phala-network-web3-computing-cloud"></a>
 
@@ -16,7 +16,7 @@ Furthermore, in a digital landscape that is becoming increasingly centralized, P
 
 ## Trustless Computation. Verifiable Results.
 
-Phala Network is designed with multiple layers of security guarantees to provide fully verifiable computation. Anybody with the correct hardware can become a compute providing “[Worker](broken-reference)” for the network and earn rewards, and Phala has an array of mechanisms in place to ensure Workers always carry out computation faithfully and securely. [Tokenomic incentives](developers/phat-contract/pay-for-cloud-service.md), hardware-based assurances, and cryptographic evidence of execution published and verified on the Phala blockchain enable Phat Contract to seamlessly extend blockchain-level security to the off-chain realm.
+Phala Network is designed with multiple layers of security guarantees to provide fully verifiable computation. Anybody with the correct hardware can become a compute providing “[Worker](broken-reference/)” for the network and earn rewards, and Phala has an array of mechanisms in place to ensure Workers always carry out computation faithfully and securely. [Tokenomic incentives](developers/phat-contract/pay-for-cloud-service.md), hardware-based assurances, and cryptographic evidence of execution published and verified on the Phala blockchain enable Phat Contract to seamlessly extend blockchain-level security to the off-chain realm.
 
 ## Supercharge Your dApps with Phat Contract
 
