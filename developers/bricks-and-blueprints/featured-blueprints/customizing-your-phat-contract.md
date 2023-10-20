@@ -418,7 +418,7 @@ As a developer you can utilize these types in many ways. Here are some examples 
 const addressCoder = new Coders.AddressCoder("address");
 // uint Coder
 const uintCoder = new Coders.NumberCoder(32, false, "uint256");
-function encodeReply(reply: [uint, uint, address]): HexString {
+function encodeReply(reply: [uint, uint, string]): HexString {
   return Coders.encode([uintCoder, uintCoder, addressCoder], reply) as HexString;
 }
 // Defined in OracleConsumerContract.sol
@@ -437,13 +437,13 @@ export default function main(request: HexString, settings: string): HexString {
   }
   //...
   try {
-    const response = "Mike Jones";
+    const response = "0x0e9e628d715003ff5045fc92002c67ddab364683";
     return encodeReply([TYPE_RESPONSE, requestId, response]);
   } catch (error) {
     // Define error logic
     // otherwise tell client we cannot process it
-    console.log("error:", [TYPE_ERROR, requestId, error]);
-    return encodeReply([TYPE_ERROR, requestId, errorToCode(error as Error)]);
+    console.log("error:", [TYPE_ERROR, requestId, "0x0"]);
+    return encodeReply([TYPE_ERROR, requestId, "0x0"]);
   }
 }
 // ...
@@ -452,8 +452,8 @@ export default function main(request: HexString, settings: string): HexString {
 `OracleConsumerContract.sol`
 
 ```solidity
-event ResponseReceived(uint reqId, string reqStr, string memory value);
-event ErrorReceived(uint reqId, string reqStr, string memory errno);
+event ResponseReceived(uint reqId, string reqStr, address memory value);
+event ErrorReceived(uint reqId, string reqStr, address memory errno);
 // ...
 // request action request for Phat Contract to respond to
 function request(string calldata reqData) public {
@@ -468,15 +468,15 @@ function request(string calldata reqData) public {
 function _onMessageReceived(bytes calldata action) internal override {
     // Optional to check length of action
     // require(action.length == 32 * 3, "cannot parse action");
-    (uint respType, uint id, string memory data) = abi.decode(
+    (uint respType, uint id, address memory addr) = abi.decode(
         action,
-        (uint, uint, string)
+        (uint, uint, address)
     );
     if (respType == TYPE_RESPONSE) {
-        emit ResponseReceived(id, requests[id], data);
+        emit ResponseReceived(id, requests[id], addr);
         delete requests[id];
     } else if (respType == TYPE_ERROR) {
-        emit ErrorReceived(id, requests[id], data);
+        emit ErrorReceived(id, requests[id], addr);
         delete requests[id];
     }
 }
@@ -604,8 +604,8 @@ export default function main(request: HexString, settings: string): HexString {
 `OracleConsumerContract.sol`
 
 ```solidity
-event ResponseReceived(uint reqId, string reqStr, string memory value);
-event ErrorReceived(uint reqId, string reqStr, string memory errno);
+event ResponseReceived(uint reqId, string reqData, uint256 value);
+event ErrorReceived(uint reqId, string reqData, uint256 errno);
 // ...
 // request action request for Phat Contract to respond to
 function request(string calldata reqData) public {
@@ -713,7 +713,9 @@ function _onMessageReceived(bytes calldata action) internal override {
 {% endtab %}
 
 {% tab title="ArrayCoder" %}
-`ArrayCoder` Example
+`ArrayCoder` Static Array Example
+
+> Static arrays can be created by defining a `number` > 0. as the `length` parameter in the `Coders.ArrayCoder(coder: Coder, length: number, localName: string)` function.
 
 `index.ts`
 
@@ -721,7 +723,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 // ...
 // Encode String
 const stringCoder = new Coders.StringCoder("string");
-const stringArrayCoder = new Coders.ArrayCoder(stringCoder, 10, "string[]");
+const stringArrayCoder = new Coders.ArrayCoder(stringCoder, 3, "string[]");
 function encodeReply(reply: [number, number, string[]]): HexString {
   return Coders.encode([uintCoder, uintCoder, stringArrayCoder], reply) as HexString;
 }
@@ -741,7 +743,7 @@ export default function main(request: HexString, settings: string): HexString {
   }
   //...
   try {
-    const response = "hello";
+    const response = ["Who?", "Mike", "Jones"];
     return encodeReply([TYPE_RESPONSE, requestId, response]);
   } catch (error) {
     // Define error logic
@@ -769,9 +771,77 @@ function request(string calldata reqData) public {
 function _onMessageReceived(bytes calldata action) internal override {
     // Optional to check length of action
     // require(action.length == 32 * 3, "cannot parse action");
-    (uint respType, uint id, string [10] memory data) = abi.decode(
+    (uint respType, uint id, string [3] memory data) = abi.decode(
         action,
-        (uint, uint, string[10])
+        (uint, uint, string[3])
+    );
+    // ...
+}
+// ...
+```
+
+
+
+`ArrayCoder` Dynamic Array Example
+
+> Dynamic arrays can be created by using `-1` as the `length` parameter in the `Coders.ArrayCoder(coder: Coder, length: number, localName: string)` function.
+
+`index.ts`
+
+```typescript
+// ...
+// Encode String
+const stringCoder = new Coders.StringCoder("string");
+// Dynamic arrays just put `-1` for the length parameter
+const stringArrayCoder = new Coders.ArrayCoder(stringCoder, -1, "string[]");
+function encodeReply(reply: [number, number, string[]]): HexString {
+  return Coders.encode([uintCoder, uintCoder, stringArrayCoder], reply) as HexString;
+}
+// Defined in OracleConsumerContract.sol
+const TYPE_RESPONSE = 0;
+const TYPE_ERROR = 2;
+
+// main entry function
+export default function main(request: HexString, settings: string): HexString {
+  //...
+   let requestId, encodedReqStr;
+  try {
+    [requestId, encodedReqStr] = Coders.decode([uintCoder, bytesCoder], request);
+  } catch (error) {
+    console.info("Malformed request received");
+    // ...
+  }
+  //...
+  try {
+    const response = ["Who?", "Mike", "Jones", "is", "dynamic"];
+    return encodeReply([TYPE_RESPONSE, requestId, response]);
+  } catch (error) {
+    // Define error logic
+    // otherwise tell client we cannot process it
+    // ...
+  }
+}
+// ...
+```
+
+`OracleConsumerContract.sol`
+
+```solidity
+// ...
+// request action request for Phat Contract to respond to
+function request(string calldata reqData) public {
+    // assemble the request
+    uint id = nextRequest;
+    requests[id] = reqData;
+    _pushMessage(abi.encode(id, reqData));
+    nextRequest += 1;
+}
+//...
+// _onMessageReceived response from Phat Contract
+function _onMessageReceived(bytes calldata action) internal override {
+    (uint respType, uint id, string[] memory data) = abi.decode(
+        action,
+        (uint, uint, string[3])
     );
     // ...
 }
