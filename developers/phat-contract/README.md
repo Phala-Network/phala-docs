@@ -30,13 +30,13 @@ On-chain computation has severe limitations and is often prohibitively expensive
 
 Given the stark technical constraints of building on-chain, it’s generally optimal to keep the on-chain contracts as small and compact as possible, and implement the more robust logic off-chain.
 
-Phat Contracts are run on a tamper-proof distributed network that uses the Phala blockchain to always ensure the fidelity of deployed contracts and their execution. This allows Phat Contracts to circumvent the limitations of Smart Contracts _**while retaining**_ trustlessness, verifiability, and permisionlessness.
+Phat Contracts are run on a tamper-proof distributed network that uses the Phala blockchain to always ensure the fidelity of deployed contracts and their execution. This allows Phat Contracts to circumvent the limitations of Smart Contracts _**while retaining**_ trustlessness, verifiability, and permissionlessness.
 
 Phat Contracts are not meant to replace Smart Contracts, instead, they are the missing decentralized computation unit for decentralized applications.
 
 ## A Developer Experience for Everyone
 
-Users can build and deploy Phat Contract in a few different ways depending on their needs and ability.
+Users can build and deploy a Phat Contract in a few different ways depending on their needs and ability.
 
 ### [**Phat Contract 2.0**](../bricks-and-blueprints/)
 
