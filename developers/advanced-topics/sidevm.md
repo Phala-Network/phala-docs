@@ -36,7 +36,7 @@ We have a [frontend](https://phat.phala.network/) but it does not support the Si
 
 ### **Upload SideVM Program**
 
-Use [Polkadot.js](https://polkadot.js.org/apps/) and change the endpoint to `Phala (PoC 5)` under `TEST NETWORKS`.
+Use [Polkadot.js](https://polkadot.js.org/apps/) and change the endpoint to `Phala (PoC 6)` under `TEST NETWORKS`.
 
 ![](https://i.imgur.com/gerZoKj.png)
 
@@ -46,9 +46,9 @@ Submit the transaction and you shall see its success.
 
 **Interact with Phat UI**
 
-Go to [https://phat.phala.network/](https://phat.phala.network/), click `sign in` and link your address. You need to ensure the `RPC Endpoint` is [wss://poc5.phala.network/ws](wss://poc5.phala.network/ws) and `Default PRuntime Endpoint` [https://poc5.phala.network/tee-api-1](https://poc5.phala.network/tee-api-1).
+Go to [https://phat.phala.network/](https://phat.phala.network/), click `sign in` and link your address. You need to ensure the `RPC Endpoint` is [wss://poc6.phala.network/ws](wss://poc5.phala.network/ws) and `Default PRuntime Endpoint` [https://phat-cluster-us.phala.network/poc6/pruntime/0xac5087e0](https://phat-cluster-us.phala.network/poc6/pruntime/0xac5087e0).
 
-![](https://i.imgur.com/P3X0YVo.png)
+![](../../.gitbook/assets/SelectPoC6.png)
 
 Click `Upload` and drag your `target/ink/start_sidevm.contract`. Choose the default constructor and Cluster `0x0000000000000000000000000000000000000000000000000000000000000000`. Click `Submit`. You should see something like
 

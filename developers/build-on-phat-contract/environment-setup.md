@@ -11,13 +11,13 @@ The Phat Contract uses the Rust-based ink! language, and is ultimately compiled 
 >
 > The Mac M1/M2 chips do not support the deployment of a local testnet at this time. If you are using a machine with these chips, you will have to deploy to the live testnet through [DevPHAse](https://github.com/l00k/devphase), [swanky phala](swanky-phala-cli-tool.md), or [Phat UI](https://phat.phala.network).
 >
-> Information to connect to the Phala Live Testnet PoC5
+> Information to connect to the Phala Live Testnet PoC6
 >
-> * RPC WS Endpoint: wss://poc5.phala.network/ws
-> * RPC HTTP Endpoint: https:/poc5.phala.network/rpc
+> * RPC WS Endpoint: wss://poc6.phala.network/ws
+> * RPC HTTP Endpoint: https:/poc6.phala.network/rpc
 > * Cluster ID: 0x0000000000000000000000000000000000000000000000000000000000000001
-> * Worker: 0x94a2ded4c77fbb910943f7e452e4d243ee5b60bf1a838a911acf2ffd4bae9b63
-> * pRuntime URL: [https://poc5.phala.network/tee-api-1](https://poc5.phala.network/tee-api-1)
+> * Worker: 0xac5087e0e21de2b2637511e6710db74e5ec2dbc3f02db76ffa02662878ecf333
+> * pRuntime URL: [https://phat-cluster-us.phala.network/poc6/pruntime/0xac5087e0](https://phat-cluster-us.phala.network/poc6/pruntime/0xac5087e0)
 
 ## Install Toolchains
 
@@ -40,9 +40,9 @@ Then you can install the `cargo-contract` with
 cargo install cargo-contract --force
 ```
 
-Then check your `cargo-contract` and ensure it’s updated to `2.x` with ink! 4 support
+Then check your `cargo-contract` and ensure it’s updated to `3.2.x` with ink! 4 support
 
 ```
 cargo contract --version
-# cargo-contract-contract 2.1.0-unknown-x86_64-unknown-linux-gnu
+# cargo-contract-contract 3.2.0-unknown-x86_64-unknown-linux-gnu
 ```

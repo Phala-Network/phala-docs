@@ -49,7 +49,7 @@
   * [Run Local Testnet](developers/advanced-topics/run-local-testnet.md)
   * [SideVM](developers/advanced-topics/sidevm.md)
 * [🆘 Support](developers/support/README.md)
-  * [Available Chains](developers/support/endpoints.md)
+  * [Available Phala Chains](developers/support/endpoints.md)
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
 * [⁉ FAQ](developers/faq.md)

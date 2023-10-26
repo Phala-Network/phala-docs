@@ -16,7 +16,7 @@ This project represents a basic EVM Consumer Contract that is compatible with a 
   * [Alchemy](https://bit.ly/46uObaH) - This repo example uses Alchemy's API Key.
   * [Infura](https://bit.ly/3PXXCtN)
   * Personal RPC Node (Ex. [ProjectPi](https://bit.ly/3RGf7QS))
-* Polkadot Account for Phala PoC5 Testnet and Mainnet deployment
+* Polkadot Account for Phala PoC6 Testnet and Mainnet deployment
 
 ### Environment Variables: <a href="#user-content-environment-variables" id="user-content-environment-variables"></a>
 
@@ -85,7 +85,7 @@ This step requires you to have a Polkadot account. You can get an account from o
 * [Talisman Wallet](https://bit.ly/3ZzAPYD)
 * [SubWallet](https://bit.ly/3tjS8R7) (**Support for iOS/Android**)
 
-First, create your Phala Profile account on the [Phala PoC5 Testnet](https://bit.ly/3LHccmR) or [Phala Mainnet](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:&#x20;
+First, create your Phala Profile account on the [Phala PoC6 Testnet](https://bit.ly/3LHccmR) or [Phala Mainnet](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:&#x20;
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/BricksProfileCheck.png" alt=""><figcaption></figcaption></figure>
 
@@ -417,11 +417,11 @@ yarn test-verify 0x090E8fDC571d65459569BC87992C1026121DB955
 # ✨  Done in 5.91s.
 ```
 
-### Deploy Phat Contract to PoC5 Testnet <a href="#user-content-deploy-phat-contract-to-poc5-testnet" id="user-content-deploy-phat-contract-to-poc5-testnet"></a>
+### Deploy Phat Contract to PoC6 Testnet <a href="#user-content-deploy-phat-contract-to-poc5-testnet" id="user-content-deploy-phat-contract-to-poc5-testnet"></a>
 
-For customizing your Phat Contract, checkout Phat Contract custom configurations in [customizing-your-phat-contract.md](customizing-your-phat-contract.md "mention") to learn more before deploying to PoC5 testnet.
+For customizing your Phat Contract, checkout Phat Contract custom configurations in [customizing-your-phat-contract.md](customizing-your-phat-contract.md "mention") to learn more before deploying to PoC6 testnet.
 
-Now that are Phat Contract has built successfully, let's deploy to Phala PoC5 Testnet with the following command:
+Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Testnet with the following command:
 
 ```shell
 # If you did not export your Polkadot account in a 
@@ -444,21 +444,21 @@ yarn test-deploy-function -a ./polkadot-account.json
 # Compiled successfully.
 #
 #  17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://poc5.phala.network/ws... ⡿
+# Connecting to the endpoint: wss://poc6.phala.network/ws... ⡿
 # (node:25497) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
-# Connecting to the endpoint: wss://poc5.phala.network/ws... done
+# Connecting to the endpoint: wss://poc6.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
 # Instantiating the ActionOffchainRollup contract... done
 # The ActionOffchainRollup contract has been instantiated: 0x9c777c16b0a185caa895835b8f3b9e8d67be9f5e30197f71b4d32d2b8fde4b3b
 # Setting up the actions... done
-# 🎉 Your workflow has been added, you can check it out here: https://bricks-poc5.phala.network/workflows/0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd/3
+# 🎉 Your workflow has been added, you can check it out here: https://bricks-poc6.phala.network/workflows/0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd/3
 # Your Attestor address: 0x2b5fe2920cce2f522d69613adaa9378ba43b687d
 # Your WORKFLOW_ID: 3
 # ✨  Done in 73.22s.
 ```
 
-Go to the [PoC5 Testnet Bricks UI](https://bit.ly/3ZzwWCY) Dashboard and you can see your newly deployed Phat Contract.&#x20;
+Go to the [PoC6 Testnet Bricks UI](https://bit.ly/3ZzwWCY) Dashboard and you can see your newly deployed Phat Contract.&#x20;
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/Function-added.png" alt=""><figcaption></figcaption></figure>
 
@@ -476,7 +476,7 @@ yarn test-set-attestor
 # $ hardhat run --network mumbai ./scripts/mumbai/set-attestor.ts
 # Setting attestor...
 # 🚨NOTE🚨
-# Make sure to set the Consumer Contract Address in your Phat Bricks 🧱 UI dashboard (https://bricks-poc5.phala.network)
+# Make sure to set the Consumer Contract Address in your Phat Bricks 🧱 UI dashboard (https://bricks-poc6.phala.network)
 # - Go to 'Configure Client' section where a text box reads 'Add Consumer Smart Contract'
 # - Set value to 0x090E8fDC571d65459569BC87992C1026121DB955
 # Done
@@ -511,7 +511,7 @@ yarn test-push-request
 # ✨  Done in 2.97s.
 ```
 
-### Update Phat Contract on Phala PoC5 Testnet <a href="#user-content-update-phat-contract-on-phala-poc5-testnet" id="user-content-update-phat-contract-on-phala-poc5-testnet"></a>
+### Update Phat Contract on Phala PoC6 Testnet <a href="#user-content-update-phat-contract-on-phala-poc5-testnet" id="user-content-update-phat-contract-on-phala-poc5-testnet"></a>
 
 Sometimes you may have had a bug in your script or you want to test things out on the fly without deploying a whole new Phat Contract. We now allow you to update your Phat Contract easily in the commandline. Now let's update the Phat Contract with the following command:
 
@@ -530,9 +530,9 @@ yarn test-update-function -a ./polkadot-account.json
 # Compiled successfully.
 #
 #   17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://poc5.phala.network/ws... ⡿
+# Connecting to the endpoint: wss://poc6.phala.network/ws... ⡿
 # (node:25392) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
-# Connecting to the endpoint: wss://poc5.phala.network/ws... done
+# Connecting to the endpoint: wss://poc6.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
 # Checking your workflow settings... done
@@ -616,7 +616,7 @@ yarn main-deploy-function -a ./polkadot-account.json
 # Instantiating the ActionOffchainRollup contract... done
 # The ActionOffchainRollup contract has been instantiated: 0x9c777c16b0a185caa895835b8f3b9e8d67be9f5e30197f71b4d32d2b8fde4b3b
 # Setting up the actions... done
-# 🎉 Your workflow has been added, you can check it out here: https://bricks-poc5.phala.network/workflows/0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd/3
+# 🎉 Your workflow has been added, you can check it out here: https://bricks-poc6.phala.network/workflows/0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd/3
 # Your Attestor address: 0x2b5fe2920cce2f522d69613adaa9378ba43b687d
 # Your WORKFLOW_ID: 2
 # ✨  Done in 73.22s.
@@ -630,7 +630,7 @@ Execute Scripts to Consumer Contract on Polygon Mainnet. The Consumer Contract o
 yarn main-set-attestor
 # Setting attestor...
 # 🚨NOTE🚨
-# Make sure to set the Consumer Contract Address in your Phat Bricks 🧱 UI dashboard (https://bricks-poc5.phala.network)
+# Make sure to set the Consumer Contract Address in your Phat Bricks 🧱 UI dashboard (https://bricks-poc6.phala.network)
 # - Go to 'Configure Client' section where a text box reads 'Add Consumer Smart Contract'
 # - Set value to 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
 # Done

@@ -22,9 +22,9 @@ Phala Network is designed with multiple layers of security guarantees to provide
 
 Developers can use Phala Network by deploying Phat Contracts, programs that run on Phala Network’s off-chain Workers that can interface with Smart Contracts on any chain.
 
-Our no-code experience, Phat Bricks, uses pre-written, audited Phat Contracts to form complex functions called [Blueprints](developers/bricks-and-blueprints/featured-blueprints/) that developers can integrate with their Smart Contracts in minutes.
+Our low-code experience, Phat Contract 2.0, uses pre-written, audited Phat Contracts to form complex functions using TypeScript/JavaScript that developers can integrate with their Smart Contracts in minutes.
 
-Developers with experience using Rust, ink!, JavaScript, or TypeScript can jump into [Native Phat Contract](developers/getting-started/) and write their own custom programs to service any number of use cases.
+Developers with experience using Rust, ink!, JavaScript, or TypeScript can jump into [Phat Contract Rust SDK](developers/getting-started/) and write their own custom programs to service any number of use cases.
 
 Use cases for Phat Contract include:
 

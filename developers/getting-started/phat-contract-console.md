@@ -14,9 +14,9 @@ On the homepage, click _Connect Wallet_ in the right top corner, and select the 
 
 Clicking the green dot beside your account will tell you the information about the current chain you are connected to.
 
-<figure><img src="../../.gitbook/assets/phat-ui-connection-info.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/SelectNetwork.png" alt=""><figcaption></figcaption></figure>
 
-By default, the UI will connect to [Phala PoC-5 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). Check the full [chain list](../support/endpoints.md).
+By default, the UI will connect to [Phala PoC-6 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). Check the full [chain list](../support/endpoints.md).
 
 You can connect to other chains by filling in the RPC Endpoint and clicking _Connect_. The UI will automatically read the cluster information from the chain and fill in the PRuntime for you, but you can always set it to other workers manually.
 
@@ -39,7 +39,7 @@ Choose `Upload` and locate your `phat_hello.contract` file that you downloaded. 
 
 <figure><img src="../../.gitbook/assets/phat-ui-upload.png" alt=""><figcaption></figcaption></figure>
 
-After you click the `Submit`, the UI will ask for your permission to upload the contract WASM to the blockchain through a transaction. Click "Approve" to continue.&#x20;
+After you click the `Submit`, the UI will ask for your permission to upload the contract WASM to the blockchain through a transaction. Click "Approve" to continue.
 
 > **What happened**
 >

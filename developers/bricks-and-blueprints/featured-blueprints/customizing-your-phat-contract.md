@@ -136,7 +136,7 @@ Here we utilize the `pink.batchHttpRequest()` function, but we only use a single
 
 ### `pink.invokeContract()` & `pink.invokeContractDelegate()` <a href="#user-content-pinkinvokecontract--pinkinvokecontractdelegate" id="user-content-pinkinvokecontract--pinkinvokecontractdelegate"></a>
 
-* `pink.invokeContract()` allows for a call to a specified address of a Phat contract deployed on Phala's Mainnet or PoC5 Testnet depending on where you deploy your function.
+* `pink.invokeContract()` allows for a call to a specified address of a Phat contract deployed on Phala's Mainnet or PoC6 Testnet depending on where you deploy your function.
 * `pink.invokeContractDelegate()` is similar but instead the call on a Phat Contract is targeted by the code hash.
 
 These functions are not necessarily important for those that are not familiar with building on the Rust SDK of Phat contract and can be skipped for now. For more information on this information, feel free to reach out to the core team in the #phat-contract channel on [discord](https://discord.gg/dB4AuP4Q).
