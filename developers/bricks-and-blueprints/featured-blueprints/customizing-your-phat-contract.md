@@ -1,5 +1,7 @@
 # 🏗 Customizing Your Phat Contract
 
+> For detailed docs on `phat_js` , go [here](https://bit.ly/phat\_js) for the latest.
+
 ## What Can You Do With Your Phat Contract? <a href="#user-content-what-can-you-do-with-your-function" id="user-content-what-can-you-do-with-your-function"></a>
 
 In the `README.md` [link](https://github.com/Phala-Network/phat-contract-starter-kit/blob/main/GETTING\_STARTED.md), you learned how to generate a new default function template and execute the 3 separate ways to test and validate your the results of the function. Now we will dive into what you can do with your function to extend the capabilities.
@@ -139,12 +141,6 @@ Here we utilize the `pink.batchHttpRequest()` function, but we only use a single
 * `pink.invokeContract()` allows for a call to a specified address of a Phat contract deployed on Phala's Mainnet or PoC6 Testnet depending on where you deploy your function.
 * `pink.invokeContractDelegate()` is similar but instead the call on a Phat Contract is targeted by the code hash.
 
-These functions are not necessarily important for those that are not familiar with building on the Rust SDK of Phat contract and can be skipped for now. For more information on this information, feel free to reach out to the core team in the #phat-contract channel on [discord](https://discord.gg/dB4AuP4Q).
-
-<details>
-
-<summary>Examples</summary>
-
 ```typescript
 // Delegate calling
 const delegateOutput = pink.invokeContractDelegate({
@@ -164,9 +160,47 @@ const contractOutput = pink.invokeContract({
 });
 ```
 
-</details>
+This is the low-level API for cross-contract call. If you have the contract metadata file, there is a [script](https://bit.ly/phat-js-meta2js) to help generate the high-level API for cross-contract call. For example run the following command:
+
+```bash
+python meta2js.py --keep System::version /path/to/system.contract
+```
+
+Would generate the following code:
+
+```typescript
+function invokeContract(callee, selector, args, metadata, registry) {
+    const inputCodec = pink.SCALE.codec(metadata.inputs, registry);
+    const outputCodec = pink.SCALE.codec(metadata.output, registry);
+    const input = inputCodec.encode(args ?? []);
+    const output = pink.invokeContract({ callee, selector, input });
+    return outputCodec.decode(output);
+}
+class System {
+    constructor(address) {
+        this.typeRegistryRaw = '#u16\n(0,0,0)\n<CouldNotReadInput::1>\n<Ok:1,Err:2>'
+        this.typeRegistry = pink.SCALE.parseTypes(this.typeRegistryRaw);
+        this.address = address;
+    }
+   
+    system$Version() {
+        const io = {"inputs": [], "output": 3};
+        return invokeContract(this.address, 2278132365, [], io, this.typeRegistry);
+    }
+}
+```
+
+Then you can use the high-level API to call the contract:
+
+```typescript
+const system = new System(systemAddress);
+const version = system.system$Version();
+console.log("version:", version);
+```
 
 ### `pink.httpRequest()` <a href="#user-content-pinkhttprequest" id="user-content-pinkhttprequest"></a>
+
+> HTTP request is supported in the JS environment. However, the API is **sync** rather than **async**. This is different from other JavaScript engines.
 
 The `pink.httpRequest()` allows for you to make a single HTTP request from your function to an HTTP endpoint. You will have to define your args:
 
@@ -387,7 +421,112 @@ Let's see how the results look.
 
     <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/TG-hashes.png" alt=""><figcaption></figcaption></figure>
 
-## Handle Response Encoding & Decoding
+## SCALE Codec
+
+Let’s introduce the details of the SCALE codec API which is not documented in the above link.
+
+The SCALE codec API is mounted on the global object `pink.SCALE` which contains the following functions:
+
+* `pink.SCALE.parseTypes(types: string): TypeRegistry`
+* `pink.SCALE.codec(type: string | number | number[], typeRegistry?: TypeRegistry): Codec`
+
+Let’s make a basice example to show how to use the SCALE codec API:
+
+```
+const types = `
+  Hash=[u8;32]
+  Info={hash:Hash,size:u32}
+`;
+const typeRegistry = pink.SCALE.parseTypes(types);
+const infoCodec = pink.SCALE.codec(`Info`, typeRegistry);
+const encoded = infoCodec.encode({
+ hash: "0x1234567890123456789012345678901234567890123456789012345678901234",
+ size: 1234,
+});
+console.log("encoded:", encoded);
+const decoded = infoCodec.decode(encoded);
+pink.inspect("decoded:", decoded);
+```
+
+The above code will output:
+
+```
+JS: encoded: 18,52,86,120,144,18,52,86,120,144,18,52,86,120,144,18,52,86,120,144,18,52,86,120,144,18,52,86,120,144,18,52,210,4,0,0
+JS: decoded: {
+JS: hash: 0x1234567890123456789012345678901234567890123456789012345678901234,
+JS: size: 1234
+JS: }
+```
+
+Or using the direct encode/decode api which support literal type definition as well as a typename or id, for example:
+
+```
+const data = { name: "Alice", age: 18 };
+const encoded = pink.SCALE.encode(data, "{ name: str, age: u8 }");
+const decoded = pink.SCALE.decode(encoded, "{ name: str, age: u8 }");
+```
+
+### Grammar of The Type Definition
+
+In the above example, we use the following type definition:
+
+```
+Hash=[u8;32]
+Info={hash:Hash,size:u32}
+```
+
+where we define a type `Hash` which is an array of 32 bytes, and a type `Info` which is a struct containing a `Hash` and a `u32`.
+
+The grammar is defined as follows:
+
+Each entry is type definition, which is of the form `name=type`. Where name must be a valid identifier, and type is a valid type expression described below.
+
+Type expression can be one of the following:
+
+<table data-full-width="true"><thead><tr><th>Type Expression</th><th>Description</th><th>Example</th><th>JS type</th></tr></thead><tbody><tr><td><code>bool</code></td><td>Primitive type bool</td><td></td><td><code>true</code>, <code>false</code></td></tr><tr><td><code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code>, <code>u128</code>, <code>i8</code>, <code>i16</code>, <code>i32</code>, <code>i64</code>, <code>i128</code></td><td>Primitive number types</td><td></td><td>number or bigint</td></tr><tr><td><code>str</code></td><td>Primitive type str</td><td></td><td>string</td></tr><tr><td><code>[type;size]</code></td><td>Array type with element type <code>type</code> and size <code>size</code>.</td><td><code>[u8; 32]</code></td><td>Array of elements. (Uint8Array or <code>0x</code> prefixed hex string is allowed for [u8; N])</td></tr><tr><td><code>[type]</code></td><td>Sequence type with element type <code>type</code>.</td><td><code>[u8]</code></td><td>Array of elements. (Uint8Array or <code>0x</code> prefixed hex string is allowed for <a href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</td></tr><tr><td><code>(type1, type2, ...)</code></td><td>Tuple type with elements of type <code>type1</code>, <code>type2</code>, …</td><td><code>(u8, str)</code></td><td>Array of value for inner type. (e.g. <code>[42, 'foobar']</code>)</td></tr><tr><td><code>{field1:type1, field2:type2, ...}</code></td><td>Struct type with fields and types.</td><td><code>{age:u32, name:str}</code></td><td>Object with field name as key</td></tr><tr><td><code>&#x3C;variant1:type1, variant2:type2, ...></code></td><td>Enum type with variants and types. if the variant is a unit variant, then the type expression can be omitted.</td><td><code>&#x3C;Success:i32, Error:str></code>, <code>&#x3C;None,Some:u32></code></td><td>Object with variant name as key. (e.g. <code>{Some: 42}</code>)</td></tr><tr><td><code>@type</code></td><td>Compact number types. Only unsigned number types is supported</td><td><code>@u64</code></td><td>number or bigint</td></tr></tbody></table>
+
+### Generic Type Support
+
+Generic parameters can be added to the type definition, for example:
+
+```
+Vec<T>=[T]
+```
+
+### Option Type
+
+The Option type is not a special type, but a vanilla enum type. It is needed to be defined by the user explicitly. Same for the Result type.
+
+```
+Option<T>=<None,Some:T>
+Result<T,E>=<Ok:T,Err:E>
+```
+
+There is one special syntax for the Option type:
+
+```
+Option<T>=<_None,_Some:T>
+```
+
+If the Option type is defined in this way, then the `None` variant would be decoded as `null` instead of `{None: null}` and the `Some` variant would be decoded as the inner value directly instead of `{Some: innerValue}`. For example:
+
+```
+const encoded = pink.SCALE.encode(42, "<_None,_Some:u32>");
+const decoded = pink.SCALE.decode(encoded, "<_None,_Some:u32>");
+console.log(decoded); // 42
+```
+
+### Nested Type Definition
+
+Type definition can be nested, for example:
+
+```
+Block={header:{hash:[u8;32],size:u32}}
+```
+
+## Handle Solidity Response Encoding & Decoding
+
+> For TypeScript/JavaScript example scripts, check out [`@phala/pink-env` examples](https://bit.ly/phala-fn-ex-scripts).
 
 In the `index.ts` file of your Phat Contract starter kit, there is an npm package available called `@phala/ethers` and your file will import `Coders` which has the following types available.
 
