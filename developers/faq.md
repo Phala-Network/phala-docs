@@ -1,6 +1,6 @@
 # ⁉ FAQ
 
-## Phat Contract Development <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
+## :page\_facing\_up: Phat Contract Development <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
 
 ***
 
@@ -91,7 +91,18 @@ There are two types of method calling:
 
 No. The stake to a contract does not change with contract calls. You can always have the full refund. But if other contracts get more stake then your computing power percentage will decrease correspondingly. This only applies to the public cluster. If we create dedicated cluster for our partners then any stake can take all the CPU time
 
-## Phala Compute Infrastructure&#x20;
+### Error on Ubuntu 22.04 Exception: Failed to start pherry component. \<PATH>/pherry: error while loading shared libraries: libssl.so.1.1: cannot open shared object file: No such file or directory
+
+***
+
+Manually pulling deb package and installing fixes issue. Reference from [askubuntu](https://askubuntu.com/questions/1403619/mongodb-install-fails-on-ubuntu-22-04-depends-on-libssl1-1-but-it-is-not-insta).&#x20;
+
+```sh
+wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.20_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.20_amd64.deb
+```
+
+## :computer: Phala Compute Infrastructure&#x20;
 
 ***
 
