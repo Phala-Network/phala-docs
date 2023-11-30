@@ -73,7 +73,7 @@ ls
 # drwxr-xr-x   3 hashwarlock  staff    96B Sep  6 15:32 src
 # drwxr-xr-x   3 hashwarlock  staff    96B Sep  6 15:32 test
 # -rw-r--r--   1 hashwarlock  staff   201B Sep  6 15:32 tsconfig.json
-# -rw-r--r--   1 hashwarlock  staff   290K Sep  6 15:32 yarn.lock
+# -rw-r--r--   1 hashwarlock  staff   290K Sep  6 15:32 package-lock.json
 ```
 
 ### Create a Bricks Profile <a href="#user-content-create-a-bricks-profile" id="user-content-create-a-bricks-profile"></a>
@@ -107,13 +107,13 @@ With a template created and a basic default function example ready to test, let�
 First step is to install the package dependencies with the following command:
 
 ```
-yarn install
+npm install
 ```
 
 Everything should go smoothly and produce similar output below:
 
 ```
-yarn install
+npm install
 # [1/4] 🔍  Resolving packages...
 # [2/4] 🚚  Fetching packages...
 # [3/4] 🔗  Linking dependencies...
@@ -129,22 +129,20 @@ Now that the package dependencies are installed, lets build the default function
 <summary>View file <code>./src/index.ts</code></summary>
 
 ```typescript
-type HexString = `0x${string}`
+// *** YOU ARE LIMITED TO THE FOLLOWING IMPORTS TO BUILD YOUR PHAT CONTRACT     ***
+// *** ADDING ANY IMPORTS WILL RESULT IN ERRORS & UPLOADING YOUR CODE TO PHALA  ***
+// *** NETWORK WILL FAIL. IF YOU WANT TO KNOW MORE, JOIN OUR DISCORD TO SPEAK   ***
+// *** WITH THE PHALA TEAM AT https://discord.gg/5HfmWQNX THANK YOU             ***
+// *** FOR DOCS ON HOW TO CUSTOMIZE YOUR PC 2.0 https://bit.ly/customize-pc-2-0 ***
+import "@phala/pink-env";
+import {encodeReply, decodeRequest, HexString, encodeReplyAbiParams, decodeRequestAbiParams} from "./viem/coder";
 
-// eth abi coder
-const uintCoder = new Coders.NumberCoder(32, false, "uint256");
-const bytesCoder = new Coders.BytesCoder("bytes");
-
-function encodeReply(reply: [number, number, number]): HexString {
-  return Coders.encode([uintCoder, uintCoder, uintCoder], reply) as HexString;
-}
-
-// Defined in TestLensOracle.sol
+// Defined in OracleConsumerContract.sol
 const TYPE_RESPONSE = 0;
 const TYPE_ERROR = 2;
 
 enum Error {
-  BadLensProfileId = "BadLensProfileId",
+  BadRequestString = "BadRequestString",
   FailedToFetchData = "FailedToFetchData",
   FailedToDecode = "FailedToDecode",
   MalformedRequest = "MalformedRequest",
@@ -152,7 +150,7 @@ enum Error {
 
 function errorToCode(error: Error): number {
   switch (error) {
-    case Error.BadLensProfileId:
+    case Error.BadRequestString:
       return 1;
     case Error.FailedToFetchData:
       return 2;
@@ -163,11 +161,6 @@ function errorToCode(error: Error): number {
     default:
       return 0;
   }
-}
-
-function isHexString(str: string): boolean {
-  const regex = /^0x[0-9a-f]+$/;
-  return regex.test(str.toLowerCase());
 }
 
 function stringToHex(str: string): string {
@@ -185,37 +178,42 @@ function fetchLensApiStats(lensApi: string, profileId: string): any {
     "User-Agent": "phat-contract",
   };
   let query = JSON.stringify({
-    query: `query Profile {
-            profile(request: { profileId: \"${profileId}\" }) {
-                stats {
-                    totalFollowers
-                    totalFollowing
-                    totalPosts
-                    totalComments
-                    totalMirrors
-                    totalPublications
-                    totalCollects
-                }
-            }
-        }`,
+    query: `
+      query Profile {
+        profile(request: { forProfileId: "0x01" }) {
+          stats {
+              followers
+              following
+              comments
+              countOpenActions
+              posts
+              quotes
+              mirrors
+              publications
+              reacted
+              reactions
+          }
+        }
+      }
+    `,
   });
   let body = stringToHex(query);
   //
-  // In Phat Function runtime, we not support async/await, you need use `pink.batchHttpRequest` to
-  // send http request. The function will return an array of response.
+  // In Phat Contract runtime, we not support async/await, you need use `pink.batchHttpRequest` to
+  // send http request. The Phat Contract will return an array of response.
   //
   let response = pink.batchHttpRequest(
-    [
-      {
-        url: lensApi,
-        method: "POST",
-        headers,
-        body,
-        returnTextBody: true,
-      },
-    ],
-    2000
-  )[0];
+      [
+        {
+          url: lensApi,
+          method: "POST",
+          headers,
+          body,
+          returnTextBody: true,
+        },
+      ],
+      10000 // Param for timeout in milliseconds. Your Phat Contract script has a timeout of 10 seconds
+  )[0]; // Notice the [0]. This is important bc the `pink.batchHttpRequest` function expects an array of up to 5 HTTP requests.
   if (response.statusCode !== 200) {
     console.log(
       `Fail to read Lens api with status code: ${response.statusCode}, error: ${
@@ -231,62 +229,50 @@ function fetchLensApiStats(lensApi: string, profileId: string): any {
   return JSON.parse(respBody);
 }
 
-function parseProfileId(hexx: string): string {
-  var hex = hexx.toString();
-  if (!isHexString(hex)) {
-    throw Error.BadLensProfileId;
-  }
-  hex = hex.slice(2);
-  var str = "";
-  for (var i = 0; i < hex.length; i += 2) {
-    const ch = String.fromCharCode(parseInt(hex.substring(i, i + 2), 16));
-    str += ch;
-  }
-  return str;
-}
-
 //
-// Here is what you need to implemented for Phat Function, you can customize your logic with
+// Here is what you need to implemented for Phat Contract, you can customize your logic with
 // JavaScript here.
 //
-// The function will be called with two parameters:
+// The Phat Contract will be called with two parameters:
 //
 // - request: The raw payload from the contract call `request` (check the `request` function in TestLensApiConsumerConract.sol).
 //            In this example, it's a tuple of two elements: [requestId, profileId]
-// - settings: The custom settings you set with the `config_core` function of the Action Offchain Rollup Phat Contract. In
-//            this example, it just a simple text of the lens api url prefix.
+// - secrets: The custom secrets you set with the `config_core` function of the Action Offchain Rollup Phat Contract. In
+//            this example, it just a simple text of the lens api url prefix. For more information on secrets, checkout the SECRETS.md file.
 //
 // Your returns value MUST be a hex string, and it will send to your contract directly. Check the `_onMessageReceived` function in
 // TestLensApiConsumerContract.sol for more details. We suggest a tuple of three elements: [successOrNotFlag, requestId, data] as
 // the return value.
 //
-export default function main(request: HexString, settings: string): HexString {
+export default function main(request: HexString, secrets: string): HexString {
   console.log(`handle req: ${request}`);
+  // Uncomment to debug the `secrets` passed in from the Phat Contract UI configuration.
+  // console.log(`secrets: ${secrets}`);
   let requestId, encodedProfileId;
   try {
-    [requestId, encodedProfileId] = Coders.decode([uintCoder, bytesCoder], request);
+    [requestId, encodedProfileId] = decodeRequest(decodeRequestAbiParams, request);
+    console.log(`[${requestId}]: ${encodedProfileId}`);
   } catch (error) {
     console.info("Malformed request received");
-    return encodeReply([TYPE_ERROR, 0, errorToCode(error as Error)]);
+    return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), 0n, BigInt(errorToCode(error as Error))]);
   }
-  const profileId = parseProfileId(encodedProfileId as string);
-  console.log(`Request received for profile ${profileId}`);
-
+  console.log(`Request received for profile ${encodedProfileId}`);
   try {
-    const respData = fetchLensApiStats(settings, profileId);
-    let stats = respData.data.profile.stats.totalCollects;
+    const respData = fetchLensApiStats(secrets, encodedProfileId);
+    let stats = respData.data.profile.stats.posts;
     console.log("response:", [TYPE_RESPONSE, requestId, stats]);
-    return encodeReply([TYPE_RESPONSE, requestId, stats]);
+    return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_RESPONSE), requestId, stats]);
   } catch (error) {
     if (error === Error.FailedToFetchData) {
       throw error;
     } else {
       // otherwise tell client we cannot process it
       console.log("error:", [TYPE_ERROR, requestId, error]);
-      return encodeReply([TYPE_ERROR, requestId, errorToCode(error as Error)]);
+      return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), requestId, BigInt(errorToCode(error as Error))]);
     }
   }
 }
+
 ```
 
 </details>
@@ -294,13 +280,13 @@ export default function main(request: HexString, settings: string): HexString {
 Build the default function with this command:
 
 ```sh
-yarn build-function
+npm run build-function
 ```
 
 You will see output similar to the example below. and a file in `./dist/index.js` will be generated.
 
 ```sh
-yarn build-function
+npm run build-function
 # Creating an optimized build... done
 # Compiled successfully.
 #
@@ -311,28 +297,28 @@ yarn build-function
 With our default function built, we can run some initial tests. First test will be simple.
 
 ```sh
-yarn run-function
+npm run run-function
 ```
 
 It was expected for it to fail like this:
 
 ```sh
-yarn run-function
+npm run run-function
 # handle req: undefined
 # Malformed request received
 # {"output":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}
 # ✨  Done in 0.96s.
 ```
 
-Notice that the test fails and reports that a `Malformed request received` was emitted and the request was `undefined`. This is expected as you will need to define the parameters by adding a `-a abi.encode(requestId, profileId) https://api-mumbai.lens.dev` to your command.
+Notice that the test fails and reports that a `Malformed request received` was emitted and the request was `undefined`. This is expected as you will need to define the parameters by adding a `-a abi.encode(requestId, profileId) https://api-v2-mumbai-live.lens.dev` to your command.
 
 To simulate the expected result locally, run the Phala Oracle function now with this command:
 
 ```sh
-yarn run-function -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
+npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev
 ```
 
-> **What are the ingredients for the `yarn run-function` command?**
+> **What are the ingredients for the `npm run run-function` command?**
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
 >
@@ -357,23 +343,26 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
 
 <summary>How the query looks under the hood</summary>
 
-* HTTP Endpoint: [https://api-mumbai.lens.dev](https://api-mumbai.lens.dev/)
+* HTTP Endpoint: [https://api-v2-mumbai-live.lens.dev](https://api-mumbai.lens.dev/)
 * Profile ID: `0x01`
 * Expected Graphql Query:
 
 ```graphql
 query Profile {
-  profile(request: { profileId: "0x01" }) {
-    stats {
-        totalFollowers
-        totalFollowing
-        totalPosts
-        totalComments
-        totalMirrors
-        totalPublications
-        totalCollects
+    profile(request: { forProfileId: "0x01" }) {
+      stats {
+          followers
+          following
+          comments
+          countOpenActions
+          posts
+          quotes
+          mirrors
+          publications
+          reacted
+          reactions
+      }
     }
-  }
 }
 ```
 
@@ -381,17 +370,19 @@ query Profile {
 
 ```graphql
 {
-  "data": {
-    "profile": {
-      "stats": {
-        "totalFollowers": 3361,
-        "totalFollowing": 0,
-        "totalPosts": 3,
-        "totalComments": 0,
-        "totalMirrors": 0,
-        "totalPublications": 3,
-        "totalCollects": 1597
-      }
+"data": {
+  "profile": {
+    "stats": {
+      "followers": 2,
+      "following": 0,
+      "comments": 0,
+      "countOpenActions": 1,
+      "posts": 14,
+      "quotes": 0,
+      "mirrors": 0,
+      "publications": 14,
+      "reacted": 0,
+      "reactions": 0
     }
   }
 }
@@ -401,14 +392,17 @@ query Profile {
 
 You will see:
 
-```
-yarn run-function -a 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000
-00000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
-# handle req: 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000
-# Request received for profile 0x01
-# response: 0,1,3361
-# {"output":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000d12"}
-# ✨  Done in 1.42s.
+```bash
+npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev/
+
+> lensapi-oracle-consumer-contract@0.0.1 run-function
+> phat-fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev/
+
+handle req: 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000
+[1]: 0x01
+Request received for profile 0x01
+response: 0,1,14
+{"output":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000e"}
 ```
 
 We have now successfully tested the default function and ran a test to verify the function returns a response as expected.
@@ -431,7 +425,7 @@ Lets’s start with the first test case.
 <summary>Expected error if <code>.env</code> not configured.</summary>
 
 ```sh
-yarn hardhat test
+npm run localhost-test
 # Error HH8: There's one or more errors in your config file:
 
 #  * Invalid value undefined for HardhatConfig.networks.polygon.url - Expected a value of type string.
@@ -441,19 +435,18 @@ yarn hardhat test
 
 # For more info go to https://hardhat.org/HH8 or run Hardhat with --show-stack-traces
 # error Command failed with exit code 1.
-# info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
 ```
 
 </details>
 
 ```sh
-yarn hardhat test
+npm run localhost-test
 ```
 
 You will now see that all test cases have passed.
 
 ```sh
-yarn hardhat test
+npm run localhost-test
 # Compiled 14 Solidity files successfully
 #
 #  TestLensApiConsumerContract
@@ -534,7 +527,7 @@ describe("TestLensApiConsumerContract", function () {
 First we will start a local hardhat node.
 
 ```
-yarn hardhat node
+npm run localhost-node
 ```
 
 <details>
@@ -542,7 +535,7 @@ yarn hardhat node
 <summary>Example output</summary>
 
 ```sh
-yarn hardhat node
+npm run localhost-node
 # Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
 
 # Accounts
@@ -557,11 +550,11 @@ yarn hardhat node
 With our hardhat node running locally, we can now deploy the `LensApiConsumerContract.sol` contract to the local hardhat network.
 
 ```sh
-yarn localhost-deploy 
+npm run localhost-deploy 
 ```
 
 ```sh
-yarn localhost-deploy
+npm run localhost-deploy
 # Deploying...
 # Deployed { consumer: '0x0165878A594ca255338adfa4d48449f69242Eb8F' }
 # ✨  Done in 0.94s.
@@ -570,23 +563,23 @@ yarn localhost-deploy
 Make sure to copy the deployed contract address when you deploy your own contract locally. Note you contract address will be different than `0x0165878A594ca255338adfa4d48449f69242Eb8F`. We will now start watching the hardhat node deployed contract for any new requests.
 
 ```sh
-yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
 ```
 
 ```sh
-yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
-# $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-v2-mumbai-live.lens.dev/
+# $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-v2-mumbai-live.lens.dev/
 # Listening for TestLensApiConsumerContract MessageQueued events...
 ```
 
 Let’s now make a new request and see what happens with the listener’s output. In separate tab, you will push a request with the following.
 
 ```sh
-LOCALHOST_CONSUMER_CONTRACT_ADDRESS=0x0165878A594ca255338adfa4d48449f69242Eb8F yarn localhost-push-request
+LOCALHOST_CONSUMER_CONTRACT_ADDRESS=0x0165878A594ca255338adfa4d48449f69242Eb8F npm run localhost-push-request
 ```
 
 ```sh
-LOCALHOST_CONSUMER_CONTRACT_ADDRESS=0x0165878A594ca255338adfa4d48449f69242Eb8F yarn localhost-push-request
+LOCALHOST_CONSUMER_CONTRACT_ADDRESS=0x0165878A594ca255338adfa4d48449f69242Eb8F npm run localhost-push-request
 # Pushing a request...
 # Received event [ResponseReceived]: {
 #  reqId: BigNumber { value: "1" },
@@ -606,8 +599,8 @@ Received event [MessageQueued]: {
 }
 handle req: 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000
 Request received for profile 0x01
-response: 0,1,3361
-JS Execution output: 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000063d
+response: 0,1,14
+JS Execution output: 0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c9
 ```
 
 ## Deployment
@@ -618,10 +611,10 @@ Now that you have the prerequisites to deploy a Polygon Consumer Contract on Pol
 
 ```shell
 # install dependencies
-$ yarn
+$ npm install
 
 # compile contracts
-$ yarn compile
+$ npm run compile
 ```
 
 ### &#x20;Deploy to Polygon Mumbai Testnet <a href="#user-content-deploy-to-polygon-mumbai-testnet" id="user-content-deploy-to-polygon-mumbai-testnet"></a>
@@ -629,12 +622,12 @@ $ yarn compile
 With the contracts successfully compiled, now we can begin deploying first to Polygon Mumbai Testnet. If you have not gotten `MATIC` for Mumbai Testnet then get `MATIC` from a [faucet](https://mumbaifaucet.com/). Ensure to save the address after deploying the Consumer Contract because this address will be use in the "[Configure Client](https://docs.phala.network/developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle#step-4-configure-the-client-address)" section of Phat Bricks UI. The deployed address will also be set to the environment variable [`MUMBAI_CONSUMER_CONTRACT_ADDRESS`](https://github.com/Phala-Network/lensapi-oracle-consumer-contract/blob/refactor/.env.local).
 
 ```sh
-yarn test-deploy
+npm run test-deploy
 ```
 
 ```sh
 # deploy contracts to testnet mumbai
-yarn test-deploy
+npm run test-deploy
 # Deploying...
 #
 # 🎉 Your Consumer Contract has been deployed, check it out here: https://mumbai.polygonscan.com/address/0x10FA409109E073C15b77A8352cB6A89C12CD1605
@@ -652,15 +645,14 @@ yarn test-deploy
 
 Ensure to update the [`mumbai.arguments.ts`](https://github.com/Phala-Network/lensapi-oracle-consumer-contract/blob/refactor/mumbai.arguments.ts) file with the constructor arguments used to instantiate the Consumer Contract. If you add additional parameters to the constructor function then make sure to update the `mumbai.arguments.ts` file.
 
-> **Note**: Your contract address will be different than `0x090E8fDC571d65459569BC87992C1026121DB955` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `yarn test-deploy`.
+> **Note**: Your contract address will be different than `0x090E8fDC571d65459569BC87992C1026121DB955` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `npm run test-deploy`.
 
 ```sh
-yarn test-verify <MUMBAI_CONSUMER_CONTRACT_ADDRESS>
+npm run test-verify -- <MUMBAI_CONSUMER_CONTRACT_ADDRESS>
 ```
 
 ```sh
-yarn test-verify 0x090E8fDC571d65459569BC87992C1026121DB955
-# yarn run v1.22.18
+npm run test-verify -- 0x090E8fDC571d65459569BC87992C1026121DB955
 # $ hardhat verify --network mumbai --constructor-args mumbai.arguments.ts 0x090E8fDC571d65459569BC87992C1026121DB955
 # Nothing to compile
 # No need to generate any newer typings.
@@ -682,9 +674,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Te
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-yarn test-deploy-function
+npm run test-deploy-function
 # If polkadot-account.json is in the root of project
-yarn test-deploy-function -a ./polkadot-account.json
+npm run test-deploy-function -- -a ./polkadot-account.json
 ```
 
 Here is the expected output:
@@ -692,7 +684,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```sh
-yarn test-deploy-function -a ./polkadot-account.json
+npm run test-deploy-function -- -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon-mumbai.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -725,12 +717,11 @@ Test Consumer Contract on Mumbai with a few tests to check for malformed request
 **Please make sure your have set your attestor address in .env file `MUMBAI_PHALA_ORACLE_ATTESTOR`**
 
 ```sh
-yarn test-set-attestor
+npm run test-set-attestor
 ```
 
 ```sh
-yarn test-set-attestor
-# yarn run v1.22.18
+npm run test-set-attestor
 # $ hardhat run --network mumbai ./scripts/mumbai/set-attestor.ts
 # Setting attestor...
 # 🚨NOTE🚨
@@ -744,12 +735,11 @@ yarn test-set-attestor
 Test pushing a malform request.
 
 ```sh
-yarn test-push-malformed-request
+npm run test-push-malformed-request
 ```
 
 ```sh
-yarn test-push-malformed-request
-# yarn run v1.22.18
+npm run test-push-malformed-request
 # $ hardhat run --network mumbai ./scripts/mumbai/push-malformed-request.ts
 # Pushing a malformed request...
 # Done
@@ -759,11 +749,11 @@ yarn test-push-malformed-request
 Test pushing a valid request.
 
 ```sh
-yarn test-push-request
+npm run test-push-request
 ```
 
 ```sh
-yarn test-push-request
+npm run test-push-request
 # Pushing a request...
 # Done
 # ✨  Done in 2.97s.
@@ -776,13 +766,13 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-yarn test-update-function
+npm run test-update-function
 # If polkadot-account.json is in the root of project
-yarn test-update-function -a ./polkadot-account.json
+npm run test-update-function -- -a ./polkadot-account.json
 ```
 
 ```sh
-yarn test-update-function -a ./polkadot-account.json
+npm run test-update-function -- -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.
@@ -805,10 +795,10 @@ Congrats! You've now successfully updated your Phat Contract!
 
 Ensure to save the address after deploying the Consumer Contract because this address will be used in the "[Configure Client](https://docs.phala.network/developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle#step-4-configure-the-client-address)" section of Phat Bricks UI. The deployed address will also be set to the environment variable `POLYGON_CONSUMER_CONTRACT_ADDRESS`.
 
-> **Note**: Your contract address will be different than `0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `yarn main-deploy`.
+> **Note**: Your contract address will be different than `0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `npm run main-deploy`.
 
 ```sh
-yarn main-deploy
+npm run main-deploy
 # Deploying...
 #
 # 🎉 Your Consumer Contract has been deployed, check it out here: https://polygonscan.com/address/0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
@@ -827,7 +817,7 @@ yarn main-deploy
 Ensure to update the `polygon.arguments.ts` file with the constructor arguments used to instantiate the Consumer Contract. If you add additional parameters to the constructor function then make sure to update the `polygon.arguments.ts` file.
 
 ```sh
-yarn main-verify 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
+npm run main-verify -- 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
 # Nothing to compile
 # No need to generate any newer typings.
 # Successfully submitted source code for contract
@@ -848,9 +838,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-yarn main-deploy-function
+npm run main-deploy-function
 # If polkadot-account.json is in the root of project
-yarn main-deploy-function -a ./polkadot-account.json
+npm run main-deploy-function -- -a ./polkadot-account.json
 ```
 
 Here is the expected output:
@@ -858,7 +848,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```sh
-yarn main-deploy-function -a ./polkadot-account.json
+npm run main-deploy-function -- -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -885,7 +875,7 @@ yarn main-deploy-function -a ./polkadot-account.json
 Execute Scripts to Consumer Contract on Polygon Mainnet. The Consumer Contract on Polygon Mainnet with a few actions to mimic a malformed request, successful requests, and set the attestor.
 
 ```sh
-yarn main-set-attestor
+npm run main-set-attestor
 # Setting attestor...
 # 🚨NOTE🚨
 # Make sure to set the Consumer Contract Address in your Phat Bricks 🧱 UI dashboard (https://bricks-poc6.phala.network)
@@ -894,11 +884,11 @@ yarn main-set-attestor
 # Done
 # ✨  Done in 1.56s.
 # execute push-malformed-request
-yarn main-push-malformed-request
+npm run main-push-malformed-request
 # Pushing a malformed request...
 # Done
 # execute push-request
-yarn main-push-request
+npm run main-push-request
 # Pushing a request...
 # Done
 ```
@@ -910,13 +900,13 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-yarn main-update-function
+npm run main-update-function
 # If polkadot-account.json is in the root of project
-yarn main-update-function -a ./polkadot-account.json
+npm run main-update-function -- -a ./polkadot-account.json
 ```
 
 ```sh
-yarn main-update-function -a ./polkadot-account.json
+npm run main-update-function -- -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.

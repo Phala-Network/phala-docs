@@ -52,6 +52,7 @@
   * [Available Phala Chains](developers/support/endpoints.md)
   * [Resource Limits](developers/support/resource-limits.md)
   * [Compatibility Matrix](developers/support/compatibility-matrix.md)
+  * [Block Explorers](developers/support/block-explorers.md)
 * [⁉ FAQ](developers/faq.md)
 
 ## Compute Providers

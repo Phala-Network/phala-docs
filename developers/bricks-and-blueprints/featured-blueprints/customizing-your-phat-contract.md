@@ -22,7 +22,7 @@ What you will learn:
     * sha256
     * keccak256
 * Customize Your Default Function and Test Locally.
-* Encode the response data and update your consumer contract to handle the abi decoding.
+* Handle the abi encoding/decoding with [`viem`](https://viem.sh/).
 
 ## Getting Started <a href="#user-content-getting-started" id="user-content-getting-started"></a>
 
@@ -66,7 +66,7 @@ ls                                                                              
 # drwxr-xr-x   3 hashwarlock  staff    96B Sep  6 15:32 src
 # drwxr-xr-x   3 hashwarlock  staff    96B Sep  6 15:32 test
 # -rw-r--r--   1 hashwarlock  staff   201B Sep  6 15:32 tsconfig.json
-# -rw-r--r--   1 hashwarlock  staff   290K Sep  6 15:32 yarn.lock
+# -rw-r--r--   1 hashwarlock  staff   290K Sep  6 15:32 package-lock.json
 ```
 
 Lastly, we will `cd` into `./src` where the `index.ts` file resides. This file will be where we customize our function logic.
@@ -88,18 +88,21 @@ function fetchApiStats(lensApi: string, profileId: string): any {
   };
   let query = JSON.stringify({
     query: `query Profile {
-            profile(request: { profileId: \"${profileId}\" }) {
-                stats {
-                    totalFollowers
-                    totalFollowing
-                    totalPosts
-                    totalComments
-                    totalMirrors
-                    totalPublications
-                    totalCollects
-                }
-            }
-        }`,
+      profile(request: { forProfileId: "0x01" }) {
+        stats {
+            followers
+            following
+            comments
+            countOpenActions
+            posts
+            quotes
+            mirrors
+            publications
+            reacted
+            reactions
+        }
+      }
+    }`,
   });
   let body = stringToHex(query);
   //
@@ -524,9 +527,30 @@ Type definition can be nested, for example:
 Block={header:{hash:[u8;32],size:u32}}
 ```
 
-## Handle Solidity Response Encoding & Decoding
+## Handle EVM Smart Contract Encoding & Decoding
 
 > For TypeScript/JavaScript example scripts, check out [`@phala/pink-env` examples](https://bit.ly/phala-fn-ex-scripts).
+>
+> \
+> **Note**: `@phala/ethers` will be no longer be maintained in favor of native support of [`viem`](https://viem.sh/).
+
+{% tabs %}
+{% tab title="viem" %}
+#### Why viem
+
+`viem` is a TypeScript Interface for Ethereum that provides low-level stateless primitives for interacting with Ethereum. An alternative to ethers.js and web3.js with a focus on reliability, efficiency, and excellent developer experience.
+
+Using native `viem` in Phat Contract 2.0 to handle EVM Smart Contract encoding/decoding helps reduce the friction of maintaining custom code. For more information on the `viem`'s why, check out the link below.
+
+{% embed url="https://viem.sh/docs/introduction.html" fullWidth="true" %}
+Why viem
+{% endembed %}
+
+For docs on how to use `viem`, check out the [ABI section](https://viem.sh/docs/abi/decodeAbiParameters.html) of the `viem` docs.&#x20;
+{% endtab %}
+
+{% tab title="@phala/ethers" %}
+> **Note**: `@phala/ethers` is no longer being maintained. Instead use the latest version of `viem` to handle the EVM Smart Contract ABI encoding/decoding.
 
 In the `index.ts` file of your Phat Contract starter kit, there is an npm package available called `@phala/ethers` and your file will import `Coders` which has the following types available.
 
@@ -545,8 +569,6 @@ import { TupleCoder } from "./coders/tuple.js";
 
 As a developer you can utilize these types in many ways. Here are some examples of how to handle each type with the TypeScript `EncodeReply()` function on the Phat Contract side and `_onMessageReceived()`on the Solidity Smart Contract side.
 
-{% tabs %}
-{% tab title="AddressCoder" %}
 `AddressCoder` Example
 
 `index.ts`
@@ -621,9 +643,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 }
 // ...
 ```
-{% endtab %}
 
-{% tab title="BooleanCoder" %}
 `BooleanCoder` Example
 
 `index.ts`
@@ -698,9 +718,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 }
 // ...
 ```
-{% endtab %}
 
-{% tab title="NumberCoder" %}
 `NumberCoder`Example
 
 `index.ts`
@@ -773,9 +791,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 }
 // ...
 ```
-{% endtab %}
 
-{% tab title="StringCoder" %}
 `StringCoder` Example
 
 `index.ts`
@@ -849,9 +865,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 }
 // ...
 ```
-{% endtab %}
 
-{% tab title="ArrayCoder" %}
 `ArrayCoder` Static Array Example
 
 > Static arrays can be created by defining a `number` > 0. as the `length` parameter in the `Coders.ArrayCoder(coder: Coder, length: number, localName: string)` function.
@@ -919,8 +933,6 @@ function _onMessageReceived(bytes calldata action) internal override {
 // ...
 ```
 
-
-
 `ArrayCoder` Dynamic Array Example
 
 > Dynamic arrays can be created by using `-1` as the `length` parameter in the `Coders.ArrayCoder(coder: Coder, length: number, localName: string)` function.
@@ -986,9 +998,7 @@ function _onMessageReceived(bytes calldata action) internal override {
 }
 // ...
 ```
-{% endtab %}
 
-{% tab title="Complex" %}
 Complex example using
 
 * `BytesCoder`
@@ -1037,6 +1047,149 @@ function _onMessageReceived(bytes calldata action) internal override {
     //...
 }
 // ...
+```
+{% endtab %}
+{% endtabs %}
+
+### Example
+
+In the Phat Contract 2.0 Starter Kit, there is a file in `src/viem/coder.ts` which will look like the following:
+
+```typescript
+import {decodeAbiParameters, encodeAbiParameters, parseAbiParameters} from "viem";
+
+export type HexString = `0x${string}`
+export const encodeReplyAbiParams = 'uint respType, uint id, uint256 data';
+export const decodeRequestAbiParams = 'uint id, string reqData';
+
+export function encodeReply(abiParams: string, reply: [bigint, bigint, bigint]): HexString {
+    return encodeAbiParameters(parseAbiParameters(abiParams),
+        reply
+    );
+}
+
+export function decodeRequest(abiParams: string, request: HexString): any {
+    return decodeAbiParameters(parseAbiParameters(abiParams),
+        request
+    );
+}
+```
+
+The 2 important functions in this file are:
+
+* `decodeRequest(abiParams, request)` - decodes the action `request` `HexString` that is passed into the `main(request, secrets)` entry function of the Phat Contract. You can find the expected encoded `HexString` in the `OracleConsumerContract.sol` `request(string calldata reqData)` function where the action is encoded with a `uint id` and `string reqData` in the `_pushMessage(abi.encode(id, reqData))` function.
+* `encodeReply(abiParams, reply)` - encodes the action reply to be sent back to the Consumer Contract on the EVM change. The Consumer Contract consumes the action reply via the `_onMessageReceived(bytes calldata action)` function where data encoded can be decoded and handled based on the Consumer Contract logic. The default example encodes a tuple of `uint respType`, `uint id`, and `uint256 data` that in turn gets decoded in  `OracleConsumerContract.sol`  `_onMessageReceived(bytes calldata action)` function with `(uint respType, uint id, uint256 data) = abi.decode(action, (uint, uint, uint256)`.
+
+Let's breakdown the example and step through the process.
+
+1. encode action request in `request(string calldata)` of `OracleConsumerContract.sol`
+2. decode action request when parsing the encoded action in the Phat Contract 2.0 `main(request, secrets)` entry function in the `src/index.ts` file.
+3. encode the action reply in the Phat Contract to send to the `OracleConsumerContract.sol`
+4. decode the action reply in the `OracleConsumerContract.sol` function `_onMessageReceived(bytes calldata action)`
+
+{% tabs %}
+{% tab title="Step 1" %}
+Here is a snippet of the code to encode a tuple that includes the `uint id` representing the request id and `string calldata reqData` that is the request data string.
+
+For the example, we will pass in:
+
+* `id` = `1`
+* `reqData` = `"0x01"`
+
+`OracleConsumerContract.sol`
+
+<pre class="language-solidity"><code class="lang-solidity">function request(string calldata reqData) public {
+   // assemble the request
+<strong>   uint id = nextRequest;
+</strong>   requests[id] = reqData;
+   _pushMessage(abi.encode(id, reqData));
+   nextRequest += 1;
+}
+   
+</code></pre>
+
+This will produce a `HexString` `0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000` representing `(1, "0x01")`
+{% endtab %}
+
+{% tab title="Step 2" %}
+In the `src/index.ts` file, we handle the decoding by calling the `decodeRequest(abiParams, request)` to parse the expected variables of `id` equal to `1` and `reqData` equal to `"0x01"`.
+
+`src/main.ts`
+
+```typescript
+export default function main(request: HexString, secrets: string): HexString {
+  console.log(`handle req: ${request}`);
+  let requestId, encodedReqStr;
+  try {
+    [requestId, encodedReqStr] = decodeRequest(decodeRequestAbiParams, request);
+    console.log(`[${requestId}]: ${encodedReqStr}`);
+  } catch (error) {
+    console.info("Malformed request received");
+    return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), 0n, BigInt(errorToCode(error as Error))]);
+  }
+```
+
+You will see logs that will look like the following when printing the encoded `request` and decoded values into `requestId` and `encodedReqStr`.
+
+```bash
+handle req: 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000
+[1]: 0x01
+```
+
+Notice that we have error handling to ensure that the `request` can be decoded or else the error will be sent back to the Consumer Contract with `encodeReply(abiParams, reply)`.
+{% endtab %}
+
+{% tab title="Step 3" %}
+Once the results are computed in the Phat Contract, the action reply is composed and sent via the `encodeReply(abiParams, reply)` function. In this example, we query the Lens v2 API to get profile id `"0x01"` and returns the total posts back as part of the encoded reply.
+
+`src/index.ts`
+
+```typescript
+try {
+    const respData = fetchApiStats(secrets, encodedReqStr);
+    let stats = respData.data.profile.stats.posts;
+    console.log("response:", [TYPE_RESPONSE, requestId, stats]);
+    return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_RESPONSE), requestId, stats]);
+  } catch (error) {
+    if (error === Error.FailedToFetchData) {
+      throw error;
+    } else {
+      // otherwise tell client we cannot process it
+      console.log("error:", [TYPE_ERROR, requestId, error]);
+      return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), requestId, BigInt(errorToCode(error as Error))]);
+    }
+  }
+```
+
+The expected posts count at the time of writing was `201` so the logs should print something similar to below where `0` equals `TYPE_RESPONSE`, `1` equals to the request id, and `201` is the total posts from profile `"0x01"`
+
+```bash
+response: 0,1,201
+{"output":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c9"}
+```
+{% endtab %}
+
+{% tab title="Step 4" %}
+The encoded action reply is lastly handled by the `OracleconsumerContract.sol` in the `_onMessageReceived(bytes calldata action)` with the expected value of action being `0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c9` which is decoded to equal `(0, 1, 201)`. This can be seen with the example below.
+
+`OracleConsumerContract.sol`
+
+```solidity
+function _onMessageReceived(bytes calldata action) internal override {
+    // Optional to check length of action
+    // require(action.length == 32 * 3, "cannot parse action");
+    (uint respType, uint id, uint256 data) = abi.decode(
+        action,
+        (uint, uint, uint256)
+    );
+    if (respType == TYPE_RESPONSE) {
+        emit ResponseReceived(id, requests[id], data);
+        delete requests[id];
+    } else if (respType == TYPE_ERROR) {
+        emit ErrorReceived(id, requests[id], data);
+        delete requests[id];
+    }
+}
 ```
 {% endtab %}
 {% endtabs %}

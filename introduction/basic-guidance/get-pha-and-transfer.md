@@ -1,6 +1,6 @@
 # Acquiring PHA
 
-PHA token is the native token of Phala Network. Its uses include paying gas fees on the blockchain, performing governance, and staking. To learn more about PHA's uses and utility, head to the [PHA Token](broken-reference) section of the docs.&#x20;
+PHA token is the native token of Phala Network. Its uses include paying gas fees on the blockchain, performing governance, and staking. To learn more about PHA's uses and utility, head to the [PHA Token ](broken-reference)section of the docs.
 
 ## Get your Phala Tokens (PHA) <a href="#get-your-phala-tokens-pha" id="get-your-phala-tokens-pha"></a>
 

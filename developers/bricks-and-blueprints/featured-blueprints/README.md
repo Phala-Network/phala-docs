@@ -44,7 +44,7 @@ You could use the Oracle to:
 
 ### Resources <a href="#resources" id="resources"></a>
 
-* [**What’s Oracle**](https://ethereum.org/en/developers/docs/oracles/)
+* [**What’s an Oracle**](https://ethereum.org/en/developers/docs/oracles/)
 * [`phat_js` Docs](https://bit.ly/phat\_js)
 * **Frontend Templates**
   * [**Scaffold ETH2**](https://bit.ly/48CYTh9)

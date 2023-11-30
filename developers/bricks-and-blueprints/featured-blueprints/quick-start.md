@@ -32,25 +32,25 @@ Once you have the CLI tool installed, you can create your first Phala Oracle tem
 Let's continue by initializing a new project with `@phala/fn`.
 
 ```sh
-npx @phala/fn init example
+npx @phala/fn@latest init example
 ```
 
 After creating a Phala Oracle template, `cd` into the new project and install the package dependencies. You can do this with the following command:
 
 ```sh
-yarn install
+npm install
 ```
 
 Now, build the default Phala Oracle function with this command:
 
 ```sh
-yarn build-function
+npm run build-function
 ```
 
 To simulate the expected result locally, run the Phala Oracle function now with this command.
 
-```
-yarn run-function -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
+```bash
+npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
 ```
 
 > **What are the ingredients for the yarn run-function command?**
@@ -66,7 +66,7 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
 >   console.log(`handle req: ${request}`);
 >   let requestId, encodedReqStr;
 >   try {
->     [requestId, encodedReqStr] = Coders.decode([uintCoder, bytesCoder], request);
+>     [requestId, encodedReqStr] = decodeRequest(decodeRequestAbiParams, request);
 >   } catch (error) {
 >     console.info("Malformed request received");
 >   }
@@ -78,7 +78,7 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
 
 <summary>How the query looks under the hood</summary>
 
-* HTTP Endpoint: [https://api-mumbai.lens.dev](https://api-mumbai.lens.dev/)
+* HTTP Endpoint: [https://api-v2-mumbai-live.lens.dev](https://api-mumbai.lens.dev/)
 * Profile ID: `0x01`
 * Expected Graphql Query:
 
@@ -102,17 +102,19 @@ query Profile {
 
 ```graphql
 {
-  "data": {
-    "profile": {
-      "stats": {
-        "totalFollowers": 3361,
-        "totalFollowing": 0,
-        "totalPosts": 3,
-        "totalComments": 0,
-        "totalMirrors": 0,
-        "totalPublications": 3,
-        "totalCollects": 1597
-      }
+"data": {
+  "profile": {
+    "stats": {
+      "followers": 2,
+      "following": 0,
+      "comments": 0,
+      "countOpenActions": 1,
+      "posts": 14,
+      "quotes": 0,
+      "mirrors": 0,
+      "publications": 14,
+      "reacted": 0,
+      "reactions": 0
     }
   }
 }
@@ -123,7 +125,7 @@ query Profile {
 Finally, run the local end-to-end tests with this command. Here we will simulate locally the interaction between the Phat Contract and the Consumer Contract with hardhat.
 
 ```sh
-yarn hardhat test
+npm run localhost-test
 ```
 
 :tada: Congratulations! You have successfully completed the quick start. For the next steps, you will learn how to deploy your Phala Oracle and connect to the consumer contract for the EVM testnet chain to start testing the request-response model live.
