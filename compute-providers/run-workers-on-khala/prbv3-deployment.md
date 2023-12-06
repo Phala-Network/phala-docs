@@ -2,7 +2,7 @@
 
 ## Basic Requirements
 
-To use PRBv3 (Runtime Bridge) for worker deployment, you need at least 1 additional device as the management server. The device connection is shown in the following diagram:&#x20;
+To use PRBv3 (Runtime Bridge) for worker deployment, you need at least 1 additional device as the management server. The device connection is shown in the following diagram:
 
 <figure><img src="https://github.com/doyleguo/phala-wiki-next/assets/110812052/5ccdd9d5-a4da-434b-b231-fd8e64800873" alt=""><figcaption></figcaption></figure>
 
@@ -166,12 +166,16 @@ enter `a` to start editing the document and paste the following content into the
 relaychain:
   select_policy: Failover # or Random
   data_sources:
+    - !HeadersCacheHttpSource
+      endpoint: http://{headerscache-ip}:21111
     - !SubstrateWebSocketSource
       endpoint: ws://{node-ip}:9945
       pruned: false
 parachain:
   select_policy: Failover
   data_sources:
+    - !HeadersCacheHttpSource
+      endpoint: http://{headerscache-ip}:21111
     - !SubstrateWebSocketSource
       endpoint: ws://{node-ip}:9944
       pruned: false
@@ -180,6 +184,12 @@ parachain:
 > There are 2 parameters here that need to be user-defined: ws://{node-ip}:9945 & ws://{node-ip}:9944;
 >
 > You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
+>
+> If you don't need the PRBv3 connect to the headers-cache, delete 2 parts of&#x20;
+>
+> `- !HeadersCacheHttpSource`&#x20;
+>
+> `endpoint: http://`{headerscache-ip}`:21111`
 
 After entering the content, save and return to the previous directory.
 
@@ -197,4 +207,4 @@ Inside the newly created folder `prb-deployment`, run the docker-compose, and th
 sudo docker-compose up -d
 ```
 
-\
+\\
