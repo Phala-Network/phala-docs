@@ -80,8 +80,6 @@ services:
     environment:
      - NODE_NAME=PNODE
      - NODE_ROLE=MINER
-     - RELAYCHAIN_DB=rocksdb
-     - PARACHAIN_DB=rocksdb
      - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
      - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
     volumes:
