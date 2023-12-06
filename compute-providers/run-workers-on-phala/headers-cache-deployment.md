@@ -57,7 +57,7 @@ services:
     ports:
       - 21111:21111
     volumes:
-      - ./headers-cache/cache.db:/cache.db
+      - /opt/headers-cache/data/cache.db
 ```
 
 After entering, complete the following steps to finish the text editing and save successfully.
