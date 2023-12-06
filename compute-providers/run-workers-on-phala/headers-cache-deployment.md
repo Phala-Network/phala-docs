@@ -36,9 +36,9 @@ Enter `a` and you will start editing the document. Paste the following content i
 ```
 version: "3"
 services:
-  khala-headers-cache:
+  phala-headers-cache:
     image: phalanetwork/phala-headers-cache:latest
-    container_name: khala-headers-cache
+    container_name: phala-headers-cache
     restart: always
     environment:
       - ROCKET_PORT=21111

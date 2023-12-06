@@ -73,8 +73,6 @@ services:
     hostname: node
     restart: always
     ports:
-     - "9933:9933"
-     - "9934:9934"
      - "9944:9944"
      - "9945:9945"
      - "30333:30333"
