@@ -46,6 +46,7 @@ services:
       - RUST_LOG=info
     command:
       - serve
+      - --db=/cache.db
       - --grab-headers
       - --grab-para-headers
       - --grab-storage-changes
@@ -57,7 +58,7 @@ services:
     ports:
       - 21111:21111
     volumes:
-      - /opt/headers-cache/data/cache.db
+      - ./cache.db:/cache.db
 ```
 
 After entering, complete the following steps to finish the text editing and save successfully.

@@ -36,9 +36,9 @@ Enter `a` and you will start editing the document. Paste the following content i
 ```
 version: "3"
 services:
-  khala-headers-cache:
+  phala-headers-cache:
     image: phalanetwork/phala-headers-cache:latest
-    container_name: khala-headers-cache
+    container_name: phala-headers-cache
     restart: always
     environment:
       - ROCKET_PORT=21111
@@ -46,6 +46,7 @@ services:
       - RUST_LOG=info
     command:
       - serve
+      - --db=/cache.db
       - --grab-headers
       - --grab-para-headers
       - --grab-storage-changes
@@ -57,7 +58,7 @@ services:
     ports:
       - 21111:21111
     volumes:
-      - ./headers-cache/cache.db:/cache.db
+      - ./cache.db:/cache.db
 ```
 
 After entering, complete the following steps to finish the text editing and save successfully.
