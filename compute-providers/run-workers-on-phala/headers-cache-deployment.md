@@ -10,6 +10,7 @@ Caching block headers can improve efficiency when downloading and synchronizing 
 
 * 2GB of memory
 * 200GB NVME - for Phala headers-cache; 500GB NVME for Khala headers-cache
+* A completely synced full node is necessary
 
 ## Steps for deployment
 
@@ -58,7 +59,7 @@ services:
     ports:
       - 21111:21111
     volumes:
-      - ./cache.db:/cache.db
+      - ./data/phala-headers-cache:/opt/headers-cache/data
 ```
 
 After entering, complete the following steps to finish the text editing and save successfully.
