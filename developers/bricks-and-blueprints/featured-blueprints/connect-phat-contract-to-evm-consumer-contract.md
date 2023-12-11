@@ -37,10 +37,10 @@ Now create your first template with the CLI tool command:
 npx @phala/fn@latest init userJourney
 ```
 
-We currently have only one template. Just press enter to see something similar to the example below:
+Select one of the template and press enter to see something similar to the example below:
 
 ```sh
-npx @phala/fn init userJourney
+npx @phala/fn@latest init userJourney
 # @phala/fn@0.2.8
 # Ok to proceed? (y) y
 # ? Please select one of the templates for your "userJourney" project: lensapi-oracle-consumer-contract. Polygon Consumer Contract for LensAPI Oracle
@@ -139,30 +139,27 @@ For those want to understand what the contents of `./src/index.ts` mean, go to t
 Build the default Phat Contract with this command:
 
 ```bash
-npm run build-function
+npx @phala/fn build
 ```
 
 You will see output similar to the example below. and a file in `./dist/index.js` will be generated.
 
 ```bash
-npm run build-function
-# Creating an optimized build... done
-# Compiled successfully.
-#
+npx @phala/fn build
+# ✓ Compiled successfully.
 #   17.66 KB  dist/index.js
-# ✨  Done in 3.48s.
 ```
 
 With our default Phat Contract built, we can run some initial tests. First test will be simple.
 
 ```bash
-npm run run-function
+npx @phala/fn run dist/index.js
 ```
 
 It was expected for it to fail like this:
 
 ```bash
-npm run run-function
+npx @phala/fn run dist/index.js
 # handle req: undefined
 # Malformed request received
 # {"output":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}
@@ -174,10 +171,10 @@ Notice that the test fails and reports that a `Malformed request received` was e
 To simulate the expected result locally, run the Phala Oracle function now with this command:
 
 ```bash
-npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev
+npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev
 ```
 
-> **What are the ingredients for the `npm run run-function` command?**
+> **What are the ingredients for the `npx @phala/fn run` command?**
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
 >
@@ -252,7 +249,7 @@ query Profile {
 You will see:
 
 ```bash
-npm run run-function -- -a 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000
+npx @phala/fn run dist/index.js -a 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000
 00000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
 # handle req: 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000
 # Request received for profile 0x01
@@ -320,12 +317,11 @@ npm run localhost-deploy
 Make sure to copy the deployed contract address when you deploy your own contract locally. Note you contract address will be different than `0x0165878A594ca255338adfa4d48449f69242Eb8F`. We will now start watching the hardhat node deployed contract for any new requests.
 
 ```sh
-npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+npx @phala/fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
 ```
 
 ```sh
-npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
-# $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+npx @phala/fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
 # Listening for OracleConsumerContract.sol MessageQueued events...
 ```
 
@@ -431,9 +427,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Te
 ```shell
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run test-deploy-function
+npx @phala/fn upload --coreSettings=https://api-v2-mumbai-live.lens.dev/
 # If polkadot-account.json is in the root of project
-npm run test-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload -a ./polkadot-account.json --coreSettings=https://api-v2-mumbai-live.lens.dev/
 ```
 
 Here is the expected output:
@@ -441,7 +437,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```shell
-npm run test-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload -a ./polkadot-account.json --coreSettings=https://api-v2-mumbai-live.lens.dev/
 # ? Please enter your client RPC URL https://polygon-mumbai.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -449,8 +445,6 @@ npm run test-deploy-function -- -a ./polkadot-account.json
 # Compiled successfully.
 #
 #  17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://poc6.phala.network/ws... ⡿
-# (node:25497) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
 # Connecting to the endpoint: wss://poc6.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
@@ -521,20 +515,18 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```shell
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run test-update-function
+npx @phala/fn update
 # If polkadot-account.json is in the root of project
-npm run test-update-function -- -a ./polkadot-account.json
+npx @phala/fn update -a ./polkadot-account.json
 ```
 
 ```shell
-npm run test-update-function -- -a ./polkadot-account.json
+npx @phala/fn update -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.
 #
 #   17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://poc6.phala.network/ws... ⡿
-# (node:25392) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
 # Connecting to the endpoint: wss://poc6.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
@@ -593,9 +585,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet
 ```shell
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run main-deploy-function
+npx @phala/fn upload --mode=production --coreSettings=https://api-v2.lens.dev/
 # If polkadot-account.json is in the root of project
-npm run main-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --mode=production -a ./polkadot-account.json --coreSettings=https://api-v2.lens.dev/
 ```
 
 Here is the expected output:
@@ -603,7 +595,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```shell
-npm run main-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --mode=production -a ./polkadot-account.json --coreSettings=https://api-v2.lens.dev/
 # ? Please enter your client RPC URL https://polygon.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -611,8 +603,6 @@ npm run main-deploy-function -- -a ./polkadot-account.json
 # Compiled successfully.
 #
 #  17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://api.phala.network/ws... ⡿
-# (node:25497) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
 # Connecting to the endpoint: wss://api.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
@@ -655,20 +645,18 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```shell
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run main-update-function
+npx @phala/fn update --mode=production
 # If polkadot-account.json is in the root of project
-npm run main-update-function -- -a ./polkadot-account.json
+npx @phala/fn update --mode=production -a ./polkadot-account.json
 ```
 
 ```shell
-npm run main-update-function -- -a ./polkadot-account.json
+npx @phala/fn update --mode=production -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.
 #
 #   17.64 KB  dist/index.js
-# Connecting to the endpoint: wss://api.phala.network/ws... ⡿
-# (node:25392) ExperimentalWarning: buffer.Blob is an experimental feature. This feature could change at any time
 # Connecting to the endpoint: wss://api.phala.network/ws... done
 # Querying your Brick Profile contract ID... done
 # Your Brick Profile contract ID: 0x4071788a8ce6fbab0cacea0cb1aa52853b5537db7955643e5010c22913c2b1dd
