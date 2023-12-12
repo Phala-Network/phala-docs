@@ -47,7 +47,6 @@ services:
       - RUST_LOG=info
     command:
       - serve
-      - --db=/cache.db
       - --grab-headers
       - --grab-para-headers
       - --grab-storage-changes
