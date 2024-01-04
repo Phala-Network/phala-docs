@@ -100,7 +100,7 @@ services:
      - /var/khala/node-data:/root/data
      
   wm:
-    image: phalanetwork/prb3:dev
+    image: phalanetwork/prb3:latest
     hostname: prb-local
     restart: always
     network_mode: host
