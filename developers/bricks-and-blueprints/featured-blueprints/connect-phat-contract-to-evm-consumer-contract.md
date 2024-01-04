@@ -17,6 +17,7 @@ This project represents a basic EVM Consumer Contract that is compatible with a 
   * [Infura](https://bit.ly/3PXXCtN)
   * Personal RPC Node (Ex. [ProjectPi](https://bit.ly/3RGf7QS))
 * Polkadot Account for Phala PoC6 Testnet and Mainnet deployment
+  * [Phala Faucet](https://bit.ly/3Tomopi)
 * Node >= 18.x
 
 ### Environment Variables: <a href="#user-content-environment-variables" id="user-content-environment-variables"></a>
@@ -25,7 +26,7 @@ Check out the environment variables here in [.env.local](https://bit.ly/3ZAA814)
 
 ## Getting Started <a href="#user-content-getting-started" id="user-content-getting-started"></a>
 
-> 🚨 **Note** 🚨:&#x20;
+> 🚨 **Note** 🚨:
 >
 > If you cloned this repo or created a template, skip to [Create a Phala Profile](connect-phat-contract-to-evm-consumer-contract.md#user-content-create-a-phala-profile).
 
@@ -86,25 +87,25 @@ This step requires you to have a Polkadot account. You can get an account from o
 * [Talisman Wallet](https://bit.ly/3ZzAPYD)
 * [SubWallet](https://bit.ly/3tjS8R7) (**Support for iOS/Android**)
 
-First, create your Phala Profile account on the [Phala PoC6 Testnet](https://bit.ly/3LHccmR) or [Phala Mainnet](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:&#x20;
+First, create your Phala Profile account on the [Phala PoC6 Testnet](https://bit.ly/3LHccmR) or [Phala Mainnet](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/BricksProfileCheck.png" alt=""><figcaption></figcaption></figure>
 
 **Option 1: Export Polkadot account as json file**
 
-Go to your browser and click on the polkadot.js extension. Select your account and click "Export Account".  Next, you will be prompted for your password before saving the file to your project directory. **Note** this is what will be set to `POLKADOT_WALLET_ACCOUNT_PASSPHRASE`.  Make sure to save the file as `polkadot-account.json` in the root of your project directory.&#x20;
+Go to your browser and click on the polkadot.js extension. Select your account and click "Export Account". Next, you will be prompted for your password before saving the file to your project directory. **Note** this is what will be set to `POLKADOT_WALLET_ACCOUNT_PASSPHRASE`. Make sure to save the file as `polkadot-account.json` in the root of your project directory.
+
+<figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/ExportAccount.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/ExportTypePass.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/SaveAccount.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/ExportAccount.png" alt=""><figcaption></figcaption></figure>
-
 **Option 2: Set mnemonic phrase to `POLKADOT_WALLET_SURI`**
 
 After creating your Phala Profile, set your `.env` variable `POLKADOT_WALLET_SURI` to the mnemonic phrase from generating the new Polkadot Account.
 
-Here is a screenshot of how to set `POLKADOT_WALLET_SURI`:&#x20;
+Here is a screenshot of how to set `POLKADOT_WALLET_SURI`:
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/PolkadotAccountSuri.png" alt=""><figcaption></figcaption></figure>
 
@@ -134,7 +135,7 @@ npm install
 
 Now that the package dependencies are installed, lets build the default Phat Contract which is located in [`./src/index.ts`](https://bit.ly/3PBnP02).
 
-For those want to understand what the contents of `./src/index.ts` mean, go to the `PHAT_CONTRACT_INFO.md` file to read more. If you are already familiar with the concepts then you can proceed to with the deployment process.
+For those want to understand what the contents of `./src/index.ts` mean, go [here](customizing-your-phat-contract.md) read more. If you are already familiar with the concepts then you can proceed to with the deployment process.
 
 Build the default Phat Contract with this command:
 
@@ -178,7 +179,7 @@ npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
 >
-> The command's first parameter is a HexString, representing a tuple of types `[uintCoder, bytesCoder]`. This serves as the entry function. The second parameter is a `string`, embodying the configurable secrets fed into the main function.
+> The command's first parameter is a HexString, representing a tuple of types `[uint, bytes]`. This serves as the entry function. The second parameter is a `string`, embodying the configurable secrets fed into the main function.
 >
 > The `Coders.decode` function deciphers these parameters, yielding the decoded `requestId` and `encodedReqStr`. These decoded elements then become the raw material for the rest of the custom logic within the script.
 >
@@ -303,9 +304,8 @@ npm run localhost-node
 
 With our hardhat node running locally, we can now deploy the `OracleConsumerContract.sol` contract to the local hardhat network.
 
-```sh
-npm run localhost-deploy 
-```
+<pre class="language-sh"><code class="lang-sh"><strong>npm run localhost-deploy 
+</strong></code></pre>
 
 ```sh
 npm run localhost-deploy
@@ -374,9 +374,8 @@ $ npm run compile
 
 With the contracts successfully compiled, now we can begin deploying first to Polygon Mumbai Testnet. If you have not gotten `MATIC` for Mumbai Testnet then get `MATIC` from a [faucet](https://bit.ly/3ZyFoT3). Ensure to save the address after deploying the Consumer Contract because this address will be use in the "Configure Client" section of Phat Bricks UI. The deployed address will also be set to the environment variable `MUMBAI_CONSUMER_CONTRACT_ADDRESS`.
 
-```sh
-npm run test-deploy
-```
+<pre class="language-sh"><code class="lang-sh"><strong>npm run test-deploy
+</strong></code></pre>
 
 ```sh
 # deploy contracts to testnet mumbai
@@ -457,7 +456,7 @@ npx @phala/fn upload -a ./polkadot-account.json --coreSettings=https://api-v2-mu
 # ✨  Done in 73.22s.
 ```
 
-Go to the [PoC6 Testnet Bricks UI](https://bit.ly/3ZzwWCY) Dashboard and you can see your newly deployed Phat Contract.&#x20;
+Go to the [PoC6 Testnet Bricks UI](https://bit.ly/3ZzwWCY) Dashboard and you can see your newly deployed Phat Contract.
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/Function-added.png" alt=""><figcaption></figcaption></figure>
 
@@ -670,6 +669,6 @@ npx @phala/fn update --mode=production -a ./polkadot-account.json
 
 ## Closing <a href="#user-content-closing" id="user-content-closing"></a>
 
-Once you have stored, the deployed address of the Consumer Contract and set the value in the "Configure Client" section of the deployed Phala Oracle, you will now have a basic boilerplate example of how to connect your Polygon dApp to a LensAPI Oracle Blueprint. Execute a new requests and check if your configuration is correct like below:&#x20;
+Once you have stored, the deployed address of the Consumer Contract and set the value in the "Configure Client" section of the deployed Phala Oracle, you will now have a basic boilerplate example of how to connect your Polygon dApp to a LensAPI Oracle Blueprint. Execute a new requests and check if your configuration is correct like below:
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/polygonscan-ex.png" alt=""><figcaption></figcaption></figure>

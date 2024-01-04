@@ -24,6 +24,7 @@ This project represents a basic Polygon Consumer Contract that is compatible wit
   * [Alchemy](https://alchemy.com) - This repo example uses Alchemy's API Key.
   * [Infura](https://infura.io)
   * Personal RPC Node
+* Test Tokens at [Phala Faucet](https://bit.ly/3Tomopi)
 
 ### Environment Variables: <a href="#user-content-environment-variables" id="user-content-environment-variables"></a>
 
@@ -135,7 +136,23 @@ Now that the package dependencies are installed, lets build the default function
 // *** WITH THE PHALA TEAM AT https://discord.gg/5HfmWQNX THANK YOU             ***
 // *** FOR DOCS ON HOW TO CUSTOMIZE YOUR PC 2.0 https://bit.ly/customize-pc-2-0 ***
 import "@phala/pink-env";
-import {encodeReply, decodeRequest, HexString, encodeReplyAbiParams, decodeRequestAbiParams} from "./viem/coder";
+import {decodeAbiParameters, encodeAbiParameters, parseAbiParameters} from "viem";
+
+type HexString = `0x${string}`;
+const encodeReplyAbiParams = 'uint respType, uint id, uint256 data';
+const decodeRequestAbiParams = 'uint id, string reqData';
+
+function encodeReply(abiParams: string, reply: any): HexString {
+  return encodeAbiParameters(parseAbiParameters(abiParams),
+      reply
+  );
+}
+
+function decodeRequest(abiParams: string, request: HexString): any {
+  return decodeAbiParameters(parseAbiParameters(abiParams),
+      request
+  );
+}
 
 // Defined in OracleConsumerContract.sol
 const TYPE_RESPONSE = 0;
@@ -171,8 +188,7 @@ function stringToHex(str: string): string {
   return "0x" + hex;
 }
 
-function fetchLensApiStats(lensApi: string, profileId: string): any {
-  // profile_id should be like 0x0001
+function fetchApiStats(apiUrl: string, requestStr: string): any {
   let headers = {
     "Content-Type": "application/json",
     "User-Agent": "phat-contract",
@@ -180,7 +196,7 @@ function fetchLensApiStats(lensApi: string, profileId: string): any {
   let query = JSON.stringify({
     query: `
       query Profile {
-        profile(request: { forProfileId: "0x01" }) {
+        profile(request: { forProfileId: "${requestStr}" }) {
           stats {
               followers
               following
@@ -203,16 +219,16 @@ function fetchLensApiStats(lensApi: string, profileId: string): any {
   // send http request. The Phat Contract will return an array of response.
   //
   let response = pink.batchHttpRequest(
-      [
-        {
-          url: lensApi,
-          method: "POST",
-          headers,
-          body,
-          returnTextBody: true,
-        },
-      ],
-      10000 // Param for timeout in milliseconds. Your Phat Contract script has a timeout of 10 seconds
+    [
+      {
+        url: apiUrl,
+        method: "POST",
+        headers,
+        body,
+        returnTextBody: true,
+      },
+    ],
+    10000 // Param for timeout in milliseconds. Your Phat Contract script has a timeout of 10 seconds
   )[0]; // Notice the [0]. This is important bc the `pink.batchHttpRequest` function expects an array of up to 5 HTTP requests.
   if (response.statusCode !== 200) {
     console.log(
@@ -241,34 +257,34 @@ function fetchLensApiStats(lensApi: string, profileId: string): any {
 //            this example, it just a simple text of the lens api url prefix. For more information on secrets, checkout the SECRETS.md file.
 //
 // Your returns value MUST be a hex string, and it will send to your contract directly. Check the `_onMessageReceived` function in
-// TestLensApiConsumerContract.sol for more details. We suggest a tuple of three elements: [successOrNotFlag, requestId, data] as
+// OracleConsumerContract.sol for more details. We suggest a tuple of three elements: [successOrNotFlag, requestId, data] as
 // the return value.
 //
 export default function main(request: HexString, secrets: string): HexString {
   console.log(`handle req: ${request}`);
   // Uncomment to debug the `secrets` passed in from the Phat Contract UI configuration.
   // console.log(`secrets: ${secrets}`);
-  let requestId, encodedProfileId;
+  let requestId, encodedReqStr;
   try {
-    [requestId, encodedProfileId] = decodeRequest(decodeRequestAbiParams, request);
-    console.log(`[${requestId}]: ${encodedProfileId}`);
+    [requestId, encodedReqStr] = decodeRequest(decodeRequestAbiParams, request);
+    console.log(`[${requestId}]: ${encodedReqStr}`);
   } catch (error) {
     console.info("Malformed request received");
     return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), 0n, BigInt(errorToCode(error as Error))]);
   }
-  console.log(`Request received for profile ${encodedProfileId}`);
+  console.log(`Request received for profile ${encodedReqStr}`);
   try {
-    const respData = fetchLensApiStats(secrets, encodedProfileId);
+    const respData = fetchApiStats(secrets, encodedReqStr);
     let stats = respData.data.profile.stats.posts;
     console.log("response:", [TYPE_RESPONSE, requestId, stats]);
-    return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_RESPONSE), requestId, stats]);
+    return encodeReply(encodeReplyAbiParams, [TYPE_RESPONSE, requestId, stats]);
   } catch (error) {
     if (error === Error.FailedToFetchData) {
       throw error;
     } else {
       // otherwise tell client we cannot process it
       console.log("error:", [TYPE_ERROR, requestId, error]);
-      return encodeReply(encodeReplyAbiParams, [BigInt(TYPE_ERROR), requestId, BigInt(errorToCode(error as Error))]);
+      return encodeReply(encodeReplyAbiParams, [TYPE_ERROR, requestId, errorToCode(error as Error)]);
     }
   }
 }
@@ -280,13 +296,13 @@ export default function main(request: HexString, secrets: string): HexString {
 Build the default function with this command:
 
 ```sh
-npm run build-function
+npx @phala/fn build
 ```
 
 You will see output similar to the example below. and a file in `./dist/index.js` will be generated.
 
 ```sh
-npm run build-function
+npx @phala/fn build
 # Creating an optimized build... done
 # Compiled successfully.
 #
@@ -297,13 +313,13 @@ npm run build-function
 With our default function built, we can run some initial tests. First test will be simple.
 
 ```sh
-npm run run-function
+npx @phala/fn run dist/index.js
 ```
 
 It was expected for it to fail like this:
 
 ```sh
-npm run run-function
+npx @phala/fn run dist/index.js
 # handle req: undefined
 # Malformed request received
 # {"output":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}
@@ -315,14 +331,14 @@ Notice that the test fails and reports that a `Malformed request received` was e
 To simulate the expected result locally, run the Phala Oracle function now with this command:
 
 ```sh
-npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev
+npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev
 ```
 
-> **What are the ingredients for the `npm run run-function` command?**
+> **What are the ingredients for the `npx @phala/fn run` command?**
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
 >
-> The command's first parameter is a HexString, representing a tuple of types `[uintCoder, bytesCoder]`. This serves as the entry function. The second parameter is a `string`, embodying the configurable secrets fed into the main function.
+> The command's first parameter is a HexString, representing a tuple of types `[uint, bytes]`. This serves as the entry function. The second parameter is a `string`, embodying the configurable secrets fed into the main function.
 >
 > The `Coders.decode` function deciphers these parameters, yielding the decoded `requestId` and `encodedReqStr`. These decoded elements then become the raw material for the rest of the custom logic within the script.
 >
@@ -331,7 +347,7 @@ npm run run-function -- -a 0x000000000000000000000000000000000000000000000000000
 >   console.log(`handle req: ${request}`);
 >   let requestId, encodedReqStr;
 >   try {
->     [requestId, encodedReqStr] = Coders.decode([uintCoder, bytesCoder], request);
+>     [requestId, encodedReqStr] = decodeRequest(decodeRequestAbiParams, request);
 >   } catch (error) {
 >     console.info("Malformed request received");
 >   }
@@ -393,7 +409,7 @@ query Profile {
 You will see:
 
 ```bash
-npm run run-function -- -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev/
+npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev/
 
 > lensapi-oracle-consumer-contract@0.0.1 run-function
 > phat-fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev/
@@ -563,11 +579,11 @@ npm run localhost-deploy
 Make sure to copy the deployed contract address when you deploy your own contract locally. Note you contract address will be different than `0x0165878A594ca255338adfa4d48449f69242Eb8F`. We will now start watching the hardhat node deployed contract for any new requests.
 
 ```sh
-npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+npx @phala/fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
 ```
 
 ```sh
-npm run localhost-watch -- 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-v2-mumbai-live.lens.dev/
+npx @phala/fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-v2-mumbai-live.lens.dev/
 # $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/TestLensApiConsumerContract.sol/TestLensApiConsumerContract.json dist/index.js -a https://api-v2-mumbai-live.lens.dev/
 # Listening for TestLensApiConsumerContract MessageQueued events...
 ```
@@ -674,9 +690,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Te
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run test-deploy-function
+npx @phala/fn upload --coreSettings=https://api-v2-mumbai-live.lens.dev/
 # If polkadot-account.json is in the root of project
-npm run test-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --coreSettings=https://api-v2-mumbai-live.lens.dev/ -a ./polkadot-account.json
 ```
 
 Here is the expected output:
@@ -684,7 +700,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```sh
-npm run test-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --coreSettings=https://api-v2-mumbai-live.lens.dev/ -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon-mumbai.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -766,13 +782,13 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run test-update-function
+npx @phala/fn update
 # If polkadot-account.json is in the root of project
-npm run test-update-function -- -a ./polkadot-account.json
+npx @phala/fn update -a ./polkadot-account.json
 ```
 
 ```sh
-npm run test-update-function -- -a ./polkadot-account.json
+npx @phala/fn update -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.
@@ -838,9 +854,9 @@ Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run main-deploy-function
+npx @phala/fn upload --mode=production --coreSettings=https://api-v2.lens.dev/
 # If polkadot-account.json is in the root of project
-npm run main-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --mode=production --coreSettings=https://api-v2.lens.dev/ -a ./polkadot-account.json
 ```
 
 Here is the expected output:
@@ -848,7 +864,7 @@ Here is the expected output:
 > Note: your contract IDs will vary and not be the same as the IDs below.
 
 ```sh
-npm run main-deploy-function -- -a ./polkadot-account.json
+npx @phala/fn upload --mode=production --coreSettings=https://api-v2.lens.dev/ -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
 # ? Please enter your consumer address 0xA4Be456Fd0d41968a52b34Cdb8Ba875F2281134a
 # ? Please Enter hahaha account password [hidden]
@@ -900,13 +916,13 @@ Sometimes you may have had a bug in your script or you want to test things out o
 ```sh
 # If you did not export your Polkadot account in a 
 # polkadot-account.json file in the root of project
-npm run main-update-function
+npx @phala/fn update --mode=production
 # If polkadot-account.json is in the root of project
-npm run main-update-function -- -a ./polkadot-account.json
+npx @phala/fn update --mode=production -a ./polkadot-account.json
 ```
 
 ```sh
-npm run main-update-function -- -a ./polkadot-account.json
+npx @phala/fn update --mode=production -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
 # Creating an optimized build... done
 # Compiled successfully.
