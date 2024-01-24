@@ -84,7 +84,7 @@ GKS=http://localhost:18000 \
 yarn setup:drivers
 ```
 
-After all, you testnet is ready. You can continue with the [Connect the polkadot app to the local testnet](broken-reference) section.
+After all, you testnet is ready. You can continue with the [Connect the polkadot app to the local testnet](broken-reference/) section.
 
 ### Alternatively, use devPHAse <a href="#alternatively-use-devphase" id="alternatively-use-devphase"></a>
 
@@ -96,7 +96,7 @@ Run the following commands to create a devPHAse project:
 # create a new project, or skip it if you already have one
 yarn init
 # Add devPHAse to the project
-yarn add -D devphase
+yarn add -D @devphase/cli
 yarn add -D typescript ts-node
 # Init project
 yarn devphase init
@@ -118,7 +118,7 @@ By default you get the Phala blockchain node at ws://localhost:9944 and the prun
 
 ## Connect the Phat UI to the local testnet <a href="#connect-the-phat-ui-to-the-local-testnet" id="connect-the-phat-ui-to-the-local-testnet"></a>
 
-We have a client-side application at [https://phat.phala.network/](https://phat.phala.network/), you can follow the instructions from [Phat Contract Console](<../../.gitbook/assets/awesome phat contracts (2)>) to connect the application to the local testnet.
+We have a client-side application at [https://phat.phala.network/](https://phat.phala.network/), you can follow the instructions from [Phat Contract Console](../../.gitbook/assets/awesome%20phat%20contracts%20\(2\)/) to connect the application to the local testnet.
 
 <figure><img src="../../.gitbook/assets/phat-ui-to-testnet.png" alt=""><figcaption></figcaption></figure>
 
