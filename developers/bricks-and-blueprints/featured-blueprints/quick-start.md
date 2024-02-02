@@ -2,20 +2,9 @@
 
 <figure><img src="../../../.gitbook/assets/case-self-owned-oracles.jpg" alt=""><figcaption><p>Visual of how Phat Contract connects to EVM Consumer Contract</p></figcaption></figure>
 
-To kickstart your journey with the Phat Contract Starter Kit, you have 2 options:
+To kickstart your journey with the Phat Contract Starter Kit, install the `@phala/fn` CLI tool.&#x20;
 
-1.  Create a template from the [`phat-contract-starter-kit`](https://bit.ly/46wkeY0) template repo. Click on the "**Use this template**" button in the top right corner of the webpage. Then skip the `npx @phala/fn init example` step.&#x20;
-
-    <div>
-
-    <figure><img src="http://localhost:63342/markdownPreview/1918810453/fileSchemeResource/ccbdfbfcaa2bb6682c484f7931b15633-UseThisTemplate.png?_ijt=3r011jj4sfe0bnqfa8f27fg7eh" alt=""><figcaption></figcaption></figure>
-
-     
-
-    <figure><img src="../../../.gitbook/assets/UseThisTemplate.png" alt=""><figcaption></figcaption></figure>
-
-    </div>
-2. Install the `@phala/fn` CLI tool. You can do this using your node package manager (`npm`) or use node package execute (`npx`). For the purpose of this tutorial, we will be using `npx`.
+You can do this using your node package manager (`npm`) or use node package execute (`npx`). For the purpose of this tutorial, we will be using `npx`.
 
 Once you have the CLI tool installed, you can create your first Phala Oracle template with the following command...
 
@@ -33,6 +22,12 @@ Let's continue by initializing a new project with `@phala/fn`.
 
 ```sh
 npx @phala/fn@latest init example
+? Please select one of the templates for your "example" project: 
+❯ phat-contract-starter-kit: Send data from any API to your smart contract with Javascript. 
+  lensapi-oracle-consumer-contract: Send data from Lens API to your smart contract to empower your Web3 Social dApp. 
+  vrf-oracle: TEE-guarded Verifiable Random Function template to bring randomness to your smart contract. 
+  airstack-phat-contract: Request an account’s data from Airstack’s API to compute trust score and send to your Web3 dApp on-chain. 
+  thegraph-phat-contract: Connect your subgraphs from The Graph to your on-chain dApps via Phat Contract.  
 ```
 
 After creating a Phala Oracle template, `cd` into the new project and install the package dependencies. You can do this with the following command:
@@ -48,6 +43,20 @@ npx @phala/fn build
 ```
 
 To simulate the expected result locally, run the Phala Oracle function now with this command.
+
+> Go to [https://playground.ethers.org](https://playground.ethers.org) to `decode` and `encode` the hexstring you want to pass into your Phat Contract `main` function.
+>
+> In this example, the hexstring  `0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000` represents types `uint id` and `string reqData`
+>
+> Here is what you will enter in the playground:
+>
+> * `utils.defaultAbiCoder.decode(['uint id', 'string reqData'], '0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000')`
+> * `[ BigNumber { value: "1" }, "0x01", id: BigNumber { value: "1" }, reqData: "0x01" ]`
+>
+> You can easily validate this by encoding the types and data with the `utils.defaultAbiCoder.encode()` function like below.
+>
+> * `utils.defaultAbiCoder.encode(['uint id', 'string reqData'], [1, "0x01"])`
+> * `"0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000"`
 
 ```bash
 npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev

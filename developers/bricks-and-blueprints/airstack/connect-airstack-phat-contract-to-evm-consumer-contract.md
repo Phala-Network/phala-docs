@@ -82,6 +82,8 @@ npx @phala/fn build
 
 To simulate the expected result locally, run the Phat Contract script now with this command:
 
+> Check [this explanation ](quick-start.md#quick-start)out or use `decode` and `encode` playground at [https://playground.ethers.org](https://playground.ethers.org).
+
 ```bash
 npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000de1683287529b9b4c3132af8aad210644b259cfd '{"apiUrl": "https://gateway.thegraph.com/api/", "apiKey": "cd22a01e5b7f9828cddcb52caf03ee79"}'
 ```

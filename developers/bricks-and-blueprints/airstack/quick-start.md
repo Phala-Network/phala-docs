@@ -39,31 +39,28 @@ First (4) the Phat Contract will create a `batchHttpRequest` to query the Airsta
 
 Make sure you have created a Phat Contract Profile in the Phat Contract 2.0 UI and claimed some PoC6 Testnet Tokens. Instructions on creating a profile can be found [here](../create-a-phat-contract-profile.md). Also, make sure to get an [API Key from Airstack](get-an-airstack-api-key.md) to avoid being rate limited by the default API Key provided by the Phala team.
 
-To kickstart your journey with the Airstack Starter Kit, you have 2 options:
+To kickstart your journey with the Airstack Starter Kit, install the `@phala/fn` CLI tool.&#x20;
 
-1.  Create a template from the [`airstack-starter-kit`](https://bit.ly/pc-airstack-repo) template repo. Click on the "**Use this template**" button in the top right corner of the webpage. Then skip the `npx @phala/fn@latest init example` step. \
+You can do this using your node package manager (`npm`) or use node package execute (`npx`). For the purpose of this tutorial, we will be using `npx`.
 
-
-    <figure><img src="../../../.gitbook/assets/Airstack-template-github.png" alt=""><figcaption></figcaption></figure>
-2. Install the `@phala/fn` CLI tool. You can do this using your node package manager (`npm`) or use node package execute (`npx`). For the purpose of this tutorial, we will be using `npx`.
-
-(Option 2) Once you have the CLI tool installed, you can create your first Phala Oracle template with the following command.
+Once you have the CLI tool installed, you can create your first Phala Oracle template with the following command.
 
 ```
-# Skip this step if chose option 1 or cloned this repo
 npx @phala/fn@latest init example
 ```
 
 🚨 Note 🚨
 
-> When selecting your template, elect `airstack-starter-kit`.
+> When selecting your template, elect `airstack-phat-contract`.
 
-```
+```bash
 npx @phala/fn@latest init example
-? Please select one of the templates for your "example" project: (Use arrow keys)
-  phat-contract-starter-kit. The Phat Contract Starter Kit 
-  lensapi-oracle-consumer-contract. Polygon Consumer Contract for LensAPI Oracle
-❯ airstack-starter-kit. Airstack Starter Kit 
+? Please select one of the templates for your "example" project: 
+  phat-contract-starter-kit: Send data from any API to your smart contract with Javascript. 
+  lensapi-oracle-consumer-contract: Send data from Lens API to your smart contract to empower your Web3 Social dApp. 
+  vrf-oracle: TEE-guarded Verifiable Random Function template to bring randomness to your smart contract. 
+❯ airstack-phat-contract: Request an account’s data from Airstack’s API to compute trust score and send to your Web3 dApp on-chain. 
+  thegraph-phat-contract: Connect your subgraphs from The Graph to your on-chain dApps via Phat Contract.  
 ```
 
 🛑 **Not so fast!** What is it exactly that we are building? 🛑
@@ -88,7 +85,21 @@ Now, build the default Phat Contract script with this command:
 npx @phala/fn build
 ```
 
-To simulate the expected result locally, run the Phat Contract script now with this command:
+To simulate the expected result locally, run the Phat Contract script now with the `npx @phala/fn run`command to test the expected output when passing an encoded hexstring and the `secrets` into the `main` function of the Phat Contract. This is helpful to test locally quick to understand the functionality of your compiled Phat Contract.
+
+> Go to [https://playground.ethers.org](https://playground.ethers.org) to `decode` and `encode` the hexstring you want to pass into your Phat Contract `main` function.
+>
+> In this example, the hexstring  `0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000964256674e42d61f0ff84097e28f65311786ccb000000000000000000000000eaf55242a90bb3289db8184772b0b98562053559` represents types `uint id` and `address requester` and `address target`&#x20;
+>
+> Here is what you will enter in the playground:
+>
+> * `utils.defaultAbiCoder.decode(['uint id', 'address requester', 'address target'], '0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000964256674e42d61f0ff84097e28f65311786ccb000000000000000000000000eaf55242a90bb3289db8184772b0b98562053559')`
+> * `[ BigNumber { value: "5" }, "0xeaf55242a90bb3289dB8184772b0B98562053559", "0x624Fef3390A244a834f19b3dBfddC28939530c17", id: BigNumber { value: "5" }, requester: "0xeaf55242a90bb3289dB8184772b0B98562053559", target: "0x624Fef3390A244a834f19b3dBfddC28939530c17" ]`
+>
+> You can easily validate this by encoding the types and data with the `utils.defaultAbiCoder.encode()` function like below.
+>
+> * `utils.defaultAbiCoder.encode(['uint id', 'address requester', 'address target'], [1, "0xeaf55242a90bb3289dB8184772b0B98562053559", "0x624Fef3390A244a834f19b3dBfddC28939530c17"])`
+> * `"0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000964256674e42d61f0ff84097e28f65311786ccb000000000000000000000000eaf55242a90bb3289db8184772b0b98562053559"`
 
 ```
 npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000964256674e42d61f0ff84097e28f65311786ccb000000000000000000000000eaf55242a90bb3289db8184772b0b98562053559 '{"apiUrl": "https://api.airstack.xyz/gql", "apiKey": "3a41775a358a4cb99ca9a29c1f6fc486"}'

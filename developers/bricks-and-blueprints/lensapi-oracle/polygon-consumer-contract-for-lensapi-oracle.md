@@ -45,10 +45,13 @@ npx @phala/fn init example
 We currently have only one template. Just press enter to see something similar to the example below:
 
 ```sh
-npx @phala/fn init example
-# ? Please select one of the templates for your "example" project: lensapi-oracle-consumer-contract. Polygon Consumer Contract for LensAPI Oracle
-# Downloading the template: https://github.com/Phala-Network/lensapi-oracle-consumer-contract... ✔
-# The project is created in ~/Projects/Phala/example
+npx @phala/fn@latest init example
+? Please select one of the templates for your "example" project: 
+  phat-contract-starter-kit: Send data from any API to your smart contract with Javascript. 
+❯ lensapi-oracle-consumer-contract: Send data from Lens API to your smart contract to empower your Web3 Social dApp. 
+  vrf-oracle: TEE-guarded Verifiable Random Function template to bring randomness to your smart contract. 
+  airstack-phat-contract: Request an account’s data from Airstack’s API to compute trust score and send to your Web3 dApp on-chain. 
+  thegraph-phat-contract: Connect your subgraphs from The Graph to your on-chain dApps via Phat Contract.  
 ```
 
 `cd` into the newly created template and `ls` the directory which will look similar to below.
@@ -329,6 +332,20 @@ npx @phala/fn run dist/index.js
 Notice that the test fails and reports that a `Malformed request received` was emitted and the request was `undefined`. This is expected as you will need to define the parameters by adding a `-a abi.encode(requestId, profileId) https://api-v2-mumbai-live.lens.dev` to your command.
 
 To simulate the expected result locally, run the Phala Oracle function now with this command:
+
+> Go to [https://playground.ethers.org](https://playground.ethers.org) to `decode` and `encode` the hexstring you want to pass into your Phat Contract `main` function.
+>
+> In this example, the hexstring  `0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000` represents types `uint id` and `string reqData`
+>
+> Here is what you will enter in the playground:
+>
+> * `utils.defaultAbiCoder.decode(['uint id', 'string reqData'], '0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000')`
+> * `[ BigNumber { value: "1" }, "0x01", id: BigNumber { value: "1" }, reqData: "0x01" ]`
+>
+> You can easily validate this by encoding the types and data with the `utils.defaultAbiCoder.encode()` function like below.
+>
+> * `utils.defaultAbiCoder.encode(['uint id', 'string reqData'], [1, "0x01"])`
+> * `"0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000"`
 
 ```sh
 npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-v2-mumbai-live.lens.dev

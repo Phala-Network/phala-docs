@@ -42,15 +42,12 @@ Select one of the template and press enter to see something similar to the examp
 
 ```sh
 npx @phala/fn@latest init userJourney
-# @phala/fn@0.2.8
-# Ok to proceed? (y) y
-# ? Please select one of the templates for your "userJourney" project: lensapi-oracle-consumer-contract. Polygon Consumer Contract for LensAPI Oracle
-# Downloading the template: https://github.com/Phala-Network/lensapi-oracle-consumer-contract... ✔
-# The project is created in /Users/hashwarlock/Projects/Phala/Temp/userJourney 🎉
-# Now run:
-#
-#  cd userJourney
-#  npm install
+? Please select one of the templates for your "userJourney" project: 
+❯ phat-contract-starter-kit: Send data from any API to your smart contract with Javascript. 
+  lensapi-oracle-consumer-contract: Send data from Lens API to your smart contract to empower your Web3 Social dApp. 
+  vrf-oracle: TEE-guarded Verifiable Random Function template to bring randomness to your smart contract. 
+  airstack-phat-contract: Request an account’s data from Airstack’s API to compute trust score and send to your Web3 dApp on-chain. 
+  thegraph-phat-contract: Connect your subgraphs from The Graph to your on-chain dApps via Phat Contract.  
 ```
 
 `cd` into the newly created template and `ls` the directory which will look similar to below.
