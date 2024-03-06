@@ -57,7 +57,7 @@ Follow the instructions from Astar Network wiki [here](https://docs.astar.networ
 **npm**
 
 ```bash
-npm install -g @phala/swanky-plugin-phala
+npm install @phala/swanky-plugin-phala
 ```
 
 or
@@ -105,12 +105,17 @@ swanky plugins:link ~/Projects/swanky-plugin-phala
 @astar-network/swanky-cli: linking plugin @phala/swanky-plugin-phala... done
 ```
 
-#### Commands
+### Commands
 
 Now there should be a `swanky phala` CLI available. Execute the `swanky phala --help` command to check available commands.
 
 ```bash
 swanky phala --help
+```
+
+Expected output:
+
+```bash
 Swanky plugin to setup Phala developer environment for Phat Contracts.
 
 USAGE
@@ -126,7 +131,7 @@ COMMANDS
   phala init   Generate a new Phat Contract environment
 ```
 
-#### Initialize a Project
+### Initialize a Project
 
 Easily get started with a new Phat Contract project by executing `swanky phala init [PROJECT_NAME]`
 
@@ -200,6 +205,11 @@ Execute `ls` to list the new project directory called `test-swanky-phala` in the
 
 ```bash
 ls
+```
+
+Expected output:
+
+```bash
 total 0
 drwxr-xr-x   3 hashwarlock  staff    96B Jan 19 20:45 .
 drwxr-xr-x   5 hashwarlock  staff   160B Jan 19 18:37 ..
@@ -210,7 +220,12 @@ drwxr-xr-x  15 hashwarlock  staff   480B Jan 19 20:46 test-swanky-phala
 
 ```bash
 cd test-swanky-phala
-└─[$]> ls
+ls
+```
+
+Expected output:
+
+```bash
 total 152
 drwxr-xr-x. 1 hashwarlock hashwarlock    254 Apr  4 16:27 .
 drwxr-xr-x. 1 hashwarlock hashwarlock    468 Apr  4 16:27 ..
@@ -232,9 +247,12 @@ drwxr-xr-x. 1 hashwarlock hashwarlock     20 Apr  4 16:26 tests
 Here is an example of how the directory structure looks like:
 
 ```bash
-└─[$]> cd stacks
-└─[$]> cd nightly-2023-04-04 
-└─[$]> ls
+ls stacks/nightly*
+```
+
+Expected output:
+
+```bash
 total 116256
 drwxr-xr-x. 1 hashwarlock hashwarlock      272 Apr  4 16:27 .
 drwxr-xr-x. 1 hashwarlock hashwarlock       36 Apr  4 16:27 ..
@@ -249,7 +267,7 @@ drwxr-xr-x. 1 hashwarlock hashwarlock       36 Apr  4 16:27 ..
 -rw-r--r--. 1 hashwarlock hashwarlock    39543 Apr  4 16:27 tokenomic.contract
 ```
 
-#### Start a Phala Local Testnet
+### Start a Phala Local Testnet
 
 `swanky phala node start` will check if the following exists in the current directory or up:
 
@@ -263,6 +281,11 @@ Once verified file are downloaded and there is not an instance running currently
 
 ```bash
 swanky phala node start
+```
+
+Expected output:
+
+```bash
 Starting local tesnet stack
 [StackBinaryDownloader] Preparing Phala stack release
   ✔ Checking releases directory
@@ -273,13 +296,13 @@ Starting local tesnet stack
   ✔ Start pherry component
 ```
 
-#### Configure the Running Local Testnet for Phat Contract Deployment
+### Configure the Running Local Testnet for Phat Contract Deployment
 
 A Phala local testnet needs the following for Phat Contracts to be deployed and instantiated to a cluster:
 
 * Register the Workers and setup their endpoints;
 * Register the Gatekeepers;
-* Create Cluster 0x0 with`Alice`as the owner and the System contract above;
+* Create Cluster `0x01` with`Alice`as the owner and the System contract above;
 * Register two Drivers to the System contract
   * the log server printing all the Phat contracts' log;
   * the SideVM deployer controlling which contracts can start the SideVM;
@@ -288,6 +311,11 @@ This is accomplished by executing `swanky phala node setup`.
 
 ```bash
 swanky phala node setup
+```
+
+Expected output:
+
+```bash
 Setting up Phala local testnet stack
 ⠋ Setting up local testnet stack[StackSetupService] Starting stack setup with default version
   ✔ Fetch worker info
@@ -306,19 +334,19 @@ Setting up Phala local testnet stack
   ✔ Deploy logger server
 Stack is ready
 Cluster Id
-0x0000000000000000000000000000000000000000000000000000000000000000
+0x0000000000000000000000000000000000000000000000000000000000000001
 ✔ Setting up local testnet stack OK
 ✔ Cleanup OK
 😎 Phala local testnet configured successfully! 😎
 ```
 
-#### Compile Your Contract
+### Compile Your Contract
 
 We have accomplished the following:
 
 * Created a project directory with a configured template Phat Contract.
 * Downloaded Phala binaries, drivers, system contracts and sideVM programs.
-* Started and set up a local testnet to start deploying Phat Contracts to a worker node in the deployed `0x0` cluster.
+* Started and set up a local testnet to start deploying Phat Contracts to a worker node in the deployed `0x01` cluster.
 
 Let’s begin the process of deploying the Phat Contract, but first the PC must be compiled to get the `contract.wasm`, `metadata.json` and `contract.contract` files that will be used to upload and instantiate the PC to the local testnet cluster.
 
@@ -328,6 +356,11 @@ We can compile the PC with `swanky phala contract compile -c [CONTRACT_NAME]` an
 
 ```bash
 swanky phala contract compile -c phat_hello
+```
+
+Expected output:
+
+```bash
 Compile contract(s)
 ⠋ Compiling Phat Contract phat_hello[MultiContractExecutor] Criteria: phat_hello
 [MultiContractExecutor] Matched contracts:
@@ -339,81 +372,107 @@ Compile contract(s)
 😎 Phat Contract compiled successfully! 😎
 ```
 
-#### Generate Types for Contract
+### Generate Types for Contract
 
 If you have compiled your contract already, the types will be auto-generated at the end of a successful compilation. In the case that the types were not generated for the contract, execute the `swanky phala contract typegen [CONTRACT_NAME]`.
 
 An example of the output will create `typings/` folder with a TypeScript file of the contract's generated types.
 
 ```bash
-└─[$]> swanky phala contract typegen phat_hello
+swanky phala contract typegen phat_hello
+```
+
+Expected output:
+
+```bash
 Create type bindings for contracts
 ⠋ Creating type bindings for Phat Contract phat_hello[TypeBinder] Generating type bindings for: phat_hello
 ✔ Creating type bindings for Phat Contract phat_hello OK
 😎 Phat Contract types generated successfully! 😎
 ```
 
-#### Validate Your Compiled WASM Contract
+### Validate Your Compiled WASM Contract
 
 Sometimes there are difficult to find errors that lie within a succesfully compiled wasm blob. The command `swanky phala contract validate -c [CONTRACT_NAME]` will do a preliminary check to verify if the compiled contract is valid for deployment.
 
+```bash
+swanky phala contract validate -c phat_hello
 ```
-└─[$]> swanky phala contract validate -c phat_hello
+
+Expected output:
+
+```
 Validating compiled WASM of phat_hello contract...
-[ERROR] Invalid contract: validation of new code failed: sign extension operations support is not enabled (at offset 0x1a36b)
-└─[$]> swanky phala contract validate -c flipper
-Validating compiled WASM of flipper contract...
-flipper.wasm validated successfully!
+phat_hello.wasm validated successfully!
 😎 Phat Contract validated successfully! 😎
 ```
 
-#### Deploy and Instantiate Contract
+### Deploy and Instantiate Contract
 
 ```bash
-USAGE
-  $ phala phala contract deploy [CONTRACTNAME] [CONTRACTCONSTRUCTOR] [CTORARGS] [-t <value>] [-n <value>] [-l <value>] [-a
-    <value>]
+swanky phala contract deploy --help
+```
 
-ARGUMENTS
-  CONTRACTNAME         Contract name
-  CONTRACTCONSTRUCTOR  Contract constructor
-  CTORARGS             Contract constructor arguments
+Expected output:
+
+```bash
+Deploy contract
+
+USAGE
+  $ swanky phala contract deploy -c <value> -o <value> [-t InkCode|SidevmCode|IndeterministicInkCode] [-n <value>] [-l <value>] [-a <value>] [-p <value>]
 
 FLAGS
-  -a, --account=<value>       [default: alice] Account used to deploy (alice default)
-  -l, --clusterId=<value>     [default: 0x0000000000000000000000000000000000000000000000000000000000000000] Target
-                              cluster id
-  -n, --network=<value>       [default: local] Target network to deploy (local default)
-  -t, --contractType=<value>  [default: InkCode] Contract type (InkCode default)
+  -a, --account=<value>      [default: alice] Account used to deploy (managed account key)
+  -c, --contract=<value>     (required) Contract name
+  -l, --cluster=<value>      Target cluster Id
+  -n, --network=<value>      [default: local] Target network to deploy (local default)
+  -o, --constructor=<value>  (required) Contract constructor to call (name)
+  -p, --params=<value>...    [default: ] Arguments supplied to the message
+  -t, --type=<option>        [default: InkCode]
+                             <options: InkCode|SidevmCode|IndeterministicInkCode>
 
 DESCRIPTION
   Deploy contract
 
 EXAMPLES
-  $ phala phala contract deploy [CONTRACT_NAME] [CONSTRUCTOR] -t [CONTRACT_TYPE] -n [NETWORK] -l [CLUSTER_ID] -a [ACCOUNT] [ctorArgs...]
+  $ swanky phala contract deploy -c [CONTRACT_NAME] -t [CONTRACT_TYPE] -o [CONSTRUCTOR] -n [NETWORK] -l [CLUSTER_ID] -a [ACCOUNT] -p [..Args]
 ```
 
-Let's deploy the `phat_hello` contract to the local testnet in cluster `0x0000000000000000000000000000000000000000000000000000000000000000`. Note if there is no account defined then `alice` will deploy the Phat Contract by default.
+Let's deploy the `phat_hello` contract to the local testnet in cluster `0x0000000000000000000000000000000000000000000000000000000000000001`. Note if there is no account defined then `alice` will deploy the Phat Contract by default.
 
 ```bash
-└─[$]> swanky phala contract deploy -c phat_hello -o new -l 0x0000000000000000000000000000000000000000000000000000000000000000
+swanky phala contract deploy -c phat_hello -o new -l 0x0000000000000000000000000000000000000000000000000000000000000001
+```
+
+Expected output:
+
+```bash
 Deploy contract
 ⠧ Deploying contract phat_helloContract deployed
 Contract Id: 0x2e11166f9a623f7536434b5f4456b2311d3bb06717dd91a376380a61b8f9b0a8
-Cluster Id:  0x0000000000000000000000000000000000000000000000000000000000000000
+Cluster Id:  0x0000000000000000000000000000000000000000000000000000000000000001
 ✔ Deploying contract phat_hello OK
 😎 Phat Contract deployed successfully! 😎
 ```
 
-#### Interact with Deployed Contract
+### Interact with Deployed Contract
+
+There are 2 ways to interact with a contract.
+
+* **Query**: if flag `-r` is not defined then `query` is default contract call.
+* **Transaction**: must define `-r` with the value `tx` to ensure the call is a transaction.
 
 ```bash
-└─[$]> swanky phala contract call --help
+swanky phala contract call --help
+```
+
+Expected output:
+
+```bash
 Call a Phat Contract
 
 USAGE
-  $ phala phala contract call -c <value> -i <value> -m <value> [-t InkCode|SidevmCode] [-r query|tx] [-n <value>] [-l
-    <value>] [-a <value>] [-p <value>]
+  $ swanky phala contract call -c <value> -i <value> -m <value> [-t InkCode|SidevmCode|IndeterministicInkCode] [-r query|tx] [-n <value>] [-l <value>] [-a <value>] [-p <value>]
 
 FLAGS
   -a, --account=<value>    [default: alice] Account used to call (managed account key)
@@ -426,22 +485,28 @@ FLAGS
   -r, --request=<option>   [default: query] Request type: transaction or query
                            <options: query|tx>
   -t, --type=<option>      [default: InkCode]
-                           <options: InkCode|SidevmCode>
+                           <options: InkCode|SidevmCode|IndeterministicInkCode>
 
 DESCRIPTION
   Call a Phat Contract
 
 EXAMPLES
-  $ phala phala contract call -c [CONTRACT_NAME] -t [CONTRACT_TYPE] -i [CONTRACT_ID] -r [REQUEST_TYPE] -m [METHOD] -t [NETWORK] -l [CLUSTER_ID] -a [ACCOUNT] -p [..ARGS]
-
+  $ swanky phala contract call -c [CONTRACT_NAME] -t [CONTRACT_TYPE] -i [CONTRACT_ID] -r [REQUEST_TYPE] -m [METHOD] -n [NETWORK] -l [CLUSTER_ID] -a [ACCOUNT] -p [..ARGS]
 ```
 
 Now we can interact with our deployed contract by taking the `Contract Id: 0x2e11166f9a623f7536434b5f4456b2311d3bb06717dd91a376380a61b8f9b0a8` returned from deploying `phat_hello` successfully. There is a function called `get_eth_balance` that takes a hex string of the account address. This is how the composed call would look like.
 
-> **Note:** ETH address has to be converted to the Hex representation `0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634` of the account opposed to using the Account ID `0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464`. This can be retrieved through the `@polkadot/util` method `stringToHex(0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464)`. Check the phat\_hello.test.ts for the example.
+> **Note:**&#x20;
+>
+> ETH address has to be converted to the Hex representation `0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634` of the account opposed to using the Account ID `0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464`. This can be retrieved through the `@polkadot/util` method `stringToHex(0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464)`. Check the phat\_hello.test.ts for the example.
 
 ```bash
-└─[$]> swanky phala contract call -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000000 -i 0x2e11166f9a623f7536434b5f4456b2311d3bb06717dd91a376380a61b8f9b0a8 -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
+swanky phala contract call -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -i 0x2e11166f9a623f7536434b5f4456b2311d3bb06717dd91a376380a61b8f9b0a8 -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
+```
+
+Expected output:
+
+```bash
 Executing call to Phat Contract
 Call result:
 {
@@ -456,12 +521,17 @@ Call result:
 }
 ```
 
-#### Create a New Contract
+### Create a New Contract
 
 To add a new contract there is the `swanky phala contract new [CONTRACT_NAME]` command. This can be done at the root of your new project folder and would look like the following.
 
 ```bash
-└─[$]> swanky phala contract new new_contract
+swanky phala contract new new_contract
+```
+
+Expected output:
+
+```bash
 Creating new Phat Contract
 ? Which contract language should we use? pink
 ? Which contract template should we use? flipper
@@ -481,12 +551,17 @@ drwxr-xr-x. 1 hashwarlock hashwarlock  26 Apr  4 17:16 new_contract
 drwxr-xr-x. 1 hashwarlock hashwarlock  58 Apr  4 16:45 phat_hello
 ```
 
-#### Create/List Accounts
+### Create/List Accounts
 
 There is a basic dev account generation that can be protected by a configured password if desired. By default, the list of accounts can be seen with `swanky phala account list`.
 
 ```bash
-└─[$]> swanky phala account list
+swanky phala account list
+```
+
+Expected output:
+
+```bash
 ✔ Stored dev accounts:
  Alias   Address                                          Protected 
  ─────── ──────────────────────────────────────────────── ───────── 
@@ -501,7 +576,12 @@ There is a basic dev account generation that can be protected by a configured pa
 Creating a new account is simple and can be done with `swanky phala account create -a [ALIAS]`.
 
 ```bash
-└─[$]> swanky phala account create -a hash
+swanky phala account create -a hash
+```
+
+Expected output:
+
+```bash
 ? Account passphrase (leave empty if to save as plain text)
 Account created
 

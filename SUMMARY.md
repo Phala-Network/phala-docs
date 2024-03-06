@@ -42,7 +42,6 @@
   * [Deploy Contract](developers/build-on-phat-contract/deploy-contract.md)
   * [Language Basics](developers/build-on-phat-contract/language-basics.md)
   * [Call Your Contract](developers/build-on-phat-contract/call-your-contract.md)
-  * [Verify Your Contract](developers/build-on-phat-contract/verify-your-contract.md)
   * [Build Stateless Backend](developers/build-on-phat-contract/build-stateless-backend.md)
   * [Use Pink Extension](developers/build-on-phat-contract/use-pink-extension.md)
   * [Use Rust Crates](developers/build-on-phat-contract/use-rust-crates.md)

@@ -19,17 +19,15 @@ Go to your development workspace and ensure that you have updated your `devphase
   },
 ```
 
-`poc6` will be the `-n` flag value in the `swanky phala contract deploy` command.
-
 Next, you will execute the following command to deploy your `phat_hello` compiled contract.
 
-{% code overflow="wrap" %}
-```bash
-swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc6 -o new
-```
-{% endcode %}
-
 The flags available for this command are defined as follows:
+
+```
+swanky phala contract deploy --help
+```
+
+Expected output:
 
 ```bash
 ➜  Norwhich git:(master) ✗ swanky help phala contract deploy                                                                                     ~/Projects/TestingEnv/Norwhich
@@ -55,10 +53,17 @@ EXAMPLES
   $ swanky phala contract deploy -c [CONTRACT_NAME] -t [CONTRACT_TYPE] -o [CONSTRUCTOR] -n [NETWORK] -l [CLUSTER_ID] -a [ACCOUNT] -p [..Args]
 ```
 
+`poc6` will be the `-n` flag value in the `swanky phala contract deploy` command.
+
+{% code overflow="wrap" %}
+```bash
+swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc6 -o new
+```
+{% endcode %}
+
 Here is an expected output after executing the `swanky phala contract deploy` command.
 
 ```bash
-➜  Norwhich git:(master) swanky phala contract deploy -c phat_hello -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc6 -o new
 Deploy contract
 Validating compiled WASM of phat_hello contract...
 phat_hello.wasm validated successfully!
@@ -72,8 +77,15 @@ Cluster Id:  0x0000000000000000000000000000000000000000000000000000000000000001
 
 Now execute the `swanky phala contract call` command since we now have the Contract Id of the deployed Phat Contract. Here is what the help command looks like:
 
+```
+swanky phala contract call --help
+```
+
+Expected output:
+
 ```bash
-➜  phala-wiki-next git:(master) ✗ swanky help phala contract call                                                                            
+Call a Phat Contract
+
 USAGE
   $ swanky phala contract call -c <value> -i <value> -m <value> [-t InkCode|SidevmCode|IndeterministicInkCode] [-r query|tx] [-n <value>] [-l <value>] [-a <value>] [-p <value>]
 
@@ -106,10 +118,13 @@ To call the `phat_hello` contract we will need the following:
 * `-p` Method Argument Parameters: `0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634`
   * Note that this is the value of `stringToHex(0xD0fE316B9f01A3b5fd6790F88C2D53739F80B464)`
 
+```bash
+swanky phala contract call -c phat_hello -i 0xac22b0163a70f1213d58b3891f20c5b493ca7a7802e2b0ee204a7c4994a4bb27 -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc6 -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
+```
+
 Now that we can compose a `swanky phala contract call` command, this would be an expected output:
 
 ```bash
-➜  phala-wiki-next git:(master) ✗ swanky phala contract call -c phat_hello -i 0xac22b0163a70f1213d58b3891f20c5b493ca7a7802e2b0ee204a7c4994a4bb27 -l 0x0000000000000000000000000000000000000000000000000000000000000001 -n poc6 -m getEthBalance -p 0x307844306645333136423966303141336235666436373930463838433244353337333946383042343634
 Executing call to Phat Contract
 Call result:
 {

@@ -50,5 +50,5 @@ You could use the Oracle to:
   * [**Scaffold ETH2**](https://bit.ly/48CYTh9)
     * [**Phat Scaffold ETH2**](https://bit.ly/468GXth)
   * [**Create ETH App**](https://bit.ly/46cm1Bt)
-  * [**Nexth Starter Kit**](../../build-on-phat-contract/verify-your-contract.md)
+  * [**Nexth Starter Kit**](broken-reference)
 * [**Technical design doc**](https://bit.ly/3ZFAXpA)
