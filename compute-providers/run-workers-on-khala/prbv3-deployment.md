@@ -98,6 +98,24 @@ services:
      - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
     volumes:
      - /var/khala/node-data:/root/data
+
+  khala-headers-cache:
+    image: phalanetwork/phala-headers-cache:latest
+    container_name: phala-headers-cache
+    network_mode: host
+    restart: always
+    environment:
+      - ROCKET_PORT=22111
+      - ROCKET_ADDRESS=0.0.0.0
+      - RUST_LOG=info
+    command:
+      - serve
+      - --grab-headers
+      - --node-uri=ws://{node-ip}:9945
+      - --para-node-uri=ws://{node-ip}:9944
+      - --interval=60
+    volumes:
+      - ./phala-headers-cache-public:/opt/headers-cache/data
      
   wm:
     image: phalanetwork/prb3:latest
@@ -120,6 +138,10 @@ services:
     volumes:
       - ./wm.yml:/app/public/wm.yml
 ```
+
+> There are 2 parameters here that need to be user-defined: ws://{node-ip}:9945 & ws://{node-ip}:9944;
+>
+> You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
 
 After entering, complete the following steps to finish the text editing and save successfully.
 
@@ -172,8 +194,6 @@ relaychain:
 parachain:
   select_policy: Failover
   data_sources:
-    - !HeadersCacheHttpSource
-      endpoint: http://{headerscache-ip}:21111
     - !SubstrateWebSocketSource
       endpoint: ws://{node-ip}:9944
       pruned: false
@@ -183,7 +203,7 @@ parachain:
 >
 > You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
 >
-> If you don't need the PRBv3 connect to the headers-cache, delete 2 parts of&#x20;
+> If you don't need the PRBv3 connect to the headers-cache, delete the part of&#x20;
 >
 > `- !HeadersCacheHttpSource`&#x20;
 >

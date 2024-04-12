@@ -119,7 +119,6 @@ services:
     - ROCKET_ADDRESS=0.0.0.0
     volumes:
     - /var/phala/pruntimev2:/opt/pruntime/data
-    - /var/phala/pruntimev2/backups:/opt/pruntime/backups
 ```
 
 Some parameters need to be customized by yourself, including:

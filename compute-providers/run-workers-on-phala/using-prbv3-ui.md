@@ -55,7 +55,7 @@ If you choose the `SyncOnly` mode, the worker will only participate in synchroni
 
 ## Start running
 
-After all information is configured, click the `Restart WM` and then click the `reload` button in the upper left corner of the page. The new configuration information will be loaded, and PRBv3 will start working.
+After all information is configured, click the `reload` button in the upper left corner of the page. The new configuration information will be loaded, and PRBv3 will start working.
 
 ## Status check
 

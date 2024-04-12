@@ -40,25 +40,20 @@ services:
   phala-headers-cache:
     image: phalanetwork/phala-headers-cache:latest
     container_name: phala-headers-cache
+    network_mode: host
     restart: always
     environment:
-      - ROCKET_PORT=21111
+      - ROCKET_PORT=22111
       - ROCKET_ADDRESS=0.0.0.0
       - RUST_LOG=info
     command:
       - serve
       - --grab-headers
-      - --grab-para-headers
-      - --grab-storage-changes
-      - --node-uri=ws://node:9945
-      - --para-node-uri=ws://node:9944
-      - --grab-storage-changes-batch=1
-      - --token=
-      - --check-batch=500000
-    ports:
-      - 21111:21111
+      - --node-uri=ws://{node-ip}:9945
+      - --para-node-uri=ws://{node-ip}:9944
+      - --interval=60
     volumes:
-      - ./data/phala-headers-cache:/opt/headers-cache/data
+      - ./phala-headers-cache-public:/opt/headers-cache/data
 ```
 
 After entering, complete the following steps to finish the text editing and save successfully.

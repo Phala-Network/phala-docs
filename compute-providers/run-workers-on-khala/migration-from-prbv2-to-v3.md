@@ -4,7 +4,7 @@ This guide will show you how to migrate a PRBv2 deployment to PRBv3 using Docker
 
 ### Deploy PRBv3
 
-First, you should create a clean PRBv3 deployment by referring to this page: [PRBv3 Deployment Guide](../run-workers-on-phala/prbv3-deployment.md)&#x20;
+First, you should create a clean PRBv3 deployment by referring to this page: [PRBv3 Deployment Guide](../run-workers-on-phala/prbv3-deployment.md)
 
 Make sure it's running and the `wm` should be running and listening on port 3001 by default.
 
@@ -39,7 +39,7 @@ To stop the PRBv2 and to run the migration script.
 
 > There you should use the same endpoint of what you wrote in wm.yml to replace the \`http://127.0.0.1:3001\`.
 
-Now the migration is done, click `Restart All`  button on the Worker Status page of the monitor, then wait for 15 seconds for the worker's beginning to start.
+Now the migration is done, just waiting for the worker's beginning to start.
 
 <figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -51,13 +51,13 @@ Before Migration, you must ensure that there can be no duplicate items in the na
 
 #### PID #0 error
 
-PRBv2 does not support PID #0, but PRBv3 supports it.&#x20;
+PRBv2 supports PID #0, but PRBv3 does not support it.
 
 This makes the migration fail if you want to migrate PID #0 from PRBv2 to PRBv3.
 
 #### Database conflicts
 
-If your PRBv3 is running and migration from PRBv2 is also necessary. Before your migration, check it to avoid the 2 limitations above.&#x20;
+If your PRBv3 is running and migration from PRBv2 is also necessary. Before your migration, check it to avoid the 2 limitations above.
 
 If your PRBv3 is brand new but may have some test data or you failed to migrate before, the previous test data or half-imported dirty data will result in poor synchronization results. Therefore, you need to:
 
