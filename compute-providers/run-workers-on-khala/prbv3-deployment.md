@@ -99,24 +99,6 @@ services:
     volumes:
      - /var/khala/node-data:/root/data
 
-  khala-headers-cache:
-    image: phalanetwork/phala-headers-cache:latest
-    container_name: phala-headers-cache
-    network_mode: host
-    restart: always
-    environment:
-      - ROCKET_PORT=22111
-      - ROCKET_ADDRESS=0.0.0.0
-      - RUST_LOG=info
-    command:
-      - serve
-      - --grab-headers
-      - --node-uri=ws://{node-ip}:9945
-      - --para-node-uri=ws://{node-ip}:9944
-      - --interval=60
-    volumes:
-      - ./phala-headers-cache-public:/opt/headers-cache/data
-     
   wm:
     image: phalanetwork/prb3:latest
     hostname: prb-local
@@ -138,10 +120,6 @@ services:
     volumes:
       - ./wm.yml:/app/public/wm.yml
 ```
-
-> There are 2 parameters here that need to be user-defined: ws://{node-ip}:9945 & ws://{node-ip}:9944;
->
-> You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
 
 After entering, complete the following steps to finish the text editing and save successfully.
 
@@ -186,8 +164,6 @@ enter `a` to start editing the document and paste the following content into the
 relaychain:
   select_policy: Failover # or Random
   data_sources:
-    - !HeadersCacheHttpSource
-      endpoint: http://{headerscache-ip}:21111
     - !SubstrateWebSocketSource
       endpoint: ws://{node-ip}:9945
       pruned: false
