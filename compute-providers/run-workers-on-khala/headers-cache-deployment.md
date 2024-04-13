@@ -38,7 +38,7 @@ Enter `a` and you will start editing the document. Paste the following content i
 version: "3"
 services:
   khala-headers-cache:
-    image: phalanetwork/phala-headers-cache:latest
+    image: phalanetwork/headers-cache:latest
     container_name: khala-headers-cache
     network_mode: host
     restart: always

@@ -30,7 +30,7 @@ services:
      - /var/phala/node-data:/root/data
 
   phala-headers-cache:
-    image: phalanetwork/phala-headers-cache:latest
+    image: phalanetwork/headers-cache:latest
     container_name: phala-headers-cache
     network_mode: host
     restart: always
