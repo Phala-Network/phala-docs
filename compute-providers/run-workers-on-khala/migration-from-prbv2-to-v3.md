@@ -41,8 +41,6 @@ To stop the PRBv2 and to run the migration script.
 
 Now the migration is done, just waiting for the worker's beginning to start.
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
-
 ### Limitations of Migration
 
 #### Duplicated worker name
