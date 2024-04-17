@@ -1,41 +1,34 @@
 ---
-description: Computation as it’s meant to be.
-cover: .gitbook/assets/Phala-Network-Intro-Page.png
-coverY: -178
+cover: .gitbook/assets/Phala-AI-Dark-BG.png
+coverY: 0
+layout:
+  cover:
+    visible: true
+    size: hero
+  title:
+    visible: true
+  description:
+    visible: false
+  tableOfContents:
+    visible: true
+  outline:
+    visible: false
+  pagination:
+    visible: true
 ---
 
-# 🤔 What is Phala Network?
+# 👾 Welcome
 
-## Our Mission <a href="#phala-network-web3-computing-cloud" id="phala-network-web3-computing-cloud"></a>
+***
 
-Phala Network is revolutionizing Web3 by providing dApp developers with an off-chain compute infrastructure that is truly decentralized and trustless. By connecting Smart Contracts to our off-chain programs called [Phat Contracts](developers/phat-contract/), developers can supercharge their dApps with seamless cross-chain integrations, connectivity to the internet, and heavy computation. Phat Contracts make your Smart Contracts even smarter, and can be integrated in minutes using our no-code developer experience [Phat Bricks](developers/bricks-and-blueprints/).
+## Discover Phala's AI Coprocessor
 
-Web3 developers are constantly pushing up against the technical limitations of building on-chain. Modern dApps need more than just Smart Contracts to support rich feature sets, and as Web3 has evolved and matured, it has become clear that efficient off-chain computation will be vital for a number of standard dApp use cases. Phala gives dApp developers access to powerful off-chain services without compromising the principles of Web3. **This is Computation as it’s Meant to Be.**
+<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td>⚡️ <strong>Introduction: Scale Blockchain with AI Coprocessor</strong></td><td></td><td></td><td><a href="overview/scale-blockchains-with-ai-coprocessor.md">scale-blockchains-with-ai-coprocessor.md</a></td><td><a href=".gitbook/assets/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr><tr><td>🔮 <strong>Vision: Agentize, Monetize, and Decentralize</strong></td><td></td><td></td><td><a href="overview/vision-agentize-monetize-and-decentralize.md">vision-agentize-monetize-and-decentralize.md</a></td><td><a href=".gitbook/assets/AI-Agent-DePIN (1).png">AI-Agent-DePIN (1).png</a></td></tr></tbody></table>
 
-Furthermore, in a digital landscape that is becoming increasingly centralized, Phala Network seeks to go against the grain by building a compute network that anybody can provide for or build on top of, trustlessly. In other words, Phala is a **Public Good Network**.
+## Getting Started
 
-## Trustless Computation. Verifiable Results.
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td>🏗️ <strong>Build Your First AI Agent Contract</strong></td><td></td><td></td><td><a href=".gitbook/assets/AI-Agent-Contract.png">AI-Agent-Contract.png</a></td><td><a href="developer-guides/getting-started/build-your-ai-agent-contract-with-langchain.md">build-your-ai-agent-contract-with-langchain.md</a></td></tr><tr><td>🛠️ <strong>Build Your AI Agent Contract with OpenAI</strong></td><td></td><td></td><td><a href=".gitbook/assets/OpenAI.png">OpenAI.png</a></td><td><a href="developer-guides/getting-started/build-your-ai-agent-contract-with-openai.md">build-your-ai-agent-contract-with-openai.md</a></td></tr><tr><td>⛓️ <strong>Build Your AI Agent Contract with LangChain</strong></td><td></td><td></td><td><a href=".gitbook/assets/langchain.png">langchain.png</a></td><td><a href="developer-guides/getting-started/build-your-ai-agent-contract-with-langchain.md">build-your-ai-agent-contract-with-langchain.md</a></td></tr><tr><td>🔌 <strong>Integrate 3rd Party APIs with HTTP Request</strong></td><td></td><td></td><td><a href=".gitbook/assets/Internet-of-AI.png">Internet-of-AI.png</a></td><td><a href="developer-guides/getting-started/integrate-with-3rd-party-api-with-http-request.md">integrate-with-3rd-party-api-with-http-request.md</a></td></tr></tbody></table>
 
-Phala Network is designed with multiple layers of security guarantees to provide fully verifiable computation. Anybody with the correct hardware can become a compute providing “[Worker](broken-reference/)” for the network and earn rewards, and Phala has an array of mechanisms in place to ensure Workers always carry out computation faithfully and securely. [Tokenomic incentives](developers/phat-contract/pay-for-cloud-service.md), hardware-based assurances, and cryptographic evidence of execution published and verified on the Phala blockchain enable Phat Contract to seamlessly extend blockchain-level security to the off-chain realm.
+## Featured Product - Agent Wars
 
-## Supercharge Your dApps with Phat Contract
-
-Developers can use Phala Network by deploying Phat Contracts, programs that run on Phala Network’s off-chain Workers that can interface with Smart Contracts on any chain.
-
-Our low-code experience, Phat Contract 2.0, uses pre-written, audited Phat Contracts to form complex functions using TypeScript/JavaScript that developers can integrate with their Smart Contracts in minutes.
-
-Developers with experience using Rust, ink!, JavaScript, or TypeScript can jump into [Phat Contract Rust SDK](developers/getting-started/) and write their own custom programs to service any number of use cases.
-
-Use cases for Phat Contract include:
-
-* Connect your Smart Contract to any API
-* Interface with any S3 storage platform
-* Compute over data
-* Automate Smart Contracts
-* etc.
-
-You can read more about Phat Contract [use cases](developers/phat-contract/use-cases.md) here.
-
-## Join the People’s Network and Earn Rewards
-
-If you want to help power the decentralized internet, you can become a compute-providing Worker for Phala network and earn rewards by allowing Web3 applications to run programs on your hardware. To view hardware requirements and our Worker onboarding guide, click [here](compute-providers/run-workers-on-phala/).
+<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td>🧐 <strong>Concepts</strong></td><td></td><td></td><td><a href=".gitbook/assets/AgentWars-Agents.png">AgentWars-Agents.png</a></td><td><a href="product-agent-wars/concepts.md">concepts.md</a></td></tr><tr><td><strong>🏃‍♀️‍➡️ Getting Started</strong></td><td></td><td></td><td><a href=".gitbook/assets/Multi-Agent.png">Multi-Agent.png</a></td><td><a href="product-agent-wars/getting-started/">getting-started</a></td></tr><tr><td>🧮 <strong>Tokenomics</strong></td><td></td><td></td><td><a href=".gitbook/assets/AgentWars (1).png">AgentWars (1).png</a></td><td><a href="product-agent-wars/agent-war-tokenomics.md">agent-war-tokenomics.md</a></td></tr></tbody></table>

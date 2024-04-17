@@ -2,7 +2,7 @@
 
 This document contains the _Supply-end Tokenomics_ for Phala Network, which defines how workers get their rewards by sharing the computing power.
 
-To read about how Demand-end users can stake PHA to use the network, see [Stake to Compute](../../developers/phat-contract/pay-for-cloud-service.md).
+To read about how Demand-end users can stake PHA to use the network, see [Stake to Compute](broken-reference).
 
 > After the approval of the “Gemini Tokenomics upgrade" democratic referendum on the block height #1,467,069, we have updated the content of the Supply-end Tokenomics as follows:
 
@@ -145,7 +145,7 @@ $$
 \Delta V_t = k_p \cdot \big((\rho^m - 1) V_t + c(s_t) + \gamma(V_t)h(V_t)\big)
 $$
 
-* $$\rho^m$$ is the unconditional $$V$$ increment factor for worker
+* $$ho^m$$ is the unconditional $$V$$ increment factor for worker
 * $$c(s_t)$$ is the operational cost to run the worker
 * $$\gamma(V_t)h(V_t)$$ represents a factor to compensate for accidental/unintentional slashing (ignored in simulated charts)
 * $$k_p = \min(\frac{P_t}{P}, 120\%)$$, where $$P_t$$ is the instant performance score, and $P$ is the initial score
@@ -153,7 +153,7 @@ $$
 
 Proposed parameters:
 
-* $$\rho^m_{\text{Phala}} =\rho^m_{\text{Khala}} = 1.00020$$ (hourly)
+* $$ho^m_{\text{Phala}} =\rho^m_{\text{Khala}} = 1.00020$$ (hourly)
 
 ### Payout Event <a href="#payout-event" id="payout-event"></a>
 
