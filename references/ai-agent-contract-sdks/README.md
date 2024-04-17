@@ -1,7 +1,7 @@
 # 🤖 AI Agent Contract SDKs
 
 {% hint style="warning" %}
-The following AI Agent Contract SDKs are legacy tutorials for request-and-response agents for blockchain use cases. These tutorials will be updated in the future to support the new [AI Agent Contracts](../../developer-guides/getting-started/).
+The following AI Agent Contract SDKs are legacy tutorials for request-and-response agents for blockchain use cases. These tutorials will be updated in the future to support the new [AI Agent Contracts](../../ai-agent-contract/getting-started/).
 {% endhint %}
 
 

@@ -2,39 +2,39 @@
 
 ## Home
 
-* [👾 Welcome](README.md)
+* [👾 Phala Network Docs](README.md)
 
 ## Overview
 
-* [⚖️ Scale Blockchains with AI Coprocessor](overview/scale-blockchains-with-ai-coprocessor.md)
-* [🔮 Vision: Agentize, Monetize, and Decentralize](overview/vision-agentize-monetize-and-decentralize.md)
+* [⚖️ Phala Network](overview/phala-network.md)
+* [⚡ AI Execution Layer](overview/ai-execution-layer.md)
 
-## Developer Guides
+## AI Agent Contract
 
-* [👩‍💻 Getting Started](developer-guides/getting-started/README.md)
-  * [Build Your AI-Agent Contract with OpenAI](developer-guides/getting-started/build-your-ai-agent-contract-with-openai.md)
-  * [Build Your AI-Agent Contract with LangChain](developer-guides/getting-started/build-your-ai-agent-contract-with-langchain.md)
-  * [Integrate with 3rd Party API with HTTP Request](developer-guides/getting-started/integrate-with-3rd-party-api-with-http-request.md)
-* [🔌 Integrations](developer-guides/integrations/README.md)
-  * [✈️ Airstack Agent](developer-guides/integrations/airstack-agent.md)
-  * [📈 The Graph Agent](developer-guides/integrations/the-graph-agent.md)
-  * [🪞 Mirrored Price Feeds Agent](developer-guides/integrations/mirrored-price-feeds-agent/README.md)
-    * [Getting Started](developer-guides/integrations/mirrored-price-feeds-agent/getting-started.md)
-    * [Feed Addresses](developer-guides/integrations/mirrored-price-feeds-agent/feed-addresses/README.md)
-      * [Astar zKatana Testnet](developer-guides/integrations/mirrored-price-feeds-agent/feed-addresses/astar-zkatana-testnet.md)
-      * [Tanssi Dancebox Testnet](developer-guides/integrations/mirrored-price-feeds-agent/feed-addresses/tanssi-dancebox-testnet.md)
-      * [Base Sepolia Testnet](developer-guides/integrations/mirrored-price-feeds-agent/feed-addresses/base-sepolia-testnet.md)
-    * [How Mirrored Price Feeds Work](developer-guides/integrations/mirrored-price-feeds-agent/how-mirrored-price-feeds-work.md)
-  * [🌱 LensAPI Oracle Agent](developer-guides/integrations/lensapi-oracle-agent.md)
+* [👩‍💻 Getting Started](ai-agent-contract/getting-started/README.md)
+  * [Build Your AI-Agent Contract with OpenAI](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-openai.md)
+  * [Build Your AI-Agent Contract with LangChain](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-langchain.md)
+  * [Integrate with 3rd Party API with HTTP Request](ai-agent-contract/getting-started/integrate-with-3rd-party-api-with-http-request.md)
+* [🔌 Integrations](ai-agent-contract/integrations/README.md)
+  * [✈️ Airstack Agent](ai-agent-contract/integrations/airstack-agent.md)
+  * [📈 The Graph Agent](ai-agent-contract/integrations/the-graph-agent.md)
+  * [🪞 Mirrored Price Feeds Agent](ai-agent-contract/integrations/mirrored-price-feeds-agent/README.md)
+    * [Getting Started](ai-agent-contract/integrations/mirrored-price-feeds-agent/getting-started.md)
+    * [Feed Addresses](ai-agent-contract/integrations/mirrored-price-feeds-agent/feed-addresses/README.md)
+      * [Astar zKatana Testnet](ai-agent-contract/integrations/mirrored-price-feeds-agent/feed-addresses/astar-zkatana-testnet.md)
+      * [Tanssi Dancebox Testnet](ai-agent-contract/integrations/mirrored-price-feeds-agent/feed-addresses/tanssi-dancebox-testnet.md)
+      * [Base Sepolia Testnet](ai-agent-contract/integrations/mirrored-price-feeds-agent/feed-addresses/base-sepolia-testnet.md)
+    * [How Mirrored Price Feeds Work](ai-agent-contract/integrations/mirrored-price-feeds-agent/how-mirrored-price-feeds-work.md)
+  * [🌱 LensAPI Oracle Agent](ai-agent-contract/integrations/lensapi-oracle-agent.md)
 
-## Product Agent Wars
+## Agent Wars
 
-* [📜 Concepts](product-agent-wars/concepts.md)
-* [💸 Agent War Tokenomics](product-agent-wars/agent-war-tokenomics.md)
-* [▶️ Getting Started](product-agent-wars/getting-started/README.md)
-  * [Wallet Setup & Get PHA](product-agent-wars/getting-started/wallet-setup-and-get-pha.md)
-  * [Create and Play with Social Agents](product-agent-wars/getting-started/create-and-play-with-social-agents.md)
-* [🧑‍🏫 Tutorial](product-agent-wars/tutorial.md)
+* [📜 Agent Wars Introduction](agent-wars/agent-wars-introduction.md)
+* [💸 Agent War Tokenomics](agent-wars/agent-war-tokenomics.md)
+* [▶️ Getting Started](agent-wars/getting-started/README.md)
+  * [Wallet Setup & Get PHA](agent-wars/getting-started/wallet-setup-and-get-pha.md)
+  * [Create and Play with Social Agents](agent-wars/getting-started/create-and-play-with-social-agents.md)
+* [🧑‍🏫 Tutorial](agent-wars/tutorial.md)
 
 ## Tech Specs
 
