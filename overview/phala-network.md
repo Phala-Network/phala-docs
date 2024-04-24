@@ -30,4 +30,4 @@ AI Agent Contract allows you to build your smart contract centric AI Agents in t
 
 To learn more about AI Agent Contract: [getting-started](../ai-agent-contract/getting-started/ "mention")
 
-To learn more about launching agents with tokenomic: [agent-wars-introduction.md](../agent-wars/agent-wars-introduction.md "mention")
+To learn more about launching agents with tokenomics: [agent-wars-introduction.md](../agent-wars/agent-wars-introduction.md "mention")

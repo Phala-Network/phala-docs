@@ -72,8 +72,8 @@
 
 ## Agent Wars
 
-* [📜 Agent Wars Introduction](agent-wars/agent-wars-introduction.md)
-* [💸 Agent War Tokenomics](agent-wars/agent-war-tokenomics.md)
+* [📜 Introduction](agent-wars/agent-wars-introduction.md)
+* [💸 Tokenomics](agent-wars/agent-war-tokenomics.md)
 * [▶️ Getting Started](agent-wars/getting-started/README.md)
   * [Wallet Setup & Get PHA](agent-wars/getting-started/wallet-setup-and-get-pha.md)
   * [Create and Play with Social Agents](agent-wars/getting-started/create-and-play-with-social-agents.md)
