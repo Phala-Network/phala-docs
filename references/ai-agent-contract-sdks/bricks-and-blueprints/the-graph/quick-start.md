@@ -37,7 +37,7 @@ First (4) the Phat Contract will create a `batchHttpRequest` to query 3 separate
 
 ## Quick Start
 
-Make sure you have created a Phat Contract Profile in the Phat Contract 2.0 UI and claimed some PoC6 Testnet Tokens. Instructions on creating a profile can be found [here](broken-reference). Also, make sure to get an [API Key from The Graph](broken-reference) to avoid being rate limited by the default API Key provided by the Phala team.
+Make sure you have created a Phat Dashboard Profile and claimed some PoC6 Testnet Tokens. Instructions on creating a profile can be found [here](../create-a-dashboard-profile.md). Also, make sure to get an [API Key from The Graph](get-an-api-key-for-the-graph.md) to avoid being rate limited by the default API Key provided by the Phala team.
 
 To kickstart your journey with The Graph Starter Kit, you install the `@phala/fn` CLI tool.&#x20;
 

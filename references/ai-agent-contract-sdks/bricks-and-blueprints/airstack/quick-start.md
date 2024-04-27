@@ -37,7 +37,7 @@ First (4) the Phat Contract will create a `batchHttpRequest` to query the Airsta
 
 ## Quick Start
 
-Make sure you have created a Phat Contract Profile in the Phat Contract 2.0 UI and claimed some PoC6 Testnet Tokens. Instructions on creating a profile can be found [here](broken-reference). Also, make sure to get an [API Key from Airstack](broken-reference) to avoid being rate limited by the default API Key provided by the Phala team.
+Make sure you have created a Phat Contract Profile in the Phat Contract 2.0 UI and claimed some PoC6 Testnet Tokens. Instructions on creating a profile can be found [here](../../../support/faucet.md). Also, make sure to get an [API Key from Airstack](get-an-airstack-api-key.md) to avoid being rate limited by the default API Key provided by the Phala team.
 
 To kickstart your journey with the Airstack Starter Kit, install the `@phala/fn` CLI tool.&#x20;
 

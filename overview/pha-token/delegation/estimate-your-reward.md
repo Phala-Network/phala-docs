@@ -25,7 +25,7 @@ $$
 
 * $$UserDelegation$$ is the delegation amount of a Delegator in the StakePool
 
-Vaults act in the same role as delegators when Vaults delegate to StakePool. But the Vault owner will charge an additional commission for the management of funds. Click to learn more about [Vault commission](broken-reference).
+Vaults act in the same role as delegators when Vaults delegate to StakePool. But the Vault owner will charge an additional commission for the management of funds. Click to learn more about [Vault commission](whats-vault.md#how-is-the-vault-owners-reward-calculated).
 
 ## Vault’s APY <a href="#vaults-apy" id="vaults-apy"></a>
 

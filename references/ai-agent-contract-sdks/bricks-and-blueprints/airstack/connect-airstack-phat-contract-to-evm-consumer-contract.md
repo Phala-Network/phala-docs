@@ -10,7 +10,7 @@ First (4) the Phat Contract will create a `batchHttpRequest` to query 3 separate
 
 ## Getting Started
 
-If you have not setup Airstack code repo locally, go back to the [Quick Start](broken-reference) section and follow the initial setup steps.
+If you have not setup Airstack code repo locally, go back to the [Quick Start](quick-start.md) section and follow the initial setup steps.
 
 ### Before Deployment
 
@@ -42,10 +42,10 @@ This guide will be separated into 3 tabs including:
 * **Testnet**: PoC6 Testnet & EVM Chain Testnet Deployment
 * **Mainnet**: Phala Mainnet & EVM Chain Mainnet Deployment
 
-> **Secrets (**[**What are Secrets**](broken-reference)**?):**
+> **Secrets (**[**What are Secrets**](../featured-blueprints/handling-secrets.md)**?):**
 >
 > * `apiUrl` - The endpoint base URL to the separate subgraph endpoints hosted on Airstack
-> * `apiKey` - an [API key](broken-reference) created on Airstack
+> * `apiKey` - an [API key](get-an-airstack-api-key.md) created on Airstack
 >
 > ```
 > {
@@ -56,7 +56,7 @@ This guide will be separated into 3 tabs including:
 
 {% tabs %}
 {% tab title="Local" %}
-In the previous [Quick Start](broken-reference) section, we installed the dependencies and ran 2 separate tests locally, but these tests were not run against a live local testnet.&#x20;
+In the previous [Quick Start](quick-start.md) section, we installed the dependencies and ran 2 separate tests locally, but these tests were not run against a live local testnet.&#x20;
 
 This section will describe the process of:
 
@@ -82,7 +82,7 @@ npx @phala/fn build
 
 To simulate the expected result locally, run the Phat Contract script now with this command:
 
-> Check [this explanation ](broken-reference)out or use `decode` and `encode` playground at [https://playground.ethers.org](https://playground.ethers.org).
+> Use `decode` and `encode` playground at [https://playground.ethers.org](https://playground.ethers.org).
 
 ```bash
 npx @phala/fn run dist/index.js -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000de1683287529b9b4c3132af8aad210644b259cfd '{"apiUrl": "https://gateway.thegraph.com/api/", "apiKey": "cd22a01e5b7f9828cddcb52caf03ee79"}'
@@ -200,7 +200,7 @@ The`mumbai` testnet is [deprecated since 2024/04/08](https://polygon.technology/
 You can opt to use the [`amoy`](https://polygon.technology/blog/introducing-the-amoy-testnet-for-polygon-pos) testnet or any other EVM testnet instead.
 {% endhint %}
 
-In the previous [Quick Start](broken-reference) section, we installed the dependencies. Now it is time to deploy and test to an EVM public testnet.&#x20;
+In the previous [Quick Start](quick-start.md) section, we installed the dependencies. Now it is time to deploy and test to an EVM public testnet.&#x20;
 
 The following steps will be performed:
 
@@ -213,9 +213,9 @@ The following steps will be performed:
 
 ### Minimum Requirements
 
-* [ ] Create a [Phat Contract 2.0 Profile](broken-reference) on Phala PoC6 Testnet
+* [ ] Create a [Phala Dashboard Profile](../create-a-dashboard-profile.md) on Phala PoC6 Testnet
   * [ ] Add funds to the EVM Gas Account to pay TX fees on target EVM Testnet Chain
-* [ ] Finished the [Quick Start](broken-reference)
+* [ ] Finished the [Quick Start](quick-start.md)
 * [ ] (Recommended) Go through the `Local` tab deployment process
 * [ ] Burner Account for EVM Consumer Contract deployment
 
@@ -284,7 +284,7 @@ npm run test-verify -- 0xEE2F3526686D27f682ecb6E3dC91cd8c972Cf355
 
 #### Deploy Phat Contract to PoC6 Testnet <a href="#user-content-deploy-phat-contract-to-poc5-testnet" id="user-content-deploy-phat-contract-to-poc5-testnet"></a>
 
-For customizing your Phat Contract, checkout Phat Contract custom configurations in [Broken link](broken-reference "mention") to learn more before deploying to PoC6 testnet.
+For customizing your Phat Contract, checkout Phat Contract custom configurations in [Cusomizing Your Phat Contract](../featured-blueprints/customizing-your-phat-contract.md) to learn more before deploying to PoC6 testnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Testnet with the following command:
 
@@ -428,9 +428,9 @@ The following steps will be performed:
 
 ### Minimum Requirements
 
-* [ ] Create a [Phat Contract 2.0 Profile](broken-reference) on Phala Mainnet
+* [ ] Create a [Phala Dashboard Profile](../create-a-dashboard-profile.md) on Phala Mainnet
   * [ ] Add funds to the EVM Gas Account to pay TX fees on target EVM Mainnet Chain
-* [ ] Finished the [Quick Start](broken-reference)
+* [ ] Finished the [Quick Start](quick-start.md)
 * [ ] (Recommended) Go through the `Local` AND `Testnet` tabs to understand the deployment process fully
 * [ ] Burner Account for EVM Consumer Contract deployment
 
@@ -499,7 +499,7 @@ npm run main-verify -- 0x0b9aC89924483077899d2B52bc8AF794F546a1e9
 
 #### Deploy Phat Contract to Phala Mainnet <a href="#user-content-deploy-phat-contract-to-poc5-testnet" id="user-content-deploy-phat-contract-to-poc5-testnet"></a>
 
-For customizing your Phat Contract, checkout Phat Contract custom configurations in [Broken link](broken-reference "mention") to learn more before deploying to Phala Mainnet.
+For customizing your Phat Contract, checkout Phat Contract custom configurations in [Customizing Your Phat Contract ](../featured-blueprints/customizing-your-phat-contract.md)to learn more before deploying to Phala Mainnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet with the following command:
 

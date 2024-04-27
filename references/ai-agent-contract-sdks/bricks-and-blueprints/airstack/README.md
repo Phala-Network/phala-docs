@@ -6,7 +6,7 @@ The Airstack template allows for users to request data from Airstack’s API to 
 
 There are a couple steps to complete before deploying the Airstack Template.
 
-* Create a [Phat Contract 2.0 Profile](https://app.gitbook.com/o/uC1n4EsT23m6ZTklOdXG/s/mFxKaTU233OXZzSqmqjx/\~/changes/60/developers/bricks-and-blueprints/create-a-phat-contract-profile)
+* Create a [Phala Dashboard Profile](../create-a-dashboard-profile.md)
   * Generate and fund an EVM account for the target chain you plan to deploy your Consumer Contract to
 * Deploy the Consumer Contract (The right side of the diagram above) on an EVM chain that will connect to the deployed Phat Contract
 * (Optional) Create API Key from Airstack. See how to get an API Key [here](https://bit.ly/airstack-api-key). By default a rate-limited key is provided with no guarantee of service if limit is exhausted.

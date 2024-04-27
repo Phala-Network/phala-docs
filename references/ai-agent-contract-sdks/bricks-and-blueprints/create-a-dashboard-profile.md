@@ -1,4 +1,4 @@
-# 👾 Create a DashboardProfile
+# 👾 Create a Dashboard Profile
 
 ## Create a Profile <a href="#user-content-create-a-phala-profile" id="user-content-create-a-phala-profile"></a>
 
@@ -19,4 +19,4 @@ To get test tokens go to the [faucet](https://bit.ly/phala-faucet) and request t
 
 <figure><img src="../../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
-Another way to get test tokens can be found [here](broken-reference) via the Phat UI.
+Another way to get test tokens can be found [here](https://phat.phala.network) via the Phat UI.

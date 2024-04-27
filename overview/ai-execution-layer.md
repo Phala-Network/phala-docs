@@ -18,7 +18,7 @@ All of these leads to a system that allow AI Agents to run in TEE workers, but a
 
 <figure><img src="../.gitbook/assets/AI-Agent-DePIN (1).png" alt=""><figcaption></figcaption></figure>
 
-The key value proposition Phala offers for AI Agents:
+### Why build AI Agents on Phala Network?
 
 * **Agentize** **Smart Contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts
 * **Decentralized and Private by Default**: Powered by the largest TEE network, fully transparent & privacy preserving

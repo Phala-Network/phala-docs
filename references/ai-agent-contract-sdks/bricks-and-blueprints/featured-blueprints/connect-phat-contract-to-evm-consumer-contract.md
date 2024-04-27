@@ -8,7 +8,7 @@ This project represents a basic EVM Consumer Contract that is compatible with a 
 
 ## Prerequisites <a href="#user-content-prerequisites" id="user-content-prerequisites"></a>
 
-* Active Phala Profile with version `>= 1.0.1` via [Phat Contract 2.0 UI](https://bit.ly/3LHccmR)
+* Active Phala Profile with version `>= 1.0.1` via [Phala Dashboard](https://bit.ly/3LHccmR)
 * [Hardhat](https://bit.ly/469uyW5)
 * For EVM Mainnet deployments:
   * Ex: Polygonscan API Key that can be generated on [polygonscan](https://bit.ly/3rBkypp)
@@ -84,7 +84,7 @@ This step requires you to have a Polkadot account. You can get an account from o
 * [Talisman Wallet](https://bit.ly/3ZzAPYD)
 * [SubWallet](https://bit.ly/3tjS8R7) (**Support for iOS/Android**)
 
-First, create your Phala Profile account on the [Phala PoC6 Testnet](https://bit.ly/3LHccmR) or [Phala Mainnet](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:
+First, create your Phala Profile account on the [Phala Dashboard](https://bit.ly/3LHccmR). Here is a quick 1 minute [YouTube video](https://bit.ly/46clfo4) on setting up from scratch. Here is what your Phala Profile account overview should look like:
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/BricksProfileCheck.png" alt=""><figcaption></figcaption></figure>
 
@@ -132,7 +132,7 @@ npm install
 
 Now that the package dependencies are installed, lets build the default Phat Contract which is located in [`./src/index.ts`](https://bit.ly/3PBnP02).
 
-For those want to understand what the contents of `./src/index.ts` mean, go [here](broken-reference) read more. If you are already familiar with the concepts then you can proceed to with the deployment process.
+For those want to understand what the contents of `./src/index.ts` mean, go [here](customizing-your-phat-contract.md) read more. If you are already familiar with the concepts then you can proceed to with the deployment process.
 
 Build the default Phat Contract with this command:
 
@@ -426,7 +426,7 @@ npm run test-verify -- 0x090E8fDC571d65459569BC87992C1026121DB955
 
 ### Deploy Phat Contract to PoC6 Testnet <a href="#user-content-deploy-phat-contract-to-poc5-testnet" id="user-content-deploy-phat-contract-to-poc5-testnet"></a>
 
-For customizing your Phat Contract, checkout Phat Contract custom configurations in [Broken link](broken-reference "mention") to learn more before deploying to PoC6 testnet.
+For customizing your Phat Contract, checkout Phat Contract custom configurations in [Customizing Your Phat Contract](customizing-your-phat-contract.md) to learn more before deploying to PoC6 testnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala PoC6 Testnet with the following command:
 
@@ -463,7 +463,7 @@ npx @phala/fn upload -a ./polkadot-account.json --coreSettings=https://api-v2-mu
 # ✨  Done in 73.22s.
 ```
 
-Go to the [PoC6 Testnet Bricks UI](https://bit.ly/3ZzwWCY) Dashboard and you can see your newly deployed Phat Contract.
+Go to the [Phala Dashboard](https://dashboard.phala.network) and you can see your newly deployed Phat Contract.
 
 <figure><img src="https://github.com/Phala-Network/phat-contract-starter-kit/raw/main/assets/Function-added.png" alt=""><figcaption></figcaption></figure>
 
@@ -584,7 +584,7 @@ npm run main-verify -- 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
 
 ### Deploy Phat Contract to Phala Mainnet <a href="#user-content-deploy-phat-contract-to-phala-mainnet" id="user-content-deploy-phat-contract-to-phala-mainnet"></a>
 
-For customizing your Phat Contract, Phat Contract custom configurations can be found here in [Broken link](broken-reference "mention") to learn more before deploying to Phala Mainnet.
+For customizing your Phat Contract, Phat Contract custom configurations can be found here in [Customizing Your Phat Contract](customizing-your-phat-contract.md) to learn more before deploying to Phala Mainnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet with the following command:
 

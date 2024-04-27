@@ -12,7 +12,7 @@ A Phat contract can utilize three kinds of storage solutions: local cache, contr
 
 The local cache is stored in the worker’s memory. As its name, it should only be used as a cache since all cached data is not shared across different workers, and can be lost if the worker is down. Also, you may experience unexpected value cleanup if the memory usage of the worker is high.
 
-The cache can be easily accessed in [Pink extension](broken-reference). You can read and write cache in query handlers, but reading cache in transaction handlers is forbidden: the result of cache reading is nondeterministic.
+The cache can be easily accessed in [Pink extension](use-pink-extension.md). You can read and write cache in query handlers, but reading cache in transaction handlers is forbidden: the result of cache reading is nondeterministic.
 
 ```rust
 use pink::chain_extension::pink_extension_instance as ext;

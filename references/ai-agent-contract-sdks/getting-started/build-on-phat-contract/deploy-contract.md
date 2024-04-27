@@ -6,7 +6,7 @@ Now that you have created and compiled your `phat_hello` contract, let's deploy 
 
 {% tabs %}
 {% tab title="Swanky Phala" %}
-> If you have not installed `swanky phala` CLI tool, follow these [steps](broken-reference) to get started.
+> If you have not installed `swanky phala` CLI tool, follow these [steps](deploy-contract.md#swanky-phala) to get started.
 
 Go to your development workspace and ensure that you have updated your `devphase.config.json` file to include the PoC6 Testnet info. Within`networks` , add the following:
 
@@ -149,7 +149,7 @@ Next, you will connect your Polkadot wallet ([Talisman](https://talisman.xyz/dow
 
 <figure><img src="../../../../.gitbook/assets/Select-Polkadot-Wallet.png" alt=""><figcaption><p>Select a Polkadot Wallet</p></figcaption></figure>
 
-For more info on these steps, check out the [Phat Contract Console ](broken-reference)section. Now that your account has PHA testnet tokens, upload the compile contract file `phat_hello.contract`
+For more info on these steps, check out the [Phat Contract Console](https://phat.phala.network) section. Now that your account has PHA testnet tokens, upload the compile contract file `phat_hello.contract`
 
 Here is a video example of the process. After the contract is deployed and instantiated into a cluster, choose any ETH address and query the balance.
 

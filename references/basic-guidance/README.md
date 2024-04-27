@@ -18,4 +18,4 @@ SubWallet is a user-friendly Web3 Multiverse Gateway for Polkadot and Kusama eco
 
 ## Setting Up an Account Identity
 
-Some activities on Phala require or are enhanced by using an account identity, a naming system that allows participants to add personal information to their on-chain account. You can learn how to set up an account identity [here](broken-reference).
+Some activities on Phala require or are enhanced by using an account identity, a naming system that allows participants to add personal information to their on-chain account. You can learn how to set up an account identity [here](../../overview/pha-token/governance/setup-account-identity.md).

@@ -34,7 +34,7 @@ There are 2 ways to deploy a local testnet.
 
 ## Environment Setup
 
-Make sure to go through the [environment setup](broken-reference) before continuing.
+Make sure to go through the environment setup before continuing.
 
 Next, install the following on your system:
 

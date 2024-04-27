@@ -8,14 +8,14 @@ Phat Contract itself focuses on computation instead of storage, so it can be ver
 
 Implementing a stateless backend also brings immediate benefits at no developing cost:
 
-* **Easy concurrent processing.** With Phala, it’s easy to deploy your contract to multiple Workers, then all the instances can handle the users' off-chain requests (called [Query](broken-reference)) concurrently if there are no state-consistency limitations;
+* **Easy concurrent processing.** With Phala, it’s easy to deploy your contract to multiple Workers, then all the instances can handle the users' off-chain requests (called [Query](call-your-contract.md)) concurrently if there are no state-consistency limitations;
 * **Go purely off-chain.** If your contract is stateless, it goes totally off-chain and is no longer limited by gas fee and block latency anymore. Many Phat Contract advantages (like HTTP support) are only allowed off-chain.
 
 ## What if I really need states / transactions? <a href="#what-if-i-really-need-states--transactions" id="what-if-i-really-need-states--transactions"></a>
 
 Phat Contract still supports the vanilla on-chain states and transaction processing!
 
-What’s more, all the contract states are encrypted and stored. But when you use these states, Phat Contract will still become subject to gas fees and low performance just like smart contracts. We explain contract states in the [storage section](broken-reference).
+What’s more, all the contract states are encrypted and stored. But when you use these states, Phat Contract will still become subject to gas fees and low performance just like smart contracts. We explain contract states in the [store-contract-states.md](store-contract-states.md "mention").
 
 For off-chain computation, the recommended way to store your states is to use external storage services. Phat Contract can easily connect to S3-compatible storage services and use them as cheaper and faster off-chain state storage. Explore how to do this in the following section.
 

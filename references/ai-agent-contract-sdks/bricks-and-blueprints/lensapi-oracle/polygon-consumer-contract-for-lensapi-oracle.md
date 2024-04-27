@@ -14,8 +14,7 @@ This project represents a basic Polygon Consumer Contract that is compatible wit
 
 ## Prerequisites
 
-* Active deployed LensAPI Oracle Blueprint via [Phat Bricks](https://bricks.phala.network)
-  * Follow steps to deploy [here](broken-reference)
+* Active deployed LensAPI Oracle Blueprint via [Phala Dashboard](https://dashboard.phala.network)
 * Address of the "[Oracle Endpoint](https://docs.phala.network/developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle#step-3-connect-your-smart-contract-to-the-oracle)" in deployed LensAPI Oracle
 * [Hardhat](https://hardhat.org)
 * For Polygon Mainnet deployments:

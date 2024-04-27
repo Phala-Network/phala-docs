@@ -59,5 +59,3 @@ For a complete list of these macros and a more detailed tutorial, refer to the [
 > If you do not know what’s Crate, you may need to go over your Rust book.
 
 [crates.io](https://crates.io/) is the market for Rust crates. While only the crates with `no_std` support can be used in your ink! contract. The reason is [explained by the official](https://ink.substrate.io/faq#why-is-rusts-standard-library-stdlib-not-available-in-ink).
-
-We will further provide crate recommendations for different use cases in the following [section](broken-reference).

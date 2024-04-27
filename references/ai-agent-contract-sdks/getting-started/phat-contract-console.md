@@ -16,7 +16,7 @@ Clicking the green dot beside your account will tell you the information about t
 
 <figure><img src="../../../.gitbook/assets/SelectNetwork.png" alt=""><figcaption></figcaption></figure>
 
-By default, the UI will connect to [Phala PoC-6 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). Check the full [chain list](broken-reference).
+By default, the UI will connect to [Phala PoC-6 Testnet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer). Check the full [chain list](../../support/endpoints.md).
 
 You can connect to other chains by filling in the RPC Endpoint and clicking _Connect_. The UI will automatically read the cluster information from the chain and fill in the PRuntime for you, but you can always set it to other workers manually.
 

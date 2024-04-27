@@ -4,10 +4,10 @@ Now you have experienced the deployment of your first Phat Contract and invoked 
 
 Your next step can be:
 
-* Begin with [stateless applications](broken-reference) and learn how to use Phat Contract’s unique capabilities like
+* Begin with [stateless applications](build-on-phat-contract/build-stateless-backend.md) and learn how to use Phat Contract’s unique capabilities like
   * send HTTP requests;
   * handle users' requests with no gas fee and low latency;
-* Learn where to [store your contract states](broken-reference) including
+* Learn where to [store your contract states](build-on-phat-contract/store-contract-states.md) including
   * store contract states on-chain;
   * store your data in decentralized storage;
   * use local memory to cache the data;

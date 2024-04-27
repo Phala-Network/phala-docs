@@ -1,10 +1,10 @@
 ---
-description: Host your AI-Agent Contract on Phala's decentralized serverless cloud.
+description: Host your AI Agent Contract on Phala's decentralized serverless cloud.
 ---
 
-# Build Your AI-Agent Contract with OpenAI
+# Build Your AI Agent Contract with OpenAI
 
-## [AI-Agent Contract Template with OpenAI](https://github.com/Phala-Network/ai-agent-template-openai/tree/main)
+## [AI Agent Contract Template with OpenAI](https://github.com/Phala-Network/ai-agent-template-openai/tree/main)
 
 ### Architecture Overview
 

@@ -43,7 +43,7 @@ In Phat Contract, defining a user request handler is as simple as labeling a fun
 
 Phat Contract has unique capabilities, and they are provided as functions in [pink-extension](https://github.com/Phala-Network/phala-blockchain/tree/master/crates/pink) (short for Phala ink! Extension). You can use all these functions in your query handler functions, but some of them are disabled in transaction handlers since they can lead to inconsistent on-chain states.
 
-Check the detailed list in the following [section](broken-reference).
+Check the detailed list in the following section.
 
 ## Learn More about Query <a href="#learn-more-about-query" id="learn-more-about-query"></a>
 

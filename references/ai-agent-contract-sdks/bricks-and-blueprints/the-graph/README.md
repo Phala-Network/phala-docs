@@ -6,7 +6,7 @@ The Graph template enables you to connect to subgraph endpoints for data and uti
 
 There are a couple steps to complete before deploying The Graph Template.
 
-* Create a [Phat Contract 2.0 Profile](broken-reference)
+* Create a [Phala Dashboard Profile](../create-a-dashboard-profile.md)
   * Generate and fund an EVM account for the target chain you plan to deploy your Consumer Contract to
 * Deploy the Consumer Contract (The right side of the diagram above) on an EVM chain that will connect to the deployed Phat Contract
 * (Optional) Create API Key from The Graph. See how to get an API Key [here](https://bit.ly/the-graph-api-key). By default a rate-limited key is provided with no guarantee of service if limit is exhausted.

@@ -16,7 +16,7 @@ Vaults increase the probability of high-performance workers being chosen as expe
 
 ## About Vault <a href="#about-vault" id="about-vault"></a>
 
-> Before you start to understand Vault, please make sure you have a clear understanding of [how StakePool works](broken-reference)
+> Before you start to understand Vault, please make sure you have a clear understanding of [how StakePool works](delegate-to-stakepool.md#how-it-works)
 
 ### How Vault works? <a href="#how-vault-works" id="how-vault-works"></a>
 
