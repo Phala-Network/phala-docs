@@ -16,7 +16,7 @@ Phala Network's multi-proof system is the answer to the AI execution problem. On
 
 Phala offers the full toolkits to help you build, ship, and profit from your smart contract centric AI Agents.
 
-<figure><img src="../.gitbook/assets/Screenshot 2024-04-22 at 16.52.03.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption><p>Overview of AI Agent Contract</p></figcaption></figure>
 
 #### AI Agent Contract
 
