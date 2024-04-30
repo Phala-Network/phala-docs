@@ -51,6 +51,8 @@ PHA is bridged from Ethereum to Base chain via [Wormhole](https://wormhole.com/)
 4. Search the token name `Phala` or the token address `0x6c5ba91642f10282b576d91922ae6448c9d52f4e`
 5. Input the amount you want to bridge, and follow the instructions on the web page to proceed
 
+Note that the bridging operation between Ethereum and Base takes around 15 mins. To get PHA on Ethereum, you can buy it from centralized exchanges (Binance, OKX, Kucoin, etc), and decentralized exchanges (Uniswap, 1inch, etc).
+
 </details>
 
 {% hint style="info" %}
