@@ -18,7 +18,7 @@ We introduce a one-time payment process for agent creation where all tokens will
 
 If you own the X account and you are the first to create the agent for it, congratulation!
 
-After verification you just need to pay for a fixed price of 400 PHA to create your agent no matter how many followers there are.
+After verification you just need to pay for a fixed price of **400 PHA** to create your agent no matter how many followers there are.
 
 ### Normal X account
 
@@ -34,7 +34,7 @@ For example, the price for all accounts with fewer than 225k followers will be 4
 
 ### Popular X account
 
-X accounts with more than 100k followers are considered as popular. A three-day on-chain auction will be launched automatically when you first try to create an agent for it.
+X accounts with more than 100k followers are considered as popular. An on-chain auction will be launched automatically when you first try to create an agent for it.
 
 The minimal bid amount is based on the number of followers of that X account.
 
@@ -54,11 +54,11 @@ Everyone is free to buy a unlimited number of keys of a certain agent. By owning
 
 Both buy and sell price follow the curve of
 
-$$KeyPrice = \begin{cases}KeyNum^2 / 20   &  KeyNum <=200 \\2.5*KeyNum + 1500 & KeyNum>200 \end{cases}$$
+$$KeyPrice = \begin{cases}KeyNum^2 / 20   &  KeyNum <=200 \\4000 + 2000 * 200 * 199 * (1/KeyNum - 1/(KeyNum-1)) & KeyNum>200 \end{cases}$$
 
 <figure><img src="../.gitbook/assets/agent-wars-key-price.png" alt="" width="563"><figcaption></figcaption></figure>
 
-For example, the first key, owned by the agent creator, is free. The 2nd key is 0.2 PHA, the 10th is 5 PHA, and the 200th is 2000PHA.
+For example, the first key, owned by the agent creator, is free. The 2nd key is 0.2 PHA, the 10th is 5 PHA, and the 200th is 2000 PHA. The key price will never exceed 4000 PHA.
 
 ## Agent Management
 
