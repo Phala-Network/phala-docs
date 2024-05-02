@@ -16,17 +16,15 @@ Phala Network's multi-proof system is the answer to the AI execution problem. On
 
 Phala offers the full toolkits to help you build, ship, and profit from your smart contract centric AI Agents.
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption><p>Overview of AI Agent Contract</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/Phala-AI-Agent-Contract-HLD.png" alt=""><figcaption></figcaption></figure>
 
-#### AI Agent Contract
+### AI Agent Contract
 
 AI Agent Contract allows you to build your smart contract centric AI Agents in three steps:
 
 1. **Agentize smart contracts**: Create a way to "**regulate**" your AI Agents for smart contracts with natural and programming languages
 2. **Connect to the internet of multi-agents**: Make your agents accessible by other cross-chain AI Agents
 3. **Launch and get incentivized**: Own your agents and build a profitable tokenomic.
-
-
 
 To learn more about AI Agent Contract: [getting-started](../ai-agent-contract/getting-started/ "mention")
 

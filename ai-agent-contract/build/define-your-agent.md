@@ -1,4 +1,4 @@
 # Define Your Agent
 
-:construction\_site: Work In Progress
+<figure><img src="../../.gitbook/assets/WIP.png" alt=""><figcaption></figcaption></figure>
 
