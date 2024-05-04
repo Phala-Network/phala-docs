@@ -96,7 +96,7 @@ export default async function main(request: string) {
 
 ### Create getLocation()
 
-For the `getLocation()` function, we will need to call an API to get the location based on [https://ipapi.co/](https://ipapi.co/). Traditionally, devs will not have access to the internet, but with Phala's AI-Agent Contracts, devs now can make async HTTP calls to bring more data for fine tuning their agents.&#x20;
+For the `getLocation()` function, we will need to call an API to get the location based on [https://ipapi.co/](https://ipapi.co/). Traditionally, devs will not have access to the internet, but with Phala's AI Agent Contracts, devs now can make async HTTP calls to bring more data for fine tuning their agents.&#x20;
 
 The implementation is simple and we will add this following code.
 
@@ -376,12 +376,12 @@ GET RESULT: {
     '    <html lang="en">\n' +
     '        <head>\n' +
     '            <meta charset="utf-8" />\n' +
-    '            <title>AI-Agent Contract Demo UI</title>\n' +
+    '            <title>AI Agent Contract Demo UI</title>\n' +
     '        </head>\n' +
     '        <body>\n' +
     '            <div align="center">\n' +
-    '                <p>"OpenAI AI-Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI-Agents."</p>\n' +
-    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI-Agent Contract" />\n' +
+    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, an AI Coprocessor for hosting AI Agents."</p>\n' +
+    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
     '                <p>Based on your location in Dallas, Texas, and the current weather, here are some activities you might enjoy:\n' +
     '\n' +
     '1. Walk in the Klyde Warren Park: The weather seems mild and suitable for outdoor activities. You could enjoy a walk or picnic at the Klyde Warren Park. \n' +
@@ -409,12 +409,12 @@ POST RESULT: {
     '    <html lang="en">\n' +
     '        <head>\n' +
     '            <meta charset="utf-8" />\n' +
-    '            <title>AI-Agent Contract Demo UI</title>\n' +
+    '            <title>AI Agent Contract Demo UI</title>\n' +
     '        </head>\n' +
     '        <body>\n' +
     '            <div align="center">\n' +
-    '                <p>"OpenAI AI-Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI-Agents."</p>\n' +
-    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI-Agent Contract" />\n' +
+    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI-Agents."</p>\n' +
+    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
     '                <p>Based on the current weather in London, which seems to be cool, here are some suggestions on activities you might consider:\n' +
     '\n' +
     "1. Visit the British Museum: One of the world's oldest museums, it houses a vast collection of world art and artefacts, and it's absolutely free to visit.\n" +
@@ -444,15 +444,15 @@ POST RESULT: {
 
 ## Publish & Interact with Agent
 
-With our test passing and everything working as expected, now we can build and publish our agent code to IPFS. Then we will set our secrets and access our deployed agent via the Phala Gateway at https://frames.phatfn.xyz/ipfs/\<cid>?key=\<key\_id>\&chatQuery=\<chat\_query>.
+With our test passing and everything working as expected, now we can build and publish our agent code to IPFS. Then we will set our secrets and access our deployed agent via the Phala Gateway at https://agents.phala.network/ipfs/\<cid>?key=\<key\_id>\&chatQuery=\<chat\_query>.
 
-Upload your compiled AI-Agent code to IPFS.
+Upload your compiled AI Agent code to IPFS.
 
 ```bash
 npm run publish
 ```
 
-Upon a successful upload, the command should show the URL to access your AI-Agent.
+Upon a successful upload, the command should show the URL to access your AI Agent.
 
 ```
 Successfully linked your account to this device
@@ -462,9 +462,9 @@ Successfully linked your account to this device
 ✔ Files stored at the following IPFS URI: ipfs://QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d
 ✔ Open this link to view your upload: https://bafybeibp43wskf3n6hecranyyrsmhsfmwp47ai6n3basbiijxfjrprr2oi.ipfs.cf-ipfs.com/
 
-AI-Agent deployed at: https://frames.phatfn.xyz/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d
+AI Agent deployed at: https://agents.phala.network/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d
 
-Make sure to add your secrets to ensure your AI-Agent works properly.
+Make sure to add your secrets to ensure your AI Agent works properly.
 ```
 
 ### Add Secret
@@ -472,25 +472,27 @@ Make sure to add your secrets to ensure your AI-Agent works properly.
 The steps to add a `secret` is simple. We will add the [OpenAI](https://platform.openai.com/docs/quickstart?context=node) API Key in this example by creating a secret JSON object with the `openaiApiKey`:
 
 ```json
-{"openApiKey": "<OPENAI_API_KEY>"}
+{"openaiApiKey": "<OPENAI_API_KEY>"}
 ```
 
 Then in your frame code, you will be able to access the secret key via `req.secret` object:
 
 ```js
 async function POST(req: Request): Promise<Response> {
-    const apiKey = req.secret?.apiKey
+    const apiKey = req.secret?.openaiApiKey
 }
 ```
 
-**Note**: Before continuing, make sure to publish your compiled AI-Agent JS code, so you can add secrets to the CID.
+**Note**: Before continuing, make sure to publish your compiled AI Agent JS code, so you can add secrets to the CID.
 
-**Open terminal** Use `curl` to `POST` your secrets to `https://frames.phatfn.xyz/vaults`. Replace `IPFS_CID` with the CID to the compile JS code in IPFS, and replace `<OPENAI_API_KEY>` with your OpenAI API key.
+**Open terminal** Use `curl` to `POST` your secrets to `https://agents.phala.network/vaults`. Replace `IPFS_CID` with the CID to the compile JS code in IPFS, and replace `<OPENAI_API_KEY>` with your OpenAI API key.
+
+> Note that you can name the secret field name something other than `openaiApiKey`, but you will need to access the key in your `index.ts` file with the syntax `req.secret?.<your-secret-field-name> as string`
 
 The command will look like this:
 
 ```shell
-curl https://frames.phatfn.xyz/vaults -H 'Content-Type: application/json' -d '{"cid": "QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d", "data": {"apiKey": "<OPENAI_API_KEY>"}}'
+curl https://agents.phala.network/vaults -H 'Content-Type: application/json' -d '{"cid": "QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d", "data": {"openaiApiKey": "<OPENAI_API_KEY>"}}'
 # Output:
 # {"token":"2f9991bfab0bcb46","key":"2cbc7c951b84b9b4","succeed":true}
 ```
@@ -500,14 +502,24 @@ The API returns a `token` and a `key`. The `key` is the id of your secret. It ca
 To verify the secret, run the following command where `key` and `token` are replaced with the values from adding your `secret` to the vault.
 
 ```shell
-curl https://frames.phatfn.xyz/vaults/<key>/<token>
+curl https://agents.phala.network/vaults/<key>/<token>
 ```
 
 Expected output:
 
 ```shell
-{"data":{"apiKey":"<OPENAI_API_KEY>"},"succeed":true}
+{"data":{"openaiApiKey":"<OPENAI_API_KEY>"},"succeed":true}
 ```
+
+### Access Queries
+
+To help create custom logic, we have an array variable named `queries` that can be accessed in the `Request` class. To access the `queries` array variable `chatQuery` value at index `0`, the syntax will look as follows:
+
+```
+const query = req.queries.chatQuery[0] as string;
+```
+
+The example at [https://agents.phala.network/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.](https://frames.phatfn.xyz/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.) will have a value of `Please suggest some activities based on my location and the weather`. `queries` can have any field name, so `chatQuery` is just an example of a field name and not a mandatory name, but remember to update your `index.ts` file logic to use your expected field name.
 
 ### Query Your Deployed Agent
 
@@ -515,4 +527,4 @@ Now that your agent is deployed, you can access the agent through a `curl` reque
 
 <figure><img src="../../.gitbook/assets/LocationAndWeatherAgent.png" alt=""><figcaption></figcaption></figure>
 
-[https://frames.phatfn.xyz/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.](https://frames.phatfn.xyz/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.)
+Example: [https://agents.phala.network/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.](https://frames.phatfn.xyz/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d?key=2cbc7c951b84b9b4\&chatQuery=Please%20suggest%20some%20activities%20based%20on%20my%20location%20and%20the%20weather.)
