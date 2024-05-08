@@ -1,10 +1,10 @@
 ---
-cover: .gitbook/assets/Phala-AI-Dark-BG.png
+cover: .gitbook/assets/Welcome-Docs.png
 coverY: 0
 layout:
   cover:
     visible: true
-    size: hero
+    size: full
   title:
     visible: true
   description:
