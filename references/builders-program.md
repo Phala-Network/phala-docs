@@ -88,7 +88,7 @@ _The application process for both tier one and tier two funding is the same, how
 
 The Phala Builders Program is a unique opportunity to receive funding and support to build with Phat Contract, however we encourage applicants to seek support from complimentary grant programs or accelerators as well. The Phala Builders Program Committee will endeavor to be as collaborative as possible, and may offer support to successful applicants in securing external funding.
 
-If you have questions about the Phala Builders Program or application process, please reach out to us at \[email protected] or in our [Discord](https://discord.gg/phala).
+If you have questions about the Phala Builders Program or application process, please reach out to us at \[email protected] or in our [Discord](https://discord.gg/phala-network).
 
 If you’d like to learn more about Phat Contract and our developer tooling, please explore our developer library below:
 

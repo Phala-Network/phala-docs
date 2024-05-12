@@ -194,7 +194,7 @@
 
 ## Web Directory
 
-* [Discord](https://discord.gg/phala)
+* [Discord](https://discord.gg/phala-network)
 * [GitHub](https://github.com/Phala-Network/)
 * [Twitter](https://twitter.com/PhalaNetwork)
 * [YouTube](https://www.youtube.com/@PhalaNetwork)
