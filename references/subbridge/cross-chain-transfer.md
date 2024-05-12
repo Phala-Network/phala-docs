@@ -13,7 +13,7 @@ This tutorial takes the transfer of PHA from Ethereum to Khala as an example. Yo
    <img src="../../.gitbook/assets/subbridge-metamask.png" alt="" data-size="original">
 6. Then confirm and click the _Transfer_ button;
 7. Double-check your accounts and figures and then click _Submit_ in the pop-up window, sign with Metamask, and submit your cross-chain asset transaction;
-8. You can go to Etherscan to check the sending details on the Etherscan block explorer when your transaction is sent; if you have any questions, you can consult our [Discord](https://discord.com/invite/phala).
+8. You can go to Etherscan to check the sending details on the Etherscan block explorer when your transaction is sent; if you have any questions, you can consult our [Discord](https://discord.gg/phala-network).
 
 ### Transfer PHA: Khala <-> Karura <a href="#transfer-pha-khala---karura" id="transfer-pha-khala---karura"></a>
 
@@ -32,4 +32,4 @@ This tutorial takes the transfer of PHA from Khala to Karura as an example, and 
 6. Click _Submit_ to sign;\
    ![](../../.gitbook/assets/subbridge-confirm.png)
 7. The transaction is sent from Khala, wait for the transaction to be confirmed;
-8. Then you can go to destination chain’s wallet (in this case, [Karura Apps](https://apps.karura.network/portfolio)) to check whether you have received the token (PHA). If it is not received within 1 minute, you can go to the Khala chain explorer ([Subscan](https://khala.subscan.io/)) to check whether you have sent a transaction; if you have any questions, you can consult our [Discord](https://discord.com/invite/phala).
+8. Then you can go to destination chain’s wallet (in this case, [Karura Apps](https://apps.karura.network/portfolio)) to check whether you have received the token (PHA). If it is not received within 1 minute, you can go to the Khala chain explorer ([Subscan](https://khala.subscan.io/)) to check whether you have sent a transaction; if you have any questions, you can consult our [Discord](https://discord.gg/phala-network).

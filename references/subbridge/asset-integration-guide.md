@@ -50,7 +50,7 @@ If you are interested in integrating your asset into SubBridge, please go to [in
 * `location` must be a [MultiLocation](https://polkadot.network/blog/xcm-the-cross-consensus-message-format/). For example, the location of `KAR` is `MultiLocation::new(1, X2(Parachain(2000), General(0x0080)))`. If your asset is an EVM asset, the `location` should be `MultiLocation::new(1, X3(Parachain(2004), GeneralIndex(chain_id), GeneralKey(erc20_address)))`. `chain_id` should match the chain your asset deployed on. So far chain id of Ethereum is `0`, and chain id of Moonriver EVM is `2`.
 * `is mintable` represents whether your ERC20 smart contract support `mint` and `burn`, if set as true, your users will need to give the mint authority to our contract when the first time they use SubBridge. Check [**Assets Registration**](technical-details.md#asset-registration) find more details about what we have done on registration.
 
-After the issue is opened, feel free to notify the team on our [Discord channel](https://discord.com/invite/phala) if we haven’t replied immediately. Now you are ready to work with the team to finish the integration stuff when we approve the request on the issue.
+After the issue is opened, feel free to notify the team on our [Discord channel](https://discord.gg/phala-network) if we haven’t replied immediately. Now you are ready to work with the team to finish the integration stuff when we approve the request on the issue.
 
 ## Test Registration <a href="#test-registration" id="test-registration"></a>
 
