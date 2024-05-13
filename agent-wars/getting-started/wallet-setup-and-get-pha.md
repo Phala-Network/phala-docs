@@ -45,13 +45,15 @@ You can bridge PHA token between Ethereum mainnet and Base chain with Wormhole b
 
 PHA is bridged from Ethereum to Base chain via [Wormhole](https://wormhole.com/) bridge. If you have PHA on Ethereum, you can easily bridge it to Base with Wormhole's UI, Portal Bridge:
 
-1. Open [Portal Bridge (Advanced Bridge)](https://portalbridge.com/advanced-tools/#/transfer)
+1. Open [Portal Bridge (Advanced Tool)](https://portalbridge.com/advanced-tools/#/transfer)
 2. Select the chains: from **Ethereum** to **Base**
 3. Connect your Web3 wallet
 4. Search the token name `Phala` or the token address `0x6c5ba91642f10282b576d91922ae6448c9d52f4e`
 5. Input the amount you want to bridge, and follow the instructions on the web page to proceed
 
 Note that the bridging operation between Ethereum and Base takes around 15 mins. To get PHA on Ethereum, you can buy it from centralized exchanges (Binance, OKX, Kucoin, etc), and decentralized exchanges (Uniswap, 1inch, etc).
+
+If you closed the web page after finishing the transfer step but haven't claimed it on the destination blockchain, you can use the "Redeem" tab in the Portal Bridge (Advanced Tool). You will need to find the tx id of your transfering tx from a blockchain explorer. The redeem tool will recover the transaction and guide you to redeem the PHA on the destination chain. Learn more at [their official docs](https://portalbridge.com/docs/tutorials/how-to-use-recovery-workflow).
 
 </details>
 
