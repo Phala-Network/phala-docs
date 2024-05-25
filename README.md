@@ -25,7 +25,7 @@ Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand a
 
 ## Discover Phala Network
 
-<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>⚡️ Phala Network: Execution Layer for Web3 AI</strong></td><td></td><td></td><td><a href="overview/phala-network.md">phala-network.md</a></td><td><a href=".gitbook/assets/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>⚡️ Phala Network: Execution Layer for Web3 AI</strong></td><td></td><td></td><td><a href="overview/phala-network.md">phala-network.md</a></td><td><a href=".gitbook/assets/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr><tr><td>🛡️ <strong>Multi-Proof and Verifiable Compute</strong></td><td></td><td></td><td><a href="tech-specs/multi-proof-and-verifiable-compute/">multi-proof-and-verifiable-compute</a></td><td><a href=".gitbook/assets/Intro-Multi-Proof.png">Intro-Multi-Proof.png</a></td></tr></tbody></table>
 
 ## Getting Started
 
