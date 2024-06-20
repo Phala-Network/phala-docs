@@ -22,11 +22,11 @@ Before deploying, you will need to either export your Phala Account via polkadot
 
 Go to your browser and click on the polkadot.js extension. Select your account and click "Export Account". Next, you will be prompted for your password before saving the file to your project directory. **Note** this is what will be set to `POLKADOT_WALLET_ACCOUNT_PASSPHRASE`. Make sure to save the file as `polkadot-account.json` in the **root** of your project directory.
 
-<figure><img src="../../../../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (5) (1).png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../../../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../../../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (4) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Option 2: Set mnemonic phrase to `POLKADOT_WALLET_SURI`**
 

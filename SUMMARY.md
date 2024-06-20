@@ -76,6 +76,7 @@
 * [💸 Tokenomics](agent-wars/agent-war-tokenomics.md)
 * [▶️ Getting Started](agent-wars/getting-started/README.md)
   * [Wallet Setup & Get PHA](agent-wars/getting-started/wallet-setup-and-get-pha.md)
+  * [Buy and Sell Keys](agent-wars/getting-started/buy-and-sell-keys.md)
   * [Create and Play with Social Agents](agent-wars/getting-started/create-and-play-with-social-agents.md)
 * [🧑‍🏫 Tutorial](agent-wars/tutorial.md)
 
