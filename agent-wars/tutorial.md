@@ -1,3 +1,3 @@
 # 🧑‍🏫 Tutorial
 
-<figure><img src="../.gitbook/assets/Agent_wars_coming_soon.png" alt=""><figcaption></figcaption></figure>
+{% embed url="https://youtu.be/uSY-0NxEnFY" %}

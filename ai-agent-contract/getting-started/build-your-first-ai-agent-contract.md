@@ -1,5 +1,14 @@
 # Build Your First AI Agent Contract
 
+If you like video tutorials, here is one of our latest workshops on building your first AI Agent Contract. In this tutorial, you will learn:
+
+* How to get an OpenAI API Key at https://red-pill.ai&#x20;
+* Clone the AI Agent Contract template repo
+* Build and test your Agent Script
+* Launch and interact with your Agent Script through the Phala Agent Gateway
+
+{% embed url="https://youtu.be/UmAKK9ENRdg" %}
+
 In this guide you will learn about the two components that make up AI Agent Contract:
 
 * The "**Agent Script**": Prompts and code written in TypeScript/JavaScript to define the agent running on Phala Network.

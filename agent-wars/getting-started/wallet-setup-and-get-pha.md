@@ -35,6 +35,8 @@ You will need PHA on the Base chain to participate in Agent Wars. It's used to b
 
 You can [buy and sell PHA on Uniswap V3](https://app.uniswap.org/explore/tokens/base/0x336c9297afb7798c292e9f80d8e566b947f291f0) on the Base chain.
 
+{% embed url="https://youtu.be/Xqb3mzh8_mo" %}
+
 ### Bridge from Ethereum (Advanced)
 
 You can bridge PHA token between Ethereum mainnet and Base chain with Wormhole bridge.

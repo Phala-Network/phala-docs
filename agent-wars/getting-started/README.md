@@ -1,3 +1,5 @@
 # ▶️ Getting Started
 
-## :construction\_site: **Coming Soon!**
+{% embed url="https://youtu.be/uSY-0NxEnFY" %}
+How to Get Started Tutorial
+{% endembed %}
