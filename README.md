@@ -21,7 +21,7 @@ layout:
 
 ***
 
-Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand and interact with blockchains, developers can now **build**, **launch**, **use**, and **profit** on their agents with security and privacy guarantees by **default**. Learn how Phala's AI Agent Contract can provide the perfect toolset to build intelligent applications.
+Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand and interact with blockchains, developers can now **build**, **launch**, **use**, and **profit** on their agents with security guarantees by **default**. Learn how Phala's AI Agent Contract can provide the perfect toolset to build intelligent applications.
 
 ## Discover Phala Network
 

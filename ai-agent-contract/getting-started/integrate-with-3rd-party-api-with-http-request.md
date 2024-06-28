@@ -415,7 +415,7 @@ POST RESULT: {
     '        </head>\n' +
     '        <body>\n' +
     '            <div align="center">\n' +
-    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI-Agents."</p>\n' +
+    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI Agents."</p>\n' +
     '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
     '                <p>Based on the current weather in London, which seems to be cool, here are some suggestions on activities you might consider:\n' +
     '\n' +

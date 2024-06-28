@@ -21,7 +21,7 @@ All of these leads to a system that allow AI Agents to run in TEE workers, but a
 ### Why build AI Agents on Phala Network?
 
 * **Agentize** **Smart Contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts.
-* **Decentralized and Private by Default**: Powered by the largest TEE network, fully transparent & privacy preserving.
+* **Decentralized**: Powered by the largest TEE network, agents are fully decentralized, tamper-proof, and unstoppable.
 * **Incentivized**: Get funded and profit on [Agent Wars](broken-reference) with innovative ideas.
 * **Powerful**: Code in fully customizable Javascript & WASM runtime.
 * **Rich Integration**: OpenAI, LangChain, [io.net](http://io.net/), etc.

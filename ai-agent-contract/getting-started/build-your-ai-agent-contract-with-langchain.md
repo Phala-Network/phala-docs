@@ -20,7 +20,7 @@ description: Host your AI Agent Contract on Phala's decentralized serverless clo
 
 </div>
 
-The LangChain AI-Agent template is a **MINIMAL** template to build an AI Agent that can be hosted on Phala Network's decentralized hosting protocol. Unlike Vercel or other FaaS, it allows you to publish your AI-Agent compiled code to IPFS and hosts it on a fully decentralized FaaS cloud with the following benefits:
+The LangChain AI Agent template is a **MINIMAL** template to build an AI Agent that can be hosted on Phala Network's decentralized hosting protocol. Unlike Vercel or other FaaS, it allows you to publish your AI Agent compiled code to IPFS and hosts it on a fully decentralized FaaS cloud with the following benefits:
 
 * 💨 **Ship Fast**: Build and ship with familiar toolchain in minutes
 * ⛑️ **Secure**: Execution guarded by rock solid TEE / Intel SGX
@@ -165,7 +165,7 @@ curl https://agents.phala.network/ipfs/<your-cid>
 
 ### Add Secrets
 
-By default, all the compiled JS code is visible for anyone to view if they look at IPFS CID. This makes private info like API keys, signer keys, etc. vulnerable to be stolen. To protect devs from leaking keys, we have added a field called `secret` in the `Request` object. It allows you to store secrets in a vault for your AI-Agent to access.
+By default, all the compiled JS code is visible for anyone to view if they look at IPFS CID. This makes private info like API keys, signer keys, etc. vulnerable to be stolen. To protect devs from leaking keys, we have added a field called `secret` in the `Request` object. It allows you to store secrets in a vault for your AI Agent to access.
 
 #### How to Add Secrets
 
@@ -183,7 +183,7 @@ async function POST(req: Request): Promise<Response> {
 }
 ```
 
-**Note**: Before continuing, make sure to publish your compiled AI-Agent JS code, so you can add secrets to the CID.
+**Note**: Before continuing, make sure to publish your compiled AI Agent JS code, so you can add secrets to the CID.
 
 **Open terminal** Use `curl` to `POST` your secrets to `https://agents.phala.network/vaults`. Replace `IPFS_CID` with the CID to the compile JS code in IPFS, and replace `<OPENAI_API_KEY>` with your OpenAI API key.
 
@@ -233,7 +233,7 @@ The example at [https://agents.phala.network/ipfs/Qma2WjqWqW8wYG2tEQ9YFUgyVrMDA9
 
 <details>
 
-<summary>What packages can I use in the ai-agent server?</summary>
+<summary>What packages can I use in the AI Agent server?</summary>
 
 * Most of the npm packages are supported: viem, onchainkit, ….
 * Some packages with some advanced features are not supported:
@@ -262,7 +262,7 @@ The example at [https://agents.phala.network/ipfs/Qma2WjqWqW8wYG2tEQ9YFUgyVrMDA9
 
 <summary>Why is the serverless platform secure?</summary>
 
-* Your AI-Agent code on is fully secure, private, and permissionless. Nobody can manipulate your program, steal any data from it, or censor it.
+* Your AI Agent code on is fully secure, private, and permissionless. Nobody can manipulate your program, steal any data from it, or censor it.
 * Security: The code is executed in the decentralized TEE network running on Phala Network. It runs code inside a secure blackbox (called enclave) created by the CPU. It generates cryptographic proofs verifiable on Phala blockchain. It proves that the hosted code is exactly the one you deployed.
 * Privacy: You can safely put secrets like API keys or user privacy on Phala Network. The code runs inside TEE hardware blackboxs. The memory of the program is fully encrypted by the TEE. It blocks any unauthorized access to your data.
 * Learn more at [Phala Network Homepage](https://phala.network)

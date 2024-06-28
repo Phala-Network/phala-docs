@@ -16,7 +16,7 @@ description: Host your AI Agent Contract on Phala's decentralized serverless clo
 
 <figure><img src="https://camo.githubusercontent.com/f987f154eda1f80db0292cec9244816487663790326499f66cca9d7262abee8f/68747470733a2f2f7777772e6a6c7772616e676c6572666f72756d732e636f6d2f666f72756d2f6174746163686d656e74732f7a6f6f6c616e6465722d6769662e3332353239392f" alt=""><figcaption></figcaption></figure>
 
-The OpenAI AI-Agent template is a **MINIMAL** template to build an AI-Agent that can be hosted on Phala Network's decentralized hosting protocol. Unlike Vercel or other FaaS, it allows you to publish your AI-Agent compiled code to IPFS and hosts it on a fully decentralized FaaS cloud with the following benefits:
+The OpenAI AI Agent template is a **MINIMAL** template to build an AI Agent that can be hosted on Phala Network's decentralized hosting protocol. Unlike Vercel or other FaaS, it allows you to publish your AI Agent compiled code to IPFS and hosts it on a fully decentralized FaaS cloud with the following benefits:
 
 * 💨 Ship Fast: Build and ship with familiar toolchain in minutes
 * ⛑️ Secure: Execution guarded by rock solid TEE / Intel SGX
@@ -139,7 +139,7 @@ Upon a successful upload, the command should show the URL to access your AI Agen
 ```
 AI Agent deployed at: 
 https://agents.phala.network/ipfs/QmQu9AmBL13tyGpxgg5ASt96WQ669p63rnJRWiAo9st8ns/0
-Make sure to add your secrets to ensure your AI-Agent works properly.
+Make sure to add your secrets to ensure your AI Agent works properly.
 ```
 
 <details>
@@ -184,7 +184,7 @@ async function POST(req: Request): Promise<Response> {
 }
 ```
 
-**Note**: Before continuing, make sure to publish your compiled AI-Agent JS code, so you can add secrets to the CID.
+**Note**: Before continuing, make sure to publish your compiled AI Agent JS code, so you can add secrets to the CID.
 
 **Open terminal** Use `curl` to `POST` your secrets to `https://agents.phala.network/vaults`. Replace `IPFS_CID` with the CID to the compile JS code in IPFS, and replace `<OPENAI_API_KEY>` with your OpenAI API key.
 
