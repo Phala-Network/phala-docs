@@ -370,7 +370,11 @@ npm run test
 Expected output:
 
 ```bash
-INPUT: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Please suggest some activities based on my location and the weather."]},"secret":{"openaiApiKey":"OPENAI-KEY"},"headers":{}}
+
+> phat-gpt-template@0.0.1 test
+> tsx src/test.ts
+
+INPUT: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Please suggest some activities based on my location and the weather."]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{}}
 GET RESULT: {
   status: 200,
   body: '\n' +
@@ -378,61 +382,23 @@ GET RESULT: {
     '    <html lang="en">\n' +
     '        <head>\n' +
     '            <meta charset="utf-8" />\n' +
-    '            <title>AI Agent Contract Demo UI</title>\n' +
+    '            <title>AI-Agent Contract Demo UI</title>\n' +
     '        </head>\n' +
     '        <body>\n' +
     '            <div align="center">\n' +
-    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, an AI Coprocessor for hosting AI Agents."</p>\n' +
-    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
-    '                <p>Based on your location in Dallas, Texas, and the current weather, here are some activities you might enjoy:\n' +
+    '                <p>"OpenAI AI-Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI-Agents."</p>\n' +
+    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI-Agent Contract" />\n' +
+    '                <p>Based on your location in Chicago, Illinois and the current weather of an apparent temperature around 25°C, I would recommend these activities:\n' +
     '\n' +
-    '1. Walk in the Klyde Warren Park: The weather seems mild and suitable for outdoor activities. You could enjoy a walk or picnic at the Klyde Warren Park. \n' +
+    '1. Visit the Navy Pier: Enjoy the beautiful view of Lake Michigan, take a ride on the Centennial Wheel or enjoy a nice meal at one of the restaurants.\n' +
     '\n' +
-    '2. Visit the Dallas Museum of Art: If you prefer an indoor activity, the Dallas Museum of Art is a great option to explore some incredible art pieces.\n' +
+    "2. Spend time in Millennium Park: With the weather being nice, it's a perfect day for a picnic. Plus, you can see the famous Cloud Gate sculpture!\n" +
     '\n' +
-    "3. Explore the Dallas Farmers Market: It's the perfect place to find local produce and unique handmade items while enjoying the pleasant weather.\n" +
+    '3. Walk along the Chicago Riverwalk: This pedestrian trail along the bank of the Chicago River offers a variety of restaurants, bars, and urban attractions.  \n' +
     '\n' +
-    '4. Dallas World Aquarium: An excellent indoor option for a humid day. Look at different species of aquatic and terrestrial animals in the beautiful Dallas World Aquarium.\n' +
+    '4. Explore the Art Institute of Chicago: If you prefer indoor activities, you might enjoy visiting this world-renowned art museum. \n' +
     '\n' +
-    'Always remember to check any COVID-19 precautions or restrictions before visiting these public places. Enjoy your time in Dallas!</p>\n' +
-    '            </div>\n' +
-    '        </body>\n' +
-    '    </html>',
-  headers: {
-    'Content-Type': 'text/html; charset=UTF-8',
-    'Access-Control-Allow-Origin': '*'
-  }
-}
-INPUT: {"method":"POST","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["What are some activities based in London today?"]},"secret":{"openaiApiKey":"OPENAI-KEY"},"headers":{},"body":"{\"untrustedData\":{\"fid\":2,\"url\":\"https://fcpolls.com/polls/1\",\"messageHash\":\"0xd2b1ddc6c88e865a33cb1a565e0058d757042974\",\"timestamp\":1706243218,\"network\":1,\"buttonIndex\":2,\"castId\":{\"fid\":226,\"hash\":\"0xa48dd46161d8e57725f5e26e34ec19c13ff7f3b9\"}},\"trustedData\":{\"messageBytes\":\"d2b1ddc6c88e865a33cb1a565e0058d757042974...\"}}"}
-POST RESULT: {
-  status: 200,
-  body: '\n' +
-    '    <!DOCTYPE html>\n' +
-    '    <html lang="en">\n' +
-    '        <head>\n' +
-    '            <meta charset="utf-8" />\n' +
-    '            <title>AI Agent Contract Demo UI</title>\n' +
-    '        </head>\n' +
-    '        <body>\n' +
-    '            <div align="center">\n' +
-    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, a DePIN infrastructure for hosting AI Agents."</p>\n' +
-    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
-    '                <p>Based on the current weather in London, which seems to be cool, here are some suggestions on activities you might consider:\n' +
-    '\n' +
-    "1. Visit the British Museum: One of the world's oldest museums, it houses a vast collection of world art and artefacts, and it's absolutely free to visit.\n" +
-    '\n' +
-    '2. Explore the Natural History Museum: Another indoor activity, this museum offers a range of varied and large-scale exhibitions. \n' +
-    '\n' +
-    '3. Explore Covent Garden: Discover a variety of unique shops, cafes, and event spaces.\n' +
-    '\n' +
-    "4. Take in a West End Show: The weather seems perfect for catching a performance at one of London's many theatres.\n" +
-    '\n' +
-    '5. Tour the Tate Modern: Home to an incredible collection of modern and contemporary art.\n' +
-    '\n' +
-    '6. Visit the Tower of London: Explore this historic castle located on the north bank of the River Thames.\n' +
-    '\n' +
-    'Remember to check any local restrictions or entry requirements due to COVID-19, and stay safe. Enjoy exploring London!\n' +
-    '</p>\n' +
+    'Remember to stay hydrated and wear comfortable footwear for walking around. Enjoy your day!</p>\n' +
     '            </div>\n' +
     '        </body>\n' +
     '    </html>',
@@ -442,7 +408,30 @@ POST RESULT: {
   }
 }
 
+INPUT: {"method":"POST","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["When did humans land on the moon?"],"openAiModel":["gpt-4o"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{},"body":"{\"untrustedData\":{\"fid\":2,\"url\":\"https://fcpolls.com/polls/1\",\"messageHash\":\"0xd2b1ddc6c88e865a33cb1a565e0058d757042974\",\"timestamp\":1706243218,\"network\":1,\"buttonIndex\":2,\"castId\":{\"fid\":226,\"hash\":\"0xa48dd46161d8e57725f5e26e34ec19c13ff7f3b9\"}},\"trustedData\":{\"messageBytes\":\"d2b1ddc6c88e865a33cb1a565e0058d757042974...\"}}"}
+POST RESULT: {
+  status: 200,
+  body: 'Not Implemented',
+  headers: {
+    'Content-Type': 'text/html; charset=UTF-8',
+    'Access-Control-Allow-Origin': '*'
+  }
+}
+
+To test in the SideVM playground go to https://phat.phala.network/contracts/view/0xf0a398600f02ea9b47a86c59aed61387e450e2a99cb8b921cd1d46f734e45409
+
+Connect you polkadot.js account and select 'run_js' with the parameters:
+- engine: SidevmQuickJSWithPolyfill
+- js_code: Source code text of dist/index.ts
+- args: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Who are you?"],"openAiModel":["gpt-4o"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{}}
+Watch video here for to see the visual steps of testing in Sidevm playground: https://www.youtube.com/watch?v=fNqNeLfFFME
+
+Make sure to replace queries and secret with your values compatible with your AI Agent Contract.
 ```
+
+#### Test in Sidevm Playground
+
+{% embed url="https://youtu.be/fNqNeLfFFME" %}
 
 ## Publish & Interact with Agent
 
@@ -451,22 +440,38 @@ With our test passing and everything working as expected, now we can build and p
 Upload your compiled AI Agent code to IPFS.
 
 ```bash
-npm run publish
+npm run publish-agent
 ```
 
 Upon a successful upload, the command should show the URL to access your AI Agent.
 
 ```
-Successfully linked your account to this device
+> phat-gpt-template@0.0.1 publish-agent
+> phat-fn build --experimentalAsync && tsx scripts/publish.ts
+
+✓ Compiled successfully.
+  72.73 KB  dist/index.js
+
+    $$\     $$\       $$\                 $$\                         $$\       
+    $$ |    $$ |      \__|                $$ |                        $$ |      
+  $$$$$$\   $$$$$$$\  $$\  $$$$$$\   $$$$$$$ |$$\  $$\  $$\  $$$$$$\  $$$$$$$\  
+  \_$$  _|  $$  __$$\ $$ |$$  __$$\ $$  __$$ |$$ | $$ | $$ |$$  __$$\ $$  __$$\ 
+    $$ |    $$ |  $$ |$$ |$$ |  \__|$$ /  $$ |$$ | $$ | $$ |$$$$$$$$ |$$ |  $$ |
+    $$ |$$\ $$ |  $$ |$$ |$$ |      $$ |  $$ |$$ | $$ | $$ |$$   ____|$$ |  $$ |
+    \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
+     \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/ 
+
+ 💎 thirdweb v0.14.12 💎
+
 - Uploading file to IPFS. This may take a while depending on file sizes.
 
 ✔ Successfully uploaded file to IPFS.
-✔ Files stored at the following IPFS URI: ipfs://QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d
-✔ Open this link to view your upload: https://bafybeibp43wskf3n6hecranyyrsmhsfmwp47ai6n3basbiijxfjrprr2oi.ipfs.cf-ipfs.com/
+✔ Files stored at the following IPFS URI: ipfs://QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
+✔ Open this link to view your upload: https://bafybeif3y2jpswse2n6s2cikwyjmbak4cxlpm6vrmgobqkgsmmn34l6m4i.ipfs.cf-ipfs.com/
 
-AI Agent deployed at: https://agents.phala.network/ipfs/QmRZe6yKPpWWkTgkcuc71JT8cACnXHsiiS8CFhdWeHaa6d
+AI Agent Contract deployed at: https://agents.phala.network/ipfs/QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
 
-Make sure to add your secrets to ensure your AI Agent works properly.
+Make sure to add your secrets to ensure your AI-Agent works properly.
 ```
 
 ### Add Secret
@@ -480,7 +485,7 @@ The steps to add a `secret` is simple. We will add the [OpenAI](https://platform
 Then in your frame code, you will be able to access the secret key via `req.secret` object:
 
 ```js
-async function POST(req: Request): Promise<Response> {
+async function GET(req: Request): Promise<Response> {
     const apiKey = req.secret?.openaiApiKey
 }
 ```

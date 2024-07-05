@@ -80,7 +80,11 @@ npm run test
 Expected Test Results
 
 ```
-INPUT: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Who are you?"]},"secret":{"openaiApiKey":"YOUR_OPENAI_KEY"},"headers":{}}
+
+> phat-gpt-template@0.0.1 test
+> tsx src/test.ts
+
+INPUT: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Who are you?"],"openAiModel":["gpt-4o"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{}}
 GET RESULT: {
   status: 200,
   body: '\n' +
@@ -88,11 +92,13 @@ GET RESULT: {
     '    <html lang="en">\n' +
     '        <head>\n' +
     '            <meta charset="utf-8" />\n' +
-    '            <title>TestUI</title>\n' +
+    '            <title>AI Agent Contract Demo UI</title>\n' +
     '        </head>\n' +
     '        <body>\n' +
     '            <div align="center">\n' +
-    '                <p>I am an AI-powered digital assistant here to help answer your questions and assist you with various tasks. How can I assist you today?</p>\n' +
+    '                <p>"OpenAI AI Agent Contract hosted on <a href="https://github.com/Phala-Network/ai-agent-template-openai">Phala Network</a>, an AI Coprocessor for hosting AI Agents."</p>\n' +
+    '                <img src="https://i.imgur.com/8B3igON.png" width="600" alt="AI Agent Contract" />\n' +
+    '                <p>I am an AI language model created by OpenAI, designed to assist with information, answer questions, and provide support on a wide range of topics. How can I help you today?</p>\n' +
     '            </div>\n' +
     '        </body>\n' +
     '    </html>',
@@ -101,45 +107,68 @@ GET RESULT: {
     'Access-Control-Allow-Origin': '*'
   }
 }
-
-
-INPUT: {"method":"POST","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["When did humans land on the moon?"]},"secret":{"openaiApiKey":"YOUR_OPENAI_KEY"},"headers":{},"body":"{\"untrustedData\":{\"fid\":2,\"url\":\"https://fcpolls.com/polls/1\",\"messageHash\":\"0xd2b1ddc6c88e865a33cb1a565e0058d757042974\",\"timestamp\":1706243218,\"network\":1,\"buttonIndex\":2,\"castId\":{\"fid\":226,\"hash\":\"0xa48dd46161d8e57725f5e26e34ec19c13ff7f3b9\"}},\"trustedData\":{\"messageBytes\":\"d2b1ddc6c88e865a33cb1a565e0058d757042974...\"}}"}
+INPUT: {"method":"POST","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["When did humans land on the moon?"],"openAiModel":["gpt-4o"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{},"body":"{\"untrustedData\":{\"fid\":2,\"url\":\"https://fcpolls.com/polls/1\",\"messageHash\":\"0xd2b1ddc6c88e865a33cb1a565e0058d757042974\",\"timestamp\":1706243218,\"network\":1,\"buttonIndex\":2,\"castId\":{\"fid\":226,\"hash\":\"0xa48dd46161d8e57725f5e26e34ec19c13ff7f3b9\"}},\"trustedData\":{\"messageBytes\":\"d2b1ddc6c88e865a33cb1a565e0058d757042974...\"}}"}
 POST RESULT: {
   status: 200,
-  body: '\n' +
-    '    <!DOCTYPE html>\n' +
-    '    <html lang="en">\n' +
-    '        <head>\n' +
-    '            <meta charset="utf-8" />\n' +
-    '            <title>TestUI</title>\n' +
-    '        </head>\n' +
-    '        <body>\n' +
-    '            <div align="center">\n' +
-    "                <p>Humans first landed on the moon on July 20, 1969, during NASA's Apollo 11 mission.</p>\n" +
-    '            </div>\n' +
-    '        </body>\n' +
-    '    </html>',
+  body: 'Not Implemented',
   headers: {
     'Content-Type': 'text/html; charset=UTF-8',
     'Access-Control-Allow-Origin': '*'
   }
 }
+
+To test in the SideVM playground go to https://phat.phala.network/contracts/view/0xf0a398600f02ea9b47a86c59aed61387e450e2a99cb8b921cd1d46f734e45409
+
+Connect you polkadot.js account and select 'run_js' with the parameters:
+- engine: SidevmQuickJSWithPolyfill
+- js_code: Source code text of dist/index.ts
+- args: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Who are you?"],"openAiModel":["gpt-4o"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{}}
+Watch video here for to see the visual steps of testing in Sidevm playground: https://www.youtube.com/watch?v=fNqNeLfFFME
+
+Make sure to replace queries and secret with your values compatible with your AI Agent Contract.
 ```
+
+#### Test in Sidevm Playground
+
+{% embed url="https://youtu.be/fNqNeLfFFME" %}
 
 ### Publish Your AI Agent
 
 Upload your compiled AI Agent code to IPFS.
 
 ```bash
-npm run publish
+npm run publish-agent
 ```
 
 Upon a successful upload, the command should show the URL to access your AI Agent.
 
 ```
-AI Agent deployed at: 
-https://agents.phala.network/ipfs/QmQu9AmBL13tyGpxgg5ASt96WQ669p63rnJRWiAo9st8ns/0
-Make sure to add your secrets to ensure your AI Agent works properly.
+> phat-gpt-template@0.0.1 publish-agent
+> phat-fn build --experimentalAsync && tsx scripts/publish.ts
+
+✓ Compiled successfully.
+  72.73 KB  dist/index.js
+
+    $$\     $$\       $$\                 $$\                         $$\       
+    $$ |    $$ |      \__|                $$ |                        $$ |      
+  $$$$$$\   $$$$$$$\  $$\  $$$$$$\   $$$$$$$ |$$\  $$\  $$\  $$$$$$\  $$$$$$$\  
+  \_$$  _|  $$  __$$\ $$ |$$  __$$\ $$  __$$ |$$ | $$ | $$ |$$  __$$\ $$  __$$\ 
+    $$ |    $$ |  $$ |$$ |$$ |  \__|$$ /  $$ |$$ | $$ | $$ |$$$$$$$$ |$$ |  $$ |
+    $$ |$$\ $$ |  $$ |$$ |$$ |      $$ |  $$ |$$ | $$ | $$ |$$   ____|$$ |  $$ |
+    \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
+     \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/ 
+
+ 💎 thirdweb v0.14.12 💎
+
+- Uploading file to IPFS. This may take a while depending on file sizes.
+
+✔ Successfully uploaded file to IPFS.
+✔ Files stored at the following IPFS URI: ipfs://QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
+✔ Open this link to view your upload: https://bafybeif3y2jpswse2n6s2cikwyjmbak4cxlpm6vrmgobqkgsmmn34l6m4i.ipfs.cf-ipfs.com/
+
+AI Agent Contract deployed at: https://agents.phala.network/ipfs/QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
+
+Make sure to add your secrets to ensure your AI-Agent works properly.
 ```
 
 <details>
@@ -179,8 +208,8 @@ The steps to add a `secret` is simple. We will add the [OpenAI](https://platform
 Then in your frame code, you will be able to access the secret key via `req.secret` object:
 
 ```js
-async function POST(req: Request): Promise<Response> {
-    const apiKey = req.secret?.apiKey
+async function GET(req: Request): Promise<Response> {
+    const apiKey = req.secret?.openaiApiKey
 }
 ```
 
@@ -252,7 +281,7 @@ The example at [https://agents.phala.network/ipfs/Qma2WjqWqW8wYG2tEQ9YFUgyVrMDA9
 * The code runs inside a tailored [QuickJS engine](https://bellard.org/quickjs/)
 * Available features: ES2023, async, fetch, setTimeout, setInterval, bigint
 * Resource limits
-  * Max execution time \~30s
+  * Max execution time \~60s
   * Max memory usage: 16 mb
   * Max code size: 500 kb
   * Limited CPU burst: CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.

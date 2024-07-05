@@ -129,21 +129,60 @@ POST RESULT: {
     'Access-Control-Allow-Origin': '*'
   }
 }
+
+To test in the SideVM playground go to https://phat.phala.network/contracts/view/0xf0a398600f02ea9b47a86c59aed61387e450e2a99cb8b921cd1d46f734e45409
+
+Connect you polkadot.js account and select 'run_js' with the parameters:
+- engine: SidevmQuickJSWithPolyfill
+- js_code: Source code text of dist/index.ts
+- args: {"method":"GET","path":"/ipfs/QmVHbLYhhYA5z6yKpQr4JWr3D54EhbSsh7e7BFAAyrkkMf","queries":{"chatQuery":["Who are you?"]},"secret":{"openaiApiKey":"OPENAI_API_KEY"},"headers":{}}
+Watch video here for to see the visual steps of testing in Sidevm playground: https://www.youtube.com/watch?v=fNqNeLfFFME
+
+Make sure to replace queries and secret with your values compatible with your AI Agent Contract.
 ```
+
+#### Test in Sidevm Playground
+
+{% embed url="https://youtu.be/fNqNeLfFFME" %}
 
 ### Publish Your AI Agent
 
 Upload your compiled AI Agent code to IPFS.
 
 ```shell
-npm run publish
+npm run publish-agent
 ```
 
 Upon a successful upload, the command should show the URL to access your AI Agent.
 
-> AI Agent deployed at: https://agents.phala.network/ipfs/QmQu9AmBL13tyGpxgg5ASt96WQ669p63rnJRWiAo9st8ns/0
->
-> Make sure to add your secrets to ensure your AI Agent works properly.
+```sh
+> phat-gpt-template@0.0.1 publish-agent
+> phat-fn build --experimentalAsync && tsx scripts/publish.ts
+
+✓ Compiled successfully.
+  72.73 KB  dist/index.js
+
+    $$\     $$\       $$\                 $$\                         $$\       
+    $$ |    $$ |      \__|                $$ |                        $$ |      
+  $$$$$$\   $$$$$$$\  $$\  $$$$$$\   $$$$$$$ |$$\  $$\  $$\  $$$$$$\  $$$$$$$\  
+  \_$$  _|  $$  __$$\ $$ |$$  __$$\ $$  __$$ |$$ | $$ | $$ |$$  __$$\ $$  __$$\ 
+    $$ |    $$ |  $$ |$$ |$$ |  \__|$$ /  $$ |$$ | $$ | $$ |$$$$$$$$ |$$ |  $$ |
+    $$ |$$\ $$ |  $$ |$$ |$$ |      $$ |  $$ |$$ | $$ | $$ |$$   ____|$$ |  $$ |
+    \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
+     \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/ 
+
+ 💎 thirdweb v0.14.12 💎
+
+- Uploading file to IPFS. This may take a while depending on file sizes.
+
+✔ Successfully uploaded file to IPFS.
+✔ Files stored at the following IPFS URI: ipfs://QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
+✔ Open this link to view your upload: https://bafybeif3y2jpswse2n6s2cikwyjmbak4cxlpm6vrmgobqkgsmmn34l6m4i.ipfs.cf-ipfs.com/
+
+AI Agent Contract deployed at: https://agents.phala.network/ipfs/QmayeZxHXwJxABXaNshP6j8uBE6RedkhmEgiaXd1w1Jib3
+
+Make sure to add your secrets to ensure your AI-Agent works properly.
+```
 
 <details>
 
@@ -178,7 +217,7 @@ The steps to add a `secret` is simple. We will add the [OpenAI](https://platform
 Then in your frame code, you will be able to access the secret key via `req.secret` object:
 
 ```js
-async function POST(req: Request): Promise<Response> {
+async function GET(req: Request): Promise<Response> {
     const apiKey = req.secret?.openaiApiKey
 }
 ```
@@ -251,7 +290,7 @@ The example at [https://agents.phala.network/ipfs/Qma2WjqWqW8wYG2tEQ9YFUgyVrMDA9
 * The code runs inside a tailored [QuickJS engine](https://bellard.org/quickjs/)
 * Available features: ES2023, async, fetch, setTimeout, setInterval, bigint
 * Resource limits
-  * Max execution time \~30s
+  * Max execution time \~60s
   * Max memory usage: 16 mb
   * Max code size: 500 kb
   * Limited CPU burst: CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.
