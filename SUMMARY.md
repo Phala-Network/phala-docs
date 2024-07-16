@@ -133,6 +133,7 @@
       * [Use Rust Crates](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/use-rust-crates.md)
       * [Unit Tests](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/unit-tests.md)
       * [Store Contract States](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/store-contract-states.md)
+  * [Supported Chains](references/ai-agent-contract-sdks/supported-chains.md)
 * [⚒️ Phala SDK](references/phala-sdk.md)
 * [🖼️ FrameHub](references/framehub.md)
 * [🌉 SubBridge](references/subbridge/README.md)
