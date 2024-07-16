@@ -70,6 +70,7 @@
       * [Base Sepolia Testnet](ai-agent-contract/integrations/mirrored-price-feeds-agent/feed-addresses/base-sepolia-testnet.md)
     * [How Mirrored Price Feeds Work](ai-agent-contract/integrations/mirrored-price-feeds-agent/how-mirrored-price-feeds-work.md)
   * [🌱 LensAPI Oracle Agent](ai-agent-contract/integrations/lensapi-oracle-agent.md)
+* [⛓️ Supported Chains](ai-agent-contract/supported-chains.md)
 
 ## Agent Wars
 
@@ -133,7 +134,6 @@
       * [Use Rust Crates](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/use-rust-crates.md)
       * [Unit Tests](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/unit-tests.md)
       * [Store Contract States](references/ai-agent-contract-sdks/getting-started/build-on-phat-contract/store-contract-states.md)
-  * [Supported Chains](references/ai-agent-contract-sdks/supported-chains.md)
 * [⚒️ Phala SDK](references/phala-sdk.md)
 * [🖼️ FrameHub](references/framehub.md)
 * [🌉 SubBridge](references/subbridge/README.md)

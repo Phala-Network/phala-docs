@@ -1,4 +1,4 @@
-# Supported Chains
+# ⛓️ Supported Chains
 
 AI Agent Contract can technically connect to any blockchain for reading and writing operations, as it can effortlessly read from arbitrary blockchain nodes and trigger signed transactions via RPC calls. However, in practice, supporting a specific blockchain requires the corresponding AI Agent Contract RPC client, serialization library, and signing library to facilitate read and write operations. Presently, EVM and Substrate blockchains have more extensive library support.
 
@@ -28,7 +28,7 @@ Native AI Agent Contract fully supports Substrate-based blockchains, including:
 
 You can learn more about AI Agent Contract's cross-chain capabilities and how to implement them in the advanced topics section:
 
-[cross-chain-solutions.md](../advanced-topics/cross-chain-solutions.md "mention")
+[cross-chain-solutions.md](../references/advanced-topics/cross-chain-solutions.md "mention")
 
 ## Expanding Support to Additional Blockchains
 
