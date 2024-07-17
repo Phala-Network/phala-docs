@@ -6,7 +6,7 @@ Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand a
 
 Web3 is complex. You often need to use multiple wallets across a few blockchains and dapps to complete a basic task. For example, buying a NFT may involve swapping, bridging, and purchasing. This complexity is the biggest barrier of mass adoption.
 
-AI can greatly improve the web3 user experience. Imagine that AI can do its own research, and go one step further to delegate every operation for you. You can simply give instructions and wait them to be done. This is where AI Agent projects like Autonolas, Polywrap, fetch.ai (and more) can help.
+AI can greatly improve the web3 user experience. Imagine that AI can do its own research, and go one step further to delegate every operation for you. You can simply give instructions and wait for them to be done. This is where AI Agent projects like Autonolas, Polywrap, fetch.ai (and more) can help.
 
 However, none of the existing AI Agents is smart contract centric. They cannot execute smart contract operations securely and autonomously, due to its off-chain nature. The missing AI Execution Layer Agents is preventing developers from creating smart contracts centric AI Agents.
 
