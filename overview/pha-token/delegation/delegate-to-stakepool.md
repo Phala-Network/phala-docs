@@ -2,7 +2,7 @@
 
 ### Why is Delegation needed? <a href="#why-is-delegation-needed" id="why-is-delegation-needed"></a>
 
-Delegation is the name of the “Stake to Earn” mechanism on the Phala and Khala Network. Staking is not yet active on the Phala Network but has been live on the Khala network since Sept 2021. (For the rest of this piece when we refer to our network, we mean both Phala and Khala)
+Delegation is the name of the “Stake to Earn” mechanism on the Phala and Khala Network. Staking is currently enabled on both Phala Network and Khala Network.
 
 * Compute cannot simply be added to the network on its own. To ensure a secure and stable environment, “Proof of Stake” is used. Each worker on the network must be staked with some PHA, which is put at risk, in order to incentivize good behavior.
 * Compute providers and those wishing to provide stake do not have to be the same people. To improve flexibility and efficiency, Phala provides a delegation mechanism that allows delegators to stake to workers they do not control and earn rewards.
