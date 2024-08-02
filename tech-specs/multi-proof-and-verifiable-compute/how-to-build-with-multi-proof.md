@@ -1,12 +1,12 @@
 # How to Build with Multi-Proof
 
-With Multi-Proof JS SDK, things would become pretty easy to run a task and generate TEE-proof for it. You still can do it with our [Rust SDK](https://docs.phala.network/references/ai-agent-contract-sdks/getting-started) with more flexibility.
+We have JS Runtime custom-built based on [QuickJS](https://bellard.org/quickjs/). JavaScript code can be deployed to Phala TEE workers. We have engineered a WASM virtual machine called [Wapo](https://github.com/Phala-Network/wapo) based on [wasmtime](https://wasmtime.dev/), to facilitate its execution in SGX with the Gramine SDK.
 
-Before we dive into the steps, here is a brief explanation of why you can simply write JavaScript code and run it inside a TEE environment:
+Before we dive into the steps, here is a brief explanation of why you can simply write JavaScript code to generate TEE proof and run it inside a TEE environment:
 
 <figure><img src="../../.gitbook/assets/Build-Multi-Proof.png" alt=""><figcaption></figcaption></figure>
 
-On top of [SideVM](https://docs.phala.network/references/advanced-topics/sidevm), which is a core component of Phala underlying infrastructure to run WASM smart contract in TEE environment, we integrated [QuickJS](https://bellard.org/quickjs/), which is a small and embeddable JavaScript engine. The QuickJS engine was compiled to a WASM binary and run in SideVM, when you submit your Javascript code, it will actually run in QuickJS engine, and essentially run it in a TEE environment. We exported bunch of useful data from Rust SDK that you can use in JS SDK by inject those data into customer's Javascript code when it being execute, one of them is the private key derived from Rust smart contract engine which you can use sign data.
+We provide WASM virtual machine as underlying infrastructure to run WASM smart contract in TEE environment, we integrated [QuickJS](https://bellard.org/quickjs/), which is a small and embeddable JavaScript engine. The QuickJS engine was compiled to a WASM binary and run in WASM virtual machine, when you submit your Javascript code, it will actually run in QuickJS engine, and essentially run it in a TEE environment. We exported bunch of useful data from Rust SDK that you can use in JS SDK by inject those data into customer's Javascript code when it being execute, one of them is the private key derived from Rust smart contract engine which you can use sign data.
 
 Now, let's break down step by step to see how you can generate a TEE-proof with JavaScript:
 
@@ -17,7 +17,7 @@ To make the whole progress as easy as possible, we have built a CLI called [jtee
     ```bash
     $ npx jtee new  <my-jtee-project>
     ```
-2.  As the diagram show above, each Javascript code is running in a seperate SideVM and Javascript engine deployed by developer. For the next step is to deploy the engine for your project, the purpose to do so is to have a dedicated private key that only be used for this project.
+2.  As the diagram show above, each Javascript code is running in a seperate WASM virtual machine instance and Javascript engine deployed by developer. For the next step is to deploy the engine for your project, the purpose to do so is to have a dedicated private key that only be used for this project.
 
     Before run deploy command, you need to prepare a Phala blockchain account with enough balance and the node endpoint in the .env file like below in your project root directory. You can check your account balance at [Phala blockchain explorer](https://polkadot.js.org/apps/#/accounts).
 
