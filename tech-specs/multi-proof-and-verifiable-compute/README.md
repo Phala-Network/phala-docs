@@ -10,6 +10,8 @@ In the blockchain space, our vision is to bring privacy, security, and verifiabi
 - Privacy in zkRollups cannot be fully guaranteed because sequencers can extract user transaction data during proof generation.
 - Verifiability in Fully Homomorphic Encryption (FHE) computations is challenging because the FHE server may not perform computations correctly, and without knowing the correct result, we cannot verify its accuracy.
 
-1. As a background requirement, we suggest everyone start with **The Need for Multi-Proof Systems** section.
-2. If you are a developer and hope to quickly go through how to build with our multi-proof system, you can jump to the **How to Build with Multi-Proof** section.
-3. If you are doing research, and hope to get a deep understanding of the TEE and verifiable computing implemented with the Phala network, the **Trusted Execution Environments (TEE) and Compute Verifiability** section is for you.
+Let's take a look at how you can get started:
+
+- As a background requirement, we suggest everyone start with [The Need for Multi-Proof Systems](./why-multi-proof-and-what-we-can-help.md) section.
+- If you are a developer and hope to quickly go through how to build with our multi-proof system, you can jump to the [How to Build with Multi-Proof](./how-to-build-with-multi-proof.md) section.
+- If you are doing research, and hope to get a deep understanding of the TEE and verifiable computing implemented with the Phala network, the [Trusted Execution Environments (TEE) and Compute Verifiability](./trusted-execution-environments-tee-and-compute-verifiability.md) section is for you.
