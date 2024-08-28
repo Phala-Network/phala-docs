@@ -12,6 +12,6 @@ In the blockchain space, our vision is to bring privacy, security, and verifiabi
 
 Let's take a look at how you can get started:
 
-- As a background requirement, we suggest everyone start with [The Need for Multi-Proof Systems](./why-multi-proof-and-what-we-can-help.md) section.
+- As a background requirement, we suggest everyone start with [The Need for Multi-Proof Systems](./why-multi-proof-and-how-we-can-help.md) section.
 - If you are a developer and hope to quickly go through how to build with our multi-proof system, you can jump to the [How to Build with Multi-Proof](./how-to-build-with-multi-proof.md) section.
 - If you are doing research, and hope to get a deep understanding of the TEE and verifiable computing implemented with the Phala network, the [Trusted Execution Environments (TEE) and Compute Verifiability](./trusted-execution-environments-tee-and-compute-verifiability.md) section is for you.

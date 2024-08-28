@@ -1,4 +1,4 @@
-# Why Multi-Proof and What We Can Help
+# Why Multi-Proof and How We Can Help
 
 ## The Need for Multi-Proof Systems
 
