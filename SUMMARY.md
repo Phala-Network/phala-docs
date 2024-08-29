@@ -87,7 +87,7 @@
 * [🥷 AI Agent Contract](tech-specs/ai-agent-contract/README.md)
   * [Phala Agent Gateway](tech-specs/ai-agent-contract/phala-agent-gateway.md)
 * [✅ Multi-Proof and Verifiable Compute](tech-specs/multi-proof-and-verifiable-compute/README.md)
-  * [Why Multi-Proof and What We Can Help](tech-specs/multi-proof-and-verifiable-compute/why-multi-proof-and-what-we-can-help.md)
+  * [Why Multi-Proof and How We Can Help](tech-specs/multi-proof-and-verifiable-compute/why-multi-proof-and-how-we-can-help.md)
   * [Trusted Execution Environments (TEE) and Compute Verifiability](tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability.md)
   * [How to Build with Multi-Proof](tech-specs/multi-proof-and-verifiable-compute/how-to-build-with-multi-proof.md)
   * [Conclusion & Future Developments](tech-specs/multi-proof-and-verifiable-compute/conclusion-and-future-developments.md)

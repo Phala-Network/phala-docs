@@ -10,7 +10,7 @@ A TEE is a secure area within the main processor of a device. It ensures externa
 
 The unassailable security of TEEs is not just limited to protecting critical data. They also authenticate and verify the data computations that take place within them. This feature illuminates the foreground of TEEs in multi-proof systems, addressing the challenge of computing verifiability.
 
-Phala currently only supports Intel SGX (Software Guard Extension) as the TEE hardware. Check [here](https://sgx101.gitbook.io/sgx101/sgx-bootstrap/overview) for more info about SGX.
+Phala currently only supports Intel SGX (Software Guard Extension) as the TEE hardware, and will support Intel TDX and NVIDIA GPU TEE soon. Check [here](https://sgx101.gitbook.io/sgx101/sgx-bootstrap/overview) for more info about SGX.
 
 ## How are TEE Devices Being Verified?
 
@@ -35,7 +35,7 @@ Unlike generating ZKP (Zero Knowledge Proof), which needs to have a specific cir
 
     Since we already guarantee the execution environment is trusted, the data signed by the key derived in the environment should be trusted too. By introducing [Key Hierarchy](https://docs.phala.network/developers/advanced-topics/blockchain-infrastructure/secret-key-hierarchy#key-hierarchy-management) and [Key Rotation](https://github.com/Phala-Network/phala-blockchain/pull/810) mechanisms, the safety of the key is guaranteed in both cryptographic and economic ways. Check this [article](https://medium.com/phala-network/technical-analysis-of-why-phala-will-not-be-affected-by-the-intel-sgx-chip-vulnerabilities-e045b0189dc2) for the analysis of Phala security design.
 
-With the above two premises, the TEE-proof generation is pretty simple. Every multi-proof program running on the system will have a dedicated app key which is derived from WASM Virtual Machine - SideVM, the SideVM is running inside TEE. Every user can deploy a Javascript Engine for themselves, the key will be injected when developer upload their Javascript code to the JS engine where developer can use this key to sign transaction in their Javascript code. To generate the TEE-proof, the program needs to use this key to sign the output of the execution result of their business logic. For example, if you are going to verify the TEE proof on Ethereum, you can sign the result with the ECDSA signature scheme. See **How to Build with Multi-Proof** section for how to generate TEE-proof with multi-proof JS SDK.
+With the above two premises, the TEE-proof generation is pretty simple. Every multi-proof program running on the system will have a dedicated app key which is derived from WASM Virtual Machine - SideVM, the SideVM is running inside TEE. Every user can deploy a Javascript Engine for themselves, the key will be injected when developer upload their Javascript code to the JS engine where developer can use this key to sign transaction in their Javascript code. To generate the TEE-proof, the program needs to use this key to sign the output of the execution result of their business logic. For example, if you are going to verify the TEE proof on Ethereum, you can sign the result with the ECDSA signature scheme. See **How to Build with Multi-Proof** section for how to generate TEE-proof with JS SDK.
 
 ## Comparison: TEE Compute Verification vs. ZK Compute Verification
 
