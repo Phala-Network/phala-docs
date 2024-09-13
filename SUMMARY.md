@@ -78,6 +78,7 @@
 ## Tech Specs
 
 * [🥷 AI Agent Contract](tech-specs/ai-agent-contract/README.md)
+  * [WapoJS Functions](tech-specs/ai-agent-contract/wapojs-functions.md)
   * [Phala Agent Gateway](tech-specs/ai-agent-contract/phala-agent-gateway.md)
 * [✅ Multi-Proof and Verifiable Compute](tech-specs/multi-proof-and-verifiable-compute/README.md)
   * [Why Multi-Proof and How We Can Help](tech-specs/multi-proof-and-verifiable-compute/why-multi-proof-and-how-we-can-help.md)
