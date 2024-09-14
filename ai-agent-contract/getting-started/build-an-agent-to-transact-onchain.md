@@ -1,6 +1,6 @@
 # Build An Agent to Transact Onchain
 
-If you like video tutorials, here is one of our latest workshops on building an Agent to transact onchain. In this tutorial, you will learn:
+If you like video tutorials, here is one of our latest workshops on building an Agent to transact onchain using the [Viem SDK](https://viem.sh) with the AI Agent Contract Template. In this tutorial, you will learn:
 
 * How to test the WapoJS functions like `deriveSecret(salt)`to derive an ECDSA key based on your `secret` added to your Agent Contract's secret vault.
 * Build and deploy your Agent Contract to IPFS then add your secret salt that will derive an ECDSA key for your deployed agent.
@@ -19,13 +19,13 @@ Clone git repo or use [degit](https://www.npmjs.com/package/degit) to get the so
 {% tabs %}
 {% tab title="git" %}
 ```sh
-git clone https://github.com/Phala-Network/ai-agent-contract-tools.git
+git clone https://github.com/Phala-Network/ai-agent-contract-viem.git
 ```
 {% endtab %}
 
 {% tab title="degit" %}
 ```bash
-npx degit github:Phala-Network/ai-agent-contract-tools#main ai-agent-contract-tools
+npx degit github:Phala-Network/ai-agent-contract-viem#main ai-agent-contract-viem
 ```
 {% endtab %}
 {% endtabs %}
