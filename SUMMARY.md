@@ -64,6 +64,7 @@
     * [How Mirrored Price Feeds Work](ai-agent-contract/integrations/mirrored-price-feeds-agent/how-mirrored-price-feeds-work.md)
   * [🌱 LensAPI Oracle Agent](ai-agent-contract/integrations/lensapi-oracle-agent.md)
 * [⛓️ Supported Chains](ai-agent-contract/supported-chains.md)
+* [FAQ](ai-agent-contract/faq.md)
 
 ## Agent Wars
 
