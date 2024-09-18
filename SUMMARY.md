@@ -138,6 +138,8 @@
   * [Technical Details](references/subbridge/technical-details.md)
 * [👨‍🚀 Builders Program](references/builders-program.md)
 * [👷 Community Builders](references/community-builders.md)
+* [🤹 Hackathon Guides](references/hackathon-guides/README.md)
+  * [ETHGlobal Hackathon Guide](references/hackathon-guides/ethglobal-hackathon-guide.md)
 * [🤯 Advanced Topics](references/advanced-topics/README.md)
   * [Cross Chain Solutions](references/advanced-topics/cross-chain-solutions.md)
   * [System Contract and Drivers](references/advanced-topics/system-contract-and-drivers.md)
