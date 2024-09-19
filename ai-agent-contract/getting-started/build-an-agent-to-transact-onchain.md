@@ -59,45 +59,23 @@ npm run test
 Expected Test Results
 
 ```sh
-INPUT: {"method":"GET","path":"/ipfs/CID","queries":{"data":["Hello MOON!"],"type":["sign"]},"secret":{"secretSalt":"SECRET_SALT"},"headers":{}}
-Signing data [Hello MOON!] with Account [0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD]
-Signature: 0xb34ff00b803c0cfead2b4f32afab4f73a9169cf24b8236307462a49ff08fc25674303b3e0cea3b80e8eece16c42563fe7d5c7f4ab09857fc4d6a1b99a7c97d2e1b
-{
-  status: 200,
-  body: '{"derivedPublicKey":"0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD","data":"Hello MOON!","signature":"0xb34ff00b803c0cfead2b4f32afab4f73a9169cf24b8236307462a49ff08fc25674303b3e0cea3b80e8eece16c42563fe7d5c7f4ab09857fc4d6a1b99a7c97d2e1b"}',
-  headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  }
-}
-INPUT: {"method":"GET","path":"/ipfs/CID","queries":{"data":["Hello MOON!"],"signature":["0xb34ff00b803c0cfead2b4f32afab4f73a9169cf24b8236307462a49ff08fc25674303b3e0cea3b80e8eece16c42563fe7d5c7f4ab09857fc4d6a1b99a7c97d2e1b"],"type":["verify"]},"secret":{"secretSalt":"SECRET_SALT"},"headers":{}}
-Verifying Signature with PublicKey  0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD
-Is signature valid?  true
-{
-  status: 200,
-  body: '{"derivedPublicKey":"0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD","data":"Hello MOON!","signature":"0xb34ff00b803c0cfead2b4f32afab4f73a9169cf24b8236307462a49ff08fc25674303b3e0cea3b80e8eece16c42563fe7d5c7f4ab09857fc4d6a1b99a7c97d2e1b","valid":true}',
-  headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  }
-}
-INPUT: {"method":"GET","path":"/ipfs/CID","queries":{"to":["0xC5227Cb20493b97bb02fADb20360fe28F52E2eff"],"gweiAmount":["420"],"type":["sendTx"]},"secret":{"secretSalt":"SECRET_SALT"},"headers":{}}
-Sending Transaction with Account 0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD to 0xC5227Cb20493b97bb02fADb20360fe28F52E2eff for 420 gwei
-Transaction Hash: 0x6a7218d19bb2529df074dd5e2ad30e3c2400a2e2d730ca554f067af29ecfff42
-Transaction Status: success
-{
-  status: 200,
-  body: '{"derivedPublicKey":"0x3F003c3501eeD0A8Ab1B023a644EdCD2a8096EaD","to":"0xC5227Cb20493b97bb02fADb20360fe28F52E2eff","gweiAmount":"420","hash":"0x6a7218d19bb2529df074dd5e2ad30e3c2400a2e2d730ca554f067af29ecfff42","receipt":{"blockHash":"0x83688869e27fb83743c7b072ef5f45a3efe3657a2878ca605f6fce8cf3b06c38","blockNumber":"14592136","contractAddress":null,"cumulativeGasUsed":"931909","effectiveGasPrice":"1000983","from":"0x3f003c3501eed0a8ab1b023a644edcd2a8096ead","gasUsed":"21000","l1BaseFeeScalar":"0x44d","l1BlobBaseFee":"0x48540a4664","l1BlobBaseFeeScalar":"0xa118b","l1Fee":"20531405242323","l1GasPrice":"18898712795","l1GasUsed":"1600","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"success","to":"0xc5227cb20493b97bb02fadb20360fe28f52e2eff","transactionHash":"0x6a7218d19bb2529df074dd5e2ad30e3c2400a2e2d730ca554f067af29ecfff42","transactionIndex":4,"type":"eip1559","l1FeeScalar":null}}',
-  headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  }
-}
-
 Now you are ready to publish your agent, add secrets, and interact with your agent in the following steps:
 - Execute: 'npm run publish-agent'
 - Set secrets: 'npm run set-secrets'
 - Go to the url produced by setting the secrets (e.g. https://wapo-testnet.phala.network/ipfs/QmPQJD5zv3cYDRM25uGAVjLvXGNyQf9Vonz7rqkQB52Jae?key=b092532592cbd0cf)
+
+ ✓ tests/index.test.ts (5) 7035ms
+   ✓ Test Viem SDK AI Agent Contract (5) 7035ms
+     ✓ Derive Account
+     ✓ Sign Message Data
+     ✓ Verify Signature
+     ✓ Send TX on Base Sepolia 6991ms
+     ✓ POST /
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  16:40:10
+   Duration  7.39s (transform 34ms, setup 6ms, collect 181ms, tests 7.04s, environment 0ms, prepare 42ms)
 ```
 
 ### Publishing Your Agent
@@ -111,22 +89,6 @@ npm run publish-agent
 Upon a successful upload, the command should show the URL to access your AI Agent.
 
 ```sh
-✓ Compiled successfully.
-  67.83 KB  dist/index.js
-Running command: npx thirdweb upload dist/index.js
-This may require you to log into thirdweb and will take some time to publish to IPFS...
-
-    $$\     $$\       $$\                 $$\                         $$\       
-    $$ |    $$ |      \__|                $$ |                        $$ |      
-  $$$$$$\   $$$$$$$\  $$\  $$$$$$\   $$$$$$$ |$$\  $$\  $$\  $$$$$$\  $$$$$$$\  
-  \_$$  _|  $$  __$$\ $$ |$$  __$$\ $$  __$$ |$$ | $$ | $$ |$$  __$$\ $$  __$$\ 
-    $$ |    $$ |  $$ |$$ |$$ |  \__|$$ /  $$ |$$ | $$ | $$ |$$$$$$$$ |$$ |  $$ |
-    $$ |$$\ $$ |  $$ |$$ |$$ |      $$ |  $$ |$$ | $$ | $$ |$$   ____|$$ |  $$ |
-    \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
-     \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/ 
-
- 💎 thirdweb v0.14.12 💎
-
 - Uploading file to IPFS. This may take a while depending on file sizes.
 
 ✔ Successfully uploaded file to IPFS.
@@ -246,6 +208,19 @@ Expected output:
 {"data":{"secretSalt":"<YOUR_SECRET_SALT>"},"succeed":true}
 ```
 
+#### Accessing Your Secrets in Your Code
+
+```typescript
+let vault: Record<string, string> = {}
+try {
+  vault = JSON.parse(process.env.secret || '')
+} catch (e) {
+  console.error(e)
+  return c.json({ error: "Failed to parse secrets" })
+}
+const secretSalt = (vault.secretSalt) ? vault.secretSalt as string : 'SALTY_BAE'
+```
+
 ### Example HTTP Requests
 
 Below are some example HTTP Requests to a deployed Agent Contract without any changes made to the template.&#x20;
@@ -271,17 +246,23 @@ URL queries are highlighted in <mark style="background-color:yellow;">yellow</ma
 
     > URL: [https://wapo-testnet.phala.network/ipfs/QmVJ3xknfRevUkc68iZc4RdPSLL2gLD8WagwMQCdGMyC4g?<mark style="background-color:yellow;">key</mark>=6978ea391960e272&<mark style="background-color:yellow;">type</mark>=sendTx&<mark style="background-color:yellow;">to</mark>=0xC5227Cb20493b97bb02fADb20360fe28F52E2eff&<mark style="background-color:yellow;">gweiAmount</mark>=420](https://wapo-testnet.phala.network/ipfs/QmVJ3xknfRevUkc68iZc4RdPSLL2gLD8WagwMQCdGMyC4g?key=6978ea391960e272\&type=sendTx\&to=0xC5227Cb20493b97bb02fADb20360fe28F52E2eff\&gweiAmount=420)
 
-### Accessing Queries
+### Handling Requests
 
-To help create custom logic, we have an array variable named `queries` that can be accessed in the `Request` class. To access the `queries` array variable `chatQuery` value at index `0`, the syntax will look as follows:
+Check the [`Hono` docs](https://hono.dev/docs) for information on accessing URL `queries` or `body` from a `post` request.
 
-```sh
-const query = req.queries.chatQuery[0] as string;
+{% hint style="info" %}
+We recommend using @hono/tiny to avoid a large bundle size and the 20MB final artifact limitation.
+{% endhint %}
+
+**Example**
+
+```typescript
+// Access query value for a URL query named `type`
+let queries = c.req.queries() || {}
+const getType = (queries.type) ? queries.type[0] as string : ''
+// Access body from post request
+const data = await c.req.json()
 ```
-
-Here is an example of adding a URL query named `chatQuery` with a value of `When did humans land on the moon`. `queries` can have any field name, so `chatQuery` is just an example of a field name and not a mandatory name, but remember to update your `index.ts` file logic to use your expected field name.
-
-> [https://wapo-testnet.phala.network/ipfs/Qmc7EDq1X8rfYGGfHyXZ6xsmcSUWQcqsDoeRMfmvFujih3?key=51f265212c26086c&<mark style="background-color:yellow;">**chatQuery**</mark>=When%20did%20humans%20land%20on%20the%20moon](https://wapo-testnet.phala.network/ipfs/Qmc7EDq1X8rfYGGfHyXZ6xsmcSUWQcqsDoeRMfmvFujih3?key=51f265212c26086c\&chatQuery=When%20did%20humans%20land%20on%20the%20moon)
 
 ### Debugging Your Agent
 
@@ -319,5 +300,40 @@ console.error('error log message!')
 ```
 
 For more information check the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/console) on `console` object.
+
+### Run a Local Testnet With Docker
+
+Run a local testnet with [`docker` support](https://docs.docker.com/desktop/). All you need to do to get a local testnet started is run:
+
+{% hint style="danger" %}
+Running the local testnet may return an error if port **`8000`** is already in use.
+{% endhint %}
+
+```shell
+npm run dev
+```
+
+**Make a Request to Your Local Build**
+
+```shell
+# GET request
+curl http://127.0.0.1:8000/local
+# GET request with URL queries
+curl http://127.0.0.1:8000/local?query1=one&query2=two
+# POST request
+curl http://127.0.0.1:8000/local -X POST -H 'content-type: application/json' -d '{"foo": "bar"}'
+```
+
+**Add Secrets to Your Local Build**
+
+```shell
+curl http://127.0.0.1:8000/vaults -H 'Content-Type: application/json' -d '{"cid": "local", "data": {"secretKey":"secretValue"}}'
+```
+
+**Check The Logs of Your Local Build**
+
+```shell
+curl 'http://127.0.0.1:8000/logs/all/local'
+```
 
 Congratulations! You have deployed and transacted on Base Sepolia! You now have the tools to connect to any top LLM API with the RedPill Agent Contract template and perform onchain actions with the `viem` SDK.

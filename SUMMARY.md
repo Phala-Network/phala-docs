@@ -35,6 +35,7 @@
   * [Build Your AI Agent Contract with OpenAI](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-openai.md)
   * [Build Your AI Agent Contract with LangChain](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-langchain.md)
   * [Integrate with 3rd Party API with HTTP Request](ai-agent-contract/getting-started/integrate-with-3rd-party-api-with-http-request.md)
+  * [Run a Local Testnet With Docker](ai-agent-contract/getting-started/run-a-local-testnet-with-docker.md)
   * [AI Agent Contract Templates](ai-agent-contract/getting-started/ai-agent-contract-templates.md)
 * [🔨 Build](ai-agent-contract/build/README.md)
   * [Define Your Agent](ai-agent-contract/build/define-your-agent.md)
