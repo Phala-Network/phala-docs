@@ -124,6 +124,27 @@ curl http://127.0.0.1:3000
 {% endtab %}
 {% endtabs %}
 
+### Ideas to Build
+
+With the ability to deploy docker in TEE, you are now free to use Phala as your base to exploring the many different prizes available at [ETH Global](https://ethglobal.com/events/sanfrancisco2024/prizes/).
+
+* **Web2 in, Web3 out**
+  * Build a product that takes a Web2 technology and make it Web3 with the use of TEE functions Remote Attestation & Derive Key Account
+  * Encumber Web2 Accounts for delegated access
+  * Bind Web2 business logic onchain
+* **What Do You Meme-coin??**
+  * Build an innovative product that solves a key memecoin funnel issue and convert users to your memecoins easier
+  * Launch a unique memecoin that aims to solve something for a good cause
+  * Create the end all, be all of memecoins that will last decades down the road
+* **Use AI to enhance the Web3 Experience**
+  * Run the many LLMs written in python and available on [huggingface](https://huggingface.co/)
+  * Build a competitor to the infamous AI memecoins with an objective to provide misinformation to the competition, and surpass the current leaders in AI memecoins
+  * Train your own small LLM and push attestations onchain for proof of training, etc.
+* **Launch Verifiable Products**
+  * Use Remote Attestation and Derive Key Account signatures to harden the connection between a user and onchain smart contracts
+  * Add AI to be able to detect if a frontend is malicious or not
+  * Build a product for data provenance based on attested data pipelines
+
 
 
 
