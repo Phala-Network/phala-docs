@@ -8,6 +8,10 @@ Welcome to the Phala Hackathon Guide! This guide will provide you with all the n
 Check out the an TEE Docker SDK we deployed called the [TEE Docker SDK Cheat Sheet](https://bit.ly/dstack-cheat-sheet)!
 {% endhint %}
 
+{% hint style="warning" %}
+The TEE Docker (Simulator) SDK is inspired by the "dstack" concept introduced by Andrew in [a Flashbots forum post](https://collective.flashbots.net/t/dstack-speedrunning-a-p2p-confidential-vm/3876). This SDK serves as an illustration of the developer experience and potential functionalities that _could_ be offered by dstack in the future. Please note, there is no affiliation between the Simulator and the dstack project, and this SDK is not endorsed or supported by Flashbots or its team.
+{% endhint %}
+
 ### Introduction
 
 Welcome to the Hackathon guide for Phala's TEE Docker SDK. If you are a Docker expert then this new developer-friendly SDK is your oyster. You now have the ability to deploy your docker containers within a TEE and utilize the JS & Python SDKs to have TEE functions to do:
