@@ -75,7 +75,7 @@ Get an API Key from Redpill
 > * Go to [https://red-pill.ai/dashboard](https://red-pill.ai/dashboard) and claim your API Key by swapping some ETH for wGPT at [https://app.uniswap.org/explore/tokens/base/0x74F62Bc1961028C22b8080961c6534f4eDD49D6C](https://app.uniswap.org/explore/tokens/base/0x74F62Bc1961028C22b8080961c6534f4eDD49D6C)
 > * Video Tutorial: [https://youtu.be/ZoJwbLNhbWE](https://youtu.be/ZoJwbLNhbWE)
 
-In [default.json](https://github.com/Phala-Network/ai-agent-template-redpill/blob/main/secrets/default.json) file replace `YOUR_API_KEY` with your API Key. The default has a rate limit. If you want access to a RedPill code, reach out to the Phala Team.
+In [secrets/default.json](https://github.com/Phala-Network/ai-agent-template-redpill/blob/main/secrets/default.json) file replace `YOUR_API_KEY` with your API Key. The default has a rate limit. If you want access to a RedPill code, reach out to the Phala Team.
 
 ```json
 {
