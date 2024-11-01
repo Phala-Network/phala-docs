@@ -49,6 +49,6 @@ Check the [Implementation](./implementation.md "mention") for the technical deta
 2. [Intel SGX DCAP Orientation](https://www.intel.com/content/dam/develop/public/us/en/documents/intel-sgx-dcap-ecdsa-orientation.pdf)
 3. [Phala's dcap-qvl](https://github.com/Phala-Network/dcap-qvl)
 4. [Automata’s Solidity Implementation](https://github.com/automata-network/automata-dcap-attestation)
-5. [Phala Nividia H200 TEE Benchmark Paper](https://arxiv.org/pdf/2409.03992)
+5. [Phala Nvidia H200 TEE Benchmark Paper](https://arxiv.org/pdf/2409.03992)
 6. [Phala DeRoT Post on FlashBots forum](https://collective.flashbots.net/t/early-thoughts-on-decentralized-root-of-trust/3868)
 7. [Phala Key Management Protocol Post on Flashbots forum](https://collective.flashbots.net/t/key-management-protocol-for-decentralized-root-of-trust/4004)
