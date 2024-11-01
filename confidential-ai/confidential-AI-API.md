@@ -33,7 +33,7 @@ https://inference-api.phala.network/
 You can copy the value of `nvidia_payload` as the whole payload as followed to verify:
 
 ```
-curl -X POST https://nras.attestation.nvidia.com/v1/attest/gpu \
+curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
  -H "accept: application/json" \
  -H "content-type: application/json" \
  -d '__COPY_FROM_ABOVE__'
