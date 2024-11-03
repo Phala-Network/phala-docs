@@ -24,11 +24,13 @@ https://inference-api.phala.network/
 {
   "signing_address": "...",
   "nvidia_payload": "...",
-  "dcap_payload": "..."
+  "intel_quote": "..."
 }
 ```
 
 ### Verify the Attestation
+
+- Verify GPU Attestation
 
 You can copy the value of `nvidia_payload` as the whole payload as followed to verify:
 
@@ -38,6 +40,19 @@ curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
  -H "content-type: application/json" \
  -d '__COPY_FROM_ABOVE__'
 ```
+
+- Verify TDX Quote
+
+Theoretically, you can verify the Intel TDX quote with the value of `intel_quote` at anywhere that provide TDX quote verification service. The screenshot below is an example of how to verify the Intel TDX quote with the [Automata's on-chain attestation smart contract](https://explorer.ata.network/address/0xE26E11B257856B0bEBc4C759aaBDdea72B64351F/contract/65536_2/readContract#F6). For Automata example, just need to convert the returned base64 encoded quote to hex format (take Node for example).
+
+```sh
+console.log('Quote bytes:', '0x' + Buffer.from(intel_quote, 'base64').toString('hex'));
+
+// Use on-chain smart contract function `verifyAndAttestOnChain` https://explorer.ata.network/address/0xE26E11B257856B0bEBc4C759aaBDdea72B64351F/contract/65536_2/readContract#F6
+// to verify with the printed quote bytes above.
+```
+
+<figure><img src="../.gitbook/assets/automata-attestation.png" alt=""><figcaption></figcaption></figure>
 
 ## Chat API
 

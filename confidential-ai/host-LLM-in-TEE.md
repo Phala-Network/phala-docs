@@ -1,5 +1,11 @@
 # Host LLM in TEE
 
+Phala Network leverages NVIDIA's TEE GPU technology to provide confidential LLM inference services. By utilizing NVIDIA Blackwell's Confidential Computing capabilities, we ensure that AI model execution and data processing remain fully protected within secure enclaves. This solution enables organizations to run their LLM workloads with guaranteed privacy and security, preventing unauthorized access to both the model and user data during inference operations.
+
+<figure><img src="../.gitbook/assets/hopper-arch-confidential-computing.jpeg" alt=""><figcaption></figcaption></figure>
+
+*source: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/*
+
 The following diagram illustrates the architecture of the Phala Confidential AI Inference (private LLM Node) service. To host your own private LLM in TEE, you only need to wrap your LLM inference code into a docker image, then deploy your own container to the TEE network. To make the LLM fully verifiable, you need make sure the docker image is reproducible.
 
 <figure><img src="../.gitbook/assets/host-llm-in-TEE.png" alt=""><figcaption></figcaption></figure>
