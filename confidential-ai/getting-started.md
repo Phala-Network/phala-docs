@@ -24,13 +24,13 @@ The response will be like:
 {
   "signing_address": "...",
   "nvidia_payload": "...",
-  "dcap_payload": "..."
+  "intel_quote": "..."
 }
 ```
 
 The `signing_address` is the account address generated inside TEE that will be used to sign the chat response. You can go to https://etherscan.io/verifiedSignatures, click Verify Signature, and paste the `signing_address` and message response to verify it.
 
-`nvidia_payload` and `dcap_payload` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE.
+`nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See [Verify the Attestation](./confidential-AI-API.md#verify-the-attestation) for more details.
 
 ### Chat With Private AI
 
