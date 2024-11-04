@@ -41,6 +41,8 @@ curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
  -d '__COPY_FROM_ABOVE__'
 ```
 
+<figure><img src="../.gitbook/assets/nvidia-gpu-attestation-v3.png" alt=""><figcaption></figcaption></figure>
+
 - Verify TDX Quote
 
 Theoretically, you can verify the Intel TDX quote with the value of `intel_quote` at anywhere that provide TDX quote verification service. The screenshot below is an example of how to verify the Intel TDX quote with the [Automata's on-chain attestation smart contract](https://explorer.ata.network/address/0xE26E11B257856B0bEBc4C759aaBDdea72B64351F/contract/65536_2/readContract#F6). For Automata example, just need to convert the returned base64 encoded quote to hex format (take Node for example).
