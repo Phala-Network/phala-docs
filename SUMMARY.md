@@ -7,6 +7,8 @@
 ## Overview
 
 * [⚖️ Phala Network](overview/phala-network.md)
+  * [⚡AI Agent Contract](overview/ai-agent-contract.md)
+  * [⚡ Confidential AI Inference](overview/confidential-ai-inference.md)
 * [💎 PHA Token](overview/pha-token/README.md)
   * [🪙 Introduction](overview/pha-token/introduction.md)
   * [👐 Delegation](overview/pha-token/delegation/README.md)
@@ -26,10 +28,10 @@
     * [Khala Governance](overview/pha-token/governance/khala-governance.md)
     * [Setting Up an Account Identity](overview/pha-token/governance/setup-account-identity.md)
 
-## Confidential AI Reference
+## Confidential AI Inference
 
 * [👩‍💻 Getting Started](confidential-ai/getting-started.md)
-* [💎 Confidential AI API](confidential-ai/api.md)
+* [💎 Confidential AI API](confidential-ai/confidential-AI-API.md)
 * [🔒 Host LLM in TEE](confidential-ai/host-LLM-in-TEE.md)
 * [🔨 Implementation](confidential-ai/implementation.md)
 * [🏎️ LLM in TEE Benchmark](confidential-ai/benchmark.md)
