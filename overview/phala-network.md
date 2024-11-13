@@ -1,16 +1,42 @@
 # ⚖️ Phala Network
 
-Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand and interact with blockchains, it unlocks the barrier for the first billion users to join web3.
-
-### The Missing AI Execution Layer
-
 Confidential AI Inference stands as a cornerstone for safeguarding sensitive data and ensuring secure AI model execution in Web3. Through the implementation of LLM models within Trusted Execution Environments (TEE), Phala Network delivers private and verifiable AI computations. This robust approach addresses fundamental challenges in the Web3 ecosystem: data privacy protection, secure execution guarantees, and computational verifiability. Such capabilities are essential for applications where the protection of user data and model integrity is paramount.
 
-AI has the potential to revolutionize the Web3 user experience by acting as an autonomous agent. Imagine AI systems that can not only conduct research independently but also execute operations on your behalf – you simply provide instructions and watch as tasks are completed. While projects like Autonolas, Polywrap, and fetch.ai are pioneering this space, they face a crucial limitation: none are truly smart contract-centric. Their off-chain nature prevents them from executing smart contract operations securely and autonomously. This gap in AI Execution Layer Agents creates a barrier for developers seeking to build smart contract-centric AI Agents.
+<figure><img src="../.gitbook/assets/Phala-AI-Agent-Contract-HLD.png" alt=""><figcaption></figcaption></figure>
 
-### Our Solution
+1. **Agentize smart contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts. "**Regulate**" your AI Agents through a DAO to enforce business logic for your agents.&#x20;
+2. **Connect to the internet of multi-agents**: Make your agents accessible by other cross-platform AI Agents deployed on Autonolas, FLock.io, Morpheus, Polywrap, etc.
+3. **Launch and get incentivized**: Own your agents and build a profitable tokenomic through our default tokenomic model or customize your own.
 
-| Solution | Description |
-|----------|-------------|
-| **[Confidential AI Inference](confidential-ai-inference.md)** | Provides secure hardware infrastructure and comprehensive SDK for running LLM models within Trusted Execution Environments (TEE) |
-| **[AI Agent Contract](ai-agent-contract.md)** | Enables trustless AI Agent execution through TEE-powered edge functions, allowing secure smart contract interactions |
+To learn more about launching agents with tokenomics: [agent-wars-introduction.md](../agent-wars/agent-wars-introduction.md "mention")
+
+## **What Sets Phala Apart:**
+
+* **We Don’t Trust Any Provider**: Our **security model** goes beyond traditional cloud solutions (e.g., AWS, Azure, GCP). **Phala does not trust any cloud platform, hardware provider, or even its users,** ensuring true zero-trust.
+* **User-Friendly & Affordable**: With **easy integration**, developers can migrate their **Web2 software** into a zero-trust environment. By using TEE as part of our hybrid infrastructure, developers can select the **level of proof** they need based on their use case, making the system both flexible and affordable.
+* **Web3 Standard Compatibility**: Phala is fully **decentralized, privacy-focused**, and auditable. Our SDK enables your programs to **easily integrate with blockchains**, providing seamless co-processing and interaction with Web3 systems.
+
+## **How It Works**
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+* Phala introduces a **new root-of-trust** beyond traditional hardware-based models.
+* We implement a combination of **TEE, MPC, ZKP (FHE)** and **blockchain game theory** to build this **new root-of-trust**.
+* Our system offers **auditable computation**, ensuring that anyone can verify the integrity of execution results, creating a **tamper-proof** environment.
+
+## **The Solution**
+
+Phala provides a comprehensive suite of tools and infrastructure to make zero-trust computing **easy to access**, **build**, and **verify**:
+
+* **Easy Access to Computers**: Phala’s **marketplace** provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100 (TEE)**, offering secure and verifiable computation at scale.
+* **Easy to Build**: [Dstack](../dstack-a-flashbots-x-project/overview.md) is the TEE SDK developed by Phala and Flashbots jointly
+  * **Docker / VM migration into TEE**, allowing developers to move existing workloads into a zero-trust environment.
+  * **Serverless edge functions**: Leverage pre-built templates to create **serverless, privacy-preserving functions** that run in secure TEEs.
+* **Easy to Prove**: Phala offers **on-chain attestation** for auditable logs of off-chain computations, ensuring integrity and transparency. Developers can prove the correctness of their computations in a verifiable, decentralized way.
+
+## **The Future is Here (Use Cases)**
+
+* **Web2 to Web3**: Easily transition Web2 software to **Web3 standards**, with seamless connectivity to smart contracts across blockchains.
+* **Intelligence-Based Economy**: Solutions like **MEV, Intent-centric applications**. Flashbots uses TEE for decentralized MEV-boost on Ethereum. Uniswap is using TEE to build a DeFi-native Ethereum L2, becoming a hub for liquidity across chains.
+* **Defense in Depth**: Projects like **Lit Protocol (MPC)**, **Zama (FHE)**, and **Scroll (ZKP)** use TEE to enhance their security and privacy, strengthening their defenses.
+* **Decentralized AI**: With **NVIDIA’s GPU TEEs**, decentralized AI platforms like **Sentient, Zero Gravity, Ritual, Morpheus**, and **Autonolas** use TEEs to run LLMs in secure, verifiable, and privacy-focused environments as part of their infrastructure.

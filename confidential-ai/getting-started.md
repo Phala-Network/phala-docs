@@ -1,4 +1,4 @@
-# Getting started
+# 👩‍💻 Getting Started
 
 ## Introduction
 
@@ -30,18 +30,17 @@ The response will be like:
 
 The `signing_address` is the account address generated inside TEE that will be used to sign the chat response. You can go to https://etherscan.io/verifiedSignatures, click Verify Signature, and paste the `signing_address` and message response to verify it.
 
-`nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See [Verify the Attestation](./confidential-AI-API.md#verify-the-attestation) for more details.
+`nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See [Verify the Attestation](confidential-AI-API.md#verify-the-attestation) for more details.
 
 ### Chat With Private AI
 
 We provide OpenAI-compatible API for you to send chat request to the LLM running inside TEE, where you just need to replace the API endpoint to `https://platform.openai.com/docs/api-reference/chat`.
 
-Check the [API Reference](./confidential-AI-API.md "mention") for more information.
+Check the [confidential-AI-API.md](confidential-AI-API.md "mention") for more information.
 
-Check the [Host-LLM-in-TEE](./host-LLM-in-TEE.md "mention") for how to host your own private LLM in TEE.
+Check the [host-LLM-in-TEE.md](host-LLM-in-TEE.md "mention") for how to host your own private LLM in TEE.
 
-Check the [Implementation](./implementation.md "mention") for the technical details of the Confidential AI Inference.
-
+Check the [implementation.md](implementation.md "mention") for the technical details of the Confidential AI Inference.
 
 ## References
 

@@ -1,4 +1,4 @@
-# Confidential AI APIs
+# 💎 Confidential AI API
 
 ## Overview
 
@@ -6,7 +6,7 @@
 2. You can get the CPU and GPU attestation to verify the service is running in Confidential VM with NVIDIA H100 in TEE mode.
 3. The attestation includes the public key of the signing key to prove the key is generated in TEE.
 4. All the inference results contain signature with the signing key.
-5. You can use the public key to verify all the inference results is generated in TEE. 
+5. You can use the public key to verify all the inference results is generated in TEE.
 
 ## Endpoint
 
@@ -30,7 +30,7 @@ https://inference-api.phala.network/
 
 ### Verify the Attestation
 
-- Verify GPU Attestation
+* Verify GPU Attestation
 
 You can copy the value of `nvidia_payload` as the whole payload as followed to verify:
 
@@ -43,9 +43,9 @@ curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
 
 <figure><img src="../.gitbook/assets/nvidia-gpu-attestation-v3.png" alt=""><figcaption></figcaption></figure>
 
-- Verify TDX Quote
+* Verify TDX Quote
 
-Theoretically, you can verify the Intel TDX quote with the value of `intel_quote` at anywhere that provide TDX quote verification service. The screenshot below is an example of how to verify the Intel TDX quote with the [Automata's on-chain attestation smart contract](https://explorer.ata.network/address/0xE26E11B257856B0bEBc4C759aaBDdea72B64351F/contract/65536_2/readContract#F6). For Automata example, just need to convert the returned base64 encoded quote to hex format (take Node for example).
+Theoretically, you can verify the Intel TDX quote with the value of `intel_quote` at anywhere that provide TDX quote verification service. The screenshot below is an example of how to verify the Intel TDX quote with the [Automata's on-chain attestation smart contract](https://explorer.ata.network/address/0xE26E11B257856B0bEBc4C759aaBDdea72B64351F/contract/65536\_2/readContract#F6). For Automata example, just need to convert the returned base64 encoded quote to hex format (take Node for example).
 
 ```sh
 console.log('Quote bytes:', '0x' + Buffer.from(intel_quote, 'base64').toString('hex'));
@@ -62,12 +62,11 @@ OpenAI-compatible API. See: https://platform.openai.com/docs/api-reference/chat
 
 ### Request
 
-Endpoint: `POST https://inference-api.phala.network/v1/chat/completions`
-`model` in the request body: currently we only support:
+Endpoint: `POST https://inference-api.phala.network/v1/chat/completions` `model` in the request body: currently we only support:
 
-- `meta-llama/meta-llama-3.1-8b-instruct`
-- `google/gemma-2-9b-it`
-- `microsoft/phi-3-mini-4k-instruct`
+* `meta-llama/meta-llama-3.1-8b-instruct`
+* `google/gemma-2-9b-it`
+* `microsoft/phi-3-mini-4k-instruct`
 
 ### Sample Request
 
@@ -151,7 +150,7 @@ data: [DONE]
 
 The sha256sum of response body is `2e704942816901eaf435945fd01d76346e5dd283d5f8a2391e525e8f9a9ef36e`
 
-(note: in this example, there are two new line `\n` in the end of response)
+(note: in this example, there are two new line  in the end of response)
 
 ## Signature
 
@@ -163,12 +162,12 @@ By default, you can query another API with the value of `id` in the response in 
 
 For example, the response in the previous section, the `id` is `chat-7ee2a39468ce48d7b2284783f21782b0`:
 
-`GET https://inference-api.phala.network/v1/signature/chat-7ee2a39468ce48d7b2284783f21782b0` 
+`GET https://inference-api.phala.network/v1/signature/chat-7ee2a39468ce48d7b2284783f21782b0`
 
 ### Response
 
-- Text: the message you may want to verify. It is joined by the sha256 of the HTTP request body, and of the HTTP response body, separated by a colon `:`.
-- Signature.
+* Text: the message you may want to verify. It is joined by the sha256 of the HTTP request body, and of the HTTP response body, separated by a colon `:`.
+* Signature.
 
 ### Sample Response
 
@@ -191,11 +190,11 @@ Since the resource limitation, the signature will be kept in the memory for 5 mi
 
 Go to https://etherscan.io/verifiedSignatures, click `Verify Signature`:
 
-- Address: You can get the address from the attestation API. The address should be same if the service did not restarted.
-- Message: see the Response of the Signature section. You can also calculate the sha256 by yourselves.
+* Address: You can get the address from the attestation API. The address should be same if the service did not restarted.
+* Message: see the Response of the Signature section. You can also calculate the sha256 by yourselves.
 
 ```
 bcf152411970b14faab35a76d559b4188b78c24ced0048d0edcd320bf47bff0a:2e704942816901eaf435945fd01d76346e5dd283d5f8a2391e525e8f9a9ef36e
 ```
 
-- Signature Hash: See the Signature section.
+* Signature Hash: See the Signature section.

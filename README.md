@@ -21,7 +21,9 @@ layout:
 
 ***
 
-Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand and interact with blockchains, developers can now **build**, **launch**, **use**, and **profit** on their agents with security guarantees by **default**. Learn how Phala's AI Agent Contract can provide the perfect toolset to build intelligent applications.
+Phala Network make trustless available and affordable for all developers.
+
+Phala Network is a next-generation **cloud platform** that provides a **low-cost, user-friendly trustless environment**, making zero-trust computing accessible to a broad range of developers. By leveraging a **hybrid infrastructure** including Trusted Execution Environments (TEEs), blockchain, Multi-Party Computation (MPC), and Zero-Knowledge Proof (ZKP), Phala delivers flexible, open-source, and affordable **verification** solutions for any developer, in any type of program.
 
 ## Discover Phala Network
 
@@ -29,8 +31,5 @@ Phala Network is the Execution Layer for Web3 AI. By enabling AI to understand a
 
 ## Getting Started
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td>🏗️ <strong>Build Your First AI Agent Contract</strong></td><td></td><td></td><td><a href=".gitbook/assets/IWTEEBannerRedPill.png">IWTEEBannerRedPill.png</a></td><td><a href="ai-agent-contract/getting-started/build-your-first-ai-agent-contract.md">build-your-first-ai-agent-contract.md</a></td></tr><tr><td>🧾 <strong>Build An Agent to Transact Onchain</strong></td><td></td><td></td><td><a href=".gitbook/assets/ViemSDK.png">ViemSDK.png</a></td><td><a href="ai-agent-contract/getting-started/build-an-agent-to-transact-onchain.md">build-an-agent-to-transact-onchain.md</a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1faa8">🪨</span> <strong>Build Docker Apps with Dstack (A Flashbots X Project)</strong></td><td></td><td></td><td><a href=".gitbook/assets/holy-TEE.jpg">holy-TEE.jpg</a></td><td><a href="dstack-a-flashbots-x-project/overview.md">overview.md</a></td></tr><tr><td>🏗️ <strong>Build Your First AI Agent Contract</strong></td><td></td><td></td><td><a href=".gitbook/assets/IWTEEBannerRedPill.png">IWTEEBannerRedPill.png</a></td><td><a href="ai-agent-contract/getting-started/build-your-first-ai-agent-contract.md">build-your-first-ai-agent-contract.md</a></td></tr><tr><td>🧾 <strong>Build An Agent to Transact Onchain</strong></td><td></td><td></td><td><a href=".gitbook/assets/ViemSDK.png">ViemSDK.png</a></td><td><a href="ai-agent-contract/getting-started/build-an-agent-to-transact-onchain.md">build-an-agent-to-transact-onchain.md</a></td></tr></tbody></table>
 
-## Agent Wars
-
-<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td>🧐 <strong>Introduction</strong></td><td></td><td></td><td><a href=".gitbook/assets/What-is-Agent-Wars.png">What-is-Agent-Wars.png</a></td><td><a href="agent-wars/agent-wars-introduction.md">agent-wars-introduction.md</a></td></tr><tr><td><strong>🏃‍♀️‍➡️ Getting Started</strong></td><td></td><td></td><td><a href=".gitbook/assets/Multi-Agent.png">Multi-Agent.png</a></td><td><a href="agent-wars/getting-started/">getting-started</a></td></tr><tr><td>🧮 <strong>Tokenomics</strong></td><td></td><td></td><td><a href=".gitbook/assets/AgentWars (1).png">AgentWars (1).png</a></td><td><a href="agent-wars/agent-war-tokenomics.md">agent-war-tokenomics.md</a></td></tr></tbody></table>
