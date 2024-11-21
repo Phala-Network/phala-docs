@@ -1,11 +1,11 @@
-# 🥷 Dstack - A Flashbots X Project
+# 🥷 Dstack
 
 {% hint style="info" %}
 Dstack is a [Flashbots](https://www.flashbots.net/) X Project jointly produce by Phala Network and Flashbots.
 
 It was inspired by [Andrew's](https://github.com/amiller) (Flashbots team) design of [Dstack](https://collective.flashbots.net/t/dstack-speedrunning-a-p2p-confidential-vm).
 
-Check our [Acknowledgement](../../dstack-a-flashbots-x-project/acknowledgement.md) for all of the key contributors that built out the Dstack SDK.
+Check our [Acknowledgement](../../dstack/acknowledgement.md) for all of the key contributors that built out the Dstack SDK.
 {% endhint %}
 
 ## Overview
@@ -35,4 +35,4 @@ When the application launched successfully, the RA Report can be exported with s
 
 ## Conclusion
 
-Now that there is an introduction to the Dstack, we can begin the fun part of building on the SDK. There are a few ways to get started depending on your starting point. Let's take a look at the options in [Getting Started](../../dstack-a-flashbots-x-project/getting-started/).
+Now that there is an introduction to the Dstack, we can begin the fun part of building on the SDK. There are a few ways to get started depending on your starting point. Let's take a look at the options in [Getting Started](../../dstack/getting-started/).

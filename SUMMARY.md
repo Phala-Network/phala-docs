@@ -7,8 +7,7 @@
 ## Overview
 
 * [⚖️ Phala Network](overview/phala-network.md)
-  * [🥷 Dstack - A Flashbots X Project](overview/phala-network/dstack-a-flashbots-x-project.md)
-  * [🕵️ AI Agent Contract](overview/ai-agent-contract.md)
+  * [🥷 Dstack](overview/phala-network/dstack.md)
   * [⚡ Confidential AI Inference](overview/confidential-ai-inference.md)
 * [💎 PHA Token](overview/pha-token/README.md)
   * [🪙 Introduction](overview/pha-token/introduction.md)
@@ -29,17 +28,17 @@
     * [Khala Governance](overview/pha-token/governance/khala-governance.md)
     * [Setting Up an Account Identity](overview/pha-token/governance/setup-account-identity.md)
 
-## Dstack - A Flashbots X Project
+## Dstack
 
-* [Overview](dstack-a-flashbots-x-project/overview.md)
-* [Getting Started](dstack-a-flashbots-x-project/getting-started/README.md)
-  * [Start From Scratch](dstack-a-flashbots-x-project/getting-started/start-from-scratch.md)
-  * [Build From Template](dstack-a-flashbots-x-project/getting-started/build-from-template.md)
-* [Design Documents](dstack-a-flashbots-x-project/design-documents/README.md)
-  * [Decentralized Root-of-Trust](dstack-a-flashbots-x-project/design-documents/decentralized-root-of-trust.md)
-  * [Key Management Protocol](dstack-a-flashbots-x-project/design-documents/key-management-protocol.md)
-  * [TEE-Controlled Domain Certificates](dstack-a-flashbots-x-project/design-documents/tee-controlled-domain-certificates.md)
-* [Acknowledgement](dstack-a-flashbots-x-project/acknowledgement.md)
+* [Overview](dstack/overview.md)
+* [Getting Started](dstack/getting-started/README.md)
+  * [Start From Scratch](dstack/getting-started/start-from-scratch.md)
+  * [Build From Template](dstack/getting-started/build-from-template.md)
+* [Design Documents](dstack/design-documents/README.md)
+  * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
+  * [Key Management Protocol](dstack/design-documents/key-management-protocol.md)
+  * [TEE-Controlled Domain Certificates](dstack/design-documents/tee-controlled-domain-certificates.md)
+* [Acknowledgement](dstack/acknowledgement.md)
 
 ## Confidential AI Inference
 
@@ -49,26 +48,8 @@
 * [🔨 Implementation](confidential-ai/implementation.md)
 * [🏎️ LLM in TEE Benchmark](confidential-ai/benchmark.md)
 
-## AI Agent Contract
-
-* [👩‍💻 Getting Started](ai-agent-contract/getting-started/README.md)
-  * [Build Your First AI Agent Contract](ai-agent-contract/getting-started/build-your-first-ai-agent-contract.md)
-  * [Build An Agent to Transact Onchain](ai-agent-contract/getting-started/build-an-agent-to-transact-onchain.md)
-  * [Build Your AI Agent Contract with OpenAI](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-openai.md)
-  * [Build Your AI Agent Contract with LangChain](ai-agent-contract/getting-started/build-your-ai-agent-contract-with-langchain.md)
-  * [Integrate with 3rd Party API with HTTP Request](ai-agent-contract/getting-started/integrate-with-3rd-party-api-with-http-request.md)
-  * [Run a Local Testnet With Docker](ai-agent-contract/getting-started/run-a-local-testnet-with-docker.md)
-  * [AI Agent Contract Templates](ai-agent-contract/getting-started/ai-agent-contract-templates.md)
-* [🧙‍♂️ Examples](ai-agent-contract/examples/README.md)
-  * [Create a Weather Agent w/ Function Calling](ai-agent-contract/examples/create-a-weather-agent-w-function-calling.md)
-* [⛓️ Supported Chains](ai-agent-contract/supported-chains.md)
-* [FAQ](ai-agent-contract/faq.md)
-
 ## Tech Specs
 
-* [🥷 AI Agent Contract](tech-specs/ai-agent-contract/README.md)
-  * [WapoJS Functions](tech-specs/ai-agent-contract/wapojs-functions.md)
-  * [Phala Agent Gateway](tech-specs/ai-agent-contract/phala-agent-gateway.md)
 * [✅ Multi-Proof and Verifiable Compute](tech-specs/multi-proof-and-verifiable-compute/README.md)
   * [Why Multi-Proof and How We Can Help](tech-specs/multi-proof-and-verifiable-compute/why-multi-proof-and-how-we-can-help.md)
   * [Trusted Execution Environments (TEE) and Compute Verifiability](tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability.md)
@@ -159,23 +140,37 @@
 * [Medium](https://medium.com/phala-network)
 * [Telegram](https://t.me/phalanetwork)
 
-***
-
-* [Telegram](https://t.me/phalanetwork)
-
 ## Legacy
 
 * [Information](legacy/information.md)
 * [⚒️ Phala SDK](legacy/phala-sdk.md)
 * [🖼️ FrameHub](legacy/framehub.md)
 * [👨‍🚀 Builders Program](legacy/builders-program.md)
+* [🥷 AI Agent Contract](legacy/ai-agent-contract/README.md)
+  * [WapoJS Functions](legacy/ai-agent-contract/wapojs-functions.md)
+  * [Phala Agent Gateway](legacy/ai-agent-contract/phala-agent-gateway.md)
 
-## Agent Wars
+## AI Agent Contract (Legacy)
 
-* [📜 Introduction](agent-wars/agent-wars-introduction.md)
-* [💸 Tokenomics](agent-wars/agent-war-tokenomics.md)
-* [▶️ Getting Started](agent-wars/getting-started/README.md)
-  * [Wallet Setup & Get PHA](agent-wars/getting-started/wallet-setup-and-get-pha.md)
-  * [Buy and Sell Keys](agent-wars/getting-started/buy-and-sell-keys.md)
-  * [Create and Play with Social Agents](agent-wars/getting-started/create-and-play-with-social-agents.md)
-* [🧑‍🏫 Tutorial](agent-wars/tutorial.md)
+* [👩‍💻 Getting Started](ai-agent-contract-legacy/getting-started/README.md)
+  * [Build Your First AI Agent Contract](ai-agent-contract-legacy/getting-started/build-your-first-ai-agent-contract.md)
+  * [Build An Agent to Transact Onchain](ai-agent-contract-legacy/getting-started/build-an-agent-to-transact-onchain.md)
+  * [Build Your AI Agent Contract with OpenAI](ai-agent-contract-legacy/getting-started/build-your-ai-agent-contract-with-openai.md)
+  * [Build Your AI Agent Contract with LangChain](ai-agent-contract-legacy/getting-started/build-your-ai-agent-contract-with-langchain.md)
+  * [Integrate with 3rd Party API with HTTP Request](ai-agent-contract-legacy/getting-started/integrate-with-3rd-party-api-with-http-request.md)
+  * [Run a Local Testnet With Docker](ai-agent-contract-legacy/getting-started/run-a-local-testnet-with-docker.md)
+  * [AI Agent Contract Templates](ai-agent-contract-legacy/getting-started/ai-agent-contract-templates.md)
+* [🧙‍♂️ Examples](ai-agent-contract-legacy/examples/README.md)
+  * [Create a Weather Agent w/ Function Calling](ai-agent-contract-legacy/examples/create-a-weather-agent-w-function-calling.md)
+* [⛓️ Supported Chains](ai-agent-contract-legacy/supported-chains.md)
+* [FAQ](ai-agent-contract-legacy/faq.md)
+
+## Agent Wars (Legacy)
+
+* [📜 Introduction](agent-wars-legacy/agent-wars-introduction.md)
+* [💸 Tokenomics](agent-wars-legacy/agent-war-tokenomics.md)
+* [▶️ Getting Started](agent-wars-legacy/getting-started/README.md)
+  * [Wallet Setup & Get PHA](agent-wars-legacy/getting-started/wallet-setup-and-get-pha.md)
+  * [Buy and Sell Keys](agent-wars-legacy/getting-started/buy-and-sell-keys.md)
+  * [Create and Play with Social Agents](agent-wars-legacy/getting-started/create-and-play-with-social-agents.md)
+* [🧑‍🏫 Tutorial](agent-wars-legacy/tutorial.md)

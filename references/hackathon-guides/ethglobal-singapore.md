@@ -1,4 +1,4 @@
-# ETHGlobal Hackathon Guide
+# ETHGlobal Singapore
 
 ## Phala Hackathon Guide at ETHGlobal Singapore
 
@@ -60,7 +60,7 @@ To get started with Phala Network
 
 * **Take the RedPill and access top AI LLMs**: Get an API Key on [RedPill](https://red-pill.ai/ethglobal). This requires a code to get access. Reach out to the Phala Team to get access. In the meantime, use the free developer API key that is rate limited.
 * **Try a New Paradigm in Transacting Onchain**: Build on the [viem Agent Contract Template](https://github.com/Phala-Network/ai-agent-contract-viem) where you can derive an account within a TEE and utilize the account to transact on any EVM chain.
-* **Choose from a** [**List of Agent Contract Templates**](../../ai-agent-contract/getting-started/ai-agent-contract-templates.md) or build a custom Agent Contract that connect to any API or uses an SDK of your choosing!
+* **Choose from a** [**List of Agent Contract Templates**](../../ai-agent-contract-legacy/getting-started/ai-agent-contract-templates.md) or build a custom Agent Contract that connect to any API or uses an SDK of your choosing!
 * **Explore Documentation**: Familiarize yourself with our [Developer Documentation](https://docs.phala.network/).
 * **Join the Community**: Connect with other developers on our [Discord Server](https://discord.gg/phala-network).
 

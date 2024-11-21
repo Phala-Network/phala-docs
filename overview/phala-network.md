@@ -8,7 +8,7 @@ Confidential AI Inference stands as a cornerstone for safeguarding sensitive dat
 2. **Connect to the internet of multi-agents**: Make your agents accessible by other cross-platform AI Agents deployed on Autonolas, FLock.io, Morpheus, Polywrap, etc.
 3. **Launch and get incentivized**: Own your agents and build a profitable tokenomic through our default tokenomic model or customize your own.
 
-To learn more about launching agents with tokenomics: [agent-wars-introduction.md](../agent-wars/agent-wars-introduction.md "mention")
+To learn more about launching agents with tokenomics: [agent-wars-introduction.md](../agent-wars-legacy/agent-wars-introduction.md "mention")
 
 ## **What Sets Phala Apart:**
 
@@ -29,7 +29,7 @@ To learn more about launching agents with tokenomics: [agent-wars-introduction.m
 Phala provides a comprehensive suite of tools and infrastructure to make zero-trust computing **easy to access**, **build**, and **verify**:
 
 * **Easy Access to Computers**: Phala’s **marketplace** provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100 (TEE)**, offering secure and verifiable computation at scale.
-* **Easy to Build**: [Dstack](../dstack-a-flashbots-x-project/overview.md) is the TEE SDK developed by Phala and Flashbots jointly
+* **Easy to Build**: [Dstack](../dstack/overview.md) is the TEE SDK developed by Phala and Flashbots jointly
   * **Docker / VM migration into TEE**, allowing developers to move existing workloads into a zero-trust environment.
   * **Serverless edge functions**: Leverage pre-built templates to create **serverless, privacy-preserving functions** that run in secure TEEs.
 * **Easy to Prove**: Phala offers **on-chain attestation** for auditable logs of off-chain computations, ensuring integrity and transparency. Developers can prove the correctness of their computations in a verifiable, decentralized way.

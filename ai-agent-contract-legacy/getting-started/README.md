@@ -1,5 +1,11 @@
 # 👩‍💻 Getting Started
 
+{% hint style="danger" %}
+WARNING: AI Agent Contract Docs are now legacy documentation that will not be maintained moving forward. We recommend using [Dstack](broken-reference) instead to build on Phala Network.
+{% endhint %}
+
+
+
 <figure><img src="../../.gitbook/assets/AI-Agent-Contract.png" alt=""><figcaption></figcaption></figure>
 
 ## AI Agent Contract Overview
