@@ -21,7 +21,7 @@ layout:
 
 ***
 
-Phala Network make trustless available and affordable for all developers.
+Phala Network makes trustless computing accessible and affordable for all developers.
 
 Phala Network is a next-generation **cloud platform** that provides a **low-cost, user-friendly trustless environment**, making zero-trust computing accessible to a broad range of developers. By leveraging a **hybrid infrastructure** including Trusted Execution Environments (TEEs), blockchain, Multi-Party Computation (MPC), and Zero-Knowledge Proof (ZKP), Phala delivers flexible, open-source, and affordable **verification** solutions for any developer, in any type of program.
 
