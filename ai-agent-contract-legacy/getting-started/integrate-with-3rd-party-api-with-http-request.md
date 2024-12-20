@@ -313,7 +313,7 @@ If we don't see a `finish_reason: "stop"` within our five iterations, we'll retu
 
 ## Update GET() and POST()
 
-Now we need to call our `agent(openai, userInput)` in our `GET` and `POST` calls that will pass in a users prompt that can be accessed in the `chatQuery` property. The code change is minimial and our functions look like the following.
+Now we need to call our `agent(openai, userInput)` in our `GET` and `POST` calls that will pass in a users prompt that can be accessed in the `chatQuery` property. The code change is minimal and our functions look like the following.
 
 ```typescript
 async function GET(req: Request): Promise<Response> {
