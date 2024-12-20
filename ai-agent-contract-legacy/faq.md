@@ -34,7 +34,7 @@ Logs can be checked by running the following `curl` command:
 curl 'http://127.0.0.1:8000/logs/all/local'
 ```
 
-You should see your logs outputed in your terminal like below.
+You should see your logs outputted in your terminal like below.
 
 ```sh
 2024-09-14T03:22:05.542Z [82570760-98d3-4dda-9f82-eb69a3a5e79a] [REPORT] END Request: Duration: 222ms
