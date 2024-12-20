@@ -51,7 +51,7 @@ When an agent is created, the first key will be minted to the agent creator. Onc
 {% hint style="info" %}
 The bonding curve is defined based on PHA token. The table above shows the corresponding USD value assuming PHA is at $0.15.
 
-The smart contract supports buying and selling in ETH or other token. When using tokens other than PHA, it automatically uses Uniswap v3 on Base to swap against PHA. For example, when buying keys with ETH, the smart contract will receive ETH from the user, and instantly swap to the corresponding PHA based on the bonding curve.
+The smart contract supports buying and selling in ETH or another token. When using tokens other than PHA, it automatically uses Uniswap v3 on Base to swap against PHA. For example, when buying keys with ETH, the smart contract will receive ETH from the user, and instantly swap to the corresponding PHA based on the bonding curve.
 
 Swapping is based on Uniswap. So the process may subject to additional trading fee, price fluctuation, and potential MEV risk.
 {% endhint %}
