@@ -2,7 +2,7 @@
 
 ## Prerequisites <a href="#prerequisites" id="prerequisites"></a>
 
-Before you go further, please ensure that your have correct setup your hardware, BIOS and operating system according to the previous section.
+Before you go further, please ensure that you have correctly setup your hardware, BIOS and operating system according to the previous section.
 
 ## Download the Khala Scripts <a href="#download-the-phala-scripts" id="download-the-phala-scripts"></a>
 
