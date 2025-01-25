@@ -8,7 +8,7 @@ To set up a Gatekeeper, you should follow the steps below:
 2. Prepare a server with proper Intel SGX support
 3. Deploy a worker stack: full node, pherry, and pRuntime
 4. Make a council proposal to add the worker to the Gatekeeper list
-5. Finally, you Gatkeeper should be up and running. As the opereator, you should keep monitoring.
+5. Finally, your Gatkeeper should be up and running. As the operator, you should keep monitoring.
 
 ## Prepare the Gatekeeper operator account <a href="#prepare-the-gatekeeper-operator-account" id="prepare-the-gatekeeper-operator-account"></a>
 
@@ -16,7 +16,7 @@ To operate a Gatekeeper, an account with some PHA balance is required. The Gatek
 
 You may already have an account. Or you can create the account on Polkadot.js Extension, or some other wallets. In either way, you will need to keep the mnemonic (sometimes called SURI), or the raw private key, because it will be used in the next step.
 
-It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transacion fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoritically each Gatekeeper has an even chance to pay for the transaction fee.
+It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transaction fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoretically each Gatekeeper has an even chance to pay for the transaction fee.
 
 ## Server requirements <a href="#server-requirements" id="server-requirements"></a>
 
@@ -28,7 +28,7 @@ It’s suggested to have at least 10 PHA in the account. The Gatekeepers may con
     A bandwidth of 50 Mbps or faster is recommended. Otherwise the initial block download will take a very long time. A public IP address is recommended because otherwise you may got too few peer connections, causing the full node got stuck for some period. A stable network is always required. Once Gatekeeper online detection is on, any detected offline event may cause significant slash. (So far it’s still under the development.)
 3.  Intel SGX compatible hardware with a confidence level >= 3
 
-    Gatekeeper runs its pRuntime inside the Secure Encalve (Intel SGX), which is the same requirement of mining on Khala Network. Please refer to the mining guide to learn more about Intel SGX compatability and the confidence score. Gatekeepers manage highly sensitive data. Therefore it requires the highest confidence level (1, 2, or 3).
+    Gatekeeper runs its pRuntime inside the Secure Encalve (Intel SGX), which is the same requirement of mining on Khala Network. Please refer to the mining guide to learn more about Intel SGX compatibility and the confidence score. Gatekeepers manage highly sensitive data. Therefore it requires the highest confidence level (1, 2, or 3).
 
     Although SGX is a feature in CPU, some configuration in BIOS is still needed. Please refer to the mining guide to tune the BIOS when necessary.
 4.  Linux OS
@@ -40,7 +40,7 @@ It’s suggested to have at least 10 PHA in the account. The Gatekeepers may con
 
 ## **SGX virtualization (vSGX)**
 
-vSGX is supported. VMWare and KVM based vSGX are being tested successfully. However, the more instances to virtualize, the less EPC size each VM can get. Smaller EPC can cause a decrease of the performance. Please use with caution.
+vSGX is supported. VMWare and KVM based vSGX are being tested successfully. However, the more instances to virtualize, the less EPC size each VM can get. Smaller EPC can cause a decrease in the performance. Please use it with caution.
 
 ## Deploy the full stack <a href="#deploy-the-full-stack" id="deploy-the-full-stack"></a>
 
