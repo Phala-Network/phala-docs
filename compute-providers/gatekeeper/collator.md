@@ -37,7 +37,7 @@ Call `collatorSelection.setInvulnerables(list)`, where `list` is the full list o
 
 ## Apply for a public collator <a href="#apply-for-a-public-collator" id="apply-for-a-public-collator"></a>
 
-To become a public collator, you will need to put a fixed amount of the deposit. The deposit can be found at `collatorSelection.candidacyBond()`. Up to a certain number of the public collators are allowed (the genesis collators are not included). The number can be found at `collatorSelection.desiredCandidates()`, and the current candidates can be found at `collatorSelection.candidates()`. As of writing, the bond is 1000 PHA, and the desired candidate number is 12.
+To become a public collator, you will need to put in a fixed amount of the deposit. The deposit can be found at `collatorSelection.candidacyBond()`. Up to a certain number of the public collators are allowed (the genesis collators are not included). The number can be found at `collatorSelection.desiredCandidates()`, and the current candidates can be found at `collatorSelection.candidates()`. As of writing, the bond is 1000 PHA, and the desired candidate number is 12.
 
 After the collator account and the node is setup correctly, submit a proposal by calling `collatorSelection.registerAsCandidate()` from the account. Once it’s submitted, you will need to wait for two sessions to become a collator.
 
