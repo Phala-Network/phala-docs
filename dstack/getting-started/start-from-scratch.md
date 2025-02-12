@@ -39,6 +39,11 @@ First lets make 1 small change to the `Dockerfile` and add the line to line 66 i
 ENV DSTACK_SIMULATOR_ENDPOINT="http://host.docker.internal:8090"
 ```
 
+On Linux:
+```docker
+ENV DSTACK_SIMULATOR_ENDPOINT="http://172.17.0.1:8090"
+```
+
 Next, lets create the API calls for both of the functions.
 
 ### Create API Calls
