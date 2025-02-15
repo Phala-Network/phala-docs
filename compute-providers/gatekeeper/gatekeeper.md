@@ -16,7 +16,7 @@ To operate a Gatekeeper, an account with some PHA balance is required. The Gatek
 
 You may already have an account. Or you can create the account on Polkadot.js Extension, or some other wallets. In either way, you will need to keep the mnemonic (sometimes called SURI), or the raw private key, because it will be used in the next step.
 
-It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transacion fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoritically each Gatekeeper has an even chance to pay for the transaction fee.
+It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transaction fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoritically each Gatekeeper has an even chance to pay for the transaction fee.
 
 ## Server requirements <a href="#server-requirements" id="server-requirements"></a>
 
@@ -100,7 +100,7 @@ docker run -dti --rm \
     phalanetwork/phala-pherry
 ```
 
-The command starts pherry, linked with `khala-node` and `phala-pruntime` containers. It reads the blokchain from `khala-node:9944` and sync the data to `phala-pruntime:8000`. If you run the full node remotely, just change the host name `khala-node` to the node rpc endpoint. The mnenomic is specified by the environment variable.
+The command starts pherry, linked with `khala-node` and `phala-pruntime` containers. It reads the blockchain from `khala-node:9944` and sync the data to `phala-pruntime:8000`. If you run the full node remotely, just change the host name `khala-node` to the node rpc endpoint. The mnenomic is specified by the environment variable.
 
 pherry usually takes 1-2 days to sync the blockchain history. However, since pRuntime doesn’t persist the state, if it exits, you will need to sync from scratch in the next time.
 
