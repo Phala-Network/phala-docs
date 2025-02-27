@@ -110,7 +110,7 @@ sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.20_amd64.deb
 
 ***
 
-> _**Note**: At the time of writing this, e_verything below except the **Demand L1** tokenomic is up and running
+> _**Note**: At the time of writing this, &#x65;_&#x76;erything below except the **Demand L1** tokenomic is up and running
 
 1. **Supply**: The contributors (miners in the past) receive reward by keeping serving the network. It follows a model similar to other PoS like Filecoin, which allows the system to punish the bad behavior. The liveness of the worker is checked by on-chain random heartbeat.
 2. **Demand L1**: The developer can stake to get a percentage of the ownership of the compute resource. Once they stake, they can request to "hire" the workers they prefer to form a **cluster**, and get the worker assigned automatically by the system. This part is described in the tokenomic paper, but not fully implemented yet.

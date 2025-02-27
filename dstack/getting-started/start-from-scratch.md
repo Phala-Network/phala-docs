@@ -80,7 +80,7 @@ export default async function derivekey(req, res) {
     const client = new TappdClient(endpoint)
     const randomNumString = Math.random().toString();
     // Call the deriveKey function and pass in the root of trust to derive a key
-    const randomDeriveKey = await client.deriveKey('/', randomNumString);
+    const randomDeriveKey = await client.deriveKey(randomNumString, randomNumString);
     // Hash the derivedKey uint8Array value
     const keccakPrivateKey = keccak256(randomDeriveKey.asUint8Array());
     // Get the private key account from the derived key hash
@@ -137,7 +137,7 @@ docker run --rm -p 3000:3000 my-nextjs-app:latest
 
 Now we can go to `http://localhost:3000` and see our deployed application.
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Call the APIs
 
@@ -148,9 +148,9 @@ We can test to see if our functions work by calling the API calls with
 
 We should see the results similar to the following screenshots.
 
-<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption><p>/api/derivekey</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption><p>/api/derivekey</p></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/image (3).png" alt=""><figcaption><p>/api/tdxquote</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption><p>/api/tdxquote</p></figcaption></figure>
 {% endtab %}
 
 {% tab title="backend" %}
@@ -288,7 +288,7 @@ async def root():
 @app.get("/derivekey")
 async def derivekey():
     client = AsyncTappdClient()
-    deriveKey = await client.derive_key('/', 'test')
+    deriveKey = await client.derive_key('test', 'test')
     assert isinstance(deriveKey, DeriveKeyResponse)
     asBytes = deriveKey.toBytes()
     assert isinstance(asBytes, bytes)

@@ -32,8 +32,10 @@
 
 * [Overview](dstack/overview.md)
 * [Getting Started](dstack/getting-started/README.md)
+  * [Quick Start](dstack/getting-started/quick-start.md)
   * [Start From Scratch](dstack/getting-started/start-from-scratch.md)
   * [Build From Template](dstack/getting-started/build-from-template.md)
+* [TEE Cloud CLI](dstack/tee-cloud-cli.md)
 * [Design Documents](dstack/design-documents/README.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Protocol](dstack/design-documents/key-management-protocol.md)

@@ -110,8 +110,6 @@ We can test to see if our functions work by calling the API calls with
 We should see the results similar to the following screenshots.
 
 <figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.26.png" alt=""><figcaption><p>/derivekey</p></figcaption></figure>
-
-<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.41.png" alt=""><figcaption><p>/tdxquote</p></figcaption></figure>
 {% endtab %}
 {% endtabs %}
 
