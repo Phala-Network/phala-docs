@@ -9,7 +9,7 @@ Check out the an TEE Docker SDK we deployed called the [TEE Docker SDK Cheat She
 
 
 
-For a detailed guide on getting started, check out the [Start From Scratch](../../dstack/getting-started/start-from-scratch.md) or [Build From Template](../../dstack/getting-started/build-from-template.md) guides.
+For a detailed guide on getting started, check out the [Start From Scratch](../../dstack/getting-started/phala-cloud-guide/start-from-scratch.md) or [Build From Template](../../dstack/getting-started/phala-cloud-guide/build-from-template.md) guides.
 {% endhint %}
 
 

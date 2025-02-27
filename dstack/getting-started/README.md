@@ -4,6 +4,10 @@ icon: robot-astromech
 
 # Getting Started
 
+{% hint style="warning" %}
+We are in progress of migrating docs for Phala Cloud Docs. In the meantime, checkout the full guide [here](https://phala-network.github.io/phala-cloud-community/docs/).
+{% endhint %}
+
 There are a couple ways to get started building with Dstack.&#x20;
 
 * Start from Scratch
@@ -19,6 +23,4 @@ Before diving into the these steps, lets take a look at the requirements needed 
     * [TypeScript/JavaScript](https://github.com/Leechael/tappd-simulator/blob/main/sdk/js/src/index.ts)
     * [Python](https://github.com/Leechael/tappd-simulator/blob/main/sdk/python/src/dstack_sdk/client.py)
 * For deployment on Real TEE Server, must publish docker image with OS/arch `linux/amd64`. For local TEE simulator, you can build in **ANY** OS/arch since they won't be running on real TEE hardware.
-
-<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td>Start From Scratch</td><td></td><td></td><td><a href="start-from-scratch.md">start-from-scratch.md</a></td></tr><tr><td>Build From Template</td><td></td><td></td><td><a href="build-from-template.md">build-from-template.md</a></td></tr></tbody></table>
 
