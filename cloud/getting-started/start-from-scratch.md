@@ -1,9 +1,5 @@
 # Start From Scratch
 
-{% hint style="warning" %}
-We are in progress of migrating docs for Phala Cloud Docs. In the meantime, checkout the full guide [here](https://phala-network.github.io/phala-cloud-community/docs/).
-{% endhint %}
-
 This tutorial will step you through setting up a project from scratch with Dstack SDK. The following have a couple ways to get started with
 
 * Create a next.js application written in JavaScript

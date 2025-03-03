@@ -1,9 +1,5 @@
 # Build From Template
 
-{% hint style="warning" %}
-We are in progress of migrating docs for Phala Cloud Docs. In the meantime, checkout the full guide [here](https://phala-network.github.io/phala-cloud-community/docs/).
-{% endhint %}
-
 There are a couple templates that we offer to allow you to get started without any heavy lifting. The steps to get started are simple and easy to test in a few minutes.
 
 {% hint style="info" %}
