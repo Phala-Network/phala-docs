@@ -30,4 +30,4 @@ Phala Cloud is a TEE (Trusted Execution Environment) cloud platform that offers 
 
 ## Get Started with Phala Cloud
 
-Check out the [Getting Started Guide](../../cloud/get-started.md) to learn how to deploy your first application on Phala Cloud.
+Check out the [Getting Started Guide](../../cloud/getting-started/getting-started.md) to learn how to deploy your first application on Phala Cloud.

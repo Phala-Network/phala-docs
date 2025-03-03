@@ -31,7 +31,7 @@ Phala Network is a next-generation **cloud platform** that provides a **low-cost
 
 ## Getting Started on Phala Cloud
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="2601">☁️</span> Phala Cloud Docs</td><td><a href=".gitbook/assets/Screenshot 2025-02-27 at 13.02.47.png">Screenshot 2025-02-27 at 13.02.47.png</a></td><td><a href="cloud/get-started.md">get-started.md</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1fad6">🫖</span> Quick Start w/ TEE Cloud CLI</td><td><a href=".gitbook/assets/Screenshot 2025-02-27 at 13.10.23.png">Screenshot 2025-02-27 at 13.10.23.png</a></td><td><a href="dstack/getting-started/quick-start.md">quick-start.md</a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="2601">☁️</span> Phala Cloud Docs</td><td><a href=".gitbook/assets/Screenshot 2025-02-27 at 13.02.47.png">Screenshot 2025-02-27 at 13.02.47.png</a></td><td><a href="cloud/getting-started/getting-started.md">get-started.md</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1fad6">🫖</span> Quick Start w/ TEE Cloud CLI</td><td><a href=".gitbook/assets/Screenshot 2025-02-27 at 13.10.23.png">Screenshot 2025-02-27 at 13.10.23.png</a></td><td><a href="cloud/getting-started/start-from-cloud-cli.md">quick-start.md</a></td></tr></tbody></table>
 
 
 

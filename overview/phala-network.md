@@ -28,7 +28,7 @@ To learn more about launching agents with tokenomics: [agent-wars-introduction.m
 
 Phala provides a comprehensive suite of tools and infrastructure to make zero-trust computing **easy to access**, **build**, and **verify**:
 
-* **Easy Access to Computers**: [Phala Cloud](../cloud/get-started.md) provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100/H200 (TEE)**, offering secure and verifiable computation at scale. Phala Cloud supports deployment of any Docker application into TEE environments, making it easy to migrate existing workloads to confidential computing.
+* **Easy Access to Computers**: [Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100/H200 (TEE)**, offering secure and verifiable computation at scale. Phala Cloud supports deployment of any Docker application into TEE environments, making it easy to migrate existing workloads to confidential computing.
 * **Easy to Build**: [Dstack](../dstack/overview.md) is the TEE SDK developed by Phala and Flashbots jointly
   * **Docker / VM migration into TEE**, allowing developers to move existing workloads into a zero-trust environment.
   * **Serverless edge functions**: Leverage pre-built templates to create **serverless, privacy-preserving functions** that run in secure TEEs.
