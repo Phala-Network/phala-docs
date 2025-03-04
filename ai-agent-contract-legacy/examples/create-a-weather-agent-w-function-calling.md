@@ -98,7 +98,7 @@ export default async function main(request: string) {
 
 For the `getLocation()` function, we will need to call an API to get the location based on [https://ipapi.co/](https://ipapi.co/). Traditionally, devs will not have access to the internet, but with Phala's AI Agent Contracts, devs now can make async HTTP calls to bring more data for fine tuning their agents.&#x20;
 
-The implementation is simple and we will add this following code.
+The implementation is simple and we will add the following code.
 
 ```typescript
 async function getLocation() {
@@ -311,7 +311,7 @@ If we don't see a `finish_reason: "stop"` within our five iterations, we'll retu
 
 ## Update GET() and POST()
 
-Now we need to call our `agent(openai, userInput)` in our `GET` and `POST` calls that will pass in a users prompt that can be accessed in the `chatQuery` property. The code change is minimial and our functions look like the following.
+Now we need to call our `agent(openai, userInput)` in our `GET` and `POST` calls that will pass in a user's prompt that can be accessed in the `chatQuery` property. The code change is minimial and our functions look like the following.
 
 ```typescript
 async function GET(req: Request): Promise<Response> {

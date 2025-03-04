@@ -46,14 +46,14 @@ The price of an agent key follows a formula defined in the smart contract. The k
 | 500        | 2974         | 446.10                    |
 | 1000       | 4009         | 601.35                    |
 
-When an agent is created, the first key will be minted to the agent creator. Once created, anyone can buy and sell keys at any time, following the bonding curve. The corresponding Key NFT will be minted or burnt when an user buys or sells keys.
+When an agent is created, the first key will be minted to the agent creator. Once created, anyone can buy and sell keys at any time, following the bonding curve. The corresponding Key NFT will be minted or burnt when a user buys or sells keys.
 
 {% hint style="info" %}
 The bonding curve is defined based on PHA token. The table above shows the corresponding USD value assuming PHA is at $0.15.
 
 The smart contract supports buying and selling in ETH or other token. When using tokens other than PHA, it automatically uses Uniswap v3 on Base to swap against PHA. For example, when buying keys with ETH, the smart contract will receive ETH from the user, and instantly swap to the corresponding PHA based on the bonding curve.
 
-Swapping is based on Uniswap. So the process may subject to additional trading fee, price fluctuation, and potential MEV risk.
+Swapping is based on Uniswap. So the process may be subject to additional trading fee, price fluctuation, and potential MEV risk.
 {% endhint %}
 
 To learn the details of the formula, please refer to [#agent-keys](../agent-war-tokenomics.md#agent-keys "mention").

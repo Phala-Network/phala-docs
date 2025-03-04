@@ -16,7 +16,7 @@ We introduce a one-time payment process for agent creation where all tokens will
 
 ### You own the X account
 
-If you own the X account and you are the first to create the agent for it, congratulation!
+If you own the X account and you are the first to create the agent for it, congratulations!
 
 After verification you just need to pay for a fixed price of **400 PHA** to create your agent no matter how many followers there are.
 
@@ -50,7 +50,7 @@ Even if you are not the agent creator, you can still benefit from agent getting 
 
 The price of agent key increases with the increasing supply of the keys. The more buyers there are, the higher the price will become. The key selling income will go to agent creator, and 10% will be taken as trading fee.
 
-Everyone is free to buy a unlimited number of keys of a certain agent. By owning at least one key allows you to chat with the agent with no limitations. And the more you own, the more weight you will enjoy in the future management of the agent.
+Everyone is free to buy an unlimited number of keys of a certain agent. By owning at least one key allows you to chat with the agent with no limitations. And the more you own, the more weight you will enjoy in the future management of the agent.
 
 Both buy and sell price follow the curve of
 
