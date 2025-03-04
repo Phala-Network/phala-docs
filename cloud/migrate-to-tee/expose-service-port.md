@@ -27,4 +27,4 @@ After deployment, you will see two public endpoints on the dashboard, one for ht
 
 <figure><img src="../../.gitbook/assets/cloud-network-page.png" alt="network-page"><figcaption></figcaption></figure>
 
-**🎉 Congratulations! You've successfully deployed your application into a TEE. If you're interested in learning more, such as how to prove your application's integrity to others or manage application logs, keep reading.**
+If you can access the service, it means you've successfully migrated your application into a TEE. Next step is to [**generate a RA report**](./generate-ra-report.md) to prove the integrity of your application.

@@ -8,7 +8,7 @@ Phala Cloud offers multiple ways to create and deploy your Confidential Virtual 
 
 If you prefer a visual interface with guided steps, the Cloud UI provides an intuitive experience for creating your CVM:
 
-[**Create with Docker Compose →**](./create-with-docker-compose)
+[**Create with Docker Compose →**](./create-with-docker-compose.md)
 
 The Cloud UI is ideal for:
 - First-time users of Phala Cloud

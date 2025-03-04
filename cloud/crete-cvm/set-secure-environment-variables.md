@@ -26,3 +26,5 @@ When your application requires environment variables, **never set them directly 
    Configure the actual values in the **Encrypted Secrets** section of the Cloud UI.
 
 <figure><img src="../../.gitbook/assets/cloud-set-env.png" alt="Setting environment variables in Encrypted Secrets"><figcaption>Encrypted Secrets configuration interface</figcaption></figure>
+
+We recommend using **Text** type for environment variables if you have many variables to set.

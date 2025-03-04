@@ -1,4 +1,4 @@
-# Deploying Applications with Docker Compose
+# Create CVM with Docker Compose
 
 ## Advanced Deployment Options
 

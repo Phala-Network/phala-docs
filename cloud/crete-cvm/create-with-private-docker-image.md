@@ -1,4 +1,4 @@
-# Deploying with Private Docker Images
+# Create CVM with Private Docker Images
 
 > **Note:** This feature requires DStack version 0.3.5 or later
 
