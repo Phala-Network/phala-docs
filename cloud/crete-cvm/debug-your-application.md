@@ -3,7 +3,7 @@
 
 When deploying your application on the Cloud UI, you can choose between two types of CVM base images: `dstack-<version>` and `dstack-dev-<version>`. The dev image allows you to log in to the CVM in the future for debugging purposes. If you opt for a non-dev image, rest assured that no one will have the ability to access your CVM, either physically or remotely.
 
-<figure><img src="../../.gitbook/assets/cloud-debug-cvm.png" alt="debug-cvm"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/cloud-config-compute-resource.png" alt="debug-cvm"><figcaption></figcaption></figure>
 
 For example, to enable the use of tool **ttypd** for logging into your CVM from a web browser, you need to add a ttypd service to your Docker Compose file as shown below:
 

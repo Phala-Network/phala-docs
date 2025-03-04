@@ -1,5 +1,7 @@
 # Phala Cloud
 
+<figure><img src="../../.gitbook/assets/cloud-banner.png" alt="cloud-banner"><figcaption></figcaption></figure>
+
 ## What is Phala Cloud?
 
 Phala Cloud is a TEE (Trusted Execution Environment) cloud platform that offers secure, confidential computing solutions for various workloads.

@@ -1,7 +1,7 @@
 
 # Deploy CVM with Template
 
-### Step1- Deploy a CVM with Template
+## Step1- Deploy a CVM with Template
 
 Click the **Deploy** -> **From Docker Compose** in the top-right corner of the cloud [homepage](https://cloud.phala.network/register?invite=PHALAWIKI) to access the deployment dashboard. Once there, you need to:
 
@@ -70,7 +70,7 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
     2025-03-04T03:18:07.517241317Z [I 2025-03-04 03:18:07.517 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
     ```
 
-### Step2 - Verify TEE Proof
+## Step2 - Verify TEE Proof
 
 1. Check the default RA Report
     
@@ -80,8 +80,12 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
     
 2. By clicking the **Check Attestation** button in the certificate chain section, you will be redirected to the [quote explorer](https://proof.t16z.com/), where you can verify the quote. You can share this quote with anyone, as it serves as proof that your program is running inside a genuine TEE.
 
-### Next Steps
+## Next Steps
 
-1. Deploy your existing application to TEE by checking out the [Migration Guide](../migration-to-tee/migration.md).
+Now that you've deployed your first confidential application, you can:
 
-2. Deploy an Eliza AI Agent in Minutes with the no-code [Eliza Agent Builder](https://cloud.phala.network/eliza). Check the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started.
+1. **Migrate your existing applications** to TEE by following our [Migration Guide](../migration-to-tee/migration.md)
+
+2. **Build an AI agent** in minutes with the no-code [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
+
+3. **Explore advanced features** like debugging, log management, and scaling your applications
