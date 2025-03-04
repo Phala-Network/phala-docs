@@ -1,7 +1,7 @@
 
-# Deploy CVM with Template
+# Create CVM with Template
 
-## Step1- Deploy a CVM with Template
+## Step1- Create a CVM with Template
 
 Click the **Deploy** -> **From Docker Compose** in the top-right corner of the cloud [homepage](https://cloud.phala.network/register?invite=PHALAWIKI) to access the deployment dashboard. Once there, you need to:
 
