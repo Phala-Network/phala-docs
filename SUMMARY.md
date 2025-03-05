@@ -36,7 +36,7 @@
   * [Start from Cloud CLI](cloud/getting-started/start-from-cloud-cli.md)
   * [Start from Template](cloud/getting-started/start-from-template.md)
   * [Start from Scratch](cloud/getting-started/start-from-scratch.md)
-* [📦 Creat CVM](cloud/crete-cvm/create-cvm.md)
+* [📦 Create CVM](cloud/crete-cvm/create-cvm.md)
   * [Create CVM with Docker Compose](cloud/crete-cvm/create-with-docker-compose.md)
   * [Create CVM with Private Docker Image](cloud/crete-cvm/create-with-private-docker-image.md)
   * [Set Secure Environment Variables](cloud/crete-cvm/set-secure-environment-variables.md)
