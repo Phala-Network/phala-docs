@@ -1,4 +1,8 @@
-# Quick Start
+# Start from Cloud CLI
+
+{% hint style="warning" %}
+Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-cloud-account.md) section before continuing.
+{% endhint %}
 
 ## Prerequisites
 
@@ -78,4 +82,3 @@ For more information on the Timelock-NTS example, check out the information in t
 ## Conclusion
 
 Congratulations! You have deployed your first CVM into the Phala Cloud. Let's move to more meaningful examples.
-

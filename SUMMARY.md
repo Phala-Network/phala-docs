@@ -32,6 +32,7 @@
 ## Cloud
 
 * [🚀 Getting Started](cloud/getting-started/getting-started.md)
+  * [Sign-up for Cloud Account](cloud/getting-started/sign-up-for-cloud-account.md)
   * [Start from Cloud UI](cloud/getting-started/start-from-cloud-ui.md)
   * [Start from Cloud CLI](cloud/getting-started/start-from-cloud-cli.md)
   * [Start from Template](cloud/getting-started/start-from-template.md)

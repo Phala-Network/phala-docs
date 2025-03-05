@@ -1,16 +1,18 @@
-# Build From Template
+# Start from Template
 
 There are a couple templates that we offer to allow you to get started without any heavy lifting. The steps to get started are simple and easy to test in a few minutes.
 
-{% hint style="info" %}
-### Before You Start
+{% hint style="warning" %}
+#### Before You Start
 
-Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/) started before you begin.
+Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/) started before you begin. \
+\
+Also, make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-cloud-account.md) section before continuing.
 {% endhint %}
 
 {% tabs %}
 {% tab title="next.js Template" %}
-## Installation
+### Installation
 
 Clone the template repo.
 
@@ -18,7 +20,7 @@ Clone the template repo.
 git clone https://github.com/Phala-Network/nextjs-viem-tee-sim-template.git
 ```
 
-## Build and Deploy Locally
+### Build and Deploy Locally
 
 Build the docker image.
 
@@ -41,9 +43,9 @@ docker run --rm -p 3000:3000 my-dapp:latest
 
 Now we can go to `http://localhost:3000` and see our deployed application.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.15.11.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.15.11.png" alt=""><figcaption></figcaption></figure>
 
-### Call the APIs
+#### Call the APIs
 
 We can test to see if our functions work by calling the API calls with
 
@@ -55,19 +57,19 @@ We can test to see if our functions work by calling the API calls with
 
 We should see the results similar to the following screenshots.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.31.56.png" alt=""><figcaption><p>/api/tdxQuote</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.31.56.png" alt=""><figcaption><p>/api/tdxQuote</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.15.11 (1).png" alt=""><figcaption><p>/api/account/address</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.15.11 (1).png" alt=""><figcaption><p>/api/account/address</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.32.07.png" alt=""><figcaption><p>/api/signMessage</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.32.07.png" alt=""><figcaption><p>/api/signMessage</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.32.40.png" alt=""><figcaption><p>/api/signTypedData</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.32.40.png" alt=""><figcaption><p>/api/signTypedData</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 23.46.39.png" alt=""><figcaption><p>/api/sendTransaction</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 23.46.39.png" alt=""><figcaption><p>/api/sendTransaction</p></figcaption></figure>
 {% endtab %}
 
 {% tab title="Python Template" %}
-## Installation
+### Installation
 
 Clone the template repo.
 
@@ -75,7 +77,7 @@ Clone the template repo.
 git clone https://github.com/Phala-Network/python-tee-sim-template.git
 ```
 
-## Build and Deploy Locally
+### Build and Deploy Locally
 
 Build the docker image.
 
@@ -98,9 +100,9 @@ docker run --rm -p 3000:3000 my-dapp:latest
 
 Now we can go to `http://localhost:3000` and see our deployed application.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.10.png" alt=""><figcaption><p>/</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.10.png" alt=""><figcaption><p>/</p></figcaption></figure>
 
-### Call the APIs
+#### Call the APIs
 
 We can test to see if our functions work by calling the API calls with
 
@@ -109,11 +111,9 @@ We can test to see if our functions work by calling the API calls with
 
 We should see the results similar to the following screenshots.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.26.png" alt=""><figcaption><p>/derivekey</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.26.png" alt=""><figcaption><p>/derivekey</p></figcaption></figure>
 {% endtab %}
 {% endtabs %}
-
-
 
 ## Conclusion
 

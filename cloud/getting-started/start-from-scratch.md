@@ -1,19 +1,21 @@
-# Start From Scratch
+# Start from Scratch
 
 This tutorial will step you through setting up a project from scratch with Dstack SDK. The following have a couple ways to get started with
 
 * Create a next.js application written in JavaScript
 * Build a Python backend application
 
-{% hint style="info" %}
-### Before You Start
+{% hint style="warning" %}
+#### Before You Start
 
 Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/) started before you begin.
+
+Also, make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-cloud-account.md) section before continuing.
 {% endhint %}
 
 {% tabs %}
 {% tab title="next.js" %}
-## Installation
+### Installation
 
 For this example, we will be starting from scratch and will need to generate a new project. For simplicity, I will use a template for a next.js docker app.
 
@@ -27,11 +29,11 @@ This should create a new project called `nextjs-docker` in the current working d
 npm install @phala/dstack-sdk viem dotenv
 ```
 
-## Make Calls to Dstack SDK Functions
+### Make Calls to Dstack SDK Functions
 
 Now that we have the packages installed, we can begin to configure our existing project to make calls to the `deriveKey(path, data)` and `tdxQuote(data)`functions in the Dstack SDK.
 
-### Edit Dockerfile
+#### Edit Dockerfile
 
 First lets make 1 small change to the `Dockerfile` and add the line to line 66 in the file.
 
@@ -41,7 +43,7 @@ ENV DSTACK_SIMULATOR_ENDPOINT="http://host.docker.internal:8090"
 
 Next, lets create the API calls for both of the functions.
 
-### Create API Calls
+#### Create API Calls
 
 Create 2 new files called `derivekey.js` `tdxquote.js` in the `pages/api/` folder.
 
@@ -114,9 +116,9 @@ export default async function tdxquote(req, res) {
 
 Now that these API calls are done, we can start with the fun of testing this locally.
 
-## Testing Locally
+### Testing Locally
 
-With the basic implementation done, let's do a quick test to see if the code works by building the docker image and testing locally.&#x20;
+With the basic implementation done, let's do a quick test to see if the code works by building the docker image and testing locally.
 
 ```bash
 docker build -t my-nextjs-app:latest .
@@ -137,9 +139,9 @@ docker run --rm -p 3000:3000 my-nextjs-app:latest
 
 Now we can go to `http://localhost:3000` and see our deployed application.
 
-<figure><img src="../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
-### Call the APIs
+#### Call the APIs
 
 We can test to see if our functions work by calling the API calls with
 
@@ -148,15 +150,15 @@ We can test to see if our functions work by calling the API calls with
 
 We should see the results similar to the following screenshots.
 
-<figure><img src="../../../.gitbook/assets/image (2) (1).png" alt=""><figcaption><p>/api/derivekey</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption><p>/api/derivekey</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (3) (1).png" alt=""><figcaption><p>/api/tdxquote</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption><p>/api/tdxquote</p></figcaption></figure>
 {% endtab %}
 
 {% tab title="backend" %}
 For the python example, we will take an existing tutorial from Docker docs [https://docs.docker.com/guides/python/containerize/](https://docs.docker.com/guides/python/containerize/) and add Dstack SDK to the project to make calls to the TEE SDK functions.
 
-## Installation
+### Installation
 
 First step is to clone the python application repo.
 
@@ -270,7 +272,7 @@ asyncio>=3.4.3
 fastapi==0.111.0
 ```
 
-## Make Calls to Dstack SDK Functions&#x20;
+### Make Calls to Dstack SDK Functions
 
 Let's make 2 new API call within the `app.py` file for `derivekey` and `tdxquote`.
 
@@ -305,9 +307,9 @@ async def tdxquote():
 
 Now that these API calls are done, we can start with the fun of testing this locally.
 
-## Testing Locally
+### Testing Locally
 
-With the basic implementation done, let's do a quick test to see if the code works by building the docker image and testing locally.&#x20;
+With the basic implementation done, let's do a quick test to see if the code works by building the docker image and testing locally.
 
 ```bash
 docker build -t my-python-app:latest .
@@ -328,9 +330,9 @@ docker run --rm -p 3000:3000 my-nextjs-app:latest
 
 Now we can go to `http://localhost:3000` and see our deployed application.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.10.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.10.png" alt=""><figcaption></figcaption></figure>
 
-### Call the APIs
+#### Call the APIs
 
 We can test to see if our functions work by calling the API calls with
 
@@ -339,9 +341,9 @@ We can test to see if our functions work by calling the API calls with
 
 We should see the results similar to the following screenshots.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.26.png" alt=""><figcaption><p>/derivekey</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.26.png" alt=""><figcaption><p>/derivekey</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.41.png" alt=""><figcaption><p>/tdxquote</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Screenshot 2024-11-07 at 19.44.41.png" alt=""><figcaption><p>/tdxquote</p></figcaption></figure>
 {% endtab %}
 {% endtabs %}
 

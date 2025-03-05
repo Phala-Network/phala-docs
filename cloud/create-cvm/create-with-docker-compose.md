@@ -12,11 +12,11 @@ Phala TEE Cloud provides a familiar Docker Compose experience within a secure TE
 
 Deploying with Docker Compose on Phala TEE Cloud works just like on a standard server, with the added benefit of confidential computing. You can:
 
-- Specify Docker image names and versions
-- Configure port mappings to expose services
-- Define environment variables
-- Set up volume mounts for persistent storage
-- Deploy multi-container applications within a single CVM
+* Specify Docker image names and versions
+* Configure port mappings to expose services
+* Define environment variables
+* Set up volume mounts for persistent storage
+* Deploy multi-container applications within a single CVM
 
 ## Multi-Service Deployments
 
@@ -26,7 +26,7 @@ One of the key advantages of using Docker Compose is the ability to orchestrate 
 
 For applications requiring additional security or proprietary code, Phala Cloud supports deployment from private Docker repositories.
 
-➡️ [Learn more about private Docker image deployment](./create-with-private-docker-image)
+➡️ [Learn more about private Docker image deployment](../crete-cvm/create-with-private-docker-image/)
 
 ## Example Configuration
 

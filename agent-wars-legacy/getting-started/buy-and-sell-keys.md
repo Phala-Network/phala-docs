@@ -10,10 +10,10 @@ You can easily buy keys on AgentWar Dapp
 
 1.  Click the Agent you want to buy on the Explore page
 
-    <figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+    <figure><img src="../../.gitbook/assets/image (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 2.  You can find the details of the key on the Agent page. Note that the free chats are limited without a key.
 
-    <figure><img src="../../.gitbook/assets/image (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+    <figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 3.  Click "Trade" button. In the popup, you can choose how many keys to buy. If you want to switch between ETH (default) and PHA payment, you can click "Switch to PHA" or "Switch to ETH" button.\
 
 

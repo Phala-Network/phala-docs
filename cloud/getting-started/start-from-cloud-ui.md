@@ -1,30 +1,28 @@
+# Start from Cloud UI
 
-# Create CVM with Template
+{% hint style="warning" %}
+Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-cloud-account.md) section before continuing.
+{% endhint %}
 
-## Step1- Create a CVM with Template
+## Step 1- Create a CVM with Template
 
 Click the **Deploy** -> **From Docker Compose** in the top-right corner of the cloud [homepage](https://cloud.phala.network/register?invite=PHALAWIKI) to access the deployment dashboard. Once there, you need to:
 
 1. Set your application name
-2. Choose a template you want to get started or use your Docker compose file by navigate to **Advanced** tab. In this guide, we will use the template **`jupyter/base-notebook`** for example.
+2.  Choose a template you want to get started or use your Docker compose file by navigate to **Advanced** tab. In this guide, we will use the template **`jupyter/base-notebook`** for example.
 
     <figure><img src="../../.gitbook/assets/cloud-deploy-new-cvm.png" alt="Deploy New CVM"><figcaption></figcaption></figure>
-    
-3. Choose the compute resources. There are some preset plans available, or you can customize them for more flexibility.
-    In **Node & Image** section, we recommend choosing **dstack-dev-<version>** as guest image if you are deploying for testing. It will enable the debug feature that you can login to the virtual machine in the future.
-        
-    <figure><img src="../../.gitbook/assets/cloud-config-compute-resource.png" alt="config-compute-resource"><figcaption></figcaption></figure>
+3.  Choose the compute resources. There are some preset plans available, or you can customize them for more flexibility. In **Node & Image** section, we recommend choosing **dstack-dev-** as guest image if you are deploying for testing. It will enable the debug feature that you can login to the virtual machine in the future.
 
-4. Set the environment variables. In this guide, we will set the environment variable **`TOKEN`** to **`phala`** for testing. Later you will use this token to login to the notebook.
+    <figure><img src="../../.gitbook/assets/cloud-config-compute-resource.png" alt="config-compute-resource"><figcaption></figcaption></figure>
+4.  Set the environment variables. In this guide, we will set the environment variable **`TOKEN`** to **`phala`** for testing. Later you will use this token to login to the notebook.
 
     <figure><img src="../../.gitbook/assets/cloud-set-jupyter-token.png" alt="set-jupyter-token"><figcaption></figcaption></figure>
-
-5. Click the **Create** button to start the deployment process. You will need to wait for a while as the backend sets everything up. In the meantime, you can view the CVM bootstrap logs by clicking the top-right icon in CVM card, and choose **Serial Logs**. Note this is the logs of confidential virtual machine, not your application logs.
+5.  Click the **Create** button to start the deployment process. You will need to wait for a while as the backend sets everything up. In the meantime, you can view the CVM bootstrap logs by clicking the top-right icon in CVM card, and choose **Serial Logs**. Note this is the logs of confidential virtual machine, not your application logs.
 
     <figure><img src="../../.gitbook/assets/cloud-cvm-logs.png" alt="cvm-logs"><figcaption></figcaption></figure>
+6.  After the deployment is complete, navigate through **View Details → Network** to see the endpoint information. You can use these endpoints to access the application if you have service serve on. You will find the endpoint is composed of application id and port. In this example, which is https://7ea38363423bf111180406f5c37c40fa48482d40-**8080**.dstack-prod5.phala.network, the application id is **7ea38363423bf111180406f5c37c40fa48482d40** and the port is **8080**. The reason why we have a port number **8080** here is that the default port of jupyter notebook is 8888, but we configure the port mapping to 8080 in the docker compose file. You can check the docker compose file in **Compose File** tab and you will find **ports:\n - 8080:8888** in the Compose File content.
 
-6. After the deployment is complete, navigate through **View Details → Network** to see the endpoint information. You can use these endpoints to access the application if you have service serve on. You will find the endpoint is composed of application id and port. In this example, which is https://7ea38363423bf111180406f5c37c40fa48482d40-**8080**.dstack-prod5.phala.network, the application id is **7ea38363423bf111180406f5c37c40fa48482d40** and the port is **8080**. The reason why we have a port number **8080** here is that the default port of jupyter notebook is 8888, but we configure the port mapping to 8080 in the docker compose file. You can check the docker compose file in **Compose File** tab and you will find **ports:\n      - 8080:8888** in the Compose File content.
-    
     <figure><img src="../../.gitbook/assets/cloud-cvm-details.png" alt="cvm-details"><figcaption></figcaption></figure>
 
     If you access the endpoint, you will see the jupyter notebook interface. Type the token you set in the previous step and you will be able to access the jupyter notebook.
@@ -72,12 +70,11 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
 
 ## Step2 - Verify TEE Proof
 
-1. Check the default RA Report
-    
+1.  Check the default RA Report
+
     We provide a default [Remote Attestation Report](https://sgx101.gitbook.io/sgx101/sgx-bootstrap/attestation#remote-attestation-primitives) (also known as TEE proof), which is displayed in the Worker Dashboard. To view the entire report, click **View Details → Attestation**.
-    
+
     <figure><img src="../../.gitbook/assets/cloud-attestation-page.png" alt="attestation-page"><figcaption></figcaption></figure>
-    
 2. By clicking the **Check Attestation** button in the certificate chain section, you will be redirected to the [quote explorer](https://proof.t16z.com/), where you can verify the quote. You can share this quote with anyone, as it serves as proof that your program is running inside a genuine TEE.
 
 ## Next Steps
@@ -85,7 +82,5 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
 Now that you've deployed your first confidential application, you can:
 
 1. **Migrate your existing applications** to TEE by following our [Migration Guide](../migration-to-tee/migration.md)
-
 2. **Build an AI agent** in minutes with the no-code [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
-
 3. **Explore advanced features** like debugging, log management, and scaling your applications

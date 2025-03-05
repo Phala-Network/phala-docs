@@ -1,5 +1,4 @@
-
-# 💊 CVM Management
+# ⚙️ CVM Management
 
 Phala TEE Cloud provides a comprehensive management system for your CVMs, allowing you to monitor, upgrade, and resize your applications.
 
@@ -7,25 +6,25 @@ Phala TEE Cloud provides a comprehensive management system for your CVMs, allowi
 
 ### Monitoring
 
-- **CVM Status**: Track the health and status of your CVMs
-- **Resource Usage**: Monitor CPU, memory, and storage consumption
-- **Logs**: View application logs and system messages
+* **CVM Status**: Track the health and status of your CVMs
+* **Resource Usage**: Monitor CPU, memory, and storage consumption
+* **Logs**: View application logs and system messages
 
 ### Upgrades
 
-- **Environment Variables**: Update your application's environment variables
-- **Docker Images**: Upgrade your application's Docker image
-- **Resource Allocation**: Adjust your CVM's CPU, memory, and storage
+* **Environment Variables**: Update your application's environment variables
+* **Docker Images**: Upgrade your application's Docker image
+* **Resource Allocation**: Adjust your CVM's CPU, memory, and storage
 
 ### Resizing
 
-- **Resource Scaling**: Dynamically adjust your CVM's CPU, memory, and storage
-- **Cost Optimization**: Reduce your cloud spending by downsizing your CVM
+* **Resource Scaling**: Dynamically adjust your CVM's CPU, memory, and storage
+* **Cost Optimization**: Reduce your cloud spending by downsizing your CVM
 
 ### Security
 
-- **Data Protection**: E2E encrypt your sensitive data at rest
-- **Access Control**: Restrict access to your CVMs and logs
+* **Data Protection**: E2E encrypt your sensitive data at rest
+* **Access Control**: Restrict access to your CVMs and logs
 
 ## CVM Management API
 
