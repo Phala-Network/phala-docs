@@ -5,7 +5,7 @@ icon: ufo
 # Overview
 
 {% hint style="info" %}
-Dstack is a [Flashbots](https://www.flashbots.net/) X Project jointly produce by Phala Network and Flashbots.
+Dstack is a [Flashbots](https://www.flashbots.net/) X Project jointly produced by Phala Network and Flashbots.
 
 It was inspired by [Andrew's](https://github.com/amiller) (Flashbots team) design of [Dstack](https://collective.flashbots.net/t/dstack-speedrunning-a-p2p-confidential-vm).
 
