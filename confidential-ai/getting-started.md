@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This chapter provides detailed technical information on the Confidential AI Inference, designed to ensure confidentiality, integrity, and verifiability of AI inference tasks. We use the the TEE technologies provided by NVIDIA GPU TEE and Intel TDX to secure AI workloads, allowing developers to easily deploy their LLMs in a secure environment.
+This chapter provides detailed technical information on the Confidential AI Inference, designed to ensure confidentiality, integrity, and verifiability of AI inference tasks. We use the TEE technologies provided by NVIDIA GPU TEE and Intel TDX to secure AI workloads, allowing developers to easily deploy their LLMs in a secure environment.
 
 ## Overview
 
@@ -47,7 +47,7 @@ Check the [implementation.md](implementation.md "mention") for the technical det
 1. [HCC-Whitepaper](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/HCC-Whitepaper-v1.0.pdf)
 2. [Intel SGX DCAP Orientation](https://www.intel.com/content/dam/develop/public/us/en/documents/intel-sgx-dcap-ecdsa-orientation.pdf)
 3. [Phala's dcap-qvl](https://github.com/Phala-Network/dcap-qvl)
-4. [Automata’s Solidity Implementation](https://github.com/automata-network/automata-dcap-attestation)
+4. [Automata's Solidity Implementation](https://github.com/automata-network/automata-dcap-attestation)
 5. [Phala Nvidia H200 TEE Benchmark Paper](https://arxiv.org/pdf/2409.03992)
 6. [Phala DeRoT Post on FlashBots forum](https://collective.flashbots.net/t/early-thoughts-on-decentralized-root-of-trust/3868)
 7. [Phala Key Management Protocol Post on Flashbots forum](https://collective.flashbots.net/t/key-management-protocol-for-decentralized-root-of-trust/4004)

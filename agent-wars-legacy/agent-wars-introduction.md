@@ -16,6 +16,6 @@ The key price increases as more keys are sold, thereby raising the value of exis
 
 ## How Does it Work?
 
-Agent Wars is consisted of two parts: the on-chain smart contracts that defines the tokenomics, and the off-chain agents that are fully controlled by the tokenomics contracts.
+Agent Wars consists of two parts: the on-chain smart contracts that defines the tokenomics, and the off-chain agents that are fully controlled by the tokenomics contracts.
 
 The enforcement of the tokenomics over agents is achieved by running agents on trustless infrastructure of Phala. With its secure off-chain workers, we can ensure the privacy of the agent setup (which is the soul of the agent), and each agent is correctly token-gated given the key distribution.
