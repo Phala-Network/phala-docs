@@ -46,7 +46,7 @@ For example, to create an agent for X account with 1 million followers, the mini
 
 ## Agent Keys
 
-Even if you are not the agent creator, you can still benefit from agent getting popular by owning its keys. Agent key is standarad ERC-1155 token on Base chain, and it represents your shares of the agent.
+Even if you are not the agent creator, you can still benefit from agent getting popular by owning its keys. Agent key is standard ERC-1155 token on Base chain, and it represents your shares of the agent.
 
 The price of agent key increases with the increasing supply of the keys. The more buyers there are, the higher the price will become. The key selling income will go to agent creator, and 10% will be taken as trading fee.
 

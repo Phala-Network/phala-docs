@@ -16,7 +16,7 @@ To operate a Gatekeeper, an account with some PHA balance is required. The Gatek
 
 You may already have an account. Or you can create the account on Polkadot.js Extension, or some other wallets. In either way, you will need to keep the mnemonic (sometimes called SURI), or the raw private key, because it will be used in the next step.
 
-It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transacion fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoritically each Gatekeeper has an even chance to pay for the transaction fee.
+It’s suggested to have at least 10 PHA in the account. The Gatekeepers may consume the transaction fee in different speed. It can burn up to 5-10 PHA per day, but can also have nearly zero transaction per day. Gatekeepers generate messages constantly, but only the first one who submits the message will be charged (other transactions are just de-duped). So theoritically each Gatekeeper has an even chance to pay for the transaction fee.
 
 ## Server requirements <a href="#server-requirements" id="server-requirements"></a>
 
