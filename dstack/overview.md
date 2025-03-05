@@ -12,6 +12,8 @@ It was inspired by [Andrew's](https://github.com/amiller) (Flashbots team) desig
 Check our [Acknowledgement](acknowledgement.md) for all of the key contributors that built out the Dstack SDK.
 {% endhint %}
 
+> [Phala Cloud](overview/phala-network/phala-cloud.md) is built on top of Dstack that enables developers to deploy programs to CVM (Confidential VM), and to follow the security best practices by default.
+
 ## Overview
 
 The [Dstack SDK](https://github.com/dstack-TEE/dstack) is designed to simplify the steps for developers to deploy programs to CVM (Confidential VM), and to follow the security best practices by default. The main features include:

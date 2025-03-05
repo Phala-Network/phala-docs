@@ -5,7 +5,7 @@
 * Docker installed and running
 * [Bun](https://bun.sh) installed
 * Docker Hub account for publishing images
-* [Phala Cloud](https://cloud.phala.network/login) API key
+* [Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) API key
 
 ## Installation
 

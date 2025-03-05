@@ -12,7 +12,7 @@ To learn more about launching agents with tokenomics: [agent-wars-introduction.m
 
 ## **What Sets Phala Apart:**
 
-* **We Don’t Trust Any Provider**: Our **security model** goes beyond traditional cloud solutions (e.g., AWS, Azure, GCP). **Phala does not trust any cloud platform, hardware provider, or even its users,** ensuring true zero-trust.
+* **We Don't Trust Any Provider**: Our **security model** goes beyond traditional cloud solutions (e.g., AWS, Azure, GCP). **Phala does not trust any cloud platform, hardware provider, or even its users,** ensuring true zero-trust.
 * **User-Friendly & Affordable**: With **easy integration**, developers can migrate their **Web2 software** into a zero-trust environment. By using TEE as part of our hybrid infrastructure, developers can select the **level of proof** they need based on their use case, making the system both flexible and affordable.
 * **Web3 Standard Compatibility**: Phala is fully **decentralized, privacy-focused**, and auditable. Our SDK enables your programs to **easily integrate with blockchains**, providing seamless co-processing and interaction with Web3 systems.
 
@@ -28,7 +28,7 @@ To learn more about launching agents with tokenomics: [agent-wars-introduction.m
 
 Phala provides a comprehensive suite of tools and infrastructure to make zero-trust computing **easy to access**, **build**, and **verify**:
 
-* **Easy Access to Computers**: Phala’s **marketplace** provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100 (TEE)**, offering secure and verifiable computation at scale.
+* **Easy Access to Computers**: [Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) provides access to TEE hardware, including **Intel TDX**, **Intel SGX**, **AMD SEV**, and **NVIDIA H100/H200 (TEE)**, offering secure and verifiable computation at scale. Phala Cloud supports deployment of any Docker application into TEE environments, making it easy to migrate existing workloads to confidential computing.
 * **Easy to Build**: [Dstack](../dstack/overview.md) is the TEE SDK developed by Phala and Flashbots jointly
   * **Docker / VM migration into TEE**, allowing developers to move existing workloads into a zero-trust environment.
   * **Serverless edge functions**: Leverage pre-built templates to create **serverless, privacy-preserving functions** that run in secure TEEs.
@@ -39,4 +39,4 @@ Phala provides a comprehensive suite of tools and infrastructure to make zero-tr
 * **Web2 to Web3**: Easily transition Web2 software to **Web3 standards**, with seamless connectivity to smart contracts across blockchains.
 * **Intelligence-Based Economy**: Solutions like **MEV, Intent-centric applications**. Flashbots uses TEE for decentralized MEV-boost on Ethereum. Uniswap is using TEE to build a DeFi-native Ethereum L2, becoming a hub for liquidity across chains.
 * **Defense in Depth**: Projects like **Lit Protocol (MPC)**, **Zama (FHE)**, and **Scroll (ZKP)** use TEE to enhance their security and privacy, strengthening their defenses.
-* **Decentralized AI**: With **NVIDIA’s GPU TEEs**, decentralized AI platforms like **Sentient, Zero Gravity, Ritual, Morpheus**, and **Autonolas** use TEEs to run LLMs in secure, verifiable, and privacy-focused environments as part of their infrastructure.
+* **Decentralized AI**: With **NVIDIA's GPU TEEs**, decentralized AI platforms like **NEAR AI, Sentient, Zero Gravity, Ritual, Morpheus**, and **Autonolas** use TEEs to run LLMs in secure, verifiable, and privacy-focused environments as part of their infrastructure.

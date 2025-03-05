@@ -7,6 +7,7 @@
 ## Overview
 
 * [⚖️ Phala Network](overview/phala-network.md)
+  * [💎 Phala Cloud](overview/phala-network/phala-cloud.md)
   * [🥷 Dstack](overview/phala-network/dstack.md)
   * [⚡ Confidential AI Inference](overview/confidential-ai-inference.md)
 * [💎 PHA Token](overview/pha-token/README.md)
@@ -28,15 +29,41 @@
     * [Khala Governance](overview/pha-token/governance/khala-governance.md)
     * [Setting Up an Account Identity](overview/pha-token/governance/setup-account-identity.md)
 
+## Cloud
+
+* [🚀 Getting Started](cloud/getting-started/getting-started.md)
+  * [Start from Cloud UI](cloud/getting-started/start-from-cloud-ui.md)
+  * [Start from Cloud CLI](cloud/getting-started/start-from-cloud-cli.md)
+  * [Start from Template](cloud/getting-started/start-from-template.md)
+  * [Start from Scratch](cloud/getting-started/start-from-scratch.md)
+* [📦 Create CVM](cloud/crete-cvm/create-cvm.md)
+  * [Create CVM with Docker Compose](cloud/crete-cvm/create-with-docker-compose.md)
+  * [Create CVM with Private Docker Image](cloud/crete-cvm/create-with-private-docker-image.md)
+  * [Set Secure Environment Variables](cloud/crete-cvm/set-secure-environment-variables.md)
+  * [Access Your Applications](cloud/crete-cvm/access-your-applications.md)
+  * [Debug Your Application](cloud/crete-cvm/debug-your-application.md)
+  * [Deployment Cheat Sheet](cloud/crete-cvm/deployment-cheat-sheet.md)
+* [⚙️ CVM Management](cloud/cvm-mangement/management.md)
+  * [Upgrade Application](cloud/cvm-mangement/upgrade-application.md)
+  * [Resize Resources](cloud/cvm-mangement/resize-resource.md)
+  * [Check Logs](cloud/cvm-mangement/check-logs.md)
+  * [Private Log Viewer](cloud/cvm-mangement/private-log-viewer.md)
+* [🔄 Migration to TEE](cloud/migrate-to-tee/migration.md)
+  * [Expose Service Port](cloud/migrate-to-tee/expose-service-port.md)
+  * [Generate RA Report](cloud/migrate-to-tee/generate-ra-report.md)
+  * [Access Database](cloud/migrate-to-tee/access-database.md)
+  * [Create Crypto Wallet](cloud/migrate-to-tee/create-crypto-wallet.md)
+* [🛠️ TEE Cloud CLI](cloud/tee-cloud-cli.md)
+* [❓ FAQs](cloud/faqs.md)
+* [🔍 Troubleshooting](cloud/troubleshooting.md)
+* [📖 Glossary](cloud/glossary.md)
+* [📋 References](cloud/references.md)
+
 ## Dstack
 
 * [Overview](dstack/overview.md)
 * [Getting Started](dstack/getting-started/README.md)
   * [Quick Start](dstack/getting-started/quick-start.md)
-  * [Phala Cloud Guide](dstack/getting-started/phala-cloud-guide/README.md)
-    * [Start From Scratch](dstack/getting-started/phala-cloud-guide/start-from-scratch.md)
-    * [Build From Template](dstack/getting-started/phala-cloud-guide/build-from-template.md)
-* [TEE Cloud CLI](dstack/tee-cloud-cli.md)
 * [Design Documents](dstack/design-documents/README.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Protocol](dstack/design-documents/key-management-protocol.md)
