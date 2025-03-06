@@ -93,7 +93,6 @@ services:
     entrypoint:
       [
         "/root/pherry",
-        "-r",
         "--parachain",
         "--mnemonic={gas fee memory seed}",
         "--substrate-ws-endpoint=ws://{node ip}:9945",
