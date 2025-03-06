@@ -34,4 +34,4 @@ The CLI approach is perfect for:
 After creating your CVM, you'll want to:
 
 * [Access to your applications](access-your-applications.md)
-* [Set up monitoring](../cvm-mangement/management-check-logs.md)
+* [Set up monitoring](../cvm-management/check-logs.md)

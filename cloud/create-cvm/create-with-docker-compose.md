@@ -26,7 +26,7 @@ One of the key advantages of using Docker Compose is the ability to orchestrate 
 
 For applications requiring additional security or proprietary code, Phala Cloud supports deployment from private Docker repositories.
 
-➡️ [Learn more about private Docker image deployment](../crete-cvm/create-with-private-docker-image/)
+➡️ [Learn more about private Docker image deployment](./create-with-private-docker-image.md)
 
 ## Example Configuration
 
