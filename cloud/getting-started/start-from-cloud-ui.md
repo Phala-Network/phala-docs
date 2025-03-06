@@ -81,6 +81,6 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
 
 Now that you've deployed your first confidential application, you can:
 
-1. **Migrate your existing applications** to TEE by following our [Migration Guide](../migration-to-tee/migration.md)
+1. **Migrate your existing applications** to TEE by following our [Migration Guide](../migrate-to-tee/migration.md)
 2. **Build an AI agent** in minutes with the no-code [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
 3. **Explore advanced features** like debugging, log management, and scaling your applications
