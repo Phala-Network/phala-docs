@@ -9,7 +9,7 @@
 * [⚖️ Phala Network](overview/phala-network.md)
   * [💎 Phala Cloud](overview/phala-network/phala-cloud.md)
   * [🥷 Dstack](overview/phala-network/dstack.md)
-  * [⚡ Confidential AI Inference](overview/confidential-ai-inference.md)
+  * [🔐 GPU TEE](overview/gpu-tee.md)
 * [💎 PHA Token](overview/pha-token/README.md)
   * [🪙 Introduction](overview/pha-token/introduction.md)
   * [👐 Delegation](overview/pha-token/delegation/README.md)
@@ -71,13 +71,10 @@
   * [TEE-Controlled Domain Certificates](dstack/design-documents/tee-controlled-domain-certificates.md)
 * [Acknowledgement](dstack/acknowledgement.md)
 
-## Confidential AI Inference
+## LLM in GPU TEE
 
-* [👩‍💻 Getting Started](confidential-ai/getting-started.md)
-* [💎 Confidential AI API](confidential-ai/confidential-AI-API.md)
-* [🔒 Host LLM in TEE](confidential-ai/host-LLM-in-TEE.md)
-* [🔨 Implementation](confidential-ai/implementation.md)
-* [🏎️ LLM in TEE Benchmark](confidential-ai/benchmark.md)
+* [👩‍💻 Put LLM in GPU TEE](gpu-tee/llm-in-tee.md)
+* [🏎️ GPU TEE Benchmark](gpu-tee/benchmark.md)
 
 ## Tech Specs
 
