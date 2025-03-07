@@ -59,6 +59,9 @@
 * [🔍 Troubleshooting](cloud/troubleshooting.md)
 * [📖 Glossary](cloud/glossary.md)
 * [📋 References](cloud/references.md)
+* [🔒 Use Cases](cloud/use-cases/README.md)
+  * [TEE with FHE and MPC](cloud/use-cases/tee_with_fhe_and_mpc.md)
+  * [TEE with ZK and ZKrollup](cloud/use-cases/tee_with_zk_and_zkrollup.md)
 
 ## Dstack
 
@@ -81,11 +84,6 @@
 
 ## Tech Specs
 
-* [✅ Multi-Proof and Verifiable Compute](tech-specs/multi-proof-and-verifiable-compute/README.md)
-  * [Why Multi-Proof and How We Can Help](tech-specs/multi-proof-and-verifiable-compute/why-multi-proof-and-how-we-can-help.md)
-  * [Trusted Execution Environments (TEE) and Compute Verifiability](tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability.md)
-  * [How to Build with Multi-Proof](tech-specs/multi-proof-and-verifiable-compute/how-to-build-with-multi-proof.md)
-  * [Conclusion & Future Developments](tech-specs/multi-proof-and-verifiable-compute/conclusion-and-future-developments.md)
 * [⛓️ Blockchain](tech-specs/blockchain/README.md)
   * [Blockchain Entities](tech-specs/blockchain/blockchain-entities.md)
   * [Cluster of Workers](tech-specs/blockchain/cluster-of-workers.md)
