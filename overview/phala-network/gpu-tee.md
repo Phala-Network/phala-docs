@@ -12,7 +12,7 @@ TEE as a general hardware-based confidential computation infrastructure can offe
 - Verification using TEEs is also more economical compared to ZKPs. An ECDSA signature suffices for on-chain verification, reducing the complexity and cost of ensuring computation integrity.
 - Native Support by NVIDIA in the series of GPUs such as H100 and H200 natively support TEEs, providing hardware-accelerated secure environments for AI workloads. This native support ensures seamless integration and optimized performance for AI fine-tuning and inference.
 
-<figure><img src="../.gitbook/assets/confidential-ai-inference-overview.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/confidential-ai-inference-overview.png" alt=""><figcaption></figcaption></figure>
 
 Our TEE-based solution can provide following features for AI Inference:
 
@@ -20,6 +20,10 @@ Our TEE-based solution can provide following features for AI Inference:
 2. **Secure Execution Environment**: Both hardware and software must be protected against attacks. This involves leveraging TEE that provides isolated environments for secure computation.
 3. **Open Source and Reproducible Builds**: The entire software stack, from the operating system to the application code must be reproducible. This allows auditors to verify the integrity of the system.
 4. **Verifiable Execution Results**: The results of AI computations must be verifiable, ensuring that the outputs are trustworthy and have not been tampered with.
+
+## Study Cases
+
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>Host DeepSeek-R1 in GPU TEE</strong></td><td><a href="https://phala.network/posts/absolute-0-ccp-use-deepseek-r1-with-gpu-tee-for-verified-ai-security">Blog Post</a></td><td><a href="../../.gitbook/assets/host-deepseek-r1-in-gpu-tee.png">host-deepseek-r1-in-gpu-tee.png</a></td></tr></tbody></table>
 
 ## What's Next?
 
