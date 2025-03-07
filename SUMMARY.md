@@ -9,7 +9,7 @@
 * [⚖️ Phala Network](overview/phala-network.md)
   * [💎 Phala Cloud](overview/phala-network/phala-cloud.md)
   * [🥷 Dstack](overview/phala-network/dstack.md)
-  * [🔐 GPU TEE](overview/gpu-tee.md)
+  * [🔐 GPU TEE](overview/phala-network/gpu-tee.md)
 * [💎 PHA Token](overview/pha-token/README.md)
   * [🪙 Introduction](overview/pha-token/introduction.md)
   * [👐 Delegation](overview/pha-token/delegation/README.md)
