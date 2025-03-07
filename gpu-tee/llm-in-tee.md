@@ -1,4 +1,4 @@
-# 👩‍💻 Put LLM in GPU TEE
+# 👩‍💻 Host LLM in GPU TEE
 
 ## Overview
 

@@ -73,7 +73,7 @@
 
 ## LLM in GPU TEE
 
-* [👩‍💻 Put LLM in GPU TEE](gpu-tee/llm-in-tee.md)
+* [👩‍💻 Host LLM in GPU TEE](gpu-tee/llm-in-tee.md)
 * [🏎️ GPU TEE Benchmark](gpu-tee/benchmark.md)
 
 ## Tech Specs

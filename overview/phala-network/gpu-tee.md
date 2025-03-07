@@ -2,7 +2,7 @@
 
 The implementation for running LLMs in GPU TEE is available in the [private-ml-sdk](https://github.com/nearai/private-ml-sdk) GitHub repository. This project is built by Phala Network and was made possible through a grant from NEARAI. The SDK provides the necessary tools and infrastructure to deploy and run LLMs securely within GPU TEE.
 
-<figure><img src="../.gitbook/assets/private-ml-sdk.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/private-ml-sdk.png" alt=""><figcaption></figcaption></figure>
 
 ## Introduction
 
