@@ -80,8 +80,8 @@ services:
     environment:
      - NODE_NAME=PNODE
      - NODE_ROLE=MINER
-     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
-     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
+     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256
+     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256
     volumes:
      - /var/phala/node-data:/root/data
 
@@ -105,7 +105,7 @@ services:
       ]
 
   phala-pruntime:
-    image: phalanetwork/phala-pruntime-v2-dcap:25022401
+    image: phalanetwork/phala-pruntime-v2-dcap-with-handover:25022401
     container_name: phala-pruntime
     hostname: phala-pruntime
     ports:

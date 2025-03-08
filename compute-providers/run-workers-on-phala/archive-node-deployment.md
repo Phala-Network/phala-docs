@@ -24,8 +24,8 @@ services:
     environment:
      - NODE_NAME=NODE
      - NODE_ROLE=ARCHIVE
-     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
-     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64 --blocks-pruning archive-canonical --state-pruning 50400
+     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256
+     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256 --blocks-pruning archive-canonical --state-pruning 50400
     volumes:
      - /var/phala/node-data:/root/data
 

@@ -94,13 +94,13 @@ services:
     environment:
      - NODE_NAME=PNODE
      - NODE_ROLE=MINER
-     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
-     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 64
+     - PARACHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256
+     - RELAYCHAIN_EXTRA_ARGS=--max-runtime-instances 32 --runtime-cache-size 8 --rpc-max-response-size 256
     volumes:
      - /var/phala/node-data:/root/data
 
   wm:
-    image: phalanetwork/prb3:latest
+    image: phalanetwork/prb3:v3.2.2
     hostname: prb-local
     restart: always
     network_mode: host
@@ -115,7 +115,7 @@ services:
       - ./prb-wm-data:/var/data/prb-wm
   
   monitor:
-    image: phalanetwork/prb3:v3.2.2
+    image: phalanetwork/prb3-monitor:latest
     restart: always
     network_mode: host
     volumes:
