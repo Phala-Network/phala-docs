@@ -115,7 +115,7 @@ services:
       - ./prb-wm-data:/var/data/prb-wm
   
   monitor:
-    image: phalanetwork/prb3-monitor:latest
+    image: phalanetwork/prb3:v3.2.2
     restart: always
     network_mode: host
     volumes:

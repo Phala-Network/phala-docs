@@ -49,7 +49,7 @@ At this point, enter `a` and you will start editing the document. Paste the foll
 version: "3"
 services:
   phala-pruntime:
-    image: phalanetwork/phala-pruntime-v2-with-handover:latest
+    image: phalanetwork/phala-pruntime-v2-dcap:25022401
     container_name: phala-pruntime
     hostname: phala-pruntime
     ports:

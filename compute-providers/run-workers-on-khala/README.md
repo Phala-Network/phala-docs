@@ -1,2 +1,6 @@
-# 🏃♀ Run Workers on Khala
+---
+hidden: true
+---
+
+# 🏃‍♀️ Run Workers on Khala
 

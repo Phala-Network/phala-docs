@@ -86,14 +86,13 @@ services:
      - /var/phala/node-data:/root/data
 
   phala-pherry:
-    image: phalanetwork/phala-pherry:latest
+    image: phalanetwork/phala-pherry-dcap:25022401
     container_name: phala-pherry
     hostname: phala-pherry
     restart: always
     entrypoint:
       [
         "/root/pherry",
-        "-r",
         "--parachain",
         "--mnemonic={gas fee memory seed}",
         "--substrate-ws-endpoint=ws://{node ip}:9945",
@@ -106,7 +105,7 @@ services:
       ]
 
   phala-pruntime:
-    image: phalanetwork/phala-pruntime-v2-with-handover:latest
+    image: phalanetwork/phala-pruntime-v2-dcap:25022401
     container_name: phala-pruntime
     hostname: phala-pruntime
     ports:
