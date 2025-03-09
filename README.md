@@ -27,7 +27,7 @@ Phala Network is a next-generation **cloud platform** that provides a **low-cost
 
 ## Discover Phala Network
 
-<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>⚡️ Phala Network: Execution Layer for Web3 AI</strong></td><td></td><td></td><td><a href="overview/phala-network.md">phala-network.md</a></td><td><a href=".gitbook/assets/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr><tr><td>🛡️ <strong>Host LLM in TEE</strong></td><td></td><td></td><td><a href="tech-specs/multi-proof-and-verifiable-compute/">multi-proof-and-verifiable-compute</a></td><td><a href=".gitbook/assets/Intro-Multi-Proof.png">Intro-Multi-Proof.png</a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>⚡️ Phala Network: Execution Layer for Web3 AI</strong></td><td></td><td></td><td><a href="overview/phala-network.md">phala-network.md</a></td><td><a href=".gitbook/assets/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr><tr><td>🛡️ <strong>Host LLM in TEE</strong></td><td></td><td></td><td><a href="overview/phala-network/gpu-tee.md">host-llm-in-tee</a></td><td><a href=".gitbook/assets/confidential-ai-inference-overview.png">private-ml-sdk.png</a></td></tr></tbody></table>
 
 ## Getting Started on Phala Cloud
 
