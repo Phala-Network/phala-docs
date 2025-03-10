@@ -67,6 +67,8 @@ App URL: https://cloud.phala.network/dashboard/cvms/app_cc3ee84d7e708aed326d5df6
 
 #### You should see the CVM in your Dashboard now. Go and check the details.
 
+> **Note:** You often need to wait for a few seconds for the CVM to be ready, before that the page will be blank.
+
 <figure><img src="../../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
 
 Click on the Containers tab and get check out the logs.

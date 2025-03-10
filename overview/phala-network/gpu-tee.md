@@ -6,11 +6,11 @@ The implementation for running LLMs in GPU TEE is available in the [private-ml-s
 
 ## Introduction
 
-TEE as a general hardware-based confidential computation infrastructure can offer a practical solution compared to other cryptographic methods like ZK and FHE in AI Inference:
+A TEE as a general hardware-based confidential computation infrastructure can offer a practical solution compared to other cryptographic methods like ZK and FHE in AI Inference:
 
 - The computational overhead is significantly lower, with nearly native speed of execution
 - Verification using TEEs is also more economical compared to ZKPs. An ECDSA signature suffices for on-chain verification, reducing the complexity and cost of ensuring computation integrity.
-- Native Support by NVIDIA in the series of GPUs such as H100 and H200 natively support TEEs, providing hardware-accelerated secure environments for AI workloads. This native support ensures seamless integration and optimized performance for AI fine-tuning and inference.
+- NVIDIA's series of GPUs such as H100 and H200 natively support TEEs, providing hardware-accelerated secure environments for AI workloads. This native support ensures seamless integration and optimized performance for AI fine-tuning and inference.
 
 <figure><img src="../../.gitbook/assets/confidential-ai-inference-overview.png" alt=""><figcaption></figcaption></figure>
 
