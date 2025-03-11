@@ -96,3 +96,35 @@ redirects:
     confidential-ai-inference/host-llm-in-tee: gpu-tee/llm-in-tee.md
     confidential-ai-inference/implementation: gpu-tee/llm-in-tee.md
     confidential-ai-inference/benchmark: gpu-tee/benchmark.md
+    cloud/create-cvm/access-your-applications: phala-cloud/create-cvm/access-your-applications.md
+    cloud/create-cvm/create-cvm: phala-cloud/create-cvm/create-cvm.md
+    cloud/create-cvm/create-with-docker-compose: phala-cloud/create-cvm/create-with-docker-compose.md
+    cloud/create-cvm/create-with-private-docker-image: phala-cloud/create-cvm/create-with-private-docker-image.md
+    cloud/create-cvm/debug-your-application: phala-cloud/create-cvm/debug-your-application.md
+    cloud/create-cvm/deployment-cheat-sheet: phala-cloud/create-cvm/deployment-cheat-sheet.md
+    cloud/create-cvm/set-secure-environment-variables: phala-cloud/create-cvm/set-secure-environment-variables.md
+    cloud/cvm-management/check-logs: phala-cloud/cvm-management/check-logs.md
+    cloud/cvm-management/management: phala-cloud/cvm-management/management.md
+    cloud/cvm-management/private-log-viewer: phala-cloud/cvm-management/private-log-viewer.md
+    cloud/cvm-management/resize-resource: phala-cloud/cvm-management/resize-resource.md
+    cloud/cvm-management/upgrade-application: phala-cloud/cvm-management/upgrade-application.md
+    cloud/faqs: phala-cloud/faqs.md
+    cloud/getting-started: phala-cloud/getting-started/README.md
+    cloud/getting-started/getting-started: phala-cloud/getting-started/getting-started.md
+    cloud/getting-started/sign-up-for-cloud-account: phala-cloud/getting-started/sign-up-for-cloud-account.md
+    cloud/getting-started/start-from-cloud-cli: phala-cloud/getting-started/start-from-cloud-cli.md
+    cloud/getting-started/start-from-cloud-ui: phala-cloud/getting-started/start-from-cloud-ui.md
+    cloud/getting-started/start-from-scratch: phala-cloud/getting-started/start-from-scratch.md
+    cloud/getting-started/start-from-template: phala-cloud/getting-started/start-from-template.md
+    cloud/glossary: phala-cloud/glossary.md
+    cloud/migrate-to-tee/access-database: phala-cloud/migrate-to-tee/access-database.md
+    cloud/migrate-to-tee/create-crypto-wallet: phala-cloud/migrate-to-tee/create-crypto-wallet.md
+    cloud/migrate-to-tee/expose-service-port: phala-cloud/migrate-to-tee/expose-service-port.md
+    cloud/migrate-to-tee/generate-ra-report: phala-cloud/migrate-to-tee/generate-ra-report.md
+    cloud/migrate-to-tee/migration: phala-cloud/migrate-to-tee/migration.md
+    cloud/references: phala-cloud/references.md
+    cloud/tee-cloud-cli: phala-cloud/tee-cloud-cli.md
+    cloud/troubleshooting: phala-cloud/troubleshooting.md
+    cloud/use-cases: phala-cloud/use-cases/README.md
+    cloud/use-cases/tee_with_fhe_and_mpc: phala-cloud/use-cases/tee_with_fhe_and_mpc.md
+    cloud/use-cases/tee_with_zk_and_zkrollup: phala-cloud/use-cases/tee_with_zk_and_zkrollup.md
