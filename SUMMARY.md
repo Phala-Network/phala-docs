@@ -29,7 +29,7 @@
     * [Khala Governance](overview/pha-token/governance/khala-governance.md)
     * [Setting Up an Account Identity](overview/pha-token/governance/setup-account-identity.md)
 
-## Cloud
+## Phala Cloud
 
 * [🚀 Getting Started](cloud/getting-started/getting-started.md)
   * [Sign-up for Cloud Account](cloud/getting-started/sign-up-for-cloud-account.md)

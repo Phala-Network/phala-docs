@@ -23,7 +23,7 @@ When your application requires environment variables, **never set them directly 
 
 2. **Set Values in Encrypted Secrets**
 
-   Configure the actual values in the **Encrypted Secrets** section of the Cloud UI.
+   Configure the actual values in the **Encrypted Secrets** section of the Phala Cloud UI.
 
 <figure><img src="../../.gitbook/assets/cloud-set-env.png" alt="Setting environment variables in Encrypted Secrets"><figcaption>Encrypted Secrets configuration interface</figcaption></figure>
 

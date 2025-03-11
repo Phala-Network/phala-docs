@@ -1,6 +1,6 @@
 # ⚙️ CVM Management
 
-Phala TEE Cloud provides a comprehensive management system for your CVMs, allowing you to monitor, upgrade, and resize your applications.
+Phala Cloud provides a comprehensive management system for your CVMs, allowing you to monitor, upgrade, and resize your applications.
 
 ## CVM Management Features
 
@@ -28,4 +28,4 @@ Phala TEE Cloud provides a comprehensive management system for your CVMs, allowi
 
 ## CVM Management API
 
-Phala TEE Cloud provides a [API](https://cloud-api.phala.network/docs) for managing your CVMs, allowing you to automate your CVM management tasks.
+Phala Cloud provides a [API](https://cloud-api.phala.network/docs) for managing your CVMs, allowing you to automate your CVM management tasks.
