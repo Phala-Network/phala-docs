@@ -1,8 +1,8 @@
 # Check Logs
 
-## Log Types in Phala TEE Cloud
+## Log Types in Phala Cloud
 
-Phala TEE Cloud provides two distinct types of logs to help you monitor and troubleshoot your applications:
+Phala Cloud provides two distinct types of logs to help you monitor and troubleshoot your applications:
 
 ### CVM Logs
 

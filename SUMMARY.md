@@ -29,7 +29,7 @@
     * [Khala Governance](overview/pha-token/governance/khala-governance.md)
     * [Setting Up an Account Identity](overview/pha-token/governance/setup-account-identity.md)
 
-## Cloud
+## Phala Cloud
 
 * [🚀 Getting Started](cloud/getting-started/getting-started.md)
   * [Sign-up for Cloud Account](cloud/getting-started/sign-up-for-cloud-account.md)
@@ -59,7 +59,7 @@
 * [🔍 Troubleshooting](cloud/troubleshooting.md)
 * [📖 Glossary](cloud/glossary.md)
 * [📋 References](cloud/references.md)
-* [🔒 Use Cases](cloud/use-cases/README.md)
+* [🔒 Use Cases](cloud/use-cases/use-cases.md)
   * [TEE with FHE and MPC](cloud/use-cases/tee_with_fhe_and_mpc.md)
   * [TEE with ZK and ZKrollup](cloud/use-cases/tee_with_zk_and_zkrollup.md)
 

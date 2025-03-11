@@ -8,7 +8,7 @@ Phala Cloud enables secure deployment of private Docker images from popular cont
 
 ## Configuration Methods
 
-### Method 1: Using the Cloud UI
+### Method 1: Using the Phala Cloud UI
 
 The most straightforward approach is configuring registry access through the user interface:
 
@@ -30,11 +30,11 @@ For automated deployments or enhanced security, you can set registry credentials
 - To download images from Docker Registry, you need to set the following encrypted environment variables: DSTACK_DOCKER_USERNAME and DSTACK_DOCKER_PASSWORD.
 - To download images from AWS ECR Private Registry, you need to set the following encrypted environment variables: DSTACK_AWS_ACCESS_KEY_ID, DSTACK_AWS_SECRET_ACCESS_KEY, and DSTACK_AWS_REGION, DSTACK_AWS_ECR_REGISTRY.
 
-## Setting with Cloud API
+## Setting with Phala Cloud API
 
-When using Cloud API to deploy, you still need to set above environment variables.
+When using Phala Cloud API to deploy, you still need to set above environment variables.
 
-Check the [Cloud API](https://cloud-api.phala.network/docs) for more details.
+Check the [Phala Cloud API](https://cloud-api.phala.network/docs) for more details.
 
 ## Troubleshooting
 

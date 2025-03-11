@@ -2,7 +2,7 @@
 
 ## Advanced Deployment Options
 
-Phala TEE Cloud provides a familiar Docker Compose experience within a secure TEE environment. To access these advanced configuration options:
+Phala Cloud provides a familiar Docker Compose experience within a secure TEE environment. To access these advanced configuration options:
 
 1. Navigate to the deployment section in the Phala Cloud dashboard
 2. Switch to the **Advanced** tab
@@ -10,7 +10,7 @@ Phala TEE Cloud provides a familiar Docker Compose experience within a secure TE
 
 ## Docker Compose Capabilities
 
-Deploying with Docker Compose on Phala TEE Cloud works just like on a standard server, with the added benefit of confidential computing. You can:
+Deploying with Docker Compose on Phala Cloud works just like on a standard server, with the added benefit of confidential computing. You can:
 
 * Specify Docker image names and versions
 * Configure port mappings to expose services

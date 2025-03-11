@@ -4,13 +4,13 @@
 
 Phala Cloud offers multiple ways to create and deploy your Confidential Virtual Machine (CVM), accommodating different workflows and preferences.
 
-### Option 1: Using the Cloud UI (Recommended for Beginners)
+### Option 1: Using the Phala Cloud UI (Recommended for Beginners)
 
-If you prefer a visual interface with guided steps, the Cloud UI provides an intuitive experience for creating your CVM:
+If you prefer a visual interface with guided steps, the Phala Cloud UI provides an intuitive experience for creating your CVM:
 
 [**Create with Docker Compose →**](create-with-docker-compose.md)
 
-The Cloud UI is ideal for:
+The Phala Cloud UI is ideal for:
 
 * First-time users of Phala Cloud
 * Visual learners who prefer graphical interfaces
