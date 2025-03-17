@@ -7,25 +7,40 @@ Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-clou
 ## Prerequisites
 
 * Docker installed and running
-* [Bun](https://bun.sh) installed
+* Node & [Bun](https://bun.sh) or npx installed
 * Docker Hub account for publishing images
 * [Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) API key
 
 ## Installation
 
-Clone the CLI repo
+Install globally or use `npx`or `bunx`
 
 ```bash
 git clone --recurse-submodules https://github.com/Phala-Network/tee-cloud-cli.git
 ```
 
 ```bash
-# Install dependencies
-bun install
-
-# Build
-bun run build
+# Skip build install globally 
+npm install -g phala
+# or use npx phala
+npx phala
 ```
+
+### Sign Up for an Account
+
+Run `npx phala free`to get started with your Phala Cloud account and a free CVM deployment.
+
+{% embed url="https://youtu.be/gNfM2UzxzQg" %}
+WTF is npx phala free?!
+{% endembed %}
+
+```bash
+npx phala free
+```
+
+This will open a browser to the Phala Cloud sign-up page. Get your free account then get started on generating your Phala Cloud API Key.
+
+<figure><img src="../../.gitbook/assets/image (12).png" alt=""><figcaption><p>Signup Page</p></figcaption></figure>
 
 ### Generate a Phala Cloud API Key
 
@@ -43,17 +58,19 @@ Click Create Token and then copy your newly generated API Key.
 
 ### Launch a CVM with a Dstack Example
 
-Now we want to set the API Key for the CLI and launch our first CVM. Take the API Key you copied down then set it with the `teecloud set-apikey`command.
+Now we want to set the API Key for the CLI and launch our first CVM. Take the API Key you copied down then set it with the `phala auth login` command.
 
 ```bash
-teecloud set-apikey your-phala-cloud-api-key
+npx phala auth login [your-phala-cloud-api-key]
 ```
 
 Deploy one of the Dstack examples under the examples folder. This example with launch the timelock-nts example where a key is derived within the TEE then after 5 minutes, the private key is released.
 
 ```bash
+# Clone dstack examples repo
+git clone git clone https://github.com/Dstack-TEE/dstack-examples.git && cd dstack-examples/
 # Deploy the timelock-nts example
-teecloud deploy -c ./examples/timelock-nts/docker-compose.yml -n timelock-nts
+npx phala deploy -c ./timelock-nts/docker-compose.yml -n timelock-nts
 ```
 
 Example Output:

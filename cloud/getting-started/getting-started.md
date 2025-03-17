@@ -22,7 +22,7 @@ The easiest way to deploy applications on Phala Cloud with no coding required. U
 
 Perfect for first-time users who want to explore Phala's capabilities quickly.
 
-### [Start from Cloud CLI](start-from-cloud-cli.md)
+### [Start from Cloud CLI](getting-started.md#start-from-cloud-cli)
 
 **Recommended for developers** 👨‍💻
 
@@ -45,18 +45,6 @@ Build on top of our pre-configured templates to accelerate your development:
 * Focus on your application logic rather than TEE configuration
 
 Perfect for developers who want to build custom applications while benefiting from proven architectures.
-
-### [Start from Scratch](start-from-scratch.md)
-
-**For TEE enthusiasts** 🦸
-
-Full control over your confidential computing environment:
-
-* Build custom TEE applications from the ground up
-* Implement advanced attestation workflows
-* Optimize every aspect of your confidential application
-
-Designed for experts who want to fully leverage Phala's TEE toolkit and create highly specialized confidential applications.
 
 ## Next Steps
 

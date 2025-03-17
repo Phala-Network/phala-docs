@@ -1,10 +1,8 @@
-
 # Debug Your Application
 
 When deploying your application on the Phala Cloud UI, you can choose between two types of CVM base images: `dstack-<version>` and `dstack-dev-<version>`. The dev image allows you to log in to the CVM in the future for debugging purposes. If you opt for a non-dev image, rest assured that no one will have the ability to access your CVM, either physically or remotely.
 
-> [!ALERT]
-> The dev image is not recommended for production environments.
+> \[!ALERT] The dev image is not recommended for production environments.
 
 <figure><img src="../../.gitbook/assets/cloud-config-compute-resource.png" alt="debug-cvm"><figcaption></figcaption></figure>
 
@@ -34,8 +32,7 @@ You can then view a specific endpoint for the ttypd service by navigating to "**
 
 When you open this endpoint in your browser (in this case, `https://7c7629f605a50abe5797e1b6bab115fec6b9e7ac-7681.dstack-prod5.phala.network/`), you will see a terminal interface. The next step is to install the **openssh-client**.
 
-> [!NOTE]
-> The base image is not Debian-based, so you will not be able to use the `apt` package manager. Instead, you will use the `apk` package manager.
+> \[!NOTE] The base image is not Debian-based, so you will not be able to use the `apt` package manager. Instead, you will use the `apk` package manager.
 
 <figure><img src="../../.gitbook/assets/cloud-ttyd-terminal.png" alt="ttyd-terminal"><figcaption></figcaption></figure>
 
