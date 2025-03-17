@@ -86,7 +86,7 @@ services:
      - /var/phala/node-data:/root/data
 
   phala-pherry:
-    image: phalanetwork/phala-pherry-dcap:25022401
+    image: phalanetwork/phala-pherry-dcap:25031701
     container_name: phala-pherry
     hostname: phala-pherry
     restart: always
