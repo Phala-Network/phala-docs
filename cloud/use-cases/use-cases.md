@@ -8,7 +8,7 @@ TEEs can protect AI model training and inference, preserving both model privacy 
 
 TEE also can be used to build unruggable AI Agents that operate with the same level of trustworthiness as smart contracts, check [the article by Phala CEO Marvin Tong](https://x.com/marvin_tong/status/1866319231350100330) to see why we get there.
 
-Coming soon
+Check out [Building Confidential AI with TEE](tee_with_ai.md)
 
 ## TEE + FHE/MPC
 
