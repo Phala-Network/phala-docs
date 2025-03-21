@@ -1,11 +1,12 @@
 # Building Confidential AI with TEE
 
+{% hint style="tip" %}
+Check Phala Network's [2025 dAGI report](https://phala.network/reports/2025RealCodeForRealdAGI.pdf) to see how TEE is used in AI full stack.
+{% endhint %}
+
 ## Introduction
 
 <figure><img src="../../.gitbook/assets/tee-ai-banner.png" alt=""><figcaption></figcaption></figure>
-
-> [!NOTE]
-> Check Phala Network's 2025 dAGI report: [Real Code for Real dAGI](https://phala.network/reports/2025RealCodeForRealdAGI.pdf)
 
 AI has become a transformative force across industries, but its widespread adoption faces significant challenges related to data privacy, model security, and computational trust. As AI systems process increasingly sensitive information and make critical decisions, ensuring the confidentiality and integrity of both the data and the AI models themselves has become paramount.
 
