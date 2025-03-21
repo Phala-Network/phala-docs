@@ -42,38 +42,10 @@ The integration of TEE technology with AI addresses several critical challenges:
 
 ## Case Studies
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f916">🤖</span> Eliza: Secure AI Agent Framework with TEE Integration</td><td><a href="../../.gitbook/assets/tee_eliza.png">tee_eliza.png</a></td><td><a href="https://eliza.how/packages/plugins/tee">Eliza TEE Plugin</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f3ae">🎮</span> Virtuals: Game Agents Running in Secure TEE Environment</td><td><a href="../../.gitbook/assets/tee_game_agents.png">tee_game_agents.png</a></td><td><a href="https://github.com/game-by-virtuals/game-node/tree/main/game-starter#to-run-project-in-phala-tee">Virtuals Game Agent</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f4e1">📡</span> Vana Network: Decentralized Data Privacy with TEE</td><td><a href="../../.gitbook/assets/tee_vana.png">tee_vana.png</a></td><td><a href="https://phala.network/posts/phala-network-and-vana-network-join-forces-to-usher-in-new-era-for-decentralized-data-privacy">Phala x Vana</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f310">🌐</span> 0G: Confidential AI Computing in Decentralized Networks</td><td><a href="../../.gitbook/assets/tee_0g.png">tee_0g.png</a></td><td><a href="https://phala.network/posts/phala-network-and-0g-partner-for-enhanced-confidential-ai-computing">Phala x 0G</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f4b0">💰</span> Fairblock: Unruggable AI with MPC-TEE Hybrid Architecture</td><td><a href="../../.gitbook/assets/fairblock_tee_registry.png">tee_fairblock.png</a></td><td><a href="https://phala.network/posts/phala-x-fairblock-a-blueprint-for-unruggable-ai-with-an-mpctee-hybrid-architecture">Phala x Fairblock</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f331">🌱</span> Spore.fun: Autonomous AI Evolution in Secure Environments</td><td><a href="../../.gitbook/assets/tee_spore.png">tee_spore.png</a></td><td><a href="https://www.spore.fun/blog/wtf">Spore.fun</a></td></tr></tbody></table>
+### TEE in Agent Frameworks
 
-## Eliza: Secure AI Agent Framework with TEE
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f916">🤖</span> Eliza: Secure AI Agent Framework with TEE Integration</td><td><a href="../../.gitbook/assets/tee_eliza.png">tee_eliza.png</a></td><td><a href="https://eliza.how/packages/plugins/tee">Eliza TEE Plugin</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f3ae">🎮</span> Virtuals: Game Agents Running in Secure TEE Environment</td><td><a href="../../.gitbook/assets/tee_game_agents.png">tee_game_agents.png</a></td><td><a href="https://github.com/game-by-virtuals/game-node/tree/main/game-starter#to-run-project-in-phala-tee">Virtuals Game Agent</a></td></tr></tbody></table>
 
-Eliza's TEE plugin represents a significant advancement in secure AI agent development, providing a robust framework for handling sensitive operations within a protected environment. The plugin enables:
+### Other TEE-AI Integrations
 
-- **Secure Key Derivation**: Generate and manage cryptographic keys within the TEE, ensuring they never exist in plaintext outside the secure enclave.
-- **Cross-Chain Wallet Management**: Derive both Ed25519 (Solana) and ECDSA (Ethereum) keypairs securely for blockchain interactions.
-- **Remote Attestation**: Generate verifiable proofs that AI agents are running in genuine TEE environments with specific security properties.
-
-By integrating with Phala Cloud, Eliza agents gain additional capabilities:
-
-1. **Confidential Agent State**: Maintain agent memory and state information in encrypted form, protected from the host system.
-2. **Verifiable Agent Behavior**: Provide cryptographic guarantees that agents follow their specified programming without tampering.
-3. **Secure Multi-Agent Collaboration**: Enable multiple agents to collaborate while maintaining data confidentiality between them.
-4. **Persistent Identity**: Ensure agent identities remain secure and consistent across sessions and deployments.
-
-This integration creates a foundation for trustless AI agents that can manage digital assets, access sensitive APIs, and perform critical operations without exposing secrets to potential attackers.
-
-## Virtuals: Game Agents in TEE
-
-The Virtuals Game Agent platform demonstrates how TEE technology can transform gaming and simulation environments by running autonomous game agents in secure enclaves. This approach offers several key advantages:
-
-- **Fair Gameplay**: Ensure game agents operate according to established rules without manipulation.
-- **Protected Game Assets**: Secure valuable in-game items and currencies from theft or duplication.
-- **Verifiable Game States**: Provide cryptographic proof of game outcomes and agent behaviors.
-
-When deployed on Phala Cloud, these game agents benefit from:
-
-1. **Scalable Secure Computation**: Run complex game simulations within TEE environments at scale.
-2. **Cross-Game Asset Management**: Securely manage digital assets across multiple game environments.
-3. **Tamper-Proof Agent Evolution**: Enable agents to learn and evolve while preventing unauthorized modifications.
-4. **Verifiable Randomness**: Generate provably fair random outcomes for game mechanics.
-
-This case study demonstrates how TEE technology can create new possibilities for autonomous gaming agents, simulations, and digital asset economies by providing a secure foundation for complex agent behaviors.
+<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f4e1">📡</span> Vana Network: Decentralized Data Privacy with TEE</td><td><a href="../../.gitbook/assets/tee_vana.png">tee_vana.png</a></td><td><a href="https://phala.network/posts/phala-network-and-vana-network-join-forces-to-usher-in-new-era-for-decentralized-data-privacy">Phala x Vana</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f310">🌐</span> 0G: Confidential AI Computing in Decentralized Networks</td><td><a href="../../.gitbook/assets/tee_0g.png">tee_0g.png</a></td><td><a href="https://phala.network/posts/phala-network-and-0g-partner-for-enhanced-confidential-ai-computing">Phala x 0G</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f4b0">💰</span> Fairblock: Unruggable AI with MPC-TEE Hybrid Architecture</td><td><a href="../../.gitbook/assets/fairblock_tee_registry.png">tee_fairblock.png</a></td><td><a href="https://phala.network/posts/phala-x-fairblock-a-blueprint-for-unruggable-ai-with-an-mpctee-hybrid-architecture">Phala x Fairblock</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f331">🌱</span> Spore.fun: Autonomous AI Evolution in Secure Environments</td><td><a href="../../.gitbook/assets/tee_spore.png">tee_spore.png</a></td><td><a href="https://www.spore.fun/blog/wtf">Spore.fun</a></td></tr></tbody></table>
