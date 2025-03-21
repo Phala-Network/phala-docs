@@ -65,7 +65,7 @@
 * [📖 Glossary](cloud/glossary.md)
 * [📋 References](cloud/references.md)
 * [🔒 Use Cases](cloud/use-cases/use-cases.md)
-  * [AI with TEE](cloud/use-cases/tee_with_ai.md)
+  * [TEE with AI](cloud/use-cases/tee_with_ai.md)
   * [TEE with FHE and MPC](cloud/use-cases/tee_with_fhe_and_mpc.md)
   * [TEE with ZK and ZKrollup](cloud/use-cases/tee_with_zk_and_zkrollup.md)
 
