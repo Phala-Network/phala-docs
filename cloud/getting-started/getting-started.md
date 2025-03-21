@@ -22,7 +22,7 @@ The easiest way to deploy applications on Phala Cloud with no coding required. U
 
 Perfect for first-time users who want to explore Phala's capabilities quickly.
 
-### [Start from Cloud CLI](getting-started.md#start-from-cloud-cli)
+### [Start from Cloud CLI](start-from-cloud-cli.md)
 
 **Recommended for developers** 👨‍💻
 
