@@ -55,7 +55,7 @@ PHA is bridged from Ethereum to Base chain via [Wormhole](https://wormhole.com/)
 
 Note that the bridging operation between Ethereum and Base takes around 15 mins. To get PHA on Ethereum, you can buy it from centralized exchanges (Binance, OKX, Kucoin, etc), and decentralized exchanges (Uniswap, 1inch, etc).
 
-If you closed the web page after finishing the transfer step but haven't claimed it on the destination blockchain, you can use the "Redeem" tab in the Portal Bridge (Advanced Tool). You will need to find the tx id of your transfering tx from a blockchain explorer. The redeem tool will recover the transaction and guide you to redeem the PHA on the destination chain. Learn more at [their official docs](https://portalbridge.com/docs/tutorials/how-to-use-recovery-workflow).
+If you closed the web page after finishing the transfer step but haven't claimed it on the destination blockchain, you can use the "Redeem" tab in the Portal Bridge (Advanced Tool). You will need to find the tx id of your transferring tx from a blockchain explorer. The redeem tool will recover the transaction and guide you to redeem the PHA on the destination chain. Learn more at [their official docs](https://portalbridge.com/docs/tutorials/how-to-use-recovery-workflow).
 
 </details>
 
