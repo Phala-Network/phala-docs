@@ -20,6 +20,4 @@ If you prefer using a CLI instead of the browser, check out [Start from Cloud CL
 
 ## Next Steps
 
-After choosing your preferred approach, follow the corresponding guide to deploy your first application on Phala Cloud. Each guide provides step-by-step instructions tailored to your chosen method.
-
 If you encounter any issues during deployment, check our [Troubleshooting](../troubleshooting.md) guide or reach out to our community for support at 🌍 [Global](https://t.me/+nbhjx1ADG9EyYmI9), 🇨🇳 [Chinese](https://t.me/+4PcAE9qTZ1kzM2M9).
