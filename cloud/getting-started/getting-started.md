@@ -1,6 +1,6 @@
 # 🚀 Getting Started
 
-Phala Cloud offers a secure and private hosting in a TEE using [Dstack](../../overview/phala-network/dstack.md). This guide will help you choose the best approach to deploy your applications on Phala Cloud based on your needs and technical expertise.
+Phala Cloud offers a secure and private hosting in a TEE using [Dstack](../../overview/phala-network/dstack.md). This guide will get you started on Phala Cloud and deploy your first CVM in minutes!
 
 {% stepper %}
 {% step %}
