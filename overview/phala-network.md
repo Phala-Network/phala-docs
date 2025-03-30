@@ -4,7 +4,7 @@ Confidential AI Inference stands as a cornerstone for safeguarding sensitive dat
 
 <figure><img src="../.gitbook/assets/Phala-AI-Agent-Contract-HLD.png" alt=""><figcaption></figcaption></figure>
 
-1. **Agentize smart contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts. "**Regulate**" your AI Agents through a DAO to enforce business logic for your agents.&#x20;
+1. **Agentize smart contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts. "**Regulate**" your AI Agents through a DAO to enforce business logic for your agents.
 2. **Connect to the internet of multi-agents**: Make your agents accessible by other cross-platform AI Agents deployed on Autonolas, FLock.io, Morpheus, Polywrap, etc.
 3. **Launch and get incentivized**: Own your agents and build a profitable tokenomic through our default tokenomic model or customize your own.
 
@@ -18,7 +18,7 @@ To learn more about launching agents with tokenomics: [agent-wars-introduction.m
 
 ## **How It Works**
 
-<figure><img src="../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (6) (1).png" alt=""><figcaption></figcaption></figure>
 
 * Phala introduces a **new root-of-trust** beyond traditional hardware-based models.
 * We implement a combination of **TEE, MPC, ZKP (FHE)** and **blockchain game theory** to build this **new root-of-trust**.

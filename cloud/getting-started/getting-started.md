@@ -1,50 +1,22 @@
 # 🚀 Getting Started
 
-Phala Cloud offers a secure, confidential computing platform powered by TEE. This guide will help you choose the best approach to deploy your applications on Phala Cloud based on your needs and technical expertise.
+Phala Cloud offers a secure and private hosting in a TEE using [Dstack](../../overview/phala-network/dstack.md). This guide will help you choose the best approach to deploy your applications on Phala Cloud based on your needs and technical expertise.
 
-## [First Sign-up for Cloud Account](sign-up-for-cloud-account.md)
+{% stepper %}
+{% step %}
+## [Sign-up for Cloud Account](sign-up-for-cloud-account.md) (1 minute)
 
-Go to the sign-up for Cloud account section to get an official Phala Cloud account to get started.
+Go to the [sign-up ](https://cloud.phala.network/register?invite=PHALAWIKI)page for Cloud account section to get an official Phala Cloud account to get started.
+{% endstep %}
 
-## Choose Your Path
+{% step %}
+## [Deploy Your First CVM](start-from-cloud-ui.md) (2-3 minutes)
 
-[Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) provides multiple ways to get started, depending on your requirements and familiarity with confidential computing:
+Once your account is created, deploy your first CVM without any coding by deploying a Jupyter Notebook.
 
-### [Start from Cloud UI](start-from-cloud-ui.md)
-
-**Recommended for beginners** 👶
-
-The easiest way to deploy applications on Phala Cloud with no coding required. Use our intuitive web interface to:
-
-* Deploy pre-configured applications with just a few clicks
-* Monitor your deployments through a visual dashboard
-* Manage resources without command-line knowledge
-
-Perfect for first-time users who want to explore Phala's capabilities quickly.
-
-### [Start from Cloud CLI](getting-started.md#start-from-cloud-cli)
-
-**Recommended for developers** 👨‍💻
-
-A powerful command-line interface for developers who prefer terminal-based workflows:
-
-* Automate deployments with scripts
-* Integrate with CI/CD pipelines
-* Access advanced configuration options
-
-Ideal for developers who want more control while maintaining productivity.
-
-### [Start from Template](start-from-template.md)
-
-**Recommended for builders** 🏗️
-
-Build on top of our pre-configured templates to accelerate your development:
-
-* Leverage existing confidential computing patterns
-* Customize templates to fit your specific needs
-* Focus on your application logic rather than TEE configuration
-
-Perfect for developers who want to build custom applications while benefiting from proven architectures.
+If you prefer using a CLI instead of the browser, check out [Start from Cloud CLI](start-from-cloud-cli.md).
+{% endstep %}
+{% endstepper %}
 
 ## Next Steps
 

@@ -71,8 +71,8 @@
 ## Dstack
 
 * [Overview](dstack/overview.md)
-* [Getting Started](dstack/getting-started/README.md)
-  * [Quick Start](dstack/getting-started/quick-start.md)
+* [Getting Started](dstack/getting-started.md)
+* [Hardware Requirements](dstack/hardware-requirements.md)
 * [Design Documents](dstack/design-documents/README.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Protocol](dstack/design-documents/key-management-protocol.md)
