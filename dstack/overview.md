@@ -16,13 +16,14 @@ Check our [Acknowledgement](acknowledgement.md) for all of the key contributors 
 
 ## Overview
 
-The [Dstack SDK](https://github.com/dstack-TEE/dstack) is designed to simplify the steps for developers to deploy programs to CVM (Confidential VM), and to follow the security best practices by default. The main features include:
+The [Dstack SDK](https://github.com/dstack-TEE/dstack) is designed to simplify the steps for developers to deploy any dockerized app to an Intel TDX Server running Dstack. It does the following things to make your app secure with security best practices:
 
-* Convert any docker container to a CVM image to deploy on supported TEEs
-* Remote Attestation API and a chain-of-trust visualization on Web UI
-* Automatic RA-HTTPS wrapping with content addressing domain on `0xABCD.dstack.host`
-* Decouple the app execution and state persistent from specific hardware with decentralized Root-of-Trust
+* Make minimal code changes to existing docker deployments and deploy in a TEE
+* Remote Attestation via single http call
+* Automatically secure your http port with e2e encrypted IO with TEE-managed HTTPS
+* Encrypted storage enabled by default
+* Persisted key and secret access with KMS (Key Management Service)
 
 ## Conclusion
 
-Now that there is an introduction to the Dstack, we can begin the fun part of building on the SDK. There are a few ways to get started depending on your starting point. Let's take a look at the options in [Getting Started](getting-started/).
+Now that we are familiar with the features that Dstack can provide, let's dive into how to get started with running Dstack on a compatible Intel TDX server. If you do not have access to hardware, you can check the [hardware requirements](hardware-requirements.md) or skip the hardware setup & use Phala Cloud by [signing up for your account](../cloud/getting-started/sign-up-for-cloud-account.md).

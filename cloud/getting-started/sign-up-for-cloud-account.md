@@ -6,7 +6,7 @@ First, you will need to sign-up for the Phala Cloud. Sign up by following the li
 
 The sign-up page should look like the following:
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
 If you are going through the https://cloud.phala.network, then click Register and use the invite code: `PHALAWIKI`
 

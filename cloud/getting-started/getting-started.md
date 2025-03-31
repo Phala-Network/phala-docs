@@ -1,14 +1,18 @@
 # 🚀 Getting Started
 
-Phala Cloud offers a secure, confidential computing platform powered by TEE. This guide will help you choose the best approach to deploy your applications on Phala Cloud based on your needs and technical expertise.
+Phala Cloud offers a secure and private hosting in a TEE using [Dstack](../../overview/phala-network/dstack.md). This guide will get you started on Phala Cloud and deploy your first CVM in minutes!
 
-## [First Sign-up for Cloud Account](sign-up-for-cloud-account.md)
+{% stepper %}
+{% step %}
+## [Sign-up for Cloud Account](sign-up-for-cloud-account.md) (1 minute)
 
-Go to the sign-up for Cloud account section to get an official Phala Cloud account to get started.
+Go to the [sign-up ](https://cloud.phala.network/register?invite=PHALAWIKI)page for Cloud account section to get an official Phala Cloud account to get started.
+{% endstep %}
 
-## Choose Your Path
+{% step %}
+## [Deploy Your First CVM](start-from-cloud-ui.md) (2-3 minutes)
 
-[Phala Cloud](https://cloud.phala.network/register?invite=PHALAWIKI) provides multiple ways to get started, depending on your requirements and familiarity with confidential computing:
+Once your account is created, deploy your first CVM without any coding by deploying a Jupyter Notebook.
 
 ### [Start from Cloud UI](start-from-cloud-ui.md)
 
@@ -46,8 +50,10 @@ Build on top of our pre-configured templates to accelerate your development:
 
 Perfect for developers who want to build custom applications while benefiting from proven architectures.
 
-## Next Steps
+If you prefer using a CLI instead of the browser, check out [Start from Cloud CLI](start-from-cloud-cli.md).
+{% endstep %}
+{% endstepper %}
 
-After choosing your preferred approach, follow the corresponding guide to deploy your first application on Phala Cloud. Each guide provides step-by-step instructions tailored to your chosen method.
+## Next Steps
 
 If you encounter any issues during deployment, check our [Troubleshooting](../troubleshooting.md) guide or reach out to our community for support at 🌍 [Global](https://t.me/+nbhjx1ADG9EyYmI9), 🇨🇳 [Chinese](https://t.me/+4PcAE9qTZ1kzM2M9).

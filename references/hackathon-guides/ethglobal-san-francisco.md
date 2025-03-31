@@ -94,7 +94,7 @@ docker run --rm -p 3000:3000 61a7efb8f25c
 
 Now you can go to your browser and see a frontend UI like below:
 
-<figure><img src="../../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (9) (1).png" alt=""><figcaption></figcaption></figure>
 {% endtab %}
 
 {% tab title="Python SDK" %}
