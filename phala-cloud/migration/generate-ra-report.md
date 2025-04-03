@@ -1,5 +1,4 @@
-
-# Generate RA Report Inside the Container
+# Generate RA Report
 
 The cloud will generate a default RA report for your application when it is bootstrapped. You can view this report on the dashboard under the **Attestation** tab and verify it by clicking the **Check** **Attestation** button.
 
@@ -9,7 +8,9 @@ There are two steps needed to generate a new RA report, rather than using the de
 
 ### Config docker compose file
 
-You first need to mount the Dstack API socket file to the container by configuring **volumes** in the Docker Compose file.
+This Docker Compose file spins up a Jupyter Notebook environment, and importantly, it's configured the `volumes` to connect to the Dstack API by mounting its socket file (`/var/run/tappd.sock`) into the container. This allows the Jupyter Notebook running inside the TEE to interact with the Dstack service like generate a remote attestation, get a TLS key, or generate a key for chains like ETH (`ECDSA, K256 curve`) or SOL (`ed25519`).
+
+For development convenience, this setup grants sudo privileges inside the container (`environment`), runs the Jupyter server with root user permissions (`user`), and starts the notebook with token-based authentication using the `TOKEN` environment variable (`command`).
 
 ```yaml
 version: '3'

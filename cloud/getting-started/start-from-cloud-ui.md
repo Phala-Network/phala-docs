@@ -32,14 +32,14 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
     If you want to view the logs of your application, you can switch to **Containers** tab and click **View Logs** to view container logs. For example, the logs of the container **jupyter** are as follows:
 
     ```
-    2025-03-04T03:18:05.828657314Z Entered start.sh with args: start-notebook.sh --NotebookApp.token=phala
+    2025-03-04T03:18:05.828657314Z Entered start.sh with args: start-notebook.sh --NotebookApp.token=*****
     2025-03-04T03:18:05.842663875Z Running hooks in: /usr/local/bin/start-notebook.d as uid: 0 gid: 0
     2025-03-04T03:18:05.842682502Z Done running hooks in: /usr/local/bin/start-notebook.d
     2025-03-04T03:18:05.856699933Z Granting jovyan passwordless sudo rights!
     2025-03-04T03:18:05.864340938Z Running hooks in: /usr/local/bin/before-notebook.d as uid: 0 gid: 0
     2025-03-04T03:18:05.864358165Z Sourcing shell script: /usr/local/bin/before-notebook.d/10activate-conda-env.sh
     2025-03-04T03:18:06.527587460Z Done running hooks in: /usr/local/bin/before-notebook.d
-    2025-03-04T03:18:06.527720112Z Running as jovyan: start-notebook.sh --NotebookApp.token=phala
+    2025-03-04T03:18:06.527720112Z Running as jovyan: start-notebook.sh --NotebookApp.token=*****
     2025-03-04T03:18:06.542227731Z WARNING: Use start-notebook.py instead
     2025-03-04T03:18:07.221798177Z [I 2025-03-04 03:18:07.221 ServerApp] jupyter_lsp | extension was successfully linked.
     2025-03-04T03:18:07.225295903Z [I 2025-03-04 03:18:07.225 ServerApp] jupyter_server_terminals | extension was successfully linked.
@@ -81,6 +81,6 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
 
 Now that you've deployed your first confidential application, you can:
 
-1. **Migrate your existing applications** to TEE by following our [Migration Guide](../migrate-to-tee/migration.md)
-2. **Build an AI agent** in minutes with the no-code [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
+1. **Deploy your existing Docker applications** to TEE - check out the [Deploy Docker App in TEE](../../phala-cloud/migration/)
+2. **Build an AI agent** in minutes and deploy in one-click with the [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
 3. **Explore advanced features** like debugging, log management, and scaling your applications

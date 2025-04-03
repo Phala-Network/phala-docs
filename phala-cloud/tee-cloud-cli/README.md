@@ -38,22 +38,6 @@ Install via npm or use npx/bunx
 npm install -g phala
 ```
 
-> **NOTE**
->
-> ```bash
-> # Use npx/bunx
->
-> npx phala help
-> bunx phala help
-> ```
->
-> You can use `npx` or `bunx` to call the `phala` command
-
-```bash
-# Phala CLI help menu
-npx phala help
-```
-
 #### **Sign Up and Get API Key**:
 
 To deploy applications to Phala Cloud, you'll need an API key:

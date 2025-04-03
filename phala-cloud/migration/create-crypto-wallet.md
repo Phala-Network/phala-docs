@@ -1,4 +1,3 @@
-
 # Create Crypto Wallet
 
 You can derive a deterministic key using the [Dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme) inside Docker. Under the hood, the `TappdClient` derives the key from the application root key.
