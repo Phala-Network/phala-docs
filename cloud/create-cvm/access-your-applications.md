@@ -17,4 +17,4 @@ If you prefer to use your own domain name, follow these steps:
 
 This approach ensures your users can verify the authenticity of your application running in a trusted execution environment.
 
-For a practical implementation, check out our [custom domain configuration example](https://github.com/Dstack-TEE/dstack-examples/pull/23) in the dstack-examples repository.
+For a practical implementation, check out our [custom domain configuration example](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain) in the dstack-examples repository.
