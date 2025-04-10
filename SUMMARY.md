@@ -60,6 +60,7 @@
     * [cvms](phala-cloud/tee-cloud-cli/phala/cvms.md)
     * [docker](phala-cloud/tee-cloud-cli/phala/docker.md)
     * [simulator](phala-cloud/tee-cloud-cli/phala/simulator.md)
+* [Production Checklist](phala-cloud/production-checklist.md)
 * [❓ FAQs](cloud/faqs.md)
 * [🔍 Troubleshooting](cloud/troubleshooting.md)
 * [📖 Glossary](cloud/glossary.md)
