@@ -28,4 +28,5 @@ Our TEE-based solution can provide following features for AI Inference:
 ## What's Next?
 
 1. [**Host LLM in GPU TEE**](../../gpu-tee/llm-in-tee.md).
-2. [**Benchmark of running LLM in TEE**](../../gpu-tee/benchmark.md).
+2. [**GPU TEE Inference API**](../../gpu-tee/inference-api.md)
+3. [**Benchmark of running LLM in TEE**](../../gpu-tee/benchmark.md).
