@@ -84,6 +84,7 @@
 ## LLM in GPU TEE
 
 * [👩‍💻 Host LLM in GPU TEE](gpu-tee/llm-in-tee.md)
+* [🔐 GPU TEE Inference API](gpu-tee/inference-api.md)
 * [🏎️ GPU TEE Benchmark](gpu-tee/benchmark.md)
 
 ## Tech Specs
