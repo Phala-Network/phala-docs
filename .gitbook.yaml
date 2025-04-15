@@ -131,3 +131,4 @@ redirects:
     cloud/use-cases/: phala-cloud/use-cases/use-cases.md
     cloud/use-cases/tee_with_fhe_and_mpc: phala-cloud/use-cases/tee_with_fhe_and_mpc.md
     cloud/use-cases/tee_with_zk_and_zkrollup: phala-cloud/use-cases/tee_with_zk_and_zkrollup.md
+    ai-agent-contract/getting-started: cloud/getting-started/getting-started.md
