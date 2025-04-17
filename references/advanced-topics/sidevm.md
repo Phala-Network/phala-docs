@@ -1,5 +1,11 @@
 # SideVM
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 ## About SideVM <a href="#about-sidevm" id="about-sidevm"></a>
 
 SideVM is the core extension of Phat Contract. Despite the advantages above, the raw Phat Contract still has limitations compared with current Web2 backend programs:
@@ -19,9 +25,9 @@ Also, you can run your local testnet following our tutorial and then do the test
 
 ### Programming SideVM <a href="#programming-sidevm" id="programming-sidevm"></a>
 
-We use [https://github.com/Phala-Network/phat-contract-examples/tree/master/start\_sidevm](https://github.com/Phala-Network/phat-contract-examples/tree/master/start\_sidevm) as an example. It contains both the Phat contract and the SideVM program under `sideprog` folder.
+We use [https://github.com/Phala-Network/phat-contract-examples/tree/master/start\_sidevm](https://github.com/Phala-Network/phat-contract-examples/tree/master/start_sidevm) as an example. It contains both the Phat contract and the SideVM program under `sideprog` folder.
 
-The SideVM part listens to a local port. It will be launched by this [line of code](https://github.com/Phala-Network/phat-contract-examples/blob/master/start\_sidevm/lib.rs#L29) if called.
+The SideVM part listens to a local port. It will be launched by this [line of code](https://github.com/Phala-Network/phat-contract-examples/blob/master/start_sidevm/lib.rs#L29) if called.
 
 ### Compile Phat Contract and SideVM Program <a href="#compile-phat-contract-and-sidevm-program" id="compile-phat-contract-and-sidevm-program"></a>
 
@@ -58,7 +64,7 @@ Click `Upload` and drag your `target/ink/start_sidevm.contract`. Choose the defa
 
 You can directly interact with your contract with Contract UI.
 
-The `start_sidevm` query is used to start the SideVM program. It contains the [invoke](https://github.com/Phala-Network/phat-contract-examples/blob/master/start\_sidevm/lib.rs#L29) to `pink::start_sidevm()`.
+The `start_sidevm` query is used to start the SideVM program. It contains the [invoke](https://github.com/Phala-Network/phat-contract-examples/blob/master/start_sidevm/lib.rs#L29) to `pink::start_sidevm()`.
 
 From the Worker log, we can see
 

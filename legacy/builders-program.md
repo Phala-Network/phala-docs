@@ -1,5 +1,11 @@
 # 👨‍🚀 Builders Program
 
+{% hint style="danger" %}
+**WARNING**
+
+The Phala Builders Program is no longer active. Please fill out the [contact form](https://cloud.phala.network/contact) to schedule a meeting to discuss your ideas.
+{% endhint %}
+
 ## _**About the Phala Builders Program**_ <a href="#about-the-phala-builders-program" id="about-the-phala-builders-program"></a>
 
 > _Funding and supporting innovative projects building with the Phala Compute Cloud via Phat Contract._
@@ -66,7 +72,7 @@ _The application process for both tier one and tier two funding is the same, how
 
 **1. Application**
 
-* Fill out and submit an application [form](https://docs.google.com/forms/d/e/1FAIpQLSdaWa5YA-YJL7Cc0b0\_cbpCdOvu1Ra7uJI95cudSLIduMrv\_A/viewform?usp=sf\_link).
+* Fill out and submit an application [form](https://docs.google.com/forms/d/e/1FAIpQLSdaWa5YA-YJL7Cc0b0_cbpCdOvu1Ra7uJI95cudSLIduMrv_A/viewform?usp=sf_link).
 
 **2. Introductory Call**
 

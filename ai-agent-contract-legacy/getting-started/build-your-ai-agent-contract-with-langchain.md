@@ -4,6 +4,12 @@ description: Host your AI Agent Contract on Phala's decentralized serverless clo
 
 # Build Your AI Agent Contract with LangChain
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 ## [AI Agent Contract Template with LangChain](https://github.com/Phala-Network/ai-agent-template-langchain)
 
 ### Architecture Overview
@@ -14,11 +20,7 @@ description: Host your AI Agent Contract on Phala's decentralized serverless clo
 
 ***
 
-<div align="center">
-
-<img src="https://www.jlwranglerforums.com/forum/attachments/zoolander-gif.325299/" alt="" height="240">
-
-</div>
+<div align="center"><img src="https://www.jlwranglerforums.com/forum/attachments/zoolander-gif.325299/" alt="" height="240"></div>
 
 The LangChain AI Agent template is a **MINIMAL** template to build an AI Agent that can be hosted on Phala Network's decentralized hosting protocol. Unlike Vercel or other FaaS, it allows you to publish your AI Agent compiled code to IPFS and hosts it on a fully decentralized FaaS cloud with the following benefits:
 

@@ -1,5 +1,11 @@
 # ⛓️ Supported Chains
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 AI Agent Contract can technically connect to any blockchain for reading and writing operations, as it can effortlessly read from arbitrary blockchain nodes and trigger signed transactions via RPC calls. However, in practice, supporting a specific blockchain requires the corresponding AI Agent Contract RPC client, serialization library, and signing library to facilitate read and write operations. Presently, EVM and Substrate blockchains have more extensive library support.
 
 ## EVM Blockchains

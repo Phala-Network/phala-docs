@@ -1,7 +1,9 @@
 # 👩‍💻 Getting Started
 
 {% hint style="danger" %}
-WARNING: AI Agent Contract Docs are now legacy documentation that will not be maintained moving forward. We recommend using [Dstack](broken-reference) instead to build on Phala Network.
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
 {% endhint %}
 
 

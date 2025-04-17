@@ -1,5 +1,11 @@
 # Build An Agent to Transact Onchain
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 If you like video tutorials, here is one of our latest workshops on building an Agent to transact onchain using the [Viem SDK](https://viem.sh) with the AI Agent Contract Template. In this tutorial, you will learn:
 
 * How to test the WapoJS functions like `deriveSecret(salt)`to derive an ECDSA key based on your `secret` added to your Agent Contract's secret vault.

@@ -54,6 +54,7 @@
   * [Generate RA Report](phala-cloud/migration/generate-ra-report.md)
   * [Access Database](phala-cloud/migration/access-database.md)
   * [Create Crypto Wallet](phala-cloud/migration/create-crypto-wallet.md)
+* [🛳️ Setup a CI/CD Pipeline](phala-cloud/setup-a-ci-cd-pipeline.md)
 * [🛠️ Phala Cloud CLI Reference](phala-cloud/tee-cloud-cli/README.md)
   * [phala](phala-cloud/tee-cloud-cli/phala/README.md)
     * [auth](phala-cloud/tee-cloud-cli/phala/auth.md)
@@ -178,7 +179,6 @@
 
 * [Information](legacy/information.md)
 * [⚒️ Phala SDK](legacy/phala-sdk.md)
-* [🖼️ FrameHub](legacy/framehub.md)
 * [👨‍🚀 Builders Program](legacy/builders-program.md)
 * [🥷 AI Agent Contract](legacy/ai-agent-contract/README.md)
   * [WapoJS Functions](legacy/ai-agent-contract/wapojs-functions.md)
@@ -206,5 +206,4 @@
 * [▶️ Getting Started](agent-wars-legacy/getting-started/README.md)
   * [Wallet Setup & Get PHA](agent-wars-legacy/getting-started/wallet-setup-and-get-pha.md)
   * [Buy and Sell Keys](agent-wars-legacy/getting-started/buy-and-sell-keys.md)
-  * [Create and Play with Social Agents](agent-wars-legacy/getting-started/create-and-play-with-social-agents.md)
 * [🧑‍🏫 Tutorial](agent-wars-legacy/tutorial.md)

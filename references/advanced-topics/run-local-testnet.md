@@ -1,5 +1,11 @@
 # Run Local Testnet
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 ## Overview <a href="#overview" id="overview"></a>
 
 In this tutorial, we’re going to set up a development environment. We are going to deploy a full stack of the core blockchain and connect the Web UI to the blockchain. By the end of the tutorial, you will be able to:

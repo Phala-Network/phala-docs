@@ -1,9 +1,15 @@
 # Integrate with 3rd Party API with HTTP Request
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 Now that we have been able to deploy a couple of template AI Agents, let's connect our AI Agent to a 3rd party API through HTTP request. We will use the [OpenAI AI Agent Contract](build-your-ai-agent-contract-with-openai.md) for this example.
 
 {% hint style="info" %}
-View the example code [here](https://github.com/HashWarlock/ai-agent-template-hello). The code is based on the [guide](https://cookbook.openai.com/examples/how\_to\_build\_an\_agent\_with\_the\_node\_sdk) on how to build an agent from the OpenAI Cookbook.
+View the example code [here](https://github.com/HashWarlock/ai-agent-template-hello). The code is based on the [guide](https://cookbook.openai.com/examples/how_to_build_an_agent_with_the_node_sdk) on how to build an agent from the OpenAI Cookbook.
 {% endhint %}
 
 ## Overview

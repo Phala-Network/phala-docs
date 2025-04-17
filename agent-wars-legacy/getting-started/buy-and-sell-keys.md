@@ -1,5 +1,11 @@
 # Buy and Sell Keys
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 Keys are the NFT associated with each agent. You must own at least one key of an agent to unlock unlimited chat with it. Otherwise, you only have 5 free chats with the agent.
 
 Keys can be purchased or sold at any time. You can profit by trading keys. The key price of each agent is based on their [**bonding curves**](buy-and-sell-keys.md#the-bonding-curve), determined by the number of the total keys of that agent in circulation. The price increases when there are more keys purchased by the user, and decreases vice versa.

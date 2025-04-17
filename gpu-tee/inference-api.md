@@ -1,4 +1,4 @@
-# GPU TEE Inference API
+# 🔐 GPU TEE Inference API
 
 Phala Cloud provides LLM inference API by connecting to Redpill. By navigating to **Dashboard**->**GPU TEE API** page, you will see details.
 
@@ -14,11 +14,10 @@ At the bottom of the page, click the **Enable** button to connect your Cloud acc
 
 <figure><img src="../.gitbook/assets/gpu-tee-api-generate-key.png" alt=""><figcaption></figcaption></figure>
 
-
 [Redpill](https://red-pill.ai/) is a models marketplace that supports private AI inference. It currently supports two models that are running in GPU TEE, you can view them in the models page by clicking the `GPU TEE` checkbox:
 
-- **[DeepSeek: R1 Distill 70B](https://red-pill.ai/models/phala/deepseek-r1-70b)**
-- **[Meta: Llama 3.3 70B Instruct](https://red-pill.ai/models/phala/llama-3.3-70b-instruct)**
+* [**DeepSeek: R1 Distill 70B**](https://red-pill.ai/models/phala/deepseek-r1-70b)
+* [**Meta: Llama 3.3 70B Instruct**](https://red-pill.ai/models/phala/llama-3.3-70b-instruct)
 
 <figure><img src="../.gitbook/assets/models-in-tee.png" alt=""><figcaption></figcaption></figure>
 
@@ -94,7 +93,7 @@ The `all_attestations` is the list of all the attestations of all GPU nodes sinc
 
 ### Verify GPU Attestation Report
 
-You can copy the value of nvidia_payload as the whole payload as followed to verify:
+You can copy the value of nvidia\_payload as the whole payload as followed to verify:
 
 ```sh
 curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
@@ -110,7 +109,6 @@ You can verify the Intel TDX Attestation Report, aka quote with the value of `in
 The `signing_address` is the account address generated inside TEE that will be used to sign the chat response. You can go to https://etherscan.io/verifiedSignatures, click Verify Signature, and paste the `signing_address` and message response to verify it.
 
 `nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See Verify the Attestation for more details.
-
 
 > Note: The trust chain works as follows: when you verify the attestation report, you trust the model provider (Redpill) and the TEE providers (NVIDIA and Intel). You then trust the open-source, reproducible code by verifying the source code [here](https://github.com/nearai/private-ml-sdk). Finally, you trust the cryptographic key derived inside the TEE. This is why we only need to verify the signature of the message during chat.
 
@@ -160,13 +158,13 @@ The sha256sum of response body is 7a97926adb2044fd598b392eee98ad8f7c39ea3a47747c
 
 (note: in this example, there are two new line in the end of response)
 
-The `id` is calculated by sha256sum(sha256sum(request_body) + sha256sum(response_body)).
+The `id` is calculated by sha256sum(sha256sum(request\_body) + sha256sum(response\_body)).
 
 ### Request Chat Signature
 
 By default, you can query another API with the value of id in the response in 30 minutes.
 
-Request
+Request\
 GET `https://api.red-pill.ai/v1/signature/{request_id}?model={model_id}&signing_algo=ecdsa`
 
 For example, the response in the previous section, the id is `chatcmpl-0cdf7629fcfa4135bbdb9936e737e95c`:
@@ -181,9 +179,9 @@ For example, the response in the previous section, the id is `chatcmpl-0cdf7629f
 }
 ```
 
-- text: the message you may want to verify. It is joined by the sha256 of the HTTP request body, and of the HTTP response body, separated by a colon :.
-- signature: the signature data.
-- signing_algo: The cryptographic scheme that the signer private key generated.
+* text: the message you may want to verify. It is joined by the sha256 of the HTTP request body, and of the HTTP response body, separated by a colon :.
+* signature: the signature data.
+* signing\_algo: The cryptographic scheme that the signer private key generated.
 
 Exactly match the value we calculated in the sample in previous section.
 
@@ -195,8 +193,8 @@ Since the resource limitation, the signature will be kept in the memory for 5 mi
 
 Go to https://etherscan.io/verifiedSignatures, click Verify Signature:
 
-- Address: You can get the address from the attestation API. The address should be same if the service did not restart.
-- Message: see the Response of the Signature section. You can also calculate the sha256 by yourself.
-- Signature Hash: See the Signature section.
+* Address: You can get the address from the attestation API. The address should be same if the service did not restart.
+* Message: see the Response of the Signature section. You can also calculate the sha256 by yourself.
+* Signature Hash: See the Signature section.
 
 <figure><img src="../.gitbook/assets/gpu-tee-api-verify-signature.png" alt=""><figcaption></figcaption></figure>

@@ -1,5 +1,11 @@
 # FAQ
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 This page is dedicated to troubleshooting issues found when building on the AI Agent Contract.
 
 #### 1. Why does my code fail to run a local testnet when executing the commands `npm run start` and `npm run dev`?

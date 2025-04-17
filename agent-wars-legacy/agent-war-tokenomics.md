@@ -1,10 +1,17 @@
-# 💸 Agent War Tokenomics
+# 💸 Tokenomics
+
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../cloud/getting-started/getting-started.md).
+{% endhint %}
 
 ## Roles
 
 In this game, there are two roles:
-- Agent Creator, who creates the agent and will take the full income from every sold key;
-- Key Holder, who holds a share of the agent and will benefit from the rise of key price when the agent attracts more buyers.
+
+* Agent Creator, who creates the agent and will take the full income from every sold key;
+* Key Holder, who holds a share of the agent and will benefit from the rise of key price when the agent attracts more buyers.
 
 ## Create Your Agent
 
@@ -30,7 +37,7 @@ $$Price = max(400, 8.75 * \sqrt FollowerNum - 3750)$$
 
 <figure><img src="../.gitbook/assets/agent-wars-create-price.png" alt="" width="563"><figcaption></figcaption></figure>
 
-For example, the price for all accounts with fewer than 225k followers will be 400 PHA, 500k followers is ~2400 PHA, 800k followers is ~4000 PHA
+For example, the price for all accounts with fewer than 225k followers will be 400 PHA, 500k followers is \~2400 PHA, 800k followers is \~4000 PHA
 
 ### Popular X account
 
@@ -54,7 +61,7 @@ Everyone is free to buy a unlimited number of keys of a certain agent. By owning
 
 Both buy and sell price follow the curve of
 
-$$KeyPrice = \begin{cases}KeyNum^2 / 20   &  KeyNum <=200 \\4000 + 2000 * 200 * 199 * (1/KeyNum - 1/(KeyNum-1)) & KeyNum>200 \end{cases}$$
+$$KeyPrice = \begin{cases}KeyNum^2 / 20 & KeyNum <=200 \\4000 + 2000 * 200 * 199 * (1/KeyNum - 1/(KeyNum-1)) & KeyNum>200 \end{cases}$$
 
 <figure><img src="../.gitbook/assets/agent-wars-key-price.png" alt="" width="563"><figcaption></figcaption></figure>
 

@@ -1,5 +1,11 @@
 # 🥷 AI Agent Contract
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 This section will dive into the technical specifications of the AI Agent Contract's execution. All content will focus on the off-chain components that allow for developers to host their Agent scripts or general purpose JS programs on Phala Network as a serverless backend.&#x20;
 
 ## Phala's WASM Runtime (Wapo)
@@ -29,16 +35,16 @@ With the enhancements with Wapo, Phala has taken the next steps to port the Quic
 
 WapoJS is an upgrade from the previous JS runtime called SideVM QuickJS. With this upgrade, developers can push the boundaries with their general-purpose JS programs with a faster response time vs the previous implementation.
 
-| Feature                    | SideVM QuickJS                                                                                     | WapoJS                                                                                             |
-| -------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| **VM Memory**              | 16MB                                                                                               | 100MB (default) Up to 4GB                                                                          |
-| **Maximum Execution Time** | 60 seconds (default) to unlimited                                                                  | 60 seconds (default) to unlimited                                                                  |
-| **HTTP Request API**       | Asynchronous [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch\_API/Using\_Fetch) API | Asynchronous [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch\_API/Using\_Fetch) API |
-| **Websockets**             | Not Supported                                                                                      | Supported (not enabled, yet)                                                                       |
-| **Concurrent Requests**    | Fully supported                                                                                    | Fully supported                                                                                    |
-| **Execution Speed**        | Fast                                                                                               | Faster                                                                                             |
-| **SCALE codec API**        | Sidevm.SCALE                                                                                       | Wapo.SCALE                                                                                         |
-| **Max Code Size**          | 500KB                                                                                              | Unlimited (Could be limited by streaming receiving from `fetch` + AbortController)                 |
-| **Limited CPU Burst**      | CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.        | CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.        |
+| Feature                    | SideVM QuickJS                                                                                   | WapoJS                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **VM Memory**              | 16MB                                                                                             | 100MB (default) Up to 4GB                                                                        |
+| **Maximum Execution Time** | 60 seconds (default) to unlimited                                                                | 60 seconds (default) to unlimited                                                                |
+| **HTTP Request API**       | Asynchronous [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) API | Asynchronous [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) API |
+| **Websockets**             | Not Supported                                                                                    | Supported (not enabled, yet)                                                                     |
+| **Concurrent Requests**    | Fully supported                                                                                  | Fully supported                                                                                  |
+| **Execution Speed**        | Fast                                                                                             | Faster                                                                                           |
+| **SCALE codec API**        | Sidevm.SCALE                                                                                     | Wapo.SCALE                                                                                       |
+| **Max Code Size**          | 500KB                                                                                            | Unlimited (Could be limited by streaming receiving from `fetch` + AbortController)               |
+| **Limited CPU Burst**      | CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.      | CPU time between async calls is limited. e.g. Too complex for-loop may hit the burst limit.      |
 
 For more information or inquries about increasing some resource limits, reach out the Phala Network team on [discord](https://discord.gg/phala-network).

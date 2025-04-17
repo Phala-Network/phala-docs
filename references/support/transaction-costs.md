@@ -7,6 +7,13 @@ description: >-
 
 # Transaction Costs
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
+\
 There are two types of the costs when interacting with a low level Phat Contract. The both costs may occur in transaction execution. Query is always free to user.
 
 ## Concepts
@@ -80,7 +87,7 @@ Once the code is uploaded, you can instantiate the contract with the code hash. 
 Typically, you pay a relatively large storage deposit for uploading, and a small gas fee for instantiating. However, sometimes you may deploy existing contracts. So you only pay a minor fee in the instantiating step, not the uploading step.
 
 {% hint style="info" %}
-It's possible to free the storage deposit for uploaded contracts, but it's a rare case in the reality. Every uploaded code has a reference counter. If there's no contract instance referring your code, you can get the storage deposit back. To terminate a contract to reduce the reference, call `env.terminate_contract()` ([doc](https://docs.rs/ink\_env/latest/ink\_env/fn.terminate\_contract.html))
+It's possible to free the storage deposit for uploaded contracts, but it's a rare case in the reality. Every uploaded code has a reference counter. If there's no contract instance referring your code, you can get the storage deposit back. To terminate a contract to reduce the reference, call `env.terminate_contract()` ([doc](https://docs.rs/ink_env/latest/ink_env/fn.terminate_contract.html))
 {% endhint %}
 
 ## Parameters

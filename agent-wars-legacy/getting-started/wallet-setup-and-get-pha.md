@@ -1,5 +1,11 @@
 # Wallet Setup & Get PHA
 
+{% hint style="danger" %}
+**WARNING**
+
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../../cloud/getting-started/getting-started.md).
+{% endhint %}
+
 Agent Wars is deployed on the [Base chain](https://www.base.org/), a popular high performance Ethereum L2 built by Coinbase. You will need to have two tokens to participate:
 
 * **ETH**: needed to pay the gas fee on Base
