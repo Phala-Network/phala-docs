@@ -200,5 +200,3 @@ Inside the newly created folder `prb-deployment`, run the docker-compose, and th
 ```undefined
 sudo docker-compose up -d
 ```
-
-\\

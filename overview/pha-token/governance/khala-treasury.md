@@ -1,4 +1,4 @@
-# Khala Treasury
+# Phala Treasury
 
 ## Current mechanisms <a href="#current-mechanisms" id="current-mechanisms"></a>
 
@@ -58,11 +58,11 @@ Spreading the word about the proposal’s explanation is ultimately up to the pr
 
 One way to create the proposal is to use the Polkadot-JS Apps [website](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/explorer). From the website, use either the [extrinsics tab](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/extrinsics) and select the Treasury pallet, then `proposeSpend` and enter the desired amount and recipient:
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/e93580b2-3f2b-461d-b965-5052b3c289ec/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211012%2Fus-west-2%2Fs3%2Faws4\_request\&X-Amz-Date=20211012T151146Z\&X-Amz-Expires=86400\&X-Amz-Signature=b45aa607091a5bdc703bd9e282edaf983fcc7134f9db7b4bb0dc7fbaba7d8b55\&X-Amz-SignedHeaders=host\&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/e93580b2-3f2b-461d-b965-5052b3c289ec/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211012%2Fus-west-2%2Fs3%2Faws4_request\&X-Amz-Date=20211012T151146Z\&X-Amz-Expires=86400\&X-Amz-Signature=b45aa607091a5bdc703bd9e282edaf983fcc7134f9db7b4bb0dc7fbaba7d8b55\&X-Amz-SignedHeaders=host\&response-content-disposition=filename%20%3D%22Untitled.png%22)
 
 or use the [Treasury tab](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/treasury) and its dedicated Submit Proposal button:
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7f02ba48-6e65-40df-9b3a-49e0bb916c58/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211012%2Fus-west-2%2Fs3%2Faws4\_request\&X-Amz-Date=20211012T151120Z\&X-Amz-Expires=86400\&X-Amz-Signature=ac29c0129134152af20b1bec4cd59012663d9e10b796e00cc63fa9b9d7b32e91\&X-Amz-SignedHeaders=host\&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7f02ba48-6e65-40df-9b3a-49e0bb916c58/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211012%2Fus-west-2%2Fs3%2Faws4_request\&X-Amz-Date=20211012T151120Z\&X-Amz-Expires=86400\&X-Amz-Signature=ac29c0129134152af20b1bec4cd59012663d9e10b796e00cc63fa9b9d7b32e91\&X-Amz-SignedHeaders=host\&response-content-disposition=filename%20%3D%22Untitled.png%22)
 
 The system will automatically take the required deposit, picking the higher of the two values mentioned [above](../../../pha-token/governance/broken-reference/).
 
@@ -73,8 +73,6 @@ Remember that the proposal has no metadata, so it’s up to the proposer to crea
 At this point, a Council member can create a motion to accept or to reject the treasury proposal. It is possible that one motion to accept and another motion to reject are both created. The proportions to accept and reject Council proposals vary between accept or reject, and possibly depend on which network the Treasury is implemented.
 
 The threshold for accepting a treasury proposal is at least three-fifths of the Council. On the other hand, the threshold for rejecting a proposal is at least one-half of the Council.
-
-![https://wiki.polkadot.network/assets/images/motion-f2fc13da7c5579a8d07062ea229791f6.png](https://wiki.polkadot.network/assets/images/motion-f2fc13da7c5579a8d07062ea229791f6.png)
 
 ## Tipping <a href="#tipping-1" id="tipping-1"></a>
 

@@ -1,4 +1,4 @@
-# PRBv2 Deployment Guide
+# PRBv2 Deployment Guide - Archived
 
 ## Now PRBv2 is out of date. Please use PRBv3 <a href="#understanding-runtime-bridge" id="understanding-runtime-bridge"></a>
 
@@ -301,10 +301,3 @@ curl --location --request POST 'http://path.to.monitor/ptp/proxy/Qmbz...RjpwY/Cr
 ```
 
 Restart the lifecycle manager after modified pools/workers.
-
-## Community Works
-
-These resources contributed by the community might be useful, use at your own risk:
-
-* [中文部署教程 / Deployment guide in Chinese](https://github.com/suugee/phala-prb/tree/next)
-* [Staking Calculator](https://phala.one/stake/)

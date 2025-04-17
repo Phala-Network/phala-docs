@@ -22,7 +22,7 @@ You can also add extra custom fields to which you can attest. Personalized field
 
 ### Getting Started <a href="#getting-started" id="getting-started"></a>
 
-1. To get started, head over to your [My Accounts](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala-api.phala.network%2Fws#/accounts) tab of Phala/Khala (Switch to “Phala/Khala Network” -> “Accounts”).
+1. To get started, head over to your [My Accounts](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala-api.phala.network%2Fws#/accounts) tab of Phala/Khala (Switch to “Phala Network” -> “Accounts”).
 
 > Each field can store up to 32 bytes of information, so the data must be less than that. When inputting the data manually through the [Extrinsics UI](https://polkadot.js.org/apps/#/extrinsics), a [UTF8 to bytes](https://onlineutf8tools.com/convert-utf8-to-bytes) converter can help.
 

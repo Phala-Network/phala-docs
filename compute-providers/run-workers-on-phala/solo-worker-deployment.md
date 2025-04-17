@@ -6,7 +6,7 @@ Currently, there is no one-click deployment script for workers on Phala Network.
 
 ### SGX Function
 
-Running Phala worker requires SGX-capable CPU. Please choose a device that supports SGX and enable SGX in the BIOS. For more information, please check: [choose your CPU](https://wiki.phala.network/en-us/mine/khala-mining/hardware-requirements/#check-your-cpu)
+Running Phala worker requires SGX-capable CPU. Please choose a device that supports SGX and enable SGX in the BIOS.&#x20;
 
 ### Device Configuration
 
@@ -19,7 +19,7 @@ Solo workers on Phala need to run 3 components: **Node**, **pherry**, and **pRun
 | pRuntime    | 2GB       | 500MB          | increase slowly                                  |
 | **Totally** | 8GB+      | 2TB            | -                                                |
 
-> The number of cores of the worker needs to be **4 or more**, the stronger the CPU computing power of the worker, the better the rewards in reward calculation. For details, please refer to: [Gemini Tokenomics](https://wiki.phala.network/en-us/general/phala-network/tokenomics/)
+> The number of cores of the worker needs to be **4 or more**, the stronger the CPU computing power of the worker, the better the rewards in reward calculation. For details, please refer to: [Gemini Tokenomics](https://docs.phala.network/compute-providers/basic-info/worker-rewards)
 
 ### OS Requirements
 
@@ -285,4 +285,4 @@ A typical pRuntime log in sync will look like this:
 2023-05-10T11:55:38.482881Z  INFO prpc_measuring: POST /prpc/PhactoryAPI.DispatchBlocks cost 18221 microseconds, status: 200   
 ```
 
-You can determine whether the synchronization is proceeding normally by checking the synchronized height and progress.\\
+You can determine whether the synchronization is proceeding normally by checking the synchronized height and progress.
