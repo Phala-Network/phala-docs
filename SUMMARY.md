@@ -42,6 +42,7 @@
   * [Create CVM with Private Docker Image](cloud/create-cvm/create-with-private-docker-image.md)
   * [Set Secure Environment Variables](cloud/create-cvm/set-secure-environment-variables.md)
   * [Access Your Applications](cloud/create-cvm/access-your-applications.md)
+  * [Setting Up Custom Domain](phala-cloud/create-cvm/setting-up-custom-domain.md)
   * [Debug Your Application](cloud/create-cvm/debug-your-application.md)
   * [Deployment Cheat Sheet](cloud/create-cvm/deployment-cheat-sheet.md)
 * [⚙️ CVM Management](cloud/cvm-management/management.md)
