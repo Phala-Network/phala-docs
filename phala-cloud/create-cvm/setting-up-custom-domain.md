@@ -2,9 +2,9 @@
 
 If you prefer to use your own custom domain, this page will guide you through setting this up in minutes.
 
-## Custom Domain Setup for dstack Applications
+## Zero Trust HTTPS: Custom Domain Setup for dstack Apps
 
-This is a solution for setting up custom domains with automatic SSL certificate management for dstack applications using Cloudflare DNS and Let's Encrypt.
+This is a solution for setting up custom domains with automatic SSL certificate management for dstack applications using Cloudflare DNS and Let's Encrypt. With this implementation, Phala enables the world's first Zero Trust HTTPS solution for your domain and apps running in a Confidential VM on Phala Cloud in one-click.
 
 ### Overview
 
