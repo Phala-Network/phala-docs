@@ -15,7 +15,9 @@ This project enables you to run dstack applications with your own custom domain,
 * Nginx reverse proxy to route traffic to your application
 * Certificate evidence generation for verification
 
-### How It Works
+<details>
+
+<summary>How It Works</summary>
 
 The dstack-ingress system provides a seamless way to set up custom domains for dstack applications with automatic SSL certificate management. Here's how it works:
 
@@ -28,6 +30,7 @@ The dstack-ingress system provides a seamless way to set up custom domains for d
    * A TXT record is added with application identification information to help dstack-gateway to route traffic to your application
    * If enabled, CAA records are set to restrict which Certificate Authorities can issue certificates for your domain
 3. **Certificate Management**:
+   * Select the **Create Token** button as shown below
    * SSL certificates are automatically obtained during initial setup
    * A scheduled task runs twice daily to check for certificate renewal
    * When certificates are renewed, Nginx is automatically reloaded to use the new certificates
@@ -36,21 +39,55 @@ The dstack-ingress system provides a seamless way to set up custom domains for d
    * These include the ACME account information and certificate data
    * Evidence files are accessible through a dedicated endpoint
 
+</details>
+
 ### Prerequisites
 
 * Host your domain on [Cloudflare](https://dash.cloudflare.com/) and have access to the Cloudflare account with API token
 
+### Create Cloudflare API Token
+
+If you have not generated an API Token for your custom domain management then follow these steps:
+
+<details>
+
+<summary>Create API Token</summary>
+
+### :one: **Go to your Cloudflare Dashboard**
+
+In your dashboard, select the domain you'd like to use and find the option to **Get Your API Token**
+
+<figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
+
+### :two: Create API Token
+
+Select the **Create Token** button as shown below
+
+<figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
+
+### :three: Select a Template
+
+The next page will have several templates. Select the template to **Edit zone DNS** as shown below
+
+<figure><img src="../../.gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
+
+### :four: Finalize API Token Creation
+
+Next select your domain in the **Zone Resources** section then click **Continue to summary** button as shown below
+
+<figure><img src="../../.gitbook/assets/image (17).png" alt=""><figcaption></figcaption></figure>
+
+Congrats! You've now created your API Token to use for your environment variable.
+
+</details>
+
 ### Deployment
 
-You can either build the ingress container and push it to docker hub, or use the prebuilt image at `kvin/dstack-ingress`.
-
 {% hint style="info" %}
-For more details on how to generate your own docker image for your setup, checkout the [github repository](https://github.com/Dstack-TEE/dstack-examples/blob/main/custom-domain/dstack-ingress/README.md) for dstack examples.
+For more details, checkout the [github repository](https://github.com/Dstack-TEE/dstack-examples/blob/main/custom-domain/dstack-ingress/README.md) for the dstack-ingress dstack examples.
 {% endhint %}
 
-**Use the Pre-built Image**
-
-The fastest way to get started is to use our pre-built image. Simply use the following docker-compose configuration:
+First you will go to your Phala Cloud Dashboard and deploy a new CVM. Select **docker-compose.yml** option for deployment then take the past the docker compose file below into the **Advanced** tab of the CVM configration page.
 
 ```yaml
 services:
@@ -85,80 +122,11 @@ Explanation of environment variables:
 * `TARGET_ENDPOINT`: The plain HTTP endpoint of your dstack application
 * `SET_CAA`: Set to `true` to enable CAA record setup
 
-### Create Cloudflare API Token
-
-If you have not generated an API Token for your custom domain management then follow these steps:
-
-{% stepper %}
-{% step %}
-### Go to your Cloudflare Dashboard
-
-In your dashboard, select the domain you'd like to use and find the option to **Get Your API Token**
-
-<figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
-{% endstep %}
-
-{% step %}
-### Create API Token&#x20;
-
-Select the **Create Token** button as shown below
-
-<figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
-{% endstep %}
-
-{% step %}
-### Select a Template
-
-The next page will have several templates. Select the template to **Edit zone DNS** as shown below
-
-<figure><img src="../../.gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
-{% endstep %}
-
-{% step %}
-### Finalize API Token Creation
-
-Next select your domain in the **Zone Resources** section then click **Continue to summary** button as shown below
-
-<figure><img src="../../.gitbook/assets/image (17).png" alt=""><figcaption></figcaption></figure>
-
-Congrats! You've now created your API Token to use for your environment variable.
-{% endstep %}
-{% endstepper %}
-
-### Deploy to Phala Cloud
+#### Deploy to Phala Cloud
 
 If you prefer video content, check the YouTube tutorial here.
 
 {% embed url="https://youtu.be/arQg6nXnSpc" %}
-
-First you will go to your Phala Cloud Dashboard and deploy a new CVM. Select **docker-compose.yml** option for deployment then take the past the docker compose file below into the **Advanced** tab of the CVM configration page.
-
-```yaml
-services:
-  dstack-ingress:
-    image: kvin/dstack-ingress@sha256:5cbf6eff9983fad4018de90ed11b0593c84f2022ddfc64b9eb513d1ba79970c7
-    ports:
-      - "443:443"
-    environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - DOMAIN=${DOMAIN}
-      - GATEWAY_DOMAIN=${GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - SET_CAA=true
-      - TARGET_ENDPOINT=http://app:80
-    volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
-      - cert-data:/etc/letsencrypt
-    restart: unless-stopped
-
-  app:
-    image: nginx
-    restart: unless-stopped
-
-volumes:
-  cert-data:
-
-```
 
 Here is how it should look like in the dashboard.
 
@@ -172,7 +140,7 @@ Click **Create** button and your CVM will deploy in a couple minutes with the cu
 
 <figure><img src="../../.gitbook/assets/image (20).png" alt=""><figcaption></figcaption></figure>
 
-### Domain Attestation and Verification
+## Domain Attestation and Verification
 
 The dstack-ingress system provides mechanisms to verify and attest that your custom domain endpoint is secure and properly configured. This comprehensive verification approach ensures the integrity and authenticity of your application.
 
