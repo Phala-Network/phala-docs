@@ -117,7 +117,7 @@ services:
       - eliza-network
 
   dstack-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: kvin/dstack-ingress@sha256:5cbf6eff9983fad4018de90ed11b0593c84f2022ddfc64b9eb513d1ba79970c7
     ports:
       - "443:443"
     environment:
@@ -151,7 +151,7 @@ Now on to the deployment. Go to you Phala Cloud Dashboard and deploy a new CVM. 
 ```yaml
 services:
   dstack-ingress:
-    image: kvin/dstack-ingress@sha256:8dfc3536d1bd0be0cb938140aeff77532d35514ae580d8bec87d3d5a26a21470
+    image: kvin/dstack-ingress@sha256:5cbf6eff9983fad4018de90ed11b0593c84f2022ddfc64b9eb513d1ba79970c7
     ports:
       - "443:443"
     environment:
