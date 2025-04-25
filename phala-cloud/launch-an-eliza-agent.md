@@ -2,7 +2,7 @@
 
 Phala Cloud has introduced a new feature that allows users to deploy an [Eliza agent](https://www.elizaos.ai/) without any coding. You can access this feature through [cloud.phala.network/eliza](https://cloud.phala.network/eliza). **In this tutorial, we'll guide you through the process of deploying an agent named Trump, capable of tweeting in his distinctive tone**.
 
-Before you begin, it would be ideal to understand what an [**Eliza's character file**](https://elizaos.github.io/eliza/docs/core/characterfile/) is. However, if you're unfamiliar with it, that's perfectly fine. You can start with a template and customize it to suit your needs. There are only two things you need to prepare:
+Before you begin, it would be ideal to understand what an [**Eliza's character file**](https://github.com/elizaOS/eliza/blob/main/docs/docs/core/characterfile.md) is. However, if you're unfamiliar with it, that's perfectly fine. You can start with a template and customize it to suit your needs. There are only two things you need to prepare:
 
 * **An X account for the agent to connect and tweet**
 * **An OpenAI account for the agent to send requests and harness its intelligence**
