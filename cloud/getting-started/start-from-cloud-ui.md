@@ -6,7 +6,7 @@ Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-clou
 
 ## Step 1- Create a CVM with Template
 
-Click the **Deploy** -> **From Docker Compose** in the top-right corner of the cloud [homepage](https://cloud.phala.network/register?invite=PHALAWIKI) to access the deployment dashboard. Once there, you need to:
+Click the **Deploy** -> **From Docker Compose** in the top-right corner of the cloud [homepage](https://cloud.phala.network/register?invite=beta) to access the deployment dashboard. Once there, you need to:
 
 1. Set your application name
 2.  Choose a template you want to get started or use your Docker compose file by navigate to **Advanced** tab. In this guide, we will use the template **`jupyter/base-notebook`** for example.

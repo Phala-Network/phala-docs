@@ -29,13 +29,15 @@ npx phala
 bunx phala
 ```
 
-## Sign Up for an Account
+## Log into Phala Cloud Account
+
+First we will log into the Phala Cloud with your account. If you have not signed up for an account and you are in the terminal, follow the steps in **Sign Up for an Account via CLI** below. Otherwise, skip to [#generate-a-phala-cloud-api-key](start-from-cloud-cli.md#generate-a-phala-cloud-api-key "mention").
+
+<details>
+
+<summary>Sign Up for an Account via CLI</summary>
 
 Run `npx phala free`to get started with your Phala Cloud account and a free CVM deployment.
-
-{% embed url="https://youtu.be/gNfM2UzxzQg" %}
-WTF is npx phala free?!
-{% endembed %}
 
 ```bash
 npx phala free
@@ -45,13 +47,17 @@ This will open a browser to the Phala Cloud sign-up page. Get your free account 
 
 <figure><img src="../../.gitbook/assets/image (12).png" alt=""><figcaption><p>Signup Page</p></figcaption></figure>
 
+
+
+</details>
+
 ## Generate a Phala Cloud API Key
 
 Log into your dashboard and select the logo in the top left corner.
 
 <figure><img src="../../.gitbook/assets/Screenshot 2025-02-27 at 11.42.32.png" alt=""><figcaption></figcaption></figure>
 
-Click your username and select "API Tokens".
+Click your username and select "**API Tokens**".
 
 <figure><img src="../../.gitbook/assets/Screenshot 2025-02-27 at 11.45.13.png" alt=""><figcaption></figcaption></figure>
 
@@ -78,11 +84,11 @@ Congratulations! You've now set up the Phala Cloud CLI and authenticated your ac
 
 Remember, you can always check your authentication status with:
 
-```
+```bash
 npx phala auth status
 ```
 
-```
+```bash
 ⟳ Checking authentication status... ✓
 
 ✓ Authenticated as hashwarlock

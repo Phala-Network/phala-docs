@@ -6,7 +6,7 @@ Phala Cloud offers a secure and private hosting in a TEE using [Dstack](../../ov
 {% step %}
 ### [Sign-up for Cloud Account](sign-up-for-cloud-account.md) (1 minute)
 
-Go to the [sign-up ](https://cloud.phala.network/register?invite=PHALAWIKI)page for Cloud account section to get an official Phala Cloud account to get started.
+Go to the [sign-up ](https://cloud.phala.network/register?invite=beta)page for Cloud account section to get an official Phala Cloud account to get started.
 {% endstep %}
 
 {% step %}
