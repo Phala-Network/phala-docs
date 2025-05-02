@@ -80,7 +80,7 @@
 * [Design Documents](dstack/design-documents/README.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Protocol](dstack/design-documents/key-management-protocol.md)
-  * [TEE-Controlled Domain Certificates](dstack/design-documents/tee-controlled-domain-certificates.md)
+  * [Zero Trust HTTPs (TLS)](dstack/design-documents/tee-controlled-domain-certificates.md)
 * [Acknowledgement](dstack/acknowledgement.md)
 
 ## LLM in GPU TEE
