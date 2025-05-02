@@ -1,6 +1,6 @@
 ---
-cover: .gitbook/assets/Welcome-Docs.png
-coverY: 0
+cover: .gitbook/assets/phala-docs (1).jpg
+coverY: -101
 layout:
   cover:
     visible: true
@@ -19,11 +19,7 @@ layout:
 
 # 👾 Phala Network Docs
 
-***
-
-Phala Network makes trustless available and affordable for all developers.
-
-Phala Network is a next-generation **cloud platform** that provides a **low-cost, user-friendly trustless environment**, making zero-trust computing accessible to a broad range of developers. By leveraging a **hybrid infrastructure** including Trusted Execution Environments (TEEs), blockchain, Multi-Party Computation (MPC), and Zero-Knowledge Proof (ZKP), Phala delivers flexible, open-source, and affordable **verification** solutions for any developer, in any type of program.
+Phala Network delivers a next-generation cloud solution via [**Phala Cloud**](https://cloud.phala.network) built on **Dstack**, offering a low-cost, user-friendly trustless environment. Notably, **Phala Cloud** enables developers to deploy any standard Docker application directly into a Trusted Execution Environment (**TEE**), providing a higher security baseline out of the box. This makes zero-trust computing, supported by Phala's hybrid infrastructure (TEEs, blockchain, **MPC**, **ZKP**), accessible, flexible, open-source, and affordable for a broad range of developers and programs.
 
 ## Discover Phala Network
 

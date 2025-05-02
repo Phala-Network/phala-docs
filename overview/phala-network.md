@@ -2,14 +2,6 @@
 
 Confidential AI Inference stands as a cornerstone for safeguarding sensitive data and ensuring secure AI model execution in Web3. Through the implementation of LLM models within Trusted Execution Environments (TEE), Phala Network delivers private and verifiable AI computations. This robust approach addresses fundamental challenges in the Web3 ecosystem: data privacy protection, secure execution guarantees, and computational verifiability. Such capabilities are essential for applications where the protection of user data and model integrity is paramount.
 
-<figure><img src="../.gitbook/assets/Phala-AI-Agent-Contract-HLD.png" alt=""><figcaption></figcaption></figure>
-
-1. **Agentize smart contracts**: Create smart contract centric AI Agents for popular web3 services and smart contracts. "**Regulate**" your AI Agents through a DAO to enforce business logic for your agents.
-2. **Connect to the internet of multi-agents**: Make your agents accessible by other cross-platform AI Agents deployed on Autonolas, FLock.io, Morpheus, Polywrap, etc.
-3. **Launch and get incentivized**: Own your agents and build a profitable tokenomic through our default tokenomic model or customize your own.
-
-To learn more about launching agents with tokenomics: [agent-wars-introduction.md](../agent-wars-legacy/agent-wars-introduction.md "mention")
-
 ## **What Sets Phala Apart:**
 
 * **We Don't Trust Any Provider**: Our **security model** goes beyond traditional cloud solutions (e.g., AWS, Azure, GCP). **Phala does not trust any cloud platform, hardware provider, or even its users,** ensuring true zero-trust.
