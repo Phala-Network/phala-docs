@@ -35,6 +35,6 @@ When the application launched successfully, the RA Report can be exported with s
 
 ## Conclusion
 
-Now that there is an introduction to the Dstack, we can begin the fun part of building on the SDK. There are a few ways to get started depending on your starting point. Let's take a look at the options in [Getting Started](../../dstack/getting-started/).
+Now that there is an introduction to the Dstack, we can begin the fun part of building on the SDK. There are a few ways to get started depending on your starting point. Let's take a look at the options in [Getting Started](../../cloud/getting-started/getting-started.md).
 
 Or if you are interested in building on Phala Cloud without runing Dstack at your own hardware, you can check out the [Phala Cloud](phala-cloud.md) page.

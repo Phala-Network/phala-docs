@@ -21,25 +21,25 @@ If you have not generated an API Token for your custom domain management then fo
 
 <summary>Create API Token</summary>
 
-### :one: **Go to your Cloudflare Dashboard**
+#### :one: **Go to your Cloudflare Dashboard**
 
 In your dashboard, select the domain you'd like to use and find the option to **Get Your API Token**
 
 <figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
 
-### :two: Create API Token
+#### :two: Create API Token
 
 Select the **Create Token** button as shown below
 
 <figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
 
-### :three: Select a Template
+#### :three: Select a Template
 
 The next page will have several templates. Select the template to **Edit zone DNS** as shown below
 
 <figure><img src="../../.gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
 
-### :four: Finalize API Token Creation
+#### :four: Finalize API Token Creation
 
 Next select your domain in the **Zone Resources** section then click **Continue to summary** button as shown below
 
@@ -178,7 +178,7 @@ Explanation of environment variables:
 * `DOMAIN`: Your custom domain (i.e. `your-domain.com` )
 * `GATEWAY_DOMAIN`: The dstack gateway domain. (e.g. `_.dstack-prod5.phala.network` for Phala Cloud **prod5** server)
 * `CERTBOT_EMAIL`: Your email address used for Let's Encrypt email notifications
-* `TARGET_ENDPOINT`: **Where the ingress should forward all incoming traffic**—i.e. the upstream service application:port. In this case, we point to the `nginx` app on port `80`.&#x20;
+* `TARGET_ENDPOINT`: **Where the ingress should forward all incoming traffic**—i.e. the upstream service application:port. In this case, we point to the `nginx` app on port `80`.
 * `SET_CAA`: Set to `true` to enable CAA record setup
 
 Now copy and paste the docker-compose.yaml code above into the **Advanced** Tab similar to the screnshot below.
@@ -189,11 +189,11 @@ Next you need to grab your Cloudflare API Token for your domain, and fill in you
 
 <figure><img src="../../.gitbook/assets/image (19).png" alt=""><figcaption></figcaption></figure>
 
-Click **Create** button and your CVM will deploy in a couple minutes with the custom domain. Here is an example of a custom domain deployed to [phala.incipient.ltd. ](https://phala.incipient.ltd)
+Click **Create** button and your CVM will deploy in a couple minutes with the custom domain. Here is an example of a custom domain deployed to [phala.incipient.ltd.](https://phala.incipient.ltd)
 
 <figure><img src="../../.gitbook/assets/image (20).png" alt=""><figcaption></figcaption></figure>
 
-**Congratulations!** You've successfully deployed your CVM with a custom domain. Your application is now secured with Zero Trust HTTPS, thanks to the seamless integration of Cloudflare DNS and Let's Encrypt.  If you are interested in the verification of this process check the [#domain-attestation-and-verification](setting-up-custom-domain.md#domain-attestation-and-verification "mention").
+**Congratulations!** You've successfully deployed your CVM with a custom domain. Your application is now secured with Zero Trust HTTPS, thanks to the seamless integration of Cloudflare DNS and Let's Encrypt. If you are interested in the verification of this process check the [#domain-attestation-and-verification](setting-up-custom-domain.md#domain-attestation-and-verification "mention").
 
 ## Knowledge
 

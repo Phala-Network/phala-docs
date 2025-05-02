@@ -11,9 +11,9 @@ console.log(keyResult.certificate_chain); // Certificate chain
 const keyBytes = keyResult.asUint8Array(); // Get key as Uint8Array
 ```
 
-## Derive wallet using view
+## Derive wallet using viem
 
-DStack SDK provides a helper function to derive a [view](https://viem.sh/) compatible wallet.
+DStack SDK provides a helper function to derive a [viem](https://viem.sh) compatible wallet.
 
 ```javascript
 import { toViemAccount } from '@phala/dstack-sdk/viem';
