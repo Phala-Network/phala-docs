@@ -1,4 +1,4 @@
-# Create CVM with Private Docker Images
+# Create CVM with Private Docker Image
 
 > **Note:** This feature requires DStack version 0.3.5 or later
 
@@ -27,8 +27,86 @@ For automated deployments or enhanced security, you can set registry credentials
 
 #### Docker Hub Registry
 
-- To download images from Docker Registry, you need to set the following encrypted environment variables: DSTACK_DOCKER_USERNAME and DSTACK_DOCKER_PASSWORD.
-- To download images from AWS ECR Private Registry, you need to set the following encrypted environment variables: DSTACK_AWS_ACCESS_KEY_ID, DSTACK_AWS_SECRET_ACCESS_KEY, and DSTACK_AWS_REGION, DSTACK_AWS_ECR_REGISTRY.
+* To download images from Docker Registry, you need to set the following encrypted environment variables: DSTACK\_DOCKER\_USERNAME and DSTACK\_DOCKER\_PASSWORD.
+* To download images from AWS ECR Private Registry, you need to set the following encrypted environment variables: DSTACK\_AWS\_ACCESS\_KEY\_ID, DSTACK\_AWS\_SECRET\_ACCESS\_KEY, and DSTACK\_AWS\_REGION, DSTACK\_AWS\_ECR\_REGISTRY.
+
+## Deploy Private Docker Image with CLI
+
+**Using a Private Docker Registry with** [**Phala Cloud CLI**](../../phala-cloud/tee-cloud-cli/)
+
+You can deploy images from a private Docker registry by setting the appropriate environment variables.
+
+**🔐 DockerHub:**
+
+Set these variables:
+
+* `DSTACK_DOCKER_USERNAME` – Your DockerHub username _(required)_
+* `DSTACK_DOCKER_PASSWORD` – Your DockerHub password or personal access token _(required)_
+* `DSTACK_DOCKER_REGISTRY` – Registry URL (optional, defaults to DockerHub)
+
+**🔐 AWS ECR:**
+
+Set these variables:
+
+* `DSTACK_AWS_ACCESS_KEY_ID` – AWS access key _(required)_
+* `DSTACK_AWS_SECRET_ACCESS_KEY` – AWS secret key _(required)_
+* `DSTACK_AWS_REGION` – AWS region of the ECR _(required)_
+* `DSTACK_AWS_ECR_REGISTRY` – Full ECR registry URL _(required)_
+
+Once set and added to your docker-compose.yml file, the CLI will automatically authenticate and pull your private image securely.
+
+Example compose file that includes the encrypted environment variables to pull the private docker image.
+
+```yaml
+version: '3.8'
+
+services:
+  brave-search:
+    image: hashwarlock/brave-search-mcp:v0.0.1
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - DSTACK_DOCKER_USERNAME=${DSTACK_DOCKER_USERNAME}
+      - DSTACK_DOCKER_PASSWORD=${DSTACK_DOCKER_PASSWORD}
+    restart: unless-stopped
+```
+
+Once these are set, run the command:
+
+```sh
+phala cvms create --name brave-search --compose docker-compose.yml --teepod-id 3 -e .env
+```
+
+You will see a log that will clarify if you are using a private registry or not.
+
+```sh
+✓ Deleted DSTACK_SIMULATOR_ENDPOINT from current process
+⟳ Fetching available TEEPods... ✓
+⟳ Getting public key from CVM... ✓
+ℹ 🔐 Using public DockerHub registry...
+⟳ Encrypting environment variables... ✓
+⟳ Creating CVM... ✓
+✓ CVM created successfully
+
+╭────────────┬────────────────────────────────────────────────────────────────────────────────────────────╮
+├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
+│ CVM ID     │ 5952                                                                                       │
+├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Name       │ brave-search                                                                               │
+├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Status     │ creating                                                                                   │
+├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
+│ App ID     │ app_9292e497bee0f6885df155c79635606c33b9c160                                               │
+├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
+│ App URL    │ https://cloud.phala.network/dashboard/cvms/app_9292e497bee0f6885df155c79635606c33b9c160    │
+╰────────────┴────────────────────────────────────────────────────────────────────────────────────────────╯
+ℹ 
+✓ Your CVM is being created. You can check its status with:
+phala cvms get app_9292e497bee0f6885df155c79635606c33b9c160
+```
 
 ## Setting with Phala Cloud API
 
