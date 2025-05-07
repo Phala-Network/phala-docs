@@ -100,7 +100,7 @@ docker run -dti --rm \
     phalanetwork/phala-pherry
 ```
 
-The command starts pherry, linked with `khala-node` and `phala-pruntime` containers. It reads the blokchain from `khala-node:9944` and sync the data to `phala-pruntime:8000`. If you run the full node remotely, just change the host name `khala-node` to the node rpc endpoint. The mnenomic is specified by the environment variable.
+The command starts pherry, linked with `khala-node` and `phala-pruntime` containers. It reads the blockchain from `khala-node:9944` and sync the data to `phala-pruntime:8000`. If you run the full node remotely, just change the host name `khala-node` to the node rpc endpoint. The mnenomic is specified by the environment variable.
 
 pherry usually takes 1-2 days to sync the blockchain history. However, since pRuntime doesn’t persist the state, if it exits, you will need to sync from scratch in the next time.
 
