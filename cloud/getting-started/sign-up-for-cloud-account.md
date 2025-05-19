@@ -1,8 +1,10 @@
-# Sign-up for Cloud Account
+# Create Your Phala Cloud Account
 
 ## Register a New Account
 
-First, you will need to sign-up for the Phala Cloud. Sign up by following the link [here](https://cloud.phala.network/register?invite=beta).&#x20;
+First, you will need to sign-up for the Phala Cloud. Click on the **Register** button to sign-up for your Phala Cloud account.
+
+<a href="https://cloud.phala.network/register?invite=beta" class="button primary">Register</a>
 
 The sign-up page should look like the following:
 

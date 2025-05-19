@@ -1,4 +1,4 @@
-# Start from Cloud UI
+# Your First CVM Deployment
 
 {% hint style="warning" %}
 Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-cloud-account.md) section before continuing.
@@ -81,6 +81,6 @@ Click the **Deploy** -> **From Docker Compose** in the top-right corner of the c
 
 Now that you've deployed your first confidential application, you can:
 
-1. **Deploy your existing Docker applications** to TEE - check out the [Deploy Docker App in TEE](../../phala-cloud/migration/)
+1. **Deploy your existing Docker applications** to TEE - check out the [Deploy Docker App in TEE](../../migration.md)
 2. **Build an AI agent** in minutes and deploy in one-click with the [Eliza Agent Builder](https://cloud.phala.network/eliza) - check out the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) to get started
 3. **Explore advanced features** like debugging, log management, and scaling your applications
