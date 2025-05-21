@@ -67,3 +67,30 @@ CN: [https://t.me/+GZwUzcON9OkzOGVl](https://t.me/+GZwUzcON9OkzOGVl) EN: [https:
 * [https://github.com/elizaOS/eliza-starter](https://github.com/elizaOS/eliza-starter)
 * [https://github.com/thejoven/awesome-eliza](https://github.com/thejoven/awesome-eliza)
 * [https://github.com/elizaOS/elizaos.github.io](https://github.com/elizaOS/elizaos.github.io)
+
+## ❓ FAQs
+
+### Do I need to create a custom Docker image for my Eliza agent?
+
+- If you want to use the default framework example, you can use the template provided by Phala
+- If you have customized code, you'll need to:
+    1. Convert your Eliza code into a Docker image
+    2. Upload it to a Docker registry
+    3. Configure it in the Phala TEE setup
+
+### Can I change the Docker image after creating an agent?
+
+Yes, applications are upgradable. To update your application:
+
+1. Push your updated Docker image to Docker Hub
+2. Execute the upgrade on the cloud dashboard
+
+### What are the recommended resources for running Eliza?
+
+It's strongly recommended to run Eliza with 2 vCPUs + 4GB RAM for optimal performance.
+
+### How can I connect the X Account with my Agent?
+
+Besides setting user name, password, and email with specific environments, you also need to enable 2FA on your X account and set it through `TWITTER_2FA_SECRET`. Check the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) for more information. 
+
+If you still receive a `Login attempt failed` error, consider logging into your X account via a browser and logging out of the existing session. See the related [issue](https://github.com/elizaOS/eliza/issues/905) on the Eliza repository.
