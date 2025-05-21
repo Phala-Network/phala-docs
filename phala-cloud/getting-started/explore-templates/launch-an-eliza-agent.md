@@ -89,7 +89,7 @@ Yes, applications are upgradable. To update your application:
 
 It's strongly recommended to run Eliza with 2 vCPUs + 4GB RAM for optimal performance.
 
-### How can I connect the X Account with my Agent
+### How can I connect the X Account with my Agent?
 
 Besides setting user name, password, and email with specific environments, you also need to enable 2FA on your X account and set it through `TWITTER_2FA_SECRET`. Check the [tutorial](https://phala.network/posts/guide-to-exploring-the-phala-cloud-agent-builder) for more information. 
 
