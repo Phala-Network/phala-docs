@@ -32,6 +32,6 @@ Reference: https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/fde_setup
 
 The deployment logic for Dstack-TEE is part of its Rust-based implementation, there are mulitple services involved in the deployment pipeline. [Dstack-TEE GitHub repository](https://github.com/Dstack-TEE/dstack) contains the core services (e.g., vmm, gateway, kms, meta-dstack).
 
-## Q: Can I run a Docker image directly in a TEE without setting up all Dstack components?
+## Can I run a Docker image directly in a TEE without setting up all Dstack components?
 
 Yes, you can run a Docker image in a TEE using the Dstack SDK without setting up all components, but with limitations. The SDK provides a base VM image that runs a minimal VM containing your Docker container. The essential components are kms (key management service) and vmm (TEE runtime), which must be included. Optional components like dstack-gateway (for TLS support) can be skipped if you don’t need features like encrypted communication. Configure the SDK with your Docker image and the required components as per the documentation.

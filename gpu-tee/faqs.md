@@ -1,6 +1,6 @@
 # ❓ FAQs
 
-## Q: What is the relationship between dstack Private ML SDK, and what's the vllm-proxy doing there?
+## What is the relationship between dstack Private ML SDK, and what's the vllm-proxy doing there?
 
 Private ML SDK in leverage the TEE feature brought by Intel and Nvidia GPU, support run any GPU workload as the form of docker container in GPU TEE TEE. In the Private ML SDK, dstack is a framework that can run Docker containers, while vllm-proxy is a specific container within it. The vllm-proxy container operates as a server that forwards requests to a vllm container (hosting a large language model) and generates quotes to attach to responses. This separation allows vllm to remain unmodified and compatible with its latest versions.
 
