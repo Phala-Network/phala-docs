@@ -105,9 +105,9 @@ Discuss custom solutions with the Phala team if this is critical for your use ca
 
 You can deploy multiple Docker instances on a single Phala Cloud VM using a "Docker-in-Docker" approach, similar to what large clients have implemented (e.g., running 150+ instances). To do this:
 
-Step1: Create a larger VM (e.g., 10 vCPUs, 20GB RAM).
-Step2: Deploy your Dockerized images inside this VM, adjusting ports or configurations as needed to avoid conflicts.
-Step3: Use custom environment variables per instance for differentiation, for example, set the image name or version through environment variable.
+Step 1: Create a larger VM (e.g., 10 vCPUs, 20GB RAM).
+Step 2: Deploy your Dockerized images inside this VM, adjusting ports or configurations as needed to avoid conflicts.
+Step 3: Use custom environment variables per instance for differentiation, for example, set the image name or version through environment variable.
 This reduces overhead (e.g., from multiple OS instances) and can lower costs. Phala can assist with implementation—reach out for support.
 
 ## What endpoint do I use to view logs for a specific instance?
