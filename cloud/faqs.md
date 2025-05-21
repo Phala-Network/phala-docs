@@ -139,7 +139,7 @@ To verify the report, user can get the report hex data from Phala Cloud dashboar
 
 Check the [pricing page](https://cloud.phala.network/pricing) for more details.
 
-## What kind of User Levels we have on Phala Cloud
+## What kind of user levels do we have on Phala Cloud?
 
 - **Free**: User who registered on Phala Cloud, but have limit resource can be used.
 - **Pro**: Paid users with self-service capabilities
