@@ -10,7 +10,7 @@ No, CUDA and NVIDIA drivers are not required on the host for the Private ML SDK 
 
 ## Is CUDA directly accessible in Phala GPU TEE?
 
-Yes, CUDA works in the GPU TEE environment. By default you don't need to install it on host environment when using prviate-ml-sdk to create a CVM, if you want to use CUDA in your CVM, you can install it inside CVM by yourselves. You can refer to our benchmark analysis with Succinct, where the SP1 VM also involves CUDA.
+Yes, CUDA works in the GPU TEE environment. By default, you don’t need to install it on the host environment when using private-ml-sdk to create a CVM. If you want to use CUDA in your CVM, you can install it manually inside the CVM. You can refer to our benchmark analysis with Succinct, where the SP1 VM also involves CUDA.
 
 ## Can I run my app in a docker container with access to GPU TEE under Intel TDX? Is this similar to Google Cloud's Confidential Space?
 
