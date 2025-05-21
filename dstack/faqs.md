@@ -30,7 +30,7 @@ Reference: https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/fde_setup
 
 ## Where is the deployment function located in the Dstack-TEE codebase, and can it be integrated with custom tools?
 
-The deployment logic for Dstack-TEE is part of its Rust-based implementation, there are mulitple services involved in the deployment pipeline. [Dstack-TEE GitHub repository](https://github.com/Dstack-TEE/dstack) contains the core services (e.g., vmm, gateway, kms, meta-dstack).
+The deployment logic for Dstack-TEE is part of its Rust-based implementation, there are multiple services involved in the deployment pipeline. [Dstack-TEE GitHub repository](https://github.com/Dstack-TEE/dstack) contains the core services (e.g., vmm, gateway, kms, meta-dstack).
 
 ## Can I run a Docker image directly in a TEE without setting up all Dstack components?
 
