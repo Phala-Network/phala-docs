@@ -104,12 +104,14 @@
   * [Key Management Service](dstack/design-documents/key-management-protocol.md)
   * [Zero Trust HTTPs (TLS)](dstack/design-documents/tee-controlled-domain-certificates.md)
 * [Acknowledgement](dstack/acknowledgement.md)
+* [❓ FAQs](dstack/faqs.md)
 
 ## LLM in GPU TEE
 
 * [👩‍💻 Host LLM in GPU TEE](gpu-tee/llm-in-tee.md)
 * [🔐 GPU TEE Inference API](gpu-tee/inference-api.md)
 * [🏎️ GPU TEE Benchmark](gpu-tee/benchmark.md)
+* [❓ FAQs](gpu-tee/faqs.md)
 
 ## Tech Specs
 
