@@ -4,36 +4,65 @@ icon: desktop
 
 # Local Development Guide
 
-Dstack brings the support for containerized applications in TEE. This means your application development and testing can be totally detached from TEE hardware and happen on your own laptop. Dstack is equipped with TEE simulator and SDKs for different programming languages for you to get secrets and verifiable TEE Quote.
+Dstack enables running containerized applications in Trusted Execution Environments (TEE). For development purposes, you can use our TEE simulator to develop and test your applications locally without TEE hardware. This guide covers setting up the simulator and using our SDKs to interact with TEE functionalities.
+
+Refer to the [**Hardware Requirements**](hardware-requirements.md) for release.
+
+## Prerequisites
+
+- Rust toolchain (for building the simulator)
+- Git
+- One of the following development environments:
+    - Node.js 16+ (for JavaScript SDK)
+    - Python 3.7+ (for Python SDK)
+    - Go 1.16+ (for Go SDK)
+    - Rust 1.70+ (for Rust SDK)
 
 ## Simulator
 
 The latest TEE simulator is available in [dstack](https://github.com/Dstack-TEE/dstack/tree/master/sdk/simulator) code repository. Use the following commands to build it:
 
+### Build Simulator
+
 ```bash
-# install rust
+# Install rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
+# Clone the repository
 git clone https://github.com/Dstack-TEE/dstack.git
 
+# Build the simulator
 cd dstack/sdk/simulator
 ./build.sh
 
-# the folder should contains the compiled dstack-simulator
-# run the simulator with
+# Run the simulator
 ./dstack-simulator
 
-# after dstack-simulator is running, it will create the following sock files in its folder
-#   tappd.sock   // the legacy TEE service interface
-#   dstack.sock  // the incoming TEE service interface
+# The simulator will create the following socket files:
+#   tappd.sock   // Legacy TEE service interface (recommended)
+#   dstack.sock  // New TEE service interface (in development)
 #   external.sock
 #   guest.sock
 ```
 
-To use the simulator with any one of the following SDKs, use the following environment variable:
+To use the simulator with any SDK, set the following environment variable with the absolute path:
 
 ```bash
 export DSTACK_SIMULATOR_ENDPOINT=/path/to/tappd.sock
+```
+
+### Verifying Simulator Setup
+
+After starting the simulator, verify the setup by checking:
+
+1. The socket files exist in the simulator directory:
+```bash
+ls *.sock
+```
+
+2. The environment variable is set correctly:
+```bash
+echo $DSTACK_SIMULATOR_ENDPOINT
 ```
 
 ## Dstack API
