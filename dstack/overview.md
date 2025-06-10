@@ -14,7 +14,7 @@ Check our [Acknowledgement](acknowledgement.md) for all of the key contributors 
 
 > [Phala Cloud](overview/phala-network/phala-cloud.md) is built on top of Dstack that enables developers to deploy programs to CVM (Confidential VM), and to follow the security best practices by default.
 
-## Overview
+## Features
 
 The [Dstack SDK](https://github.com/dstack-TEE/dstack) is designed to simplify the steps for developers to deploy any dockerized app to an Intel TDX Server running Dstack. It does the following things to make your app secure with security best practices:
 

@@ -97,6 +97,7 @@
 ## Dstack
 
 * [Overview](dstack/overview.md)
+* [Local Development Guide](dstack/local-development.md)
 * [Getting Started](dstack/getting-started.md)
 * [Hardware Requirements](dstack/hardware-requirements.md)
 * [Design Documents](dstack/design-documents/README.md)
