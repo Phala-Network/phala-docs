@@ -100,6 +100,7 @@
 * [Getting Started](dstack/getting-started.md)
 * [Hardware Requirements](dstack/hardware-requirements.md)
 * [Design Documents](dstack/design-documents/README.md)
+  * [Whitepaper](dstack/design-documents//whitepaper.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Service](dstack/design-documents/key-management-protocol.md)
   * [Zero Trust HTTPs (TLS)](dstack/design-documents/tee-controlled-domain-certificates.md)
