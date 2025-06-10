@@ -20,35 +20,35 @@ Dstack is a **developer friendly** and **security first** SDK to simplify the de
 
 Main features:
 
-* 🔒 Deploy Docker apps securely in TEE in minutes
-* 🛠️ Use familiar tools - just write a docker-compose.yaml
-* 🔑 Safely manage secrets and sensitive data
-* 📡 Expose services via built-in TLS termination
+- 🔒 Deploy containerized apps securely in TEE in minutes
+- 🛠️ Use familiar tools - just write a docker-compose.yaml
+- 🔑 Safely manage secrets and sensitive data
+- 📡 Expose services via built-in TLS termination
 
-Dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Neithermind](https://github.com/neithermind) and many others.
+Dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Nethermind](https://github.com/NethermindEth/nethermind) and [many others](#contributors).
 
 ## Overview
 
 Components in Dstack:
 
-* `teepod`: A service running in bare TDX host to manage CVMs
-* `tproxy`: A reverse proxy to forward TLS connections to CVMs
-* `kms`: A KMS server to generate keys for CVMs
-* `tappd`: A service running in CVM to serve containers' key derivation and attestation requests
-* `meta-dstack`: A Yocto meta layer to build CVM guest images
+- `dstack-vmm`: A service running in bare TDX host to manage CVMs
+- `dstack-gateway`: A reverse proxy to forward TLS connections to CVMs
+- `dstack-kms`: A KMS server to generate keys for CVMs
+- `dstack-guest-agent`: A service running in CVM to serve containers' key derivation and attestation requests
+- `meta-dstack`: A Yocto meta layer to build CVM guest images
 
 The overall architecture is shown below:
 
 ## Directory structure
 
-```
+```text
 dstack/
     kms/                         A prototype KMS server
-    tappd/                       A service running in CVM to serve containers' key derivation and attestation requests.
-    tdxctl/                      A CLI tool getting TDX quote, extending RTMR, generating cert for RA-TLS, etc.
-    teepod/                      A service running in bare TDX host to manage CVMs
-    tproxy/                      A reverse proxy to forward TLS connections to CVMs
-    certbot/                     A tool to automatically obtain and renew TLS certificates for tproxy
+    guest-agent/                 A service running in CVM to serve containers' key derivation and attestation requests.
+    dstack-util/                 A CLI tool in the guest setting up the system, getting TDX quote, extending RTMR, generating cert for RA-TLS, etc.
+    vmm/                         A service running in bare TDX host to manage CVMs
+    gateway/                     A reverse proxy to forward TLS connections to CVMs
+    certbot/                     A tool to automatically obtain and renew TLS certificates for dstack-gateway
     ra-rpc/                      RA-TLS support for pRPC
     ra-tls/                      RA-TLS support library
     tdx-attest/                  Guest library for getting TDX quote and extending RTMR
@@ -58,10 +58,11 @@ dstack/
 
 ### Prerequisites
 
-* A TDX host machine setup following [canonical/tdx](https://github.com/canonical/tdx)
-* Public IPv4 address assigned to the machine
-* A domain name you can modify DNS records
-* At least 16GB RAM, 100GB free disk space.
+- A bare metal TDX server setup following [canonical/tdx](https://github.com/canonical/tdx)
+- Public IPv4 address assigned to the machine
+- At least 16GB RAM, 100GB free disk space.
+- A domain with DNS access if you want to set up `dstack-gateway` for Zero Trust HTTPS
+
 
 ### Install dependencies
 
@@ -77,89 +78,69 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```bash
 git clone https://github.com/Dstack-TEE/meta-dstack.git --recursive
 cd meta-dstack/
-source dev-setup
 
 mkdir build
 cd build
-../build.sh
+../build.sh hostcfg
 # This outputs the following message:
 # Config file ../build-config.sh created, please edit it to configure the build
 
 vim ./build-config.sh
 ```
 
-Now edit the config file. The following configurations values must be changed properly according to your environment:
+Review and customize the `build-config.sh` configuration file according to your environment requirements. The file contains network ports, domain settings, and other important parameters. Once configured, run the build script again to generate the necessary artifacts:
 
 ```bash
-# The internal port for teepod to listen to requests from you
-TEEPOD_RPC_LISTEN_PORT=9080
-# The start CID for teepod to allocate to CVMs
-TEEPOD_CID_POOL_START=20000
-
-# The internal port for kms to listen to requests from CVMs
-KMS_RPC_LISTEN_PORT=9043
-# The internal port for tproxy to listen to requests from CVMs
-TPROXY_RPC_LISTEN_PORT=9070
-
-# WireGuard interface name for tproxy
-TPROXY_WG_INTERFACE=tproxy-kvin
-# WireGuard listening port for tproxy
-TPROXY_WG_LISTEN_PORT=9182
-# WireGuard server IP for tproxy
-TPROXY_WG_IP=10.0.3.1
-# WireGuard client IP range
-TPROXY_WG_CLIENT_IP_RANGE=10.0.3.0/24
-# The public port for tproxy to listen to requests that would be forwarded to app in CVMs
-TPROXY_SERVE_PORT=9443
-
-# The public domain name for tproxy. Please set a wildacard DNS record (e.g. *.app.kvin.wang in this example)
-# for this domain that points the IP address of your TDX host.
-TPROXY_PUBLIC_DOMAIN=app.kvin.wang
-# The path to the TLS certificate for tproxy's public endpoint
-TPROXY_CERT=/etc/rproxy/certs/cert.pem
-# The path to the TLS key for tproxy's public endpoint
-TPROXY_KEY=/etc/rproxy/certs/key.pem
-```
-
-Run build.sh again to build the artifacts.
-
-```bash
-../build.sh
+../build.sh hostcfg
 
 # If everything is okay, you should see the built artifacts in the `build` directory.
 $ ls
-certs  images  kms  kms.toml  run  teepod  teepod.toml  tproxy  tproxy.toml
+certs  images  dstack-kms  kms.toml  run  dstack-vmm  vmm.toml  dstack-gateway  gateway.toml
+```
 
-# The wireguard interface should be set up:
-$ ifconfig tproxy-kvin
-tproxy-kvin: flags=209<UP,POINTOPOINT,RUNNING,NOARP>  mtu 1420
-        inet 10.0.3.1  netmask 255.255.255.0  destination 10.0.3.1
-        unspec 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
-        RX packets 4839  bytes 839320 (839.3 KB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 3836  bytes 507540 (507.5 KB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+### Download guest image or build guest image from source
+
+```bash
+# This will download the guest image from the release page.
+../build.sh dl 0.5.2
+```
+
+Or build guest image from source:
+
+```bash
+# This will build the guest image from source using the yocto meta layer. This will take a while.
+../build.sh guest
 ```
 
 Now you can open 3 terminals to start the components:
 
-1. Run `./kms`
-2. Run `sudo ./tproxy`
-3. Run `./teepod`
+1. Run `./dstack-kms -c kms.toml`
+2. Run `sudo ./dstack-gateway -c gateway.toml`
+3. Run `./dstack-vmm -c vmm.toml`
 
 ### Deploy an App
 
-Open the teepod webpage [http://localhost:9080](http://localhost:9080)(change the port according to your configuration) on your local machine to deploy a `docker-compose.yaml` file:
+Open the dstack-vmm webpage [http://localhost:9080](http://localhost:9080)(change the port according to your configuration) on your local machine to deploy a `docker-compose.yaml` file:
+
+![vmm](../.gitbook/assets/dstack-vmm.png)
 
 After the container deployed, it should need some time to start the CVM and the containers. Time would be vary depending on your workload.
 
-* Click the \[Logs] button to see the logs of the CVM, you can see if the container is finished starting there.
-* Once the container is running, you can click the \[Dashboard] button to see some information of the container. And the logs of the containers can be seen in the \[Dashboard] page.
-* You can open tproxy's dashboard at [https://localhost:9070](https://localhost:9070) to see the CVM's wireguard ip address, as shown below:
+- Click the [Logs] button to see the logs of the CVM, you can see if the container is finished starting there.
+
+- Once the container is running, you can click the [Dashboard] button to see some information of the container. And the logs of the containers can be seen in the [Dashboard] page.
+
+    ![dstack-guest-agent](../.gitbook/assets/dstack-guest-agent.png)
+
+- You can open dstack-gateway's dashboard at [https://localhost:9070](https://localhost:9070) to see the CVM's wireguard ip address, as shown below:
+
+    ![dstack-gateway](../.gitbook/assets/dstack-gateway.png)
 
 ### Pass Secrets to Apps
 
 When deploying a new App, you can pass private data via Encrypted Environment Variables. These variables can be referenced in the docker-compose.yaml file as shown below:
+
+![secret](../.gitbook/assets/dstack-secret.png)
 
 The environment variables will be encrypted in the client-side and decrypted in the CVM before being passed to the containers.
 
@@ -167,18 +148,18 @@ The environment variables will be encrypted in the client-side and decrypted in 
 
 Once the app is deployed and listening on an HTTP port, you can access the HTTP service via tproxy's public domain. The ingress mapping rules are:
 
-* `<id>[s].<base_domain>` maps to port `80` or `443` if with `s` in the CVM.
-* `<id>-<port>[s].<base_domain>` maps to port `<port>` in the CVM.
+- `<id>[s].<base_domain>` maps to port `80` or `443` if with `s` in the CVM.
+- `<id>-<port>[s].<base_domain>` maps to port `<port>` in the CVM.
 
 For example, `3327603e03f5bd1f830812ca4a789277fc31f577-8080.app.kvin.wang` maps to port `8080` in the CVM.
 
-Where the `<id>` can be either the app id or the instance id. If the app id is used, one of the instances will be selected by the load balancer.\
-If the `id-port` part ends with `s`, it means the TLS connection will be passthrough to the app rather than terminating at tproxy.
+Where the `<id>` can be either the app id or the instance id. If the app id is used, one of the instances will be selected by the load balancer.
+If the `id-port` part ends with `s`, it means the TLS connection will be passthrough to the app rather than terminating at dstack-gateway.
 
 You can also ssh into the CVM to inspect more information, if your deployment uses the image `dstack-x.x.x-dev`:
 
 ```bash
-# The IP address of the CVM can be found in the tproxy dashboard.
+# The IP address of the CVM can be found in the gateway dashboard.
 ssh root@10.0.3.2
 ```
 
@@ -189,22 +170,23 @@ To get a TDX quote within app containers:
 1.  Mount `/var/run/tappd.sock` to the target container in `docker-compose.yaml`
 
     ```yaml
-    version: '3'
+    version: "3"
     services:
     nginx:
-        image: nginx:latest
-        volumes:
+      image: nginx:latest
+      volumes:
         - /var/run/tappd.sock:/var/run/tappd.sock
-        ports:
+      ports:
         - "8080:80"
-        restart: always
+      restart: always
     ```
+
 2.  Execute the quote request command in the container.
 
     ```bash
     # The argument report_data accepts binary data encoding in hex string.
     # The actual report_data passing the to the underlying TDX driver is sha2_256(report_data).
-    curl -X POST --unix-socket /var/run/tappd.sock -d '{"report_data": "0x1234deadbeef"}' http://localhost/prpc/Tappd.TdxQuote?json | jq .  
+    curl -X POST --unix-socket /var/run/tappd.sock -d '{"report_data": "0x1234deadbeef"}' http://localhost/prpc/Tappd.TdxQuote?json | jq .
     ```
 
 ### Container logs
@@ -217,12 +199,12 @@ curl 'http://<appid>.app.kvin.wang:9090/logs/<container name>?since=0&until=0&fo
 
 Replace `<appid>` and `<container name>` with actual values. Available parameters:
 
-* since=0: Starting Unix timestamp for log retrieval
-* until=0: Ending Unix timestamp for log retrieval
-* follow: Enables continuous log streaming
-* text: Returns human-readable text instead of base64 encoding
-* timestamps: Adds timestamps to each log line
-* bare: Returns the raw log lines without json format
+- since=0: Starting Unix timestamp for log retrieval
+- until=0: Ending Unix timestamp for log retrieval
+- follow: Enables continuous log streaming
+- text: Returns human-readable text instead of base64 encoding
+- timestamps: Adds timestamps to each log line
+- bare: Returns the raw log lines without json format
 
 The response of the RPC looks like:
 
@@ -234,50 +216,25 @@ $ curl 'http://0.0.0.0:9190/logs/zk-provider-server?text&timestamps'
 {"channel":"stdout","message":"2024-09-29T03:05:45.209546381Z [2024-09-29T03:05:44Z INFO  rust_prover::groth16] Starting setup process\n"}
 ```
 
-### Reverse proxy: TLS Passthrough
+## TLS Passthrough with Custom Domain
 
-The build configuration for TLS Passthrough is:
+dstack-gateway supports TLS passthrough for custom domains.
 
-```bash
-TPROXY_LISTEN_PORT_PASSTHROUGH=9008
-```
-
-With this configuration, tproxy listens port `9008` for incoming TLS connections and forwards them to the appropriate Tapp based on `SNI`, where SNI represents your custom domain and the forwarding destination is determined by your DNS records.
-
-For example, assuming I've deployed an app at `3327603e03f5bd1f830812ca4a789277fc31f577`, as shown below:
-
-Now, I want to use my custom domain `tapp-nginx.kvin.wang` to access the Tapp. I need to set up two DNS records with my DNS provider (Cloudflare in my case):
-
-1. `A` or `CNAME` record to point the domain to the tdx machine:
-2. `TXT` record to instruct the Tproxy to direct the request to the specified Tapp:
-
-Where
-
-`_tapp-address.tapp-nginx.kvin.wang` means configuring the tapp destination address of domain `tapp-nginx.kvin.wang`.
-
-The TXT record value `3327603e03f5bd1f830812ca4a789277fc31f577:8043` means that requests sent to `tapp-nginx.kvin.wang` will be processed by Tapp `3327603e03f5bd1f830812ca4a789277fc31f577` on port `8043`
-
-Given the config `TPROXY_LISTEN_PORT_PASSTHROUGH=9008`, now we can go to [`https://tapp-nginx.kvin.wang:9008`](https://tapp-nginx.kvin.wang:9008) and the request will be handled by the service listening on `8043` in Tapp `3327603e03f5bd1f830812ca4a789277fc31f577`.
+See the example [here](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress) for more details.
 
 ### Upgrade an App
 
-Got to the teepod webpage, click the \[Upgrade] button, select or paste the compose file you want to upgrade to, and click the \[Upgrade] button again.\
-Upon successful initiation of the upgrade, you'll see a message prompting you to run the following command in your terminal to authorize the upgrade through KMS:
-
-```shell
-./kms-allow-upgrade.sh <app_id> <upgraded_app_id>
-```
-
+Got to the dstack-vmm webpage, click the [Upgrade] button, select or paste the compose file you want to upgrade to, and click the [Upgrade] button again.
 The app id does not change after the upgrade. Stop and start the app to apply the upgrade.
 
 ### HTTPS Certificate Transparency
 
-In the tutorial above, we used a TLS certificate with a private key external to the TEE (Tproxy-CVM here). To establish trust, we need to generate and maintain the certificate's private key within the TEE and provide evidence that all TLS certificates for the domain were originate solely from Tproxy-CVM.
+In the tutorial above, we used a TLS certificate with a private key external to the TEE. To establish trust, we need to generate and maintain the certificate's private key within the TEE and provide evidence that all TLS certificates for the domain were originate solely from dstack-gateway CVM.
 
 By combining Certificate Transparency Logs and CAA DNS records, we can make best effort to minimize security risks. Here's our approach:
 
-* Set CAA records to allow only the account created in Tproxy-CVM to request Certificates.
-* Launch a program to monitor Certificate Transparency Log and give alarm once any certificate issued to a pubkey that isn’t generated by Tproxy.
+- Set CAA records to allow only the account created in dstack-gateway CVM to request Certificates.
+- Launch a program to monitor Certificate Transparency Log and give alarm once any certificate issued to a pubkey that isn’t generated by dstack-gateway CVM.
 
 #### Configurations
 
@@ -285,8 +242,8 @@ To launch Certbot, you need to own a domain hosted on Cloudflare. Obtain an API 
 
 ```bash
 # The directory to store the auto obtained TLS certificate and key
-TPROXY_CERT=${CERBOT_WORKDIR}/live/cert.pem
-TPROXY_KEY=${CERBOT_WORKDIR}/live/key.pem
+GATEWAY_CERT=${CERBOT_WORKDIR}/live/cert.pem
+GATEWAY_KEY=${CERBOT_WORKDIR}/live/key.pem
 
 # for certbot
 CF_ZONE_ID=cc0a40...
@@ -304,8 +261,7 @@ Then re-run the ../build.sh:
 #### Launch certbot
 
 Then run the certbot in the `build/` and you will see the following log:
-
-```
+```text
 $ RUST_LOG=info,certbot=debug ./certbot renew -c certbot.toml
 2024-10-25T07:41:00.682990Z  INFO certbot::bot: creating new ACME account
 2024-10-25T07:41:00.869246Z  INFO certbot::bot: created new ACME account: https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853
@@ -341,21 +297,26 @@ $ RUST_LOG=info,certbot=debug ./certbot renew -c certbot.toml
 
 Where the command did are:
 
-* Registered to letsencrypt and got a new account `https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853`
-* Auto set CAA records for the domain on cloudflare, you can open the CF dashboard to see the record:
-* Auto requested a new certificate from Let's Encrypt. Automatically renews the certificate to maintain its validity
+- Registered to letsencrypt and got a new account `https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853`
+- Auto set CAA records for the domain on cloudflare, you can open the CF dashboard to see the record:
 
-#### Launch Tproxy
+    ![certbot-caa](../.gitbook/assets/dstack-certbot-caa.png)
 
-Execute tproxy with `sudo ./tproxy`, then access the web portal to check the Tproxy-CVM managed Let's Encrypt account. The account's private key remains securely sealed within the TEE.
+- Auto requested a new certificate from Let's Encrypt. Automatically renews the certificate to maintain its validity
+
+#### Launch dstack-gateway
+
+Execute dstack-gateway with `sudo ./dstack-gateway -c gateway.toml`, then access the web portal to check the dstack-gateway CVM managed Let's Encrypt account. The account's private key remains securely sealed within the TEE.
+
+![gateway-accountid](../.gitbook/assets/dstack-gateway-accountid.png)
 
 ### Certificate transparency log monitor
 
-To enhance security, we've limited TLS certificate issuance to Tproxy via CAA records. However, since these records can be modified through Cloudflare's domain management, we need to implement global CA certificate monitoring to maintain security oversight.
+To enhance security, we've limited TLS certificate issuance to dstack-gateway via CAA records. However, since these records can be modified through Cloudflare's domain management, we need to implement global CA certificate monitoring to maintain security oversight.
 
-`ct_monitor` tracks Certificate Transparency logs via [https://crt.sh](https://crt.sh/?q=app.kvin.wang), comparing their public key with the ones got from Tproxy RPC. It immediately alerts when detecting unauthorized certificates not issued through Tproxy:
+`ct_monitor` tracks Certificate Transparency logs via [https://crt.sh](https://crt.sh/?q=app.kvin.wang), comparing their public key with the ones got from dstack-gateway RPC. It immediately alerts when detecting unauthorized certificates not issued through dstack-gateway:
 
-```
+```text
 $ ./ct_monitor -t https://localhost:9010/prpc -d app.kvin.wang
 2024-10-25T08:12:11.366463Z  INFO ct_monitor: monitoring app.kvin.wang...
 2024-10-25T08:12:11.366488Z  INFO ct_monitor: fetching known public keys from https://localhost:9010/prpc
@@ -368,15 +329,15 @@ $ ./ct_monitor -t https://localhost:9010/prpc -d app.kvin.wang
 
 ## Troubleshooting
 
-#### Error from teepod: qemu-system-x86\_64: -device vhost-vsock-pci,guest-cid=: vhost-vsock: unable to set guest cid: Address already in use
+#### Error from dstack-vmm: qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=<id>: vhost-vsock: unable to set guest cid: Address already in use
 
-`teepod` may throw this error when creating a new VM if the [Unix Socket CID](https://man7.org/linux/man-pages/man7/vsock.7.html) is occupied. To solve the problem, first, you should list the occupied CID:
+`dstack-vmm` may throw this error when creating a new VM if the [Unix Socket CID](https://man7.org/linux/man-pages/man7/vsock.7.html) is occupied. To solve the problem, first, you should list the occupied CID:
 
 ```bash
 ps aux | grep 'guest-cid='
 ```
 
-Then choose a new range of the CID not conflicting with the CID in use. You can change `build/teepod.toml` file and restart `teepod`. This error should disappear. For example, you may find 33000-34000 free to use:
+Then choose a new range of the CID not conflicting with the CID in use. You can change `build/vmm.toml` file and restart `dstack-vmm`. This error should disappear. For example, you may find 33000-34000 free to use:
 
 ```toml
 [cvm]
@@ -384,7 +345,7 @@ cid_start = 33000
 cid_pool_size = 1000
 ```
 
-When building the dstack from scratch, you should change the CID configs in `build-config.sh` instead, because `teepod.toml` file is generated by `build.sh`. Its content is derived from `build-config.sh`.
+When building the dstack from scratch, you should change the CID configs in `build-config.sh` instead, because `vmm.toml` file is generated by `build.sh`. Its content is derived from `build-config.sh`.
 
 You may encounter this problem when upgrading from an older version of dstack, because CID was introduced in `build-config.sh` in later versions. In such case, please follow the docs to add the missing entries in `build-config.sh` and rebuild dstack.
 
@@ -413,18 +374,18 @@ Then try building again. For more information about this restriction, see the [U
 
 Dstack is proudly built by open source and Pi-rateship contributors:
 
-* Phala Network: [Kevin Wang](https://github.com/kvinwang), [Shelven Zhou](https://github.com/shelvenzhou), [Leechael](https://github.com/leechael)
-* Teleport: [Andrew Miller](https://github.com/amiller), [Sxy Sun](https://github.com/sxysun)
-* Flashbots: [Tina](https://github.com/CarboClanC), [Mateusz](https://github.com/Ruteri), [Dmarz](https://github.com/dmarzzz), [Moe](https://github.com/MoeMahhouk)
-* Ithaca: [Georgios](https://github.com/gakonst)
-* Fabric: [@gaoist](https://x.com/gaoist)
-* And many more...
+- Phala Network: [Kevin Wang](https://github.com/kvinwang), [Shelven Zhou](https://github.com/shelvenzhou), [Leechael](https://github.com/leechael)
+- Teleport: [Andrew Miller](https://github.com/amiller), [Sxy Sun](https://github.com/sxysun)
+- Flashbots: [Tina](https://github.com/CarboClanC), [Mateusz](https://github.com/Ruteri), [Dmarz](https://github.com/dmarzzz), [Moe](https://github.com/MoeMahhouk)
+- Ithaca: [Georgios](https://github.com/gakonst)
+- Fabric: [@gaoist](https://x.com/gaoist)
+- And many more...
 
 The inspiration for this work stems from [Andrew Miller](https://github.com/amiller)’s pioneering concept of a [Docker-based P2P TEE SDK](https://collective.flashbots.net/t/dstack-speedrunning-a-p2p-confidential-vm/3876).
 
 This project cannot be built without standing on the shoulders of giants:
 
-* [konvera/meta-confidential-compute](https://github.com/konvera/meta-confidential-compute)
+- [konvera/meta-confidential-compute](https://github.com/konvera/meta-confidential-compute)
 
 Special acknowledgment to [Flashbots](https://github.com/flashbots) for building a community around TEE. The TEE Hacker House initiative, organized by [Flashbots](https://github.com/flashbots) and led by [Tina](https://github.com/CarboClanC), has brought together TEE builders to develop tools for TEE-Web3 integration. This collaborative journey has generated invaluable insights for advancing secure, confidential environments within Web3.
 
