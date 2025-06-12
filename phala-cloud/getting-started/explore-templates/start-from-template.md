@@ -101,7 +101,7 @@ You can copy and paste the `docker-compose.yml` file from this repo to see the e
 
 Go to your Phala Cloud dashboard and click Deploy. You will have an option for deploying via docker compose file. Click on this option to deploy.
 
-<figure><img src="../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
 You will come to a CVM configuration page. Click on **Advanced** and replace the default docker compose contents with the following (Make sure to replace the `<docker-username>`with your own:
 
@@ -116,7 +116,7 @@ services:
       - /var/run/tappd.sock:/var/run/tappd.sock
 ```
 
-<figure><img src="../../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Deploy via Phala Cloud CLI
 
@@ -134,9 +134,9 @@ npx phala cvms create -c docker-compose.yml -n my-app
 
 Your application should be deployed now to your Phala Cloud dashboard. Go to the **Network** tab to be able to open your application.
 
-<figure><img src="../../../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
 {% endtab %}
 
 {% tab title="Python Template" %}
@@ -213,7 +213,7 @@ You can copy and paste the `docker-compose.yml` file from this repo to see the e
 
 Go to your Phala Cloud dashboard and click Deploy. You will have an option for deploying via docker compose file. Click on this option to deploy.
 
-<figure><img src="../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
 You will come to a CVM configuration page. Click on **Advanced** and replace the default docker compose contents with the following (Make sure to replace the `<docker-username>`with your own:
 
@@ -228,19 +228,19 @@ services:
       - /var/run/tappd.sock:/var/run/tappd.sock
 ```
 
-<figure><img src="../../../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (4) (1).png" alt=""><figcaption></figcaption></figure>
 
 Now you can interact with your application by going to the **Network** tab and making calls like the following.
 
-<figure><img src="../../../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (5) (1).png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (6).png" alt=""><figcaption><p>/tdx_quote</p></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (6) (1).png" alt=""><figcaption><p>/tdx_quote</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (7).png" alt=""><figcaption><p>/derive_key</p></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (7) (1).png" alt=""><figcaption><p>/derive_key</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (8).png" alt=""><figcaption><p>/eth_account</p></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (8) (1).png" alt=""><figcaption><p>/eth_account</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/image (9).png" alt=""><figcaption><p>/sol_account</p></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (9) (1).png" alt=""><figcaption><p>/sol_account</p></figcaption></figure>
 {% endtab %}
 {% endtabs %}
 

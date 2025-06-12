@@ -1,4 +1,4 @@
-# Key Management Protocol
+# Key Management Service
 
 In [Decentralized Root-of-Trust](decentralized-root-of-trust.md), we described our motivation to update the TEE Root-of-Trust from hardware-kept unrecoverable secret keys to a smart-contract-governed software (i.e., DeRoT). In this article, we’ll delve deeper into the details of its key management protocol.
 
@@ -45,7 +45,7 @@ This attack motivates an important principle in our design: _every operation inv
 
 ### Verifiable DeRoT and Key Chain <a href="#p-8432-verifiable-derot-and-key-chain-5" id="p-8432-verifiable-derot-and-key-chain-5"></a>
 
-<figure><img src="../../.gitbook/assets/image (7) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (7) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 To enable the verification on the DeRoT program integrity and correctness, its measurement will be specified in the governance smart contract. Several steps need to be followed to ensure the smart contract’s governance over the DeRoT program.
 
@@ -67,7 +67,7 @@ The public key of RootKey must be published on-chain to enable any party to veri
 
 The key management of DeRoT follows the _Principle of Least Privilege_ that the secrecy known by each entity in the system is strictly limited to what it requires to finish the jobs. We first explain the keys used during program execution, and then discuss the privileges of different entities.
 
-<figure><img src="../../.gitbook/assets/image (8) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (8) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 DeRoT turns the previous hardware-centric key management to application-centric key management. That is, each application has its own keys to seal the states and encrypt the databases, and they can be distributed to different TEE workers to enable the applications to be migrated between them. There are three entities involved in the key management protocol, and they have different knowledge of the keys:
 

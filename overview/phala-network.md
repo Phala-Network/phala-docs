@@ -10,7 +10,7 @@ Confidential AI Inference stands as a cornerstone for safeguarding sensitive dat
 
 ## **How It Works**
 
-<figure><img src="../.gitbook/assets/image (6) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (6) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 * Phala introduces a **new root-of-trust** beyond traditional hardware-based models.
 * We implement a combination of **TEE, MPC, ZKP (FHE)** and **blockchain game theory** to build this **new root-of-trust**.

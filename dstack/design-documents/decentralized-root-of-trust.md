@@ -4,7 +4,7 @@ Root-of-Trust (RoT) is the cornerstone of the TEE chain-of-trust. The end user v
 
 ## Hardware Root-of-Trust <a href="#p-8175-hardware-root-of-trust-1" id="p-8175-hardware-root-of-trust-1"></a>
 
-<figure><img src="../../.gitbook/assets/image (5) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (5) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 However, hardware RoT has several drawbacks due to the limitations of physical hardware:
 
@@ -38,7 +38,7 @@ Implementing a software RoT offers several advantages but also introduces new ch
 
 ## Decentralized Root-of-Trust <a href="#p-8175-decentralized-root-of-trust-3" id="p-8175-decentralized-root-of-trust-3"></a>
 
-<figure><img src="../../.gitbook/assets/image (6) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (6) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 While a software-based RoT offers significant benefits, it introduces the risk of centralization, which compromises security. To address this, a decentralized RoT can eliminate such risks and offer a more secure, distributed alternative.
 
