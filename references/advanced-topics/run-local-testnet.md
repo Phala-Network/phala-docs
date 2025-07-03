@@ -173,7 +173,7 @@ You will see a new directory called `stacks/` has been created
       - phala-node            # node binary
       - pherry                # pherry binary
       - pruntime              # pruntime binary
-      - *.so.*                # multiple requried libs
+      - *.so.*                # multiple required libs
       - *.contract            # system contracts
 ```
 
