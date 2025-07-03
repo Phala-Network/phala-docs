@@ -83,9 +83,17 @@
       * [cvms](phala-cloud/references/tee-cloud-cli/phala/cvms.md)
       * [docker](phala-cloud/references/tee-cloud-cli/phala/docker.md)
       * [simulator](phala-cloud/references/tee-cloud-cli/phala/simulator.md)
-  * [Phala Cloud API & SDKs](phala-cloud/references/phala-cloud-api-and-sdks/README.md)
-    * [API Endpoints & Examples](phala-cloud/references/phala-cloud-api-and-sdks/api-endpoints-and-examples.md)
-    * [SDKs and Integrations](phala-cloud/references/phala-cloud-api-and-sdks/sdks-and-integrations.md)
+  * [Cloud API (beta)](phala-cloud/references/cloud-api-beta/README.md)
+    * ```yaml
+      type: builtin:openapi
+      props:
+        models: true
+      dependencies:
+        spec:
+          ref:
+            kind: openapi
+            spec: phala-cloud-api
+      ```
   * [Phala Cloud Pricing](phala-cloud/references/phala-cloud-pricing.md)
 * [❓ FAQs](cloud/faqs.md)
 
@@ -101,7 +109,7 @@
 * [Getting Started](dstack/getting-started.md)
 * [Hardware Requirements](dstack/hardware-requirements.md)
 * [Design Documents](dstack/design-documents/README.md)
-  * [Whitepaper](dstack/design-documents//whitepaper.md)
+  * [Whitepaper](dstack/design-documents/whitepaper.md)
   * [Decentralized Root-of-Trust](dstack/design-documents/decentralized-root-of-trust.md)
   * [Key Management Service](dstack/design-documents/key-management-protocol.md)
   * [Zero Trust HTTPs (TLS)](dstack/design-documents/tee-controlled-domain-certificates.md)

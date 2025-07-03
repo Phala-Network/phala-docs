@@ -20,28 +20,28 @@ Dstack is a **developer friendly** and **security first** SDK to simplify the de
 
 Main features:
 
-- 🔒 Deploy containerized apps securely in TEE in minutes
-- 🛠️ Use familiar tools - just write a docker-compose.yaml
-- 🔑 Safely manage secrets and sensitive data
-- 📡 Expose services via built-in TLS termination
+* 🔒 Deploy containerized apps securely in TEE in minutes
+* 🛠️ Use familiar tools - just write a docker-compose.yaml
+* 🔑 Safely manage secrets and sensitive data
+* 📡 Expose services via built-in TLS termination
 
-Dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Nethermind](https://github.com/NethermindEth/nethermind) and [many others](#contributors).
+Dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Nethermind](https://github.com/NethermindEth/nethermind) and [many others](getting-started.md#contributors).
 
 ## Overview
 
 Components in Dstack:
 
-- `dstack-vmm`: A service running in bare TDX host to manage CVMs
-- `dstack-gateway`: A reverse proxy to forward TLS connections to CVMs
-- `dstack-kms`: A KMS server to generate keys for CVMs
-- `dstack-guest-agent`: A service running in CVM to serve containers' key derivation and attestation requests
-- `meta-dstack`: A Yocto meta layer to build CVM guest images
+* `dstack-vmm`: A service running in bare TDX host to manage CVMs
+* `dstack-gateway`: A reverse proxy to forward TLS connections to CVMs
+* `dstack-kms`: A KMS server to generate keys for CVMs
+* `dstack-guest-agent`: A service running in CVM to serve containers' key derivation and attestation requests
+* `meta-dstack`: A Yocto meta layer to build CVM guest images
 
 The overall architecture is shown below:
 
 ## Directory structure
 
-```text
+```
 dstack/
     kms/                         A prototype KMS server
     guest-agent/                 A service running in CVM to serve containers' key derivation and attestation requests.
@@ -58,11 +58,10 @@ dstack/
 
 ### Prerequisites
 
-- A bare metal TDX server setup following [canonical/tdx](https://github.com/canonical/tdx)
-- Public IPv4 address assigned to the machine
-- At least 16GB RAM, 100GB free disk space.
-- A domain with DNS access if you want to set up `dstack-gateway` for Zero Trust HTTPS
-
+* A bare metal TDX server setup following [canonical/tdx](https://github.com/canonical/tdx)
+* Public IPv4 address assigned to the machine
+* At least 16GB RAM, 100GB free disk space.
+* A domain with DNS access if you want to set up `dstack-gateway` for Zero Trust HTTPS
 
 ### Install dependencies
 
@@ -126,13 +125,11 @@ Open the dstack-vmm webpage [http://localhost:9080](http://localhost:9080)(chang
 
 After the container deployed, it should need some time to start the CVM and the containers. Time would be vary depending on your workload.
 
-- Click the [Logs] button to see the logs of the CVM, you can see if the container is finished starting there.
-
-- Once the container is running, you can click the [Dashboard] button to see some information of the container. And the logs of the containers can be seen in the [Dashboard] page.
+* Click the \[Logs] button to see the logs of the CVM, you can see if the container is finished starting there.
+*   Once the container is running, you can click the \[Dashboard] button to see some information of the container. And the logs of the containers can be seen in the \[Dashboard] page.
 
     ![dstack-guest-agent](../.gitbook/assets/dstack-guest-agent.png)
-
-- You can open dstack-gateway's dashboard at [https://localhost:9070](https://localhost:9070) to see the CVM's wireguard ip address, as shown below:
+*   You can open dstack-gateway's dashboard at [https://localhost:9070](https://localhost:9070) to see the CVM's wireguard ip address, as shown below:
 
     ![dstack-gateway](../.gitbook/assets/dstack-gateway.png)
 
@@ -148,12 +145,12 @@ The environment variables will be encrypted in the client-side and decrypted in 
 
 Once the app is deployed and listening on an HTTP port, you can access the HTTP service via tproxy's public domain. The ingress mapping rules are:
 
-- `<id>[s].<base_domain>` maps to port `80` or `443` if with `s` in the CVM.
-- `<id>-<port>[s].<base_domain>` maps to port `<port>` in the CVM.
+* `<id>[s].<base_domain>` maps to port `80` or `443` if with `s` in the CVM.
+* `<id>-<port>[s].<base_domain>` maps to port `<port>` in the CVM.
 
 For example, `3327603e03f5bd1f830812ca4a789277fc31f577-8080.app.kvin.wang` maps to port `8080` in the CVM.
 
-Where the `<id>` can be either the app id or the instance id. If the app id is used, one of the instances will be selected by the load balancer.
+Where the `<id>` can be either the app id or the instance id. If the app id is used, one of the instances will be selected by the load balancer.\
 If the `id-port` part ends with `s`, it means the TLS connection will be passthrough to the app rather than terminating at dstack-gateway.
 
 You can also ssh into the CVM to inspect more information, if your deployment uses the image `dstack-x.x.x-dev`:
@@ -180,7 +177,6 @@ To get a TDX quote within app containers:
         - "8080:80"
       restart: always
     ```
-
 2.  Execute the quote request command in the container.
 
     ```bash
@@ -199,12 +195,12 @@ curl 'http://<appid>.app.kvin.wang:9090/logs/<container name>?since=0&until=0&fo
 
 Replace `<appid>` and `<container name>` with actual values. Available parameters:
 
-- since=0: Starting Unix timestamp for log retrieval
-- until=0: Ending Unix timestamp for log retrieval
-- follow: Enables continuous log streaming
-- text: Returns human-readable text instead of base64 encoding
-- timestamps: Adds timestamps to each log line
-- bare: Returns the raw log lines without json format
+* since=0: Starting Unix timestamp for log retrieval
+* until=0: Ending Unix timestamp for log retrieval
+* follow: Enables continuous log streaming
+* text: Returns human-readable text instead of base64 encoding
+* timestamps: Adds timestamps to each log line
+* bare: Returns the raw log lines without json format
 
 The response of the RPC looks like:
 
@@ -224,7 +220,7 @@ See the example [here](https://github.com/Dstack-TEE/dstack-examples/tree/main/c
 
 ### Upgrade an App
 
-Got to the dstack-vmm webpage, click the [Upgrade] button, select or paste the compose file you want to upgrade to, and click the [Upgrade] button again.
+Got to the dstack-vmm webpage, click the \[Upgrade] button, select or paste the compose file you want to upgrade to, and click the \[Upgrade] button again.\
 The app id does not change after the upgrade. Stop and start the app to apply the upgrade.
 
 ### HTTPS Certificate Transparency
@@ -233,8 +229,8 @@ In the tutorial above, we used a TLS certificate with a private key external to 
 
 By combining Certificate Transparency Logs and CAA DNS records, we can make best effort to minimize security risks. Here's our approach:
 
-- Set CAA records to allow only the account created in dstack-gateway CVM to request Certificates.
-- Launch a program to monitor Certificate Transparency Log and give alarm once any certificate issued to a pubkey that isn’t generated by dstack-gateway CVM.
+* Set CAA records to allow only the account created in dstack-gateway CVM to request Certificates.
+* Launch a program to monitor Certificate Transparency Log and give alarm once any certificate issued to a pubkey that isn’t generated by dstack-gateway CVM.
 
 #### Configurations
 
@@ -261,7 +257,8 @@ Then re-run the ../build.sh:
 #### Launch certbot
 
 Then run the certbot in the `build/` and you will see the following log:
-```text
+
+```
 $ RUST_LOG=info,certbot=debug ./certbot renew -c certbot.toml
 2024-10-25T07:41:00.682990Z  INFO certbot::bot: creating new ACME account
 2024-10-25T07:41:00.869246Z  INFO certbot::bot: created new ACME account: https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853
@@ -297,12 +294,11 @@ $ RUST_LOG=info,certbot=debug ./certbot renew -c certbot.toml
 
 Where the command did are:
 
-- Registered to letsencrypt and got a new account `https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853`
-- Auto set CAA records for the domain on cloudflare, you can open the CF dashboard to see the record:
+* Registered to letsencrypt and got a new account `https://acme-staging-v02.api.letsencrypt.org/acme/acct/168601853`
+*   Auto set CAA records for the domain on cloudflare, you can open the CF dashboard to see the record:
 
     ![certbot-caa](../.gitbook/assets/dstack-certbot-caa.png)
-
-- Auto requested a new certificate from Let's Encrypt. Automatically renews the certificate to maintain its validity
+* Auto requested a new certificate from Let's Encrypt. Automatically renews the certificate to maintain its validity
 
 #### Launch dstack-gateway
 
@@ -316,7 +312,7 @@ To enhance security, we've limited TLS certificate issuance to dstack-gateway vi
 
 `ct_monitor` tracks Certificate Transparency logs via [https://crt.sh](https://crt.sh/?q=app.kvin.wang), comparing their public key with the ones got from dstack-gateway RPC. It immediately alerts when detecting unauthorized certificates not issued through dstack-gateway:
 
-```text
+```
 $ ./ct_monitor -t https://localhost:9010/prpc -d app.kvin.wang
 2024-10-25T08:12:11.366463Z  INFO ct_monitor: monitoring app.kvin.wang...
 2024-10-25T08:12:11.366488Z  INFO ct_monitor: fetching known public keys from https://localhost:9010/prpc
@@ -329,7 +325,7 @@ $ ./ct_monitor -t https://localhost:9010/prpc -d app.kvin.wang
 
 ## Troubleshooting
 
-#### Error from dstack-vmm: qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=<id>: vhost-vsock: unable to set guest cid: Address already in use
+#### Error from dstack-vmm: qemu-system-x86\_64: -device vhost-vsock-pci,guest-cid=: vhost-vsock: unable to set guest cid: Address already in use
 
 `dstack-vmm` may throw this error when creating a new VM if the [Unix Socket CID](https://man7.org/linux/man-pages/man7/vsock.7.html) is occupied. To solve the problem, first, you should list the occupied CID:
 
@@ -374,18 +370,18 @@ Then try building again. For more information about this restriction, see the [U
 
 Dstack is proudly built by open source and Pi-rateship contributors:
 
-- Phala Network: [Kevin Wang](https://github.com/kvinwang), [Shelven Zhou](https://github.com/shelvenzhou), [Leechael](https://github.com/leechael)
-- Teleport: [Andrew Miller](https://github.com/amiller), [Sxy Sun](https://github.com/sxysun)
-- Flashbots: [Tina](https://github.com/CarboClanC), [Mateusz](https://github.com/Ruteri), [Dmarz](https://github.com/dmarzzz), [Moe](https://github.com/MoeMahhouk)
-- Ithaca: [Georgios](https://github.com/gakonst)
-- Fabric: [@gaoist](https://x.com/gaoist)
-- And many more...
+* Phala Network: [Kevin Wang](https://github.com/kvinwang), [Shelven Zhou](https://github.com/shelvenzhou), [Leechael](https://github.com/leechael)
+* Teleport: [Andrew Miller](https://github.com/amiller), [Sxy Sun](https://github.com/sxysun)
+* Flashbots: [Tina](https://github.com/CarboClanC), [Mateusz](https://github.com/Ruteri), [Dmarz](https://github.com/dmarzzz), [Moe](https://github.com/MoeMahhouk)
+* Ithaca: [Georgios](https://github.com/gakonst)
+* Fabric: [@gaoist](https://x.com/gaoist)
+* And many more...
 
 The inspiration for this work stems from [Andrew Miller](https://github.com/amiller)’s pioneering concept of a [Docker-based P2P TEE SDK](https://collective.flashbots.net/t/dstack-speedrunning-a-p2p-confidential-vm/3876).
 
 This project cannot be built without standing on the shoulders of giants:
 
-- [konvera/meta-confidential-compute](https://github.com/konvera/meta-confidential-compute)
+* [konvera/meta-confidential-compute](https://github.com/konvera/meta-confidential-compute)
 
 Special acknowledgment to [Flashbots](https://github.com/flashbots) for building a community around TEE. The TEE Hacker House initiative, organized by [Flashbots](https://github.com/flashbots) and led by [Tina](https://github.com/CarboClanC), has brought together TEE builders to develop tools for TEE-Web3 integration. This collaborative journey has generated invaluable insights for advancing secure, confidential environments within Web3.
 

@@ -6,16 +6,16 @@ Dstack is open for PR to add that support. Currently it’s focusing on bare met
 
 ## How does KMS key generation work and how can it be modified?
 
-The key generation logic is implemented in the onboard service:
-Reference: https://github.com/Dstack-TEE/dstack/blob/master/kms/src/onboard_service.rs#L50
+The key generation logic is implemented in the onboard service:\
+Reference: https://github.com/Dstack-TEE/dstack/blob/master/kms/src/onboard\_service.rs#L50
 
 ## How does on-chain KMS work and how can I customize its governance?
 
 The KMS contract allows for customizable ownership and governance:
 
-- During deployment, you can specify an owner
-- After deployment, ownership can be transferred using transferOwnership function
-Reference: https://github.com/Dstack-TEE/dstack/blob/master/kms/auth-eth/hardhat.config.ts#L96
+* During deployment, you can specify an owner
+* After deployment, ownership can be transferred using transferOwnership function\
+  Reference: https://github.com/Dstack-TEE/dstack/blob/master/kms/auth-eth/hardhat.config.ts#L96
 
 ## Where can I find KMS deployment instructions?
 
@@ -25,8 +25,8 @@ Reference: https://github.com/Dstack-TEE/dstack/blob/master/docs/deployment.md
 
 ## How does the current data encryption system work?
 
-The system uses Linux's built-in LUKS (Linux Unified Key Setup) for disk encryption:
-Reference: https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/fde_setup.rs#L437-L442
+The system uses Linux's built-in LUKS (Linux Unified Key Setup) for disk encryption:\
+Reference: https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/fde\_setup.rs#L437-L442
 
 ## Where is the deployment function located in the Dstack-TEE codebase, and can it be integrated with custom tools?
 

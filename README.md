@@ -1,20 +1,6 @@
 ---
 cover: .gitbook/assets/phala-docs (1).jpg
 coverY: -101
-layout:
-  cover:
-    visible: true
-    size: full
-  title:
-    visible: true
-  description:
-    visible: false
-  tableOfContents:
-    visible: true
-  outline:
-    visible: false
-  pagination:
-    visible: true
 ---
 
 # 👾 Phala Network Docs
