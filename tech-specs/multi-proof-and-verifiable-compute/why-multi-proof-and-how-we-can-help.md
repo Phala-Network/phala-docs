@@ -40,7 +40,7 @@ Most FHE-based blockchain networks introduce a threshold signature-based MPC net
 
 2. **Build 2FA for ZK-Rollups**:
 
-Inspired by Vitalik Buterin's [presentation](https://hackmd.io/@vbuterin/zk\_slides\_20221010#/) and a recent [post](https://ethresear.ch/t/2fa-zk-Rollups-using-sgx/14462) by Justin Drake, we have awarded that there are few improvement space exist in zk implementation. For example, we currently can not guarantee that the ZK circuit is bug free since it's tens of thousands code and we also cannot guarantee the privacy of user transaction because the sequencer can say anything.
+Inspired by Vitalik Buterin's [presentation](https://hackmd.io/@vbuterin/zk\_slides\_20221010#/) and a recent [post](https://ethresear.ch/t/2fa-zk-Rollups-using-sgx/14462) by Justin Drake, we have awared that there are few improvement space exist in zk implementation. For example, we currently can not guarantee that the ZK circuit is bug free since it's tens of thousands code and we also cannot guarantee the privacy of user transaction because the sequencer can say anything.
 
 To solve thoese problem, zk-Rollup can run a separate STF (state transition function) in TEE, and the result returned by STF will be signed by the key derived in TEE (check this [article](https://phala.network/posts/introducing-phala-sgxprover-a-twofactor-authentication-solution-for-zkrollups) for more details), then submitted on-chain verifier along with the ZKP, the security levels can be significantly improved while ensuring computational efficiencies.
 
