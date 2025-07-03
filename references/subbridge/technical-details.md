@@ -111,7 +111,7 @@ Similarly, when a cross-chain transfer is initiated from EVM Chains, the SygmaBr
 
 ## Other <a href="#other" id="other"></a>
 
-SubBridge's SygmaBridge in mantained by Phala team and Sygma team together. The substrate side is exist on Phala network, the smart contract on EVM side is deployed by Sygma team and the liquidity is maintained by both Phala team and Sygma team through multi-sig account.
+SubBridge's SygmaBridge in maintained by Phala team and Sygma team together. The substrate side is exist on Phala network, the smart contract on EVM side is deployed by Sygma team and the liquidity is maintained by both Phala team and Sygma team through multi-sig account.
 
 SubBridge’s ChainBridge cross-chain bridge module is maintained and developed by the Phala team and is responsible for running three Relayers. The Relayer of the ChainBridge cross-chain bridge constructs the captured origin chain cross-chain transaction into a proposal, and then the three relayers vote on the Proposal. After the vote is passed, the proposal will be executed and the assets will be deposited in the user address.
 
