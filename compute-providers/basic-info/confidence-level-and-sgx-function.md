@@ -2,11 +2,11 @@
 
 ### Test your Intel® SGX Capability
 
-The confidence level impacts your worker’s score. Before configuring your worker, the necessary drivers are required, and the `sgx-test` option determines your Intel® SGX Capability alongside the confidence level.
+The confidence level impacts your worker’s score. Before configuring your worker, the necessary drivers are required, and the `sgx-test` option determines your Intel® SGX DCAP Capability.
 
 ```bash
-sudo docker pull phalanetwork/phala-sgx_detect
-sudo docker run -it --network host --device /dev/sgx_enclave --device /dev/sgx_provision  --device /dev/sgx_enclave:/dev/sgx/enclave --device /dev/sgx_provision:/dev/sgx/provision  phalanetwork/phala-sgx_detect
+sudo docker pull phalanetwork/phala-dcap_test:latest
+sudo docker run -it --network host --device /dev/sgx_enclave --device /dev/sgx_provision phalanetwork/phala-dcap_test:latest
 ```
 
 > This command need to install 🐳 Docker, the required Intel® SGX drivers, and pull all the necessary Docker images for your Phala worker 🪨⛏️.
@@ -67,41 +67,3 @@ confidenceLevel = 5
 If you can not run Phala pRuntime with both of them tagged as ✔, you may have to check whether your BIOS is the latest version with latest security patches. If you still can’t run Phala pRuntime docker with the latest BIOS of your motherboard manufacturer, we are afraid you can’t contribute computing power for now with this motherboard.
 
 Your confidence level, referred to as the “Tier” in the table below, will appear in the last line of the report after executing `sudo phala sgx-test`.
-
-### Confidence Level of a Worker
-
-| Level  | isvEnclaveQuoteStatus                                            | advisoryIDs               |
-| ------ | ---------------------------------------------------------------- | ------------------------- |
-| Tier 1 | OK                                                               | None                      |
-| Tier 2 | SW\_HARDENING\_NEEDED                                            | None                      |
-| Tier 3 | CONFIGURATION\_NEEDED, CONFIGURATION\_AND\_SW\_HARDENING\_NEEDED | Whitelisted\*             |
-| Tier 4 | CONFIGURATION\_NEEDED, CONFIGURATION\_AND\_SW\_HARDENING\_NEEDED | Some beyond the whitelist |
-| Tier 5 | GROUP\_OUT\_OF\_DATE                                             | Any value                 |
-
-The confidence level measures how secure the SGX Enclave execution environment is. It’s determined by the Remote Attestation report from Intel. Among them, `isvEnclaveQuoteStatus` indicates if the platform is vulnerable to some known problems, and `advisoryIDs` indicates the actual affected problems.
-
-Not all the `advisoryIDs` are problematic. Some advisories doesn’t affect Phala’s security assumption, and therefore are whitelisted:
-
-* INTEL-SA-00219
-* INTEL-SA-00334
-* INTEL-SA-00381
-* INTEL-SA-00389
-
-Tier 1, 2, 3 are considered with the best security level because they are either not affected by any known vulnerability, or the adversary is known trivial. It’s good to run highest valuable apps on these workers, for instance:
-
-* Financial apps: privacy-preserving DEX, DeFi ,etc
-* Secret key management: wallet, node KMS, password manager
-* Phala Gatekeeper
-
-Tier 4, 5 are considered with reduced security, because these machines requires some configuration fix in the BIOS or BIOS firmware (CONFIGURATION\_NEEDED, CONFIGURATION\_AND\_SW\_HARDENING\_NEEDED), or their microcode or the corresponding BIOS firmware are out-of-date (GROUP\_OUT\_OF\_DATE). Therefore we cannot assume the platform is suitable for highest security scenarios. However it’s still good to run batch processing jobs, apps dealing with ephemeral privacy data, and traditional blockchain apps:
-
-* Data analysis jobs (e.g. Web3 Analytics)
-* On-chain PvP games
-* VPN
-* Web2.0 apps
-* Blockchain Oracle
-* DApps
-
-Once Phala is open for developers to deploy their apps, there will be an option for them to choose which tiers they will accept. Since Tier 1, 2, 3 have better security, they can potentially get higher chance to win the confidential contract assignment. However, Tier 4, 5 are useful in other use cases, and therefore can be a more economic choice for the developers.
-
-If your worker is in tier 4 or 5, please check the FAQ page for potential fixes.
