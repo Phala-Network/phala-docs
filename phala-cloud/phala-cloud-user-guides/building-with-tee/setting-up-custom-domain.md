@@ -195,13 +195,33 @@ Click **Deploy** button and your CVM will deploy in a couple minutes with the cu
 
 **Congratulations!** You've successfully deployed your CVM with a custom domain. Your application is now secured with Zero Trust HTTPS, thanks to the seamless integration of Cloudflare DNS and Let's Encrypt. If you are interested in the verification of this process check the [#domain-attestation-and-verification](setting-up-custom-domain.md#domain-attestation-and-verification "mention").
 
-## Integration Notes
+## Troubleshooting
 
-`dstack-ingress`  is a sidecar in your docker compose file. When adding it, you should make sure:
+First, make sure you have configured it properly. `dstack-ingress`  is a sidecar in your docker compose file. When adding it, you should make sure:
 
 1. You have configured the necessary environmental variables and encrypted secrets according as described above
 2. Declare the `cert-data`  volume in your docker compose file as it's used by `dstack-ingress`
 3. `dstack-ingress`  service is connected to the same network as the service specified in  `TARGET_ENDPOINT` . e.g. If you set `network: net1`  for your app, you should also have it in `dstack-ingress` .
+
+After deploying your app, you can find the `dstack-ingress`  container logs. It should print logs like below:
+
+```
+2025-07-17T23:12:12.758817184Z Account registered.
+2025-07-17T23:12:12.760403962Z Requesting a certificate for custom-test.phala.systems
+2025-07-17T23:12:16.184509409Z Waiting 120 seconds for DNS changes to propagate
+2025-07-17T23:14:22.000463333Z 
+2025-07-17T23:14:22.000488847Z Successfully received certificate.
+# ...
+2025-07-17T23:14:22.085351978Z Generated evidences successfully
+# ...
+2025-07-17T23:14:29.396160169Z [Thu Jul 17 23:14:29 UTC 2025] Next renewal check in 12 hours
+```
+
+Finally, access the custom domain. You should see nginx access logs in the `dstack-ingress`  container logs like below:
+
+```
+2025-07-17T23:16:15.748373090Z 10.0.3.1 - - [17/Jul/2025:23:16:15 +0000] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" "-"
+```
 
 ## Knowledge
 
