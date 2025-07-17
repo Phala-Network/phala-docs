@@ -201,7 +201,7 @@ First, make sure you have configured it properly. `dstack-ingress`  is a sidecar
 
 1. You have configured the necessary environmental variables and encrypted secrets according as described above
 2. Declare the `cert-data`  volume in your docker compose file as it's used by `dstack-ingress`
-3. `dstack-ingress`  service is connected to the same network as the service specified in  `TARGET_ENDPOINT` . e.g. If you set `network: net1`  for your app, you should also have it in `dstack-ingress` .
+3. `dstack-ingress`  service is connected to the same network as the service specified in  `TARGET_ENDPOINT` . e.g. If you set `networks: [net1]`  for your app, you should also have it in `dstack-ingress` .
 
 After deploying your app, you can find the `dstack-ingress`  container logs. It should print logs like below:
 
