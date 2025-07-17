@@ -10,7 +10,7 @@ If you prefer video content, check the YouTube tutorial here.
 
 ## Prerequisites
 
-* Host your domain on [Cloudflare](https://dash.cloudflare.com/)
+* Host the DNS of your domain on [Cloudflare](https://dash.cloudflare.com/) (other providers will be supported soon)
 * Have access to the Cloudflare account with API token
 
 ## Create Cloudflare API Token
@@ -55,24 +55,59 @@ Congrats! You've now created your API Token to use for your environment variable
 For more details, checkout the [github repository](https://github.com/Dstack-TEE/dstack-examples/blob/main/custom-domain/dstack-ingress/README.md) for the dstack-ingress dstack examples.
 {% endhint %}
 
-For this deployment example, we will be an `nginx` application where the `dstack-ingress` container that will forward traffic the `TARGET_ENDPOINT` that points to the `nginx` application with an exposed port `80` . It is important to know that this can change based on how your docker app's compose file is configured.
+For this deployment example, we will be an `nginx` application where the `dstack-ingress` container that will forward traffic the `TARGET_ENDPOINT` that points to the `app` service (running the nginx image) with an exposed port `80` . It is important to know that this can change based on how your docker app's compose file is configured.
+
+Now on to the deployment. Go to you Phala Cloud Dashboard and deploy a new CVM. Select **docker-compose.yml** option for deployment then take the past the docker compose file below into the **Advanced** tab of the CVM configuration page.
+
+```yaml
+services:
+  dstack-ingress:
+    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    ports:
+      - "443:443"
+    environment:
+      - DOMAIN=example.com
+      - TARGET_ENDPOINT=http://app:80
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - cert-data:/etc/letsencrypt
+    restart: unless-stopped
+  app:
+    image: nginx  # Replace with your application image
+    restart: unless-stopped
+volumes:
+  cert-data:  # Persistent volume for certificates
+```
+
+Here's an explanation of the configs:
+
+* `DOMAIN`: Your custom domain (i.e. `your-domain.com` ).
+* `TARGET_ENDPOINT`: **Where the ingress should forward all incoming traffic** — i.e. the upstream application `service:port`. In this case, we point to the nginx service `app` on port `80`.&#x20;
+* Other variables
+  * `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
+  * `CERTBOT_EMAIL`: Your email address used for Let's Encrypt email notifications
+  * `SET_CAA`: Leave it to `true` to enable CAA record setup. Necessary for a secure zt-https setup.
+  * `GATEWAY_DOMAIN`: Leave it unchanged. It points to the dstack gateway domain automatically populated by Phala Cloud.
 
 <details>
 
-<summary>Why <code>TARGET_ENDPOINT</code> Matters</summary>
+<summary>Understanding <code>TARGET_ENDPOINT</code></summary>
 
-*   **Tells the proxy where to send traffic**\
-    When a request arrives at `https://your-custom-domain`, `dstack-ingress` decrypts TLS and then forwards the HTTP payload to exactly the URL in `TARGET_ENDPOINT`.
+Why is `TARGET_ENDPOINT`  important?
+
+*   **Tell the proxy where to send traffic**\
+    When a request arrives at `https://your-custom-domain.com`, `dstack-ingress` decrypts TLS and then forwards the HTTP payload to exactly the URL in `TARGET_ENDPOINT`.
 
     ```
-    https://pastebin.example.com  →  dstack-ingress  →  http://app:80
+    https://your-custom-domain.com  →  dstack-ingress  →  http://app:80
     ```
 
 - **Decouples host networking from container internals**\
-  Your app can stay on port 80 (or 3000, or the exposed port of your app), and you never have to re-map messy host ports. The ingress simply forwards traffic to “app:80” over the Docker bridge network.
-
-* **Enables dynamic, multi-service gateways**\
-  If you later add more services behind the same ingress (e.g. `api-service:4000`), you only need to change their corresponding `TARGET_ENDPOINT` or add routing rules—no firewall or host-port juggling required.
+  Your app can stay on port 80 (or 3000, or the exposed port of your app), and you never have to re-map host ports. The ingress simply forwards traffic to “app:80” over the Docker internal network.
 
 In the following example, we will show a more complex configuration for an ElizaOS Deployment where the docker app has a Postgresql + pgvector container that serves as a DB for the ElizaOS `eliza` container. The `SERVER_PORT` is expected to be port `3000` in this example where the `dstack-ingress` will forward traffic through the `DOMAIN` environment variable.
 
@@ -121,12 +156,12 @@ services:
     ports:
       - "443:443"
     environment:
-      - DOMAIN=${DOMAIN}
-      - GATEWAY_DOMAIN=${GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - SET_CAA=true
+      - DOMAIN=example.com
       - TARGET_ENDPOINT=http://eliza:3000
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
     volumes:
       - /var/run/tappd.sock:/var/run/tappd.sock
       - cert-data:/etc/letsencrypt
@@ -146,54 +181,27 @@ volumes:
 
 </details>
 
-Now on to the deployment. Go to you Phala Cloud Dashboard and deploy a new CVM. Select **docker-compose.yml** option for deployment then take the past the docker compose file below into the **Advanced** tab of the CVM configration page.
+Now copy and paste the docker-compose.yaml code above into the **compose.yml** section similar to the screenshot below.
 
-```yaml
-services:
-  dstack-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
-    ports:
-      - "443:443"
-    environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - DOMAIN=${DOMAIN}
-      - GATEWAY_DOMAIN=${GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - SET_CAA=true
-      - TARGET_ENDPOINT=http://app:80
-    volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
-      - cert-data:/etc/letsencrypt
-    restart: unless-stopped
-  app:
-    image: nginx  # Replace with your application image
-    restart: unless-stopped
-volumes:
-  cert-data:  # Persistent volume for certificates
-```
+<figure><img src="../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
-Explanation of environment variables:
+Next you need to grab your Cloudflare API Token for your domain, and fill in your encrypted secrets.
 
-* `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
-* `DOMAIN`: Your custom domain (i.e. `your-domain.com` )
-* `GATEWAY_DOMAIN`: The dstack gateway domain. (e.g. `_.dstack-prod5.phala.network` for Phala Cloud **prod5** server)
-* `CERTBOT_EMAIL`: Your email address used for Let's Encrypt email notifications
-* `TARGET_ENDPOINT`: **Where the ingress should forward all incoming traffic**—i.e. the upstream service application:port. In this case, we point to the `nginx` app on port `80`.
-* `SET_CAA`: Set to `true` to enable CAA record setup
+<figure><img src="../../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
-Now copy and paste the docker-compose.yaml code above into the **Advanced** Tab similar to the screnshot below.
-
-<figure><img src="../../../.gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
-
-Next you need to grab your Cloudflare API Token for your domain, and fill in your environment variables. For this example, deploy to **prod5** ( domai&#x6E;**:**`dstack-prod5.phala.network`).
-
-<figure><img src="../../../.gitbook/assets/image (19).png" alt=""><figcaption></figcaption></figure>
-
-Click **Create** button and your CVM will deploy in a couple minutes with the custom domain. Here is an example of a custom domain deployed to [phala.incipient.ltd.](https://phala.incipient.ltd)
+Click **Deploy** button and your CVM will deploy in a couple minutes with the custom domain. Here is an example of a custom domain deployed to [phala.incipient.ltd.](https://phala.incipient.ltd)
 
 <figure><img src="../../../.gitbook/assets/image (20).png" alt=""><figcaption></figcaption></figure>
 
 **Congratulations!** You've successfully deployed your CVM with a custom domain. Your application is now secured with Zero Trust HTTPS, thanks to the seamless integration of Cloudflare DNS and Let's Encrypt. If you are interested in the verification of this process check the [#domain-attestation-and-verification](setting-up-custom-domain.md#domain-attestation-and-verification "mention").
+
+## Integration Notes
+
+`dstack-ingress`  is a sidecar in your docker compose file. When adding it, you should make sure:
+
+1. You have configured the necessary environmental variables and encrypted secrets according as described above
+2. Declare the `cert-data`  volume in your docker compose file as it's used by `dstack-ingress`
+3. `dstack-ingress`  service is connected to the same network as the service specified in  `TARGET_ENDPOINT` . e.g. If you set `network: net1`  for your app, you should also have it in `dstack-ingress` .
 
 ## Knowledge
 

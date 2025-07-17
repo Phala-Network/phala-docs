@@ -6,14 +6,14 @@ Make sure you have gone through the [Sign-up for Cloud Account](sign-up-for-clou
 
 ## Step 1 - Create a CVM
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption><p>Create CVM</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption><p>Create CVM</p></figcaption></figure>
 
 Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cloud [dashboard](https://cloud.phala.network/dashboard). Once there, you need to:
 
 1. Set your application name (e.g. "hello-world")
 2.  Paste the config file to describe your service in docker compose format. In this tutorial, we deploy a basic jupyter-notebook without any code change.
 
-    <figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption><p>Docker Compose File</p></figcaption></figure>
+    <figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Docker Compose File</p></figcaption></figure>
 
     ```yaml
     services:
@@ -31,7 +31,7 @@ Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cl
 3.  Choose the resource plan. There are some preset plans available, or you can customize them for more flexibility. In **Node & Image** section, we recommend choosing **dstack-dev-** as guest image if you are deploying for testing. It will enable the debug feature that you can login to the virtual machine in the future.\
 
 
-    <figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption><p>Compute Resources</p></figcaption></figure>
+    <figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption><p>Compute Resources</p></figcaption></figure>
 4.  (Optional) Set **Encrypted Secrets**. Encrypted Secrets are variables that can be referenced in your docker compose file. It's end-to-end encrypted between you and the app you deployed. In this guide, we set the environment variable **`TOKEN`** to **`phala`** for testing. Later you will use this token to login to the notebook. Note that `TOKEN` is referenced in the `command` field in the compose file.\
     &#x20; &#x20;
 

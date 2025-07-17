@@ -63,7 +63,7 @@ Click your username and select "**API Tokens**".
 
 Click Create Token and then copy your newly generated API Key.
 
-<figure><img src="../../../.gitbook/assets/image (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (2) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 With your API Key in hand, authenticate your CLI:
 
