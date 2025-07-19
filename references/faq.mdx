@@ -3,7 +3,7 @@
 <Note type="danger">
 **WARNING**
 
-This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](../cloud/getting-started/getting-started.md).
+This section is no longer recommended for deploying on Phala. To build and deploy securely and efficiently, please use the fully managed [Phala Cloud](https://cloud.phala.network) platform instead. Check out the doc on how to [get started](/cloud/getting-started/getting-started).
 </Note>
 
 ## :page\_facing\_up: (Legacy) Phat Contract Development <a href="#how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui" id="how-to-set-arguments-when-instantiating-the-contract-in-phat-contract-ui"></a>
@@ -30,7 +30,7 @@ or sometimes “use of floating point type in locals is forbidden”
 This error occurs when the contract or its dependencies use floating point operations not allowed by the ink runtime.
 
 * To find the source of the problem, try recompiling the contract with `--keep-debug-symbols`, then convert the wasm file to wat using `wasm2wat my_contract.wasm > my_contract.wat`, and search for `f32` or `f64` in my\_contract.wat to find the function using these instructions.
-* If the floating point operations are necessary, see the section [“How to do floating point calculations”](../developers/support/broken-reference/) for more information.
+* If the floating point operations are necessary, see the section [“How to do floating point calculations”]() for more information.
 
 #### **Error: sign extension operations support is not enabled**
 
@@ -42,7 +42,7 @@ Upgrade cargo-contract to version 1.5.2 or higher once [this PR](https://github.
 
 A common case that introduces FP instructions is parsing JSON in a contract. Either serde or serde\_json are designed to be able to handle FP numbers. In theory, if you don’t use it to deal with FP data, the compiler and wasm-opt should be able to optimize the FP instructions away for many cases. However, in practice, if you use serde\_json, it always emits FP instructions in the final output wasm file.
 
-If your JSON document contains FP numbers, you can skip this section and go to [“How to do floating point calculations”](../developers/support/broken-reference/) for solutions. If your JSON document does not contain FP numbers, here are some suggestions for removing the instructions:
+If your JSON document contains FP numbers, you can skip this section and go to [“How to do floating point calculations”]() for solutions. If your JSON document does not contain FP numbers, here are some suggestions for removing the instructions:
 
 * Use the crate [pink-json](https://crates.io/crates/pink-json) instead of `serde_json`.
 * Don’t deserialize to `json::Value` or `serde::Value`. These are dynamically typed values and make it impossible for the compiler to optimize the code paths that contain FP ops. Instead, mark concrete types with `#[derive(Deserialize)]` and deserialize to them directly.

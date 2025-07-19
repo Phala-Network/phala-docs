@@ -48,7 +48,7 @@ If you are interested in integrating your asset into SubBridge, please go to [in
 ```
 
 * `location` must be a [MultiLocation](https://polkadot.network/blog/xcm-the-cross-consensus-message-format/). For example, the location of `KAR` is `MultiLocation::new(1, X2(Parachain(2000), General(0x0080)))`. If your asset is an EVM asset, the `location` should be `MultiLocation::new(1, X3(Parachain(2004), GeneralIndex(chain_id), GeneralKey(erc20_address)))`. `chain_id` should match the chain your asset deployed on. So far chain id of Ethereum is `0`, and chain id of Moonriver EVM is `2`.
-* `is mintable` represents whether your ERC20 smart contract support `mint` and `burn`, if set as true, your users will need to give the mint authority to our contract when the first time they use SubBridge. Check [**Assets Registration**](technical-details.md#asset-registration) find more details about what we have done on registration.
+* `is mintable` represents whether your ERC20 smart contract support `mint` and `burn`, if set as true, your users will need to give the mint authority to our contract when the first time they use SubBridge. Check [**Assets Registration**](/references/subbridge/technical-details#asset-registration) find more details about what we have done on registration.
 
 After the issue is opened, feel free to notify the team on our [Discord channel](https://discord.gg/phala-network) if we haven’t replied immediately. Now you are ready to work with the team to finish the integration stuff when we approve the request on the issue.
 
@@ -75,11 +75,11 @@ To start integration testing, please **transfer some assets to our test account 
 * For parachain asset, please transfer 10000 of your asset to account `0x7804e66ec9eea3d8daf6273ffbe0a8af25a8879cf43f14d0ebbb30941f578242` on your parachain
 * For EVM asset, please transfer 10000 of your asset(ERC20) to account `0xA29D4E0F035cb50C0d78c8CeBb56Ca292616Ab20` on Kovan
 
-Now it’s time to let us know that you have everything ready to do the test with the Phala team on Rococo. We will register your asset on the Rhala network and enable ChainBridge transfer if you are an EVM asset or you certainly want to bridge your parachain asset to EVM chains. Check [**Assets Registration**](technical-details.md#asset-registration) to find more details.
+Now it’s time to let us know that you have everything ready to do the test with the Phala team on Rococo. We will register your asset on the Rhala network and enable ChainBridge transfer if you are an EVM asset or you certainly want to bridge your parachain asset to EVM chains. Check [**Assets Registration**](/references/subbridge/technical-details#asset-registration) to find more details.
 
 ## Register assets on the Khala network <a href="#register-assets-on-the-khala-network" id="register-assets-on-the-khala-network"></a>
 
-After we have confirmed all functions are working properly on Rococo, we will start integrating your asset on the Khala network. If your asset is a parachian asset, please refer to [**Parachain assets integration guide**](../../other-products/subbridge/broken-reference/) and if your assets is an EVM asset, please refer to [**EVM assets integration guide**](../../other-products/subbridge/broken-reference/).
+After we have confirmed all functions are working properly on Rococo, we will start integrating your asset on the Khala network. If your asset is a parachian asset, please refer to **Parachain assets integration guide** and if your assets is an EVM asset, please refer to **EVM assets integration guide**.
 
 #### Parachain Assets Integration Guide <a href="#parachain-assets-integration-guide" id="parachain-assets-integration-guide"></a>
 
@@ -143,7 +143,7 @@ HRMP channel is a one-way channel, which means you also need to receive our open
 
 **Step 4: Register PHA on your parachain**
 
-Since the HRMP channel already opened between our two parachains, the last thing we need to do is to register your asset into our parachain and register our asset(PHA) into your parachain. You can refer to [**Assets Registration**](technical-details.md#asset-registration) to see what we have done to register an asset. Please note that the location of `PHA` is **MultiLocation::new(1, X1(Parachain(2004))**. You may want to add it to your runtime XCM trader config according to your implementation.
+Since the HRMP channel already opened between our two parachains, the last thing we need to do is to register your asset into our parachain and register our asset(PHA) into your parachain. You can refer to [**Assets Registration**](/references/subbridge/technical-details#asset-registration) to see what we have done to register an asset. Please note that the location of `PHA` is **MultiLocation::new(1, X1(Parachain(2004))**. You may want to add it to your runtime XCM trader config according to your implementation.
 
 #### EVM Assets Integration Guide <a href="#evm-assets-integration-guide" id="evm-assets-integration-guide"></a>
 
@@ -178,7 +178,7 @@ Head to [Sygma shared repo](https://github.com/sygmaprotocol/sygma-shared-config
 | relayer2 | 0xdca0f5B3686cc87415100808a2568879fE74E01a |
 | relayer2 | 0x4EE535bE2ce432151916E36B3c684E1dB8Cbf8c1 |
 
-Compare with the registration of parachain assets, registration of EVM assets is more convenient. You should be relaxed because we will do everything need with the registration information provided by you. If you are aware of things we did when registering an asset, please refer to [**Assets Registration**](technical-details.md#asset-registration) for more information.
+Compare with the registration of parachain assets, registration of EVM assets is more convenient. You should be relaxed because we will do everything need with the registration information provided by you. If you are aware of things we did when registering an asset, please refer to [**Assets Registration**](/references/subbridge/technical-details#asset-registration) for more information.
 
 > 💡 You should receive the update when we finish the registration.
 

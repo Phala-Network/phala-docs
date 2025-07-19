@@ -26,7 +26,7 @@ Be sure to configure the volume in your docker-compose.yml to capture the right 
 
 ### 2.1. Use encrypted environment variables
 
-Store secrets (API keys, tokens, passwords) as [_Encrypted Variables_](../phala-cloud-user-guides/create-cvm/set-secure-environment-variables.md) in your Docker Compose configuration. Phala Cloud’s deployment process encrypts your secrets on the client side and only decrypts them inside the TEE at runtime . This means even the Phala Cloud cannot read your plaintext secrets.
+Store secrets (API keys, tokens, passwords) as [_Encrypted Variables_](/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables) in your Docker Compose configuration. Phala Cloud’s deployment process encrypts your secrets on the client side and only decrypts them inside the TEE at runtime . This means even the Phala Cloud cannot read your plaintext secrets.
 
 ### 2.2. Prefer TEE-managed keys when possible
 

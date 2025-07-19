@@ -26,7 +26,7 @@ And attempt a restart with
 sudo phala start
 ```
 
-If you still have issues attempt to [update the script](solo-scripts-guidance/update-your-workers-node.md).
+If you still have issues attempt to [update the script](/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node).
 
 ## Investigating the Issue <a href="#investigating-the-issue" id="investigating-the-issue"></a>
 
@@ -44,7 +44,7 @@ In case your node is stuck, a typical scenario would look like the following:
 
 (image showing stuck node on the worker)
 
-With the symptom in the scenario above, the right method to solve the issue would be restarting the `node` container only, with the commands mentioned [here](troubleshooting.md#general), and restarting the containers.
+With the symptom in the scenario above, the right method to solve the issue would be restarting the `node` container only, with the commands mentioned [here](#general), and restarting the containers.
 
 Now check the status of the node again.
 
@@ -121,7 +121,7 @@ cd solo-mining-scripts-main/ #note this depends on your current directory
 sudo ./phala.sh install
 ```
 
-You may now [restart your node](troubleshooting.md#general).
+You may now [restart your node](#general).
 
 ## Peer Connectivity <a href="#peer-connectivity" id="peer-connectivity"></a>
 
@@ -160,7 +160,7 @@ sudo phala install isgx
 
 ## Khala Node Stops Synching <a href="#khala-node-stops-synching" id="khala-node-stops-synching"></a>
 
-If the Khala Chain stops synching and is stuck at a specific block and does not continue to sync, we advise you first to [restart your node](troubleshooting.md#general).
+If the Khala Chain stops synching and is stuck at a specific block and does not continue to sync, we advise you first to [restart your node](#general).
 
 If the synchronization still fails, you may try to delete the khala chain database on your worker’s node. It is located in `/var/khala-dev-node/chains/khala`.
 
@@ -200,4 +200,4 @@ sudo rm -r ~/solo-mining-scripts-main
 sudo rm ~/main.zip
 ```
 
-You can [follow this tutorial](./) to redownload and reinstall the new phala mining scripts.
+You can [follow this tutorial](/compute-providers/run-workers-on-khala) to redownload and reinstall the new phala mining scripts.
