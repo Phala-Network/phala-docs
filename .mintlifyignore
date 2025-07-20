@@ -3,3 +3,4 @@ ai-agent-contract-legacy/
 legacy/
 *.md
 .tmp/
+tmp/
