@@ -32,11 +32,11 @@ def extract_urls_from_summary(summary_content):
     
     return sorted(urls)
 
-def test_local_page(page_path, base_url="http://localhost:3000"):
+def test_local_page(page_path, base_url="https://phalanetwork-1606097b.mintlify.app"):
     """Test if a page is accessible on local Mintlify server."""
     url = f"{base_url}/{page_path}"
     try:
-        response = requests.get(url, timeout=5, allow_redirects=False)
+        response = requests.get(url, timeout=3, allow_redirects=False)
         
         # If it's a 200, the page exists
         if response.status_code == 200:
@@ -317,7 +317,7 @@ def main():
 
     print("🚀 Complete Migration Validator (SUMMARY.md + GitBook redirects -> Mintlify)")
     print("=" * 70)
-    print("📍 Testing original doc structure against: http://localhost:3000")
+    print("📍 Testing original doc structure against: https://phalanetwork-1606097b.mintlify.app")
     print("-" * 70)
     
     # Extract URLs from original SUMMARY.md
@@ -391,7 +391,7 @@ def main():
         print("   - Check if missing pages exist as .mdx files")
         print("   - Verify docs.json navigation includes all pages")
         print("   - Check for path mismatches between original and migrated structure")
-        print("   - Ensure Mintlify server is running on port 3000")
+        print("   - Ensure production site is accessible and deployed correctly")
         
         return 1
     else:
