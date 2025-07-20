@@ -412,7 +412,7 @@
     },
     {
       "source": "/compute-providers/basic-info/index",
-      "destination": "/compute-providers/basic-info"
+      "destination": "/compute-providers/basic-info/introduction"
     },
     {
       "source": "/compute-providers/gatekeeper/index",
@@ -521,6 +521,46 @@
     {
       "source": "/tech-specs/blockchain/index",
       "destination": "/tech-specs/blockchain"
+    },
+    {
+      "source": "/overview/phala-network/confidential-ai-inference",
+      "destination": "/overview/phala-network/gpu-tee"
+    },
+    {
+      "source": "/confidential-ai-inference/getting-started",
+      "destination": "/overview/phala-network/gpu-tee"
+    },
+    {
+      "source": "/confidential-ai-inference/confidential-ai-api",
+      "destination": "/gpu-tee/llm-in-tee"
+    },
+    {
+      "source": "/confidential-ai-inference/host-llm-in-tee",
+      "destination": "/gpu-tee/llm-in-tee"
+    },
+    {
+      "source": "/confidential-ai-inference/implementation",
+      "destination": "/gpu-tee/llm-in-tee"
+    },
+    {
+      "source": "/confidential-ai-inference/benchmark",
+      "destination": "/gpu-tee/benchmark"
+    },
+    {
+      "source": "/cloud/getting-started/start-from-cloud-cli",
+      "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli"
+    },
+    {
+      "source": "/cloud/getting-started/start-from-scratch",
+      "destination": "/cloud/getting-started/overview"
+    },
+    {
+      "source": "/cloud/getting-started/start-from-template",
+      "destination": "/phala-cloud/getting-started/explore-templates/start-from-template"
+    },
+    {
+      "source": "/ai-agent-contract/getting-started",
+      "destination": "/cloud/getting-started/overview"
     }
   ],
   "footer": {

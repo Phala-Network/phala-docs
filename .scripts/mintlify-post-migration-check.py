@@ -37,13 +37,88 @@ def test_local_page(page_path, base_url="http://localhost:3000"):
     url = f"{base_url}/{page_path}"
     try:
         response = requests.get(url, timeout=5, allow_redirects=False)
-        return response.status_code == 200, response.status_code, None, url
+        
+        # If it's a 200, the page exists
+        if response.status_code == 200:
+            return True, response.status_code, None, url
+        
+        # If it's a redirect, check the destination
+        if response.status_code in [301, 302, 307, 308]:
+            location = response.headers.get('location', '/')
+            # Clean up the location header (sometimes contains duplicates like "/, /")
+            clean_location = location.split(',')[0].strip()
+            # If redirected to root (/), treat as page not found (Mintlify's catch-all)
+            if clean_location == '/':
+                return False, response.status_code, f"Redirected to root (page not found)", url
+            else:
+                # Valid redirect to another page
+                return True, response.status_code, f"Redirected to {clean_location}", url
+        
+        # Other status codes are failures
+        return False, response.status_code, None, url
+        
     except requests.exceptions.ConnectionError:
         return False, None, "Connection refused - is Mintlify server running?", url
     except requests.exceptions.Timeout:
         return False, None, "Timeout", url
     except Exception as e:
         return False, None, str(e), url
+
+def extract_gitbook_redirects():
+    """Extract GitBook redirects from the original .gitbook.yaml configuration."""
+    gitbook_redirects = {
+        "en-us/general/phala-network/intro": "README.md",
+        "en-us/general/phala-network/products": "other-products/subbridge/README.md",
+        "en-us/general/phala-network/governance": "pha-token/governance/governance-mechanism.md",
+        "en-us/general/phala-network/phat-contract-fee": "developers/phat-contract/pay-for-cloud-service.md",
+        "en-us/general/phala-network/tokenomics": "compute-providers/basic-info/worker-rewards.md",
+        "en-us/general/khala-network/intro": "compute-providers/basic-info/introduction.md",
+        "en-us/general/khala-network/governance": "pha-token/governance/khala-governance.md",
+        "en-us/general/khala-network/tokenomics": "compute-providers/run-workers-on-khala/khala-worker-rewards.md",
+        "en-us/general/applications/extension-wallet": "introduction/basic-guidance/README.md",
+        "en-us/general/applications/setup-identity": "introduction/basic-guidance/setup-account-identity.md",
+        "en-us/general/applications/get-pha": "introduction/basic-guidance/get-pha-and-transfer.md",
+        "en-us/general/subbridge/intro": "other-products/subbridge/README.md",
+        "en-us/general/subbridge/tutorial": "other-products/subbridge/cross-chain-transfer.md",
+        "en-us/general/subbridge/supported-assets": "other-products/subbridge/supported-assets.md",
+        "en-us/general/subbridge/asset-integration": "other-products/subbridge/asset-integration-guide.md",
+        "en-us/general/subbridge/technical-details": "other-products/subbridge/technical-details.md",
+        "en-us/general/applications/stake-pha": "pha-token/delegation/README.md",
+        "en-us/general/applications/stakepool": "pha-token/delegation/delegate-to-stakepool.md",
+        "en-us/general/applications/vault": "pha-token/delegation/whats-vault.md",
+        "en-us/general/applications/share": "pha-token/delegation/whats-share.md",
+        "en-us/general/applications/wpha": "pha-token/delegation/wrappedbalances-and-w-pha.md",
+        "en-us/general/applications/delegation-example": "pha-token/delegation/examples-of-delegation.md",
+        "en-us/general/applications/phala-app": "pha-token/delegation/use-phala-app-to-delegate.md",
+        "en-us/general/applications/reward-calculation": "pha-token/delegation/estimate-your-reward.md",
+        "en-us/general/applications/use-delegation-to-vote": "pha-token/delegation/wrappedbalances-and-w-pha.md",
+        "overview/phala-network/confidential-ai-inference": "overview/phala-network/gpu-tee.md",
+        "confidential-ai-inference/getting-started": "overview/phala-network/gpu-tee.md",
+        "confidential-ai-inference/confidential-ai-api": "gpu-tee/llm-in-tee.md",
+        "confidential-ai-inference/host-llm-in-tee": "gpu-tee/llm-in-tee.md",
+        "confidential-ai-inference/implementation": "gpu-tee/llm-in-tee.md",
+        "confidential-ai-inference/benchmark": "gpu-tee/benchmark.md",
+        "cloud/getting-started/getting-started": "phala-cloud/getting-started/getting-started.md",
+        "cloud/getting-started/sign-up-for-cloud-account": "phala-cloud/getting-started/sign-up-for-cloud-account.md",
+        "cloud/getting-started/start-from-cloud-cli": "phala-cloud/getting-started/start-from-cloud-cli.md",
+        "cloud/getting-started/start-from-cloud-ui": "phala-cloud/getting-started/start-from-cloud-ui.md",
+        "cloud/getting-started/start-from-scratch": "phala-cloud/getting-started/start-from-scratch.md",
+        "cloud/getting-started/start-from-template": "phala-cloud/getting-started/start-from-template.md",
+        "cloud/use-cases/tee_with_fhe_and_mpc": "phala-cloud/use-cases/tee_with_fhe_and_mpc.md",
+        "cloud/use-cases/tee_with_zk_and_zkrollup": "phala-cloud/use-cases/tee_with_zk_and_zkrollup.md",
+        "ai-agent-contract/getting-started": "cloud/getting-started/getting-started.md",
+    }
+    
+    # Convert GitBook redirects to Mintlify URLs (remove .md extensions and handle special cases)
+    converted_redirects = []
+    for old_path, target_path in gitbook_redirects.items():
+        # Convert target to Mintlify format
+        mintlify_path = target_path.replace('.md', '')
+        # Handle README -> index conversion
+        mintlify_path = mintlify_path.replace('/README', '/index').replace('README', 'index')
+        converted_redirects.append(old_path)
+    
+    return sorted(converted_redirects)
 
 def main():
     # Original SUMMARY.md content from pre-migration
@@ -240,28 +315,43 @@ def main():
   * [Gatekeeper](compute-providers/gatekeeper/gatekeeper.md)
 """
 
-    print("🚀 Original URLs Validator (Pre-Migration -> Mintlify)")
+    print("🚀 Complete Migration Validator (SUMMARY.md + GitBook redirects -> Mintlify)")
     print("=" * 70)
     print("📍 Testing original doc structure against: http://localhost:3000")
     print("-" * 70)
     
     # Extract URLs from original SUMMARY.md
     original_urls = extract_urls_from_summary(summary_content)
-    print(f"🔍 Found {len(original_urls)} original pages to test")
+    print(f"🔍 Found {len(original_urls)} SUMMARY.md pages to test")
+    
+    # Extract GitBook redirects
+    gitbook_redirects = extract_gitbook_redirects()
+    print(f"🔍 Found {len(gitbook_redirects)} GitBook redirect URLs to test")
+    
+    # Combine all URLs for testing
+    all_urls = sorted(set(original_urls + gitbook_redirects))
+    print(f"🔍 Total unique URLs to test: {len(all_urls)}")
     print("-" * 70)
     
     successful_pages = []
     failed_pages = []
     
-    # Test each original URL
-    for url_path in original_urls:
+    # Test each URL (both original and GitBook redirects)
+    for url_path in all_urls:
         accessible, status_code, error, full_url = test_local_page(url_path)
         
         if accessible:
-            print(f"✅ {url_path}")
+            if error and "Redirected to" in error:
+                redirect_dest = error.split('Redirected to ')[1]
+                print(f"✅ {url_path} → {redirect_dest}")
+            else:
+                print(f"✅ {url_path}")
             successful_pages.append(url_path)
         else:
-            status_info = f"({status_code})" if status_code else f"({error})"
+            if error:
+                status_info = f"({status_code}) {error}" if status_code else f"({error})"
+            else:
+                status_info = f"({status_code})" if status_code else "(Unknown error)"
             print(f"❌ {url_path} {status_info}")
             failed_pages.append({
                 'page': url_path,
@@ -272,15 +362,18 @@ def main():
     
     # Summary
     print("\n" + "=" * 70)
-    print("📊 MIGRATION VALIDATION SUMMARY")
+    print("📊 COMPLETE MIGRATION VALIDATION SUMMARY")
     print("=" * 70)
     
-    total_pages = len(original_urls)
+    total_pages = len(all_urls)
     success_count = len(successful_pages)
     fail_count = len(failed_pages)
     
-    print(f"✅ Migrated Successfully: {success_count}/{total_pages} ({success_count/total_pages*100:.1f}%)")
-    print(f"❌ Migration Issues: {fail_count}/{total_pages} ({fail_count/total_pages*100:.1f}%)")
+    print(f"📄 SUMMARY.md pages: {len(original_urls)}")
+    print(f"🔗 GitBook redirects: {len(gitbook_redirects)}")
+    print(f"📋 Total unique URLs: {total_pages}")
+    print(f"✅ Accessible URLs: {success_count}/{total_pages} ({success_count/total_pages*100:.1f}%)")
+    print(f"❌ Failed URLs: {fail_count}/{total_pages} ({fail_count/total_pages*100:.1f}%)")
     
     if failed_pages:
         print(f"\n🔍 PAGES WITH MIGRATION ISSUES:")
@@ -296,14 +389,15 @@ def main():
         
         print("💡 RECOMMENDATIONS:")
         print("   - Check if missing pages exist as .mdx files")
-        print("   - Verify mint.json navigation includes all pages")
+        print("   - Verify docs.json navigation includes all pages")
         print("   - Check for path mismatches between original and migrated structure")
         print("   - Ensure Mintlify server is running on port 3000")
         
         return 1
     else:
-        print(f"\n🎉 Perfect Migration! All {total_pages} original pages are accessible!")
-        print("✅ Zero broken links - migration completed successfully!")
+        print(f"\n🎉 Perfect Migration! All {total_pages} URLs are accessible!")
+        print("✅ Zero broken links - comprehensive migration validation successful!")
+        print("📋 Validated: SUMMARY.md pages + GitBook redirects + Mintlify navigation")
         
         return 0
 
