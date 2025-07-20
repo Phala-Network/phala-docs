@@ -1,13 +1,42 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Phala Docs",
+  "name": "Phala",
   "colors": {
     "primary": "#93c606",
     "light": "#E8FF7A",
     "dark": "#9FDC00"
   },
   "favicon": "/favicon.ico",
+  "navbar": {
+    "links": [
+      {
+        "label": "Community",
+        "href": "https://discord.gg/phala-network"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get started",
+      "href": "https://cloud.phala.network"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
+  },
+  "styling": {
+    "codeblocks": "system"
+  },
+  "errors": {
+    "404": {
+      "redirect": false
+    }
+  },
   "navigation": {
     "anchors": [
       {
@@ -384,19 +413,6 @@
       ]
     }
   },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "https://discord.gg/phala-network"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.phala.network"
-    }
-  },
   "redirects": [
     {
       "source": "/cloud/getting-started/getting-started",
@@ -569,6 +585,11 @@
       "github": "https://github.com/Phala-Network",
       "linkedin": "https://linkedin.com/company/phala-network",
       "discord": "https://discord.gg/phala-network"
+    }
+  },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-RHRW9RL5LG"
     }
   }
 }
