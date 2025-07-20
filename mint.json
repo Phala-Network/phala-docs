@@ -54,12 +54,11 @@
         {
           "group": "PHA Token",
           "pages": [
-            "overview/pha-token/index",
             "overview/pha-token/introduction",
             {
               "group": "Delegation",
               "pages": [
-                "overview/pha-token/delegation/index",
+                "overview/pha-token/delegation/overview",
                 "overview/pha-token/delegation/delegate-to-stakepool",
                 "overview/pha-token/delegation/whats-vault",
                 "overview/pha-token/delegation/whats-share",
@@ -72,7 +71,7 @@
             {
               "group": "Governance",
               "pages": [
-                "overview/pha-token/governance/index",
+                "overview/pha-token/governance/overview",
                 "overview/pha-token/governance/governance-mechanism",
                 "overview/pha-token/governance/join-the-council",
                 "overview/pha-token/governance/voting-for-councillors",
@@ -92,13 +91,13 @@
         {
           "group": "Getting Started",
           "pages": [
-            "cloud/getting-started/getting-started",
+            "cloud/getting-started/overview",
             "cloud/getting-started/sign-up-for-cloud-account",
             "cloud/getting-started/start-from-cloud-ui",
             {
               "group": "Explore Templates",
               "pages": [
-                "phala-cloud/getting-started/explore-templates/index",
+                "phala-cloud/getting-started/explore-templates/overview",
                 "phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
                 "phala-cloud/getting-started/explore-templates/start-from-template"
               ]
@@ -109,7 +108,6 @@
         {
           "group": "TEEs, Attestation & Zero Trust Security",
           "pages": [
-            "phala-cloud/tees-attestation-and-zero-trust-security/index",
             "phala-cloud/tees-attestation-and-zero-trust-security/attestation",
             "phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
           ]
@@ -117,18 +115,16 @@
         {
           "group": "Phala Cloud User Guides",
           "pages": [
-            "phala-cloud/phala-cloud-user-guides/index",
             {
               "group": "Deploy and Manage CVMs",
               "pages": [
-                "phala-cloud/phala-cloud-user-guides/create-cvm/index",
+                "phala-cloud/phala-cloud-user-guides/create-cvm/overview",
                 "phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
                 "phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
                 "phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
                 {
                   "group": "Debugging and Analyzing Logs",
                   "pages": [
-                    "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/index",
                     "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
                     "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
                     "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
@@ -142,7 +138,6 @@
             {
               "group": "Building with TEE",
               "pages": [
-                "phala-cloud/phala-cloud-user-guides/building-with-tee/index",
                 "phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
                 "phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
                 "phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain",
@@ -155,7 +150,6 @@
             {
               "group": "Advanced Deployment Options",
               "pages": [
-                "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/index",
                 "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
                 "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/deploy-cvm-with-phala-cloud-api",
                 "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/setup-a-ci-cd-pipeline"
@@ -166,11 +160,9 @@
         {
           "group": "Be Production Ready",
           "pages": [
-            "phala-cloud/be-production-ready/index",
             {
               "group": "CI/CD Automation",
               "pages": [
-                "phala-cloud/be-production-ready/ci-cd-automation/index",
                 "phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
                 "phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
               ]
@@ -183,7 +175,7 @@
         {
           "group": "Use Cases",
           "pages": [
-            "cloud/use-cases/use-cases",
+            "cloud/use-cases/overview",
             "cloud/use-cases/tee_with_ai",
             "cloud/use-cases/tee_with_fhe_and_mpc",
             "cloud/use-cases/tee_with_zk_and_zkrollup"
@@ -192,15 +184,15 @@
         {
           "group": "References",
           "pages": [
-            "phala-cloud/references/index",
+            "phala-cloud/references/overview",
             {
               "group": "Phala Cloud CLI Reference",
               "pages": [
-                "phala-cloud/references/tee-cloud-cli/index",
+                "phala-cloud/references/tee-cloud-cli/overview",
                 {
                   "group": "phala",
                   "pages": [
-                    "phala-cloud/references/tee-cloud-cli/phala/index",
+                    "phala-cloud/references/tee-cloud-cli/phala/overview",
                     "phala-cloud/references/tee-cloud-cli/phala/auth",
                     "phala-cloud/references/tee-cloud-cli/phala/cvms",
                     "phala-cloud/references/tee-cloud-cli/phala/docker",
@@ -209,7 +201,7 @@
                 }
               ]
             },
-            "phala-cloud/references/cloud-api-beta/index",
+            "phala-cloud/references/cloud-api-beta/overview",
             "phala-cloud/references/phala-cloud-pricing"
           ]
         },
@@ -234,7 +226,6 @@
         {
           "group": "Design Documents",
           "pages": [
-            "dstack/design-documents/index",
             "dstack/design-documents/whitepaper",
             "dstack/design-documents/decentralized-root-of-trust",
             "dstack/design-documents/key-management-protocol",
@@ -260,7 +251,7 @@
         {
           "group": "Blockchain",
           "pages": [
-            "tech-specs/blockchain/index",
+            "tech-specs/blockchain/overview",
             "tech-specs/blockchain/blockchain-entities",
             "tech-specs/blockchain/cluster-of-workers",
             "tech-specs/blockchain/secret-key-hierarchy"
@@ -274,14 +265,14 @@
         {
           "group": "Setting Up a Wallet on Phala",
           "pages": [
-            "references/basic-guidance/index",
+            "references/basic-guidance/overview",
             "references/basic-guidance/get-pha-and-transfer"
           ]
         },
         {
           "group": "SubBridge",
           "pages": [
-            "references/subbridge/index",
+            "references/subbridge/overview",
             "references/subbridge/cross-chain-transfer",
             "references/subbridge/supported-assets",
             "references/subbridge/asset-integration-guide",
@@ -292,7 +283,6 @@
         {
           "group": "Hackathon Guides",
           "pages": [
-            "references/hackathon-guides/index",
             "references/hackathon-guides/ethglobal-singapore",
             "references/hackathon-guides/ethglobal-san-francisco",
             "references/hackathon-guides/ethglobal-bangkok"
@@ -301,7 +291,6 @@
         {
           "group": "Advanced Topics",
           "pages": [
-            "references/advanced-topics/index",
             "references/advanced-topics/cross-chain-solutions",
             "references/advanced-topics/system-contract-and-drivers",
             "references/advanced-topics/run-local-testnet",
@@ -311,7 +300,7 @@
         {
           "group": "Support",
           "pages": [
-            "references/support/index",
+            "references/support/overview",
             "references/support/endpoints",
             "references/support/resource-limits",
             "references/support/transaction-costs",
@@ -329,7 +318,6 @@
         {
           "group": "Basic Info",
           "pages": [
-            "compute-providers/basic-info/index",
             "compute-providers/basic-info/introduction",
             "compute-providers/basic-info/worker-rewards",
             "compute-providers/basic-info/budget-balancer",
@@ -343,7 +331,6 @@
         {
           "group": "Run Workers on Phala",
           "pages": [
-            "compute-providers/run-workers-on-phala/index",
             "compute-providers/run-workers-on-phala/solo-worker-deployment",
             "compute-providers/run-workers-on-phala/prbv3-deployment",
             "compute-providers/run-workers-on-phala/using-prbv3-ui",
@@ -356,11 +343,9 @@
         {
           "group": "Run Workers on Khala - Archived",
           "pages": [
-            "compute-providers/run-workers-on-khala/index",
             {
               "group": "Solo Scripts Guidance - Archived",
               "pages": [
-                "compute-providers/run-workers-on-khala/solo-scripts-guidance/index",
                 "compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
                 "compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
                 "compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
@@ -385,9 +370,8 @@
         {
           "group": "Gatekeeper",
           "pages": [
-            "compute-providers/gatekeeper/index",
-            "compute-providers/gatekeeper/collator",
-            "compute-providers/gatekeeper/gatekeeper"
+            "compute-providers/gatekeeper/overview",
+            "compute-providers/gatekeeper/collator"
           ]
         }
       ]
