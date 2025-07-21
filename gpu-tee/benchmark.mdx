@@ -6,4 +6,6 @@ title: GPU TEE Benchmark
 
 **The benchmark is based on running LLMs in NVIDIA H100 and H200,** our results show that as input size grows, the efficiency of TEE mode increases significantly. When computation time within the GPU dominates overall processing time, the I/O overhead introduced by TEE mode diminishes, allowing efficiency to approach nearly 99%. Efficiency growth is more pronounced in larger models, such as Phi3-14B-128k and Llama3.1-70B, due to their greater computational demands, which result in longer GPU processing times. **Consequently, the I/O overhead becomes increasingly trivial as model size increases**. The total token size (sum of input and output token size) significantly influences the throughput overhead. Larger total token counts lead to higher efficiencies, as they enhance the ratio of computation time to I/O time. These findings underscore the scalability of TEE mode in handling large-scale LLM inference tasks, particularly as input sizes and model complexities grow. The minimal overhead in high-computation scenarios validates its applicability in secure, high-performance AI workloads.
 
+## Resources
+
 For more details of metrics and analysis, check the [benchmark paper](https://arxiv.org/pdf/2409.03992) we published earlier.

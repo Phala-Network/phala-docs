@@ -13,13 +13,13 @@ def extract_urls_from_summary(summary_content):
     # Pattern to match markdown links like * [Title](path/file.md)
     pattern = r'\* \[.*?\]\((.*?\.md)\)'
     matches = re.findall(pattern, summary_content)
-    
+
     # Also get README.md files that might be standalone
     readme_pattern = r'\[.*?\]\((.*?README\.md)\)'
     readme_matches = re.findall(readme_pattern, summary_content)
-    
+
     all_paths = list(set(matches + readme_matches))
-    
+
     # Convert paths to expected Mintlify URLs
     urls = []
     for path in all_paths:
@@ -29,7 +29,7 @@ def extract_urls_from_summary(summary_content):
         url_path = re.sub(r'/README$', '/index', url_path)
         url_path = re.sub(r'^README$', 'index', url_path)
         urls.append(url_path)
-    
+
     return sorted(urls)
 
 def test_local_page(page_path, base_url="https://phalanetwork-1606097b.mintlify.app"):
@@ -37,11 +37,11 @@ def test_local_page(page_path, base_url="https://phalanetwork-1606097b.mintlify.
     url = f"{base_url}/{page_path}"
     try:
         response = requests.get(url, timeout=3, allow_redirects=False)
-        
+
         # If it's a 200, the page exists
         if response.status_code == 200:
             return True, response.status_code, None, url
-        
+
         # If it's a redirect, check the destination
         if response.status_code in [301, 302, 307, 308]:
             location = response.headers.get('location', '/')
@@ -53,10 +53,10 @@ def test_local_page(page_path, base_url="https://phalanetwork-1606097b.mintlify.
             else:
                 # Valid redirect to another page
                 return True, response.status_code, f"Redirected to {clean_location}", url
-        
+
         # Other status codes are failures
         return False, response.status_code, None, url
-        
+
     except requests.exceptions.ConnectionError:
         return False, None, "Connection refused - is Mintlify server running?", url
     except requests.exceptions.Timeout:
@@ -108,7 +108,7 @@ def extract_gitbook_redirects():
         "cloud/use-cases/tee_with_zk_and_zkrollup": "phala-cloud/use-cases/tee_with_zk_and_zkrollup.md",
         "ai-agent-contract/getting-started": "cloud/getting-started/getting-started.md",
     }
-    
+
     # Convert GitBook redirects to Mintlify URLs (remove .md extensions and handle special cases)
     converted_redirects = []
     for old_path, target_path in gitbook_redirects.items():
@@ -117,7 +117,7 @@ def extract_gitbook_redirects():
         # Handle README -> index conversion
         mintlify_path = mintlify_path.replace('/README', '/index').replace('README', 'index')
         converted_redirects.append(old_path)
-    
+
     return sorted(converted_redirects)
 
 def main():
@@ -319,27 +319,27 @@ def main():
     print("=" * 70)
     print("📍 Testing original doc structure against: https://phalanetwork-1606097b.mintlify.app")
     print("-" * 70)
-    
+
     # Extract URLs from original SUMMARY.md
     original_urls = extract_urls_from_summary(summary_content)
     print(f"🔍 Found {len(original_urls)} SUMMARY.md pages to test")
-    
+
     # Extract GitBook redirects
     gitbook_redirects = extract_gitbook_redirects()
     print(f"🔍 Found {len(gitbook_redirects)} GitBook redirect URLs to test")
-    
+
     # Combine all URLs for testing
     all_urls = sorted(set(original_urls + gitbook_redirects))
     print(f"🔍 Total unique URLs to test: {len(all_urls)}")
     print("-" * 70)
-    
+
     successful_pages = []
     failed_pages = []
-    
+
     # Test each URL (both original and GitBook redirects)
     for url_path in all_urls:
         accessible, status_code, error, full_url = test_local_page(url_path)
-        
+
         if accessible:
             if error and "Redirected to" in error:
                 redirect_dest = error.split('Redirected to ')[1]
@@ -359,22 +359,22 @@ def main():
                 'error': error,
                 'url': full_url
             })
-    
+
     # Summary
     print("\n" + "=" * 70)
     print("📊 COMPLETE MIGRATION VALIDATION SUMMARY")
     print("=" * 70)
-    
+
     total_pages = len(all_urls)
     success_count = len(successful_pages)
     fail_count = len(failed_pages)
-    
+
     print(f"📄 SUMMARY.md pages: {len(original_urls)}")
     print(f"🔗 GitBook redirects: {len(gitbook_redirects)}")
     print(f"📋 Total unique URLs: {total_pages}")
     print(f"✅ Accessible URLs: {success_count}/{total_pages} ({success_count/total_pages*100:.1f}%)")
     print(f"❌ Failed URLs: {fail_count}/{total_pages} ({fail_count/total_pages*100:.1f}%)")
-    
+
     if failed_pages:
         print(f"\n🔍 PAGES WITH MIGRATION ISSUES:")
         print("-" * 50)
@@ -386,19 +386,19 @@ def main():
             if page_info['error']:
                 print(f"  ↳ Error: {page_info['error']}")
             print()
-        
+
         print("💡 RECOMMENDATIONS:")
         print("   - Check if missing pages exist as .mdx files")
         print("   - Verify docs.json navigation includes all pages")
         print("   - Check for path mismatches between original and migrated structure")
         print("   - Ensure production site is accessible and deployed correctly")
-        
+
         return 1
     else:
         print(f"\n🎉 Perfect Migration! All {total_pages} URLs are accessible!")
         print("✅ Zero broken links - comprehensive migration validation successful!")
         print("📋 Validated: SUMMARY.md pages + GitBook redirects + Mintlify navigation")
-        
+
         return 0
 
 if __name__ == "__main__":

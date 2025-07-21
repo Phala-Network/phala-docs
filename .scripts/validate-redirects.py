@@ -12,7 +12,7 @@ from typing import Set, List, Dict, Any
 def extract_pages_from_navigation(nav_item) -> Set[str]:
     """Recursively extract all page paths from navigation structure"""
     pages = set()
-    
+
     if isinstance(nav_item, str):
         # Single page path
         pages.add(nav_item)
@@ -29,53 +29,53 @@ def extract_pages_from_navigation(nav_item) -> Set[str]:
         # List of items
         for item in nav_item:
             pages.update(extract_pages_from_navigation(item))
-    
+
     return pages
 
 
 def get_all_available_paths(docs_config: Dict[str, Any]) -> Set[str]:
     """Extract all available page paths from docs.json"""
     available_paths = set()
-    
+
     # Extract from navigation
     if "navigation" in docs_config:
         nav = docs_config["navigation"]
-        
+
         # Handle anchors structure
         if "anchors" in nav:
             for anchor in nav["anchors"]:
                 if "groups" in anchor:
                     for group in anchor["groups"]:
                         available_paths.update(extract_pages_from_navigation(group))
-        
+
         # Handle direct navigation items
         if "pages" in nav:
             available_paths.update(extract_pages_from_navigation(nav["pages"]))
-    
+
     return available_paths
 
 
 def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -> List[Dict[str, str]]:
     """Validate that all redirect destinations point to valid paths"""
     invalid_redirects = []
-    
+
     if "redirects" not in docs_config:
         return invalid_redirects
-    
+
     for redirect in docs_config["redirects"]:
         source = redirect.get("source", "")
         destination = redirect.get("destination", "")
-        
+
         # Remove leading slash for comparison
         dest_path = destination.lstrip("/")
-        
+
         if dest_path not in available_paths:
             invalid_redirects.append({
                 "source": source,
                 "destination": destination,
                 "reason": "Destination path not found in navigation"
             })
-    
+
     return invalid_redirects
 
 
@@ -85,19 +85,19 @@ def main():
         # Load docs.json
         with open("docs.json", "r") as f:
             docs_config = json.load(f)
-        
+
         print("🔍 Extracting available page paths from navigation...")
         available_paths = get_all_available_paths(docs_config)
-        
+
         print(f"✅ Found {len(available_paths)} available page paths")
-        
+
         print("\n📋 Available paths:")
         for path in sorted(available_paths):
             print(f"  - {path}")
-        
+
         print(f"\n🔗 Validating {len(docs_config.get('redirects', []))} redirects...")
         invalid_redirects = validate_redirects(docs_config, available_paths)
-        
+
         if not invalid_redirects:
             print("✅ All redirects are valid!")
             return 0
@@ -107,7 +107,7 @@ def main():
                 print(f"  - {redirect['source']} → {redirect['destination']}")
                 print(f"    Reason: {redirect['reason']}")
             return 1
-            
+
     except FileNotFoundError:
         print("❌ Error: docs.json not found in current directory")
         return 1
