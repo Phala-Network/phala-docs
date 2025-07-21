@@ -210,10 +210,16 @@ When working with dstack TEE deployments, pay special attention to:
 
 Check more instructions [here](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md) on how Dstack attestation work.
 
-### Conclusion
+## Conclusion
 
 Understanding attestation reports is crucial for developers working with TEE environments. By correctly interpreting these fields, you can verify that your application is running in a genuine, secure environment with the expected configuration and code.
 
 For more detailed information on Intel TDX attestation, refer to the Intel TDX Module documentation. For dstack-specific attestation flows, consult the dstack documentation and GitHub repository at [https://github.com/dstack-TEE/dstack](https://github.com/dstack-TEE/dstack).
 
-Example of verification: [https://github.com/Dstack-TEE/dstack-examples/pull/16/files#diff-a37816fef898fbd92c747eefa6ed85ede031a8bcd3288295976c6772ffd69fcc](https://github.com/Dstack-TEE/dstack-examples/pull/16/files#diff-a37816fef898fbd92c747eefa6ed85ede031a8bcd3288295976c6772ffd69fcc)
+Full verification script: [https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)
+
+## Public PCCS Server
+
+We host a public PCCS server: `https://pccs.phala.network/sgx/certification/v4/`.
+
+When you want to run a local verifier like [`dcap-qvl`](https://github.com/Phala-Network/dcap-qvl), you can use this PCCS server to get the quote collaterals for verification.
