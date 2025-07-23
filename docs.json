@@ -20,7 +20,96 @@
       "github": "https://github.com/Phala-Network",
       "linkedin": "https://linkedin.com/company/phala-network",
       "x": "https://x.com/PhalaNetwork"
-    }
+    },
+    "links": [
+      {
+        "header": "Phala Cloud",
+        "items": [
+          {
+            "label": "Getting Started",
+            "href": "https://docs.phala.network/cloud/getting-started/overview"
+          },
+          {
+            "label": "TEEs, Attestation & Zero Trust Security",
+            "href": "https://docs.phala.network/cloud/tees-attestation-and-zero-trust-security/attestation"
+          },
+          {
+            "label": "Phala Cloud User Guides",
+            "href": "https://docs.phala.network/cloud/phala-cloud-user-guides/overview"
+          },
+          {
+            "label": "Be Production Ready",
+            "href": "https://docs.phala.network/cloud/be-production-ready/overview"
+          },
+          {
+            "label": "Use Cases",
+            "href": "https://docs.phala.network/cloud/use-cases/overview"
+          },
+          {
+            "label": "References",
+            "href": "https://docs.phala.network/cloud/references/overview"
+          },
+          {
+            "label": "FAQs",
+            "href": "https://docs.phala.network/cloud/faqs"
+          }
+        ]
+      },
+      {
+        "header": "Dstack",
+        "items": [
+          {
+            "label": "Overview",
+            "href": "https://docs.phala.network/dstack/overview"
+          },
+          {
+            "label": "Local Development",
+            "href": "https://docs.phala.network/dstack/local-development"
+          },
+          {
+            "label": "Getting Started",
+            "href": "https://docs.phala.network/dstack/getting-started"
+          },
+          {
+            "label": "Hardware Requirements",
+            "href": "https://docs.phala.network/dstack/hardware-requirements"
+          },
+          {
+            "label": "Acknowledgement",
+            "href": "https://docs.phala.network/dstack/acknowledgement"
+          },
+          {
+            "label": "FAQs",
+            "href": "https://docs.phala.network/dstack/faqs"
+          },
+          {
+            "label": "Design Documents",
+            "href": "https://docs.phala.network/dstack/design-documents"
+          }
+        ]
+      },
+      {
+        "header": "Network",
+        "items": [
+          {
+            "label": "LLM in GPU TEE",
+            "href": "https://docs.phala.network/network/llm-in-gpu-tee"
+          },
+          {
+            "label": "Tech Specs",
+            "href": "https://docs.phala.network/network/tech-specs"
+          },
+          {
+            "label": "References",
+            "href": "https://docs.phala.network/network/references"
+          },
+          {
+            "label": "Compute Providers",
+            "href": "https://docs.phala.network/network/compute-providers"
+          }
+        ]
+      }
+    ]
   },
   "integrations": {
     "ga4": {
@@ -211,6 +300,7 @@
         "tab": "Network",
         "icon": "square-terminal",
         "pages": [
+          "network/index",
           {
             "group": "LLM in GPU TEE",
             "pages": [

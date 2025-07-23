@@ -1,36 +1,28 @@
 ---
-title: "Phala Network Documentation"
-description: "Build confidential, verifiable, and decentralized applications with Phala Network's Trusted Execution Environment (TEE) technology."
+description: Quick start guide for deploying confidential applications on Phala Cloud.
+icon: robot-astromech
+title: Overview
 ---
 
-# 👾 Phala Network Docs
 
-Welcome to the official documentation for Phala Network, the decentralized cloud computing protocol that enables confidential smart contracts and secure off-chain computation.
+There are several ways to get started building with Phala Cloud:
 
-## Quick Start
+* [Start from Cloud UI](/cloud/getting-started/start-from-cloud-ui) - The easiest way with no coding required
+* [Start from Cloud CLI](/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli) - For developers who prefer command-line tools
+* [Start from Template](/phala-cloud/getting-started/explore-templates/start-from-template) - Build on top of existing templates
+* [Start from Scratch](#start-from-scratch) - Full control for advanced users
 
-- **[Overview](/overview/phala-network)** - Learn about Phala Network's architecture and core concepts
-- **[Phala Cloud](/cloud/getting-started/getting-started)** - Deploy confidential applications in Trusted Execution Environments
+Before diving into these steps, let's take a look at the requirements needed to build on Phala Cloud.
 
-## What is Phala Network?
+### Requirements
 
-Phala Network is a decentralized cloud computing protocol that:
+* Docker([Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/)): Phala Cloud supports the deployment of **ANY** Docker images. Check out how to build & publish to Docker Hub (i.e. [Docker Tutorial](https://docs.docker.com/get-started/introduction/build-and-push-first-image/))
+* With full Docker support, you can build in **ANY** language you prefer. We have built out an SDK to make it easy for TypeScript/JavaScript and Python programs to call the Phala Cloud SDK functions, but this can be done for **ANY** programming language.
+  * Check the code to see how the RPC calls are constructed
+    * [TypeScript/JavaScript](https://github.com/Leechael/tappd-simulator/blob/main/sdk/js/src/index.ts)
+    * [Python](https://github.com/Leechael/tappd-simulator/blob/main/sdk/python/src/dstack_sdk/client.py)
+* For deployment on Real TEE Server, must publish docker image with OS/arch `linux/amd64`. For local TEE simulator, you can build in **ANY** OS/arch since they won't be running on real TEE hardware.
 
-- **Provides Privacy**: Execute smart contracts and computations in secure enclaves
-- **Ensures Verifiability**: All computations are cryptographically verifiable
-- **Scales Efficiently**: Off-chain execution with on-chain verification
-- **Maintains Decentralization**: Distributed network of compute providers
+### Join Phala Cloud Community
 
-## Key Products
-
-- **[Phala Cloud](/cloud/getting-started/getting-started)**: Deploy TEE applications easily
-- **[Dstack](/dstack/overview)**: Decentralized cloud infrastructure
-- **[GPU TEE](/gpu-tee/llm-in-tee)**: Run AI models in secure environments
-
-## Community
-
-Join our growing community of developers and users:
-
-- [Discord](https://discord.gg/phala-network)
-- [GitHub](https://github.com/Phala-Network/)
-- [Twitter](https://twitter.com/PhalaNetwork)
+We welcome your feedback and contributions! If you have feature requests, want to report issues, or are interested in contributing to Phala Cloud, please visit our [Github page](https://github.com/Phala-Network/phala-cloud-community) for more information.
