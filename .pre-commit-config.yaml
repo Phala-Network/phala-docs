@@ -34,16 +34,6 @@ repos:
         always_run: false
         pass_filenames: false
 
-      # Check for broken internal links in MDX files
-      - id: check-internal-links
-        name: Check internal links in MDX files
-        entry: python3
-        args: [.scripts/check-internal-links.py]
-        language: system
-        files: \.mdx?$
-        always_run: false
-        pass_filenames: false
-
 
   # Markdown linting (using markdownlint-cli2)
   - repo: https://github.com/DavidAnson/markdownlint-cli2

@@ -41,7 +41,19 @@ def get_all_available_paths(docs_config: Dict[str, Any]) -> Set[str]:
     if "navigation" in docs_config:
         nav = docs_config["navigation"]
 
-        # Handle anchors structure
+        # Handle tabs structure (current format)
+        if "tabs" in nav:
+            for tab in nav["tabs"]:
+                # Handle tabs with "groups" array (like Phala Cloud)
+                if "groups" in tab:
+                    for group in tab["groups"]:
+                        available_paths.update(extract_pages_from_navigation(group))
+                # Handle tabs with "pages" array directly (like Network, Dstack, Confidential AI)
+                elif "pages" in tab:
+                    for page in tab["pages"]:
+                        available_paths.update(extract_pages_from_navigation(page))
+
+        # Handle anchors structure (legacy format)
         if "anchors" in nav:
             for anchor in nav["anchors"]:
                 if "groups" in anchor:
@@ -66,10 +78,8 @@ def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -
         source = redirect.get("source", "")
         destination = redirect.get("destination", "")
 
-        # Remove leading slash for comparison
-        dest_path = destination.lstrip("/")
-
-        if dest_path not in available_paths:
+        # Keep destination path as-is (with leading slash) for comparison
+        if destination not in available_paths:
             invalid_redirects.append({
                 "source": source,
                 "destination": destination,
