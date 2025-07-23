@@ -350,7 +350,7 @@
           {
             "group": "Overview",
             "pages": [
-              "/overview/phala-network",
+              "/overview/phala-network/phala-network",
               {
                 "group": "Phala Token",
                 "pages": [
@@ -517,6 +517,22 @@
     ]
   },
   "redirects": [
+    {
+      "destination": "/dstack/overview",
+      "source": "/overview/phala-network/dstack"
+    },
+    {
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "source": "/overview/phala-network/gpu-tee"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/overview",
+      "source": "/overview/phala-network/phala-cloud"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/overview",
+      "source": "/phala-cloud/getting-started/getting-started"
+    },
     {
       "destination": "/phala-cloud/getting-started/overview",
       "source": "/cloud/getting-started/getting-started"
