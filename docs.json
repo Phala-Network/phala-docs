@@ -180,6 +180,12 @@
       {
         "groups": [
           {
+            "group": "Phala Cloud",
+            "pages": [
+              "/index"
+            ]
+          },
+          {
             "group": "Getting Started",
             "pages": [
               "/phala-cloud/getting-started/overview",

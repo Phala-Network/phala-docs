@@ -1,28 +1,65 @@
 ---
-description: Quick start guide for deploying confidential applications on Phala Cloud.
-icon: robot-astromech
 title: Overview
+cover: images/phala-docs (1).jpg
+coverY: -101
 ---
 
+Welcome to the official documentation for **Phala** - the secure cloud platform that enables AI developers to deploy applications with hardware-level privacy and verifiable computation.
 
-There are several ways to get started building with Phala Cloud:
+## What is Phala Cloud
 
-* [Start from Cloud UI](/phala-cloud/getting-started/start-from-cloud-ui) - The easiest way with no coding required
-* [Start from Cloud CLI](/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli) - For developers who prefer command-line tools
-* [Start from Template](/phala-cloud/getting-started/explore-templates/start-from-template) - Build on top of existing templates
-* [Start from Scratch](#start-from-scratch) - Full control for advanced users
+Phala Cloud is a Confidential AI native Neocloud solution that provides you with a secure, user-friendly environment for running AI applications. You can deploy any standard Docker application directly into a **Trusted Execution Environment (TEE)**, ensuring your AI models and data remain confidential and tamper-proof.
 
-Before diving into these steps, let's take a look at the requirements needed to build on Phala Cloud.
+### Key Features for AI Developers
 
-### Requirements
+- **Confidential AI Computing**: Run LLMs and AI models in GPU TEE with hardware-level security
+- **Verifiable Results**: Cryptographic proof that your AI computations are genuine and unmodified  
+- **Privacy Protection**: Complete confidentiality for your models, data, and algorithms
+- **Easy Deployment**: Deploy existing Docker applications with zero code changes
+- **Cost Effective**: Web2 pricing model with transparent, second-level billing
 
-* Docker([Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/)): Phala Cloud supports the deployment of **ANY** Docker images. Check out how to build & publish to Docker Hub (i.e. [Docker Tutorial](https://docs.docker.com/get-started/introduction/build-and-push-first-image/))
-* With full Docker support, you can build in **ANY** language you prefer. We have built out an SDK to make it easy for TypeScript/JavaScript and Python programs to call the Phala Cloud SDK functions, but this can be done for **ANY** programming language.
-  * Check the code to see how the RPC calls are constructed
-    * [TypeScript/JavaScript](https://github.com/Leechael/tappd-simulator/blob/main/sdk/js/src/index.ts)
-    * [Python](https://github.com/Leechael/tappd-simulator/blob/main/sdk/python/src/dstack_sdk/client.py)
-* For deployment on Real TEE Server, must publish docker image with OS/arch `linux/amd64`. For local TEE simulator, you can build in **ANY** OS/arch since they won't be running on real TEE hardware.
+## Getting Started
 
-### Join Phala Cloud Community
+New to Phala Cloud? You can start here:
 
-We welcome your feedback and contributions! If you have feature requests, want to report issues, or are interested in contributing to Phala Cloud, please visit our [Github page](https://github.com/Phala-Network/phala-cloud-community) for more information.
+<Card title="Quick Start" icon="rocket" href="/phala-cloud/getting-started/overview">
+  Deploy your first secure application in minutes
+</Card>
+
+<Card title="Phala Cloud Platform" icon="cloud" href="/phala-cloud/phala-cloud-user-guides/create-cvm/overview">
+  Explore the complete cloud platform features
+</Card>
+
+<Card title="Confidential AI" icon="shield" href="/confidential-ai/gpu-tee/llm-in-tee">
+  Run LLMs in GPU TEE environments
+</Card>
+
+## Core Concepts
+
+Understanding Phala Cloud's architecture:
+
+<CardGroup cols={2}>
+  <Card title="Trusted Execution Environment" icon="lock" href="/phala-cloud/tees-attestation-and-zero-trust-security/attestation">
+    Learn how TEE provides hardware-level security
+  </Card>
+  
+  <Card title="Key Management" icon="key" href="/dstack/design-documents/key-management-protocol">
+    Secure cryptographic key generation and management
+  </Card>
+  
+  <Card title="Dstack SDK" icon="code" href="/dstack/getting-started">
+    Developer tools for building on Phala Cloud
+  </Card>
+</CardGroup>
+
+## Support
+
+Need help? We're here to assist:
+
+- **Documentation Issues**: Report problems with our docs on [GitHub](https://github.com/Phala-Network/phala-docs)
+- **Technical Support**: Join our [Telegram community](https://t.me/+nbhjx1ADG9EyYmI9) for real-time help
+- **Enterprise**: [Contact us](https://cloud.phala.network/contact) for enterprise solutions and partnerships
+
+---
+
+Ready to build secure AI? [Get started with Phala Cloud →](https://cloud.phala.network)
