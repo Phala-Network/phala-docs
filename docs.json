@@ -27,23 +27,23 @@
         "items": [
           {
             "label": "Getting Started",
-            "href": "https://docs.phala.network/cloud/getting-started/overview"
+            "href": "https://docs.phala.network/phala-cloud/getting-started/overview"
           },
           {
             "label": "TEEs, Attestation & Zero Trust Security",
-            "href": "https://docs.phala.network/cloud/tees-attestation-and-zero-trust-security/attestation"
+            "href": "https://docs.phala.network/phala-cloud/tees-attestation-and-zero-trust-security/attestation"
           },
           {
             "label": "Phala Cloud User Guides",
-            "href": "https://docs.phala.network/cloud/phala-cloud-user-guides/overview"
+            "href": "https://docs.phala.network/phala-cloud/phala-cloud-user-guides/overview"
           },
           {
             "label": "Be Production Ready",
-            "href": "https://docs.phala.network/cloud/be-production-ready/overview"
+            "href": "https://docs.phala.network/phala-cloud/be-production-ready/overview"
           },
           {
             "label": "Use Cases",
-            "href": "https://docs.phala.network/cloud/use-cases/overview"
+            "href": "https://docs.phala.network/phala-cloud/use-cases/overview"
           },
           {
             "label": "References",
@@ -51,7 +51,7 @@
           },
           {
             "label": "FAQs",
-            "href": "https://docs.phala.network/cloud/faqs"
+            "href": "https://docs.phala.network/phala-cloud/faqs"
           }
         ]
       },
@@ -85,6 +85,27 @@
           {
             "label": "Design Documents",
             "href": "https://docs.phala.network/dstack/design-documents"
+          }
+        ]
+      },
+      {
+        "header": "Confidential AI",
+        "items": [
+          {
+            "label": "LLM in GPU TEE",
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/llm-in-tee"
+          },
+          {
+            "label": "GPU TEE Inference API",
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/inference-api"
+          },
+          {
+            "label": "Benchmark",
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/benchmark"
+          },
+          {
+            "label": "FAQs",
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/faqs"
           }
         ]
       },
@@ -297,19 +318,20 @@
         ]
       },
       {
+        "tab": "Confidential AI",
+        "icon": "square-terminal",
+        "pages": [
+          "/confidential-ai/gpu-tee/llm-in-tee",
+          "/confidential-ai/gpu-tee/inference-api",
+          "/confidential-ai/gpu-tee/benchmark",
+          "/confidential-ai/gpu-tee/faqs"
+        ]
+      },
+      {
         "tab": "Network",
         "icon": "square-terminal",
         "pages": [
           "/network/index",
-          {
-            "group": "LLM in GPU TEE",
-            "pages": [
-              "/network/gpu-tee/llm-in-tee",
-              "/network/gpu-tee/inference-api",
-              "/network/gpu-tee/benchmark",
-              "/network/gpu-tee/faqs"
-            ]
-          },
           {
             "group": "Tech Specs",
             "pages": [
@@ -577,19 +599,19 @@
       "source": "/confidential-ai-inference/getting-started"
     },
     {
-      "destination": "/network/gpu-tee/llm-in-tee",
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/confidential-ai-api"
     },
     {
-      "destination": "/network/gpu-tee/llm-in-tee",
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/host-llm-in-tee"
     },
     {
-      "destination": "/network/gpu-tee/llm-in-tee",
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/implementation"
     },
     {
-      "destination": "/network/gpu-tee/benchmark",
+      "destination": "/confidential-ai/gpu-tee/benchmark",
       "source": "/confidential-ai-inference/benchmark"
     },
     {
