@@ -304,19 +304,19 @@
           {
             "group": "LLM in GPU TEE",
             "pages": [
-              "gpu-tee/llm-in-tee",
-              "gpu-tee/inference-api",
-              "gpu-tee/benchmark",
-              "gpu-tee/faqs"
+              "network/gpu-tee/llm-in-tee",
+              "network/gpu-tee/inference-api",
+              "network/gpu-tee/benchmark",
+              "network/gpu-tee/faqs"
             ]
           },
           {
             "group": "Tech Specs",
             "pages": [
-              "tech-specs/blockchain/overview",
-              "tech-specs/blockchain/blockchain-entities",
-              "tech-specs/blockchain/cluster-of-workers",
-              "tech-specs/blockchain/secret-key-hierarchy"
+              "network/tech-specs/blockchain/overview",
+              "network/tech-specs/blockchain/blockchain-entities",
+              "network/tech-specs/blockchain/cluster-of-workers",
+              "network/tech-specs/blockchain/secret-key-hierarchy"
             ]
           },
           {
@@ -325,51 +325,51 @@
               {
                 "group": "Setting Up a Wallet on Phala",
                 "pages": [
-                  "references/basic-guidance/overview",
-                  "references/basic-guidance/get-pha-and-transfer"
+                  "network/references/basic-guidance/overview",
+                  "network/references/basic-guidance/get-pha-and-transfer"
                 ]
               },
               {
                 "group": "SubBridge",
                 "pages": [
-                  "references/subbridge/overview",
-                  "references/subbridge/cross-chain-transfer",
-                  "references/subbridge/supported-assets",
-                  "references/subbridge/asset-integration-guide",
-                  "references/subbridge/technical-details"
+                  "network/references/subbridge/overview",
+                  "network/references/subbridge/cross-chain-transfer",
+                  "network/references/subbridge/supported-assets",
+                  "network/references/subbridge/asset-integration-guide",
+                  "network/references/subbridge/technical-details"
                 ]
               },
-              "references/community-builders",
+              "network/references/community-builders",
               {
                 "group": "Hackathon Guides",
                 "pages": [
-                  "references/hackathon-guides/ethglobal-singapore",
-                  "references/hackathon-guides/ethglobal-san-francisco",
-                  "references/hackathon-guides/ethglobal-bangkok"
+                  "network/references/hackathon-guides/ethglobal-singapore",
+                  "network/references/hackathon-guides/ethglobal-san-francisco",
+                  "network/references/hackathon-guides/ethglobal-bangkok"
                 ]
               },
               {
                 "group": "Advanced Topics",
                 "pages": [
-                  "references/advanced-topics/cross-chain-solutions",
-                  "references/advanced-topics/system-contract-and-drivers",
-                  "references/advanced-topics/run-local-testnet",
-                  "references/advanced-topics/sidevm"
+                  "network/references/advanced-topics/cross-chain-solutions",
+                  "network/references/advanced-topics/system-contract-and-drivers",
+                  "network/references/advanced-topics/run-local-testnet",
+                  "network/references/advanced-topics/sidevm"
                 ]
               },
               {
                 "group": "Support",
                 "pages": [
-                  "references/support/overview",
-                  "references/support/endpoints",
-                  "references/support/resource-limits",
-                  "references/support/transaction-costs",
-                  "references/support/compatibility-matrix",
-                  "references/support/block-explorers",
-                  "references/support/faucet"
+                  "network/references/support/overview",
+                  "network/references/support/endpoints",
+                  "network/references/support/resource-limits",
+                  "network/references/support/transaction-costs",
+                  "network/references/support/compatibility-matrix",
+                  "network/references/support/block-explorers",
+                  "network/references/support/faucet"
                 ]
               },
-              "references/faq"
+              "network/references/faq"
             ]
           },
           {
@@ -378,26 +378,26 @@
               {
                 "group": "Basic Info",
                 "pages": [
-                  "compute-providers/basic-info/introduction",
-                  "compute-providers/basic-info/worker-rewards",
-                  "compute-providers/basic-info/budget-balancer",
-                  "compute-providers/basic-info/staking-mechanism",
-                  "compute-providers/basic-info/requirements-in-phala-khala",
-                  "compute-providers/basic-info/confidence-level-and-sgx-function",
-                  "compute-providers/basic-info/rent-hardware",
-                  "compute-providers/basic-info/error-summary"
+                  "network/compute-providers/basic-info/introduction",
+                  "network/compute-providers/basic-info/worker-rewards",
+                  "network/compute-providers/basic-info/budget-balancer",
+                  "network/compute-providers/basic-info/staking-mechanism",
+                  "network/compute-providers/basic-info/requirements-in-phala-khala",
+                  "network/compute-providers/basic-info/confidence-level-and-sgx-function",
+                  "network/compute-providers/basic-info/rent-hardware",
+                  "network/compute-providers/basic-info/error-summary"
                 ]
               },
               {
                 "group": "Run Workers on Phala",
                 "pages": [
-                  "compute-providers/run-workers-on-phala/solo-worker-deployment",
-                  "compute-providers/run-workers-on-phala/prbv3-deployment",
-                  "compute-providers/run-workers-on-phala/using-prbv3-ui",
-                  "compute-providers/run-workers-on-phala/prb-worker-deployment",
-                  "compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
-                  "compute-providers/run-workers-on-phala/headers-cache-deployment",
-                  "compute-providers/run-workers-on-phala/archive-node-deployment"
+                  "network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+                  "network/compute-providers/run-workers-on-phala/prbv3-deployment",
+                  "network/compute-providers/run-workers-on-phala/using-prbv3-ui",
+                  "network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+                  "network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
+                  "network/compute-providers/run-workers-on-phala/headers-cache-deployment",
+                  "network/compute-providers/run-workers-on-phala/archive-node-deployment"
                 ]
               },
               {
@@ -406,32 +406,32 @@
                   {
                     "group": "Solo Scripts Guidance - Archived",
                     "pages": [
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing",
-                      "compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing",
+                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
                     ]
                   },
-                  "compute-providers/run-workers-on-khala/prbv3-deployment",
-                  "compute-providers/run-workers-on-khala/using-prbv3-ui",
-                  "compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3",
-                  "compute-providers/run-workers-on-khala/headers-cache-deployment",
-                  "compute-providers/run-workers-on-khala/archive-node-deployment",
-                  "compute-providers/run-workers-on-khala/deployment-guide-for-prbv2",
-                  "compute-providers/run-workers-on-khala/prb-worker-deployment",
-                  "compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining",
-                  "compute-providers/run-workers-on-khala/khala-worker-rewards",
-                  "compute-providers/run-workers-on-khala/troubleshooting"
+                  "network/compute-providers/run-workers-on-khala/prbv3-deployment",
+                  "network/compute-providers/run-workers-on-khala/using-prbv3-ui",
+                  "network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3",
+                  "network/compute-providers/run-workers-on-khala/headers-cache-deployment",
+                  "network/compute-providers/run-workers-on-khala/archive-node-deployment",
+                  "network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2",
+                  "network/compute-providers/run-workers-on-khala/prb-worker-deployment",
+                  "network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining",
+                  "network/compute-providers/run-workers-on-khala/khala-worker-rewards",
+                  "network/compute-providers/run-workers-on-khala/troubleshooting"
                 ]
               },
               {
                 "group": "Gatekeeper",
                 "pages": [
-                  "compute-providers/gatekeeper/overview",
-                  "compute-providers/gatekeeper/collator"
+                  "network/compute-providers/gatekeeper/overview",
+                  "network/compute-providers/gatekeeper/collator"
                 ]
               }
             ]
@@ -445,35 +445,35 @@
   },
   "redirects": [
     {
-      "destination": "/cloud/getting-started/overview",
+      "destination": "/phala-cloud/getting-started/overview",
       "source": "/cloud/getting-started/getting-started"
     },
     {
-      "destination": "/cloud/use-cases/overview",
+      "destination": "/phala-cloud/use-cases/overview",
       "source": "/cloud/use-cases/use-cases"
     },
     {
-      "destination": "/compute-providers/gatekeeper/overview",
+      "destination": "/network/compute-providers/gatekeeper/overview",
       "source": "/compute-providers/gatekeeper/gatekeeper"
     },
     {
-      "destination": "/compute-providers/basic-info/introduction",
+      "destination": "/network/compute-providers/basic-info/introduction",
       "source": "/compute-providers/basic-info/index"
     },
     {
-      "destination": "/compute-providers/gatekeeper/overview",
+      "destination": "/network/compute-providers/gatekeeper/overview",
       "source": "/compute-providers/gatekeeper/index"
     },
     {
-      "destination": "/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+      "destination": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
       "source": "/compute-providers/run-workers-on-khala/index"
     },
     {
-      "destination": "/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+      "destination": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
       "source": "/compute-providers/run-workers-on-khala/solo-scripts-guidance/index"
     },
     {
-      "destination": "/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
       "source": "/compute-providers/run-workers-on-phala/index"
     },
     {
@@ -545,27 +545,27 @@
       "source": "/phala-cloud/tees-attestation-and-zero-trust-security/index"
     },
     {
-      "destination": "/references/advanced-topics/cross-chain-solutions",
+      "destination": "/network/references/advanced-topics/cross-chain-solutions",
       "source": "/references/advanced-topics/index"
     },
     {
-      "destination": "/references/basic-guidance/overview",
+      "destination": "/network/references/basic-guidance/overview",
       "source": "/references/basic-guidance/index"
     },
     {
-      "destination": "/references/hackathon-guides/ethglobal-singapore",
+      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
       "source": "/references/hackathon-guides/index"
     },
     {
-      "destination": "/references/subbridge/overview",
+      "destination": "/network/references/subbridge/overview",
       "source": "/references/subbridge/index"
     },
     {
-      "destination": "/references/support/overview",
+      "destination": "/network/references/support/overview",
       "source": "/references/support/index"
     },
     {
-      "destination": "/tech-specs/blockchain/overview",
+      "destination": "/network/tech-specs/blockchain/overview",
       "source": "/tech-specs/blockchain/index"
     },
     {
@@ -577,19 +577,19 @@
       "source": "/confidential-ai-inference/getting-started"
     },
     {
-      "destination": "/gpu-tee/llm-in-tee",
+      "destination": "/network/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/confidential-ai-api"
     },
     {
-      "destination": "/gpu-tee/llm-in-tee",
+      "destination": "/network/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/host-llm-in-tee"
     },
     {
-      "destination": "/gpu-tee/llm-in-tee",
+      "destination": "/network/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/implementation"
     },
     {
-      "destination": "/gpu-tee/benchmark",
+      "destination": "/network/gpu-tee/benchmark",
       "source": "/confidential-ai-inference/benchmark"
     },
     {
@@ -597,7 +597,7 @@
       "source": "/cloud/getting-started/start-from-cloud-cli"
     },
     {
-      "destination": "/cloud/getting-started/overview",
+      "destination": "/phala-cloud/getting-started/overview",
       "source": "/cloud/getting-started/start-from-scratch"
     },
     {
@@ -605,7 +605,7 @@
       "source": "/cloud/getting-started/start-from-template"
     },
     {
-      "destination": "/cloud/getting-started/overview",
+      "destination": "/phala-cloud/getting-started/overview",
       "source": "/ai-agent-contract/getting-started"
     }
   ],
