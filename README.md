@@ -3,14 +3,64 @@ cover: images/phala-docs (1).jpg
 coverY: -101
 ---
 
-# 👾 Phala Network Docs
+# Phala Documentation
 
-Phala Network delivers a next-generation cloud solution via [**Phala Cloud**](https://cloud.phala.network) built on **Dstack**, offering a low-cost, user-friendly trustless environment. Notably, **Phala Cloud** enables developers to deploy any standard Docker application directly into a Trusted Execution Environment (**TEE**), providing a higher security baseline out of the box. This makes zero-trust computing, supported by Phala's hybrid infrastructure (TEEs, blockchain, **MPC**, **ZKP**), accessible, flexible, open-source, and affordable for a broad range of developers and programs.
+Welcome to the official documentation for **Phala Cloud** - the secure cloud platform that enables AI developers to deploy applications with hardware-level privacy and verifiable computation.
 
-## Discover Phala Network
+## What is Phala Cloud
 
-<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>⚡️ Phala Network: Execution Layer for Web3 AI</strong></td><td></td><td></td><td><a href="overview/phala-network.md">phala-network.md</a></td><td><a href="images/Phala-AI-Connect.png">Phala-AI-Connect.png</a></td></tr><tr><td>🛡️ <strong>Host LLM in TEE</strong></td><td></td><td></td><td><a href="overview/phala-network/gpu-tee.md">gpu-tee.md</a></td><td><a href="images/confidential-ai-inference-overview.png">confidential-ai-inference-overview.png</a></td></tr></tbody></table>
+Phala Cloud is a next-generation cloud solution built on **Dstack** that provides you with a secure, user-friendly environment for running AI applications. You can deploy any standard Docker application directly into a **Trusted Execution Environment (TEE)**, ensuring your AI models and data remain confidential and tamper-proof.
 
-## Getting Started on Phala Cloud
+### Key Features for AI Developers
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="2601">☁️</span>  Quick Start on Phala Cloud</td><td><a href="images/Screenshot 2025-02-27 at 13.02.47.png">Screenshot 2025-02-27 at 13.02.47.png</a></td><td><a href="cloud/getting-started/getting-started.md">getting-started.md</a></td></tr><tr><td><span data-gb-custom-inline data-tag="emoji" data-code="1f7e7">🟧</span> Launch an Eliza Agent in One-Click</td><td><a href="images/bullish-TEE.jpg">bullish-TEE.jpg</a></td><td><a href="phala-cloud/getting-started/explore-templates/launch-an-eliza-agent.md">launch-an-eliza-agent.md</a></td></tr></tbody></table>
+- **Confidential AI Computing**: Run LLMs and AI models in GPU TEE with hardware-level security
+- **Verifiable Results**: Cryptographic proof that your AI computations are genuine and unmodified  
+- **Privacy Protection**: Complete confidentiality for your models, data, and algorithms
+- **Easy Deployment**: Deploy existing Docker applications with zero code changes
+- **Cost Effective**: Web2 pricing model with transparent, second-level billing
+
+## Getting Started
+
+New to Phala Cloud? You can start here:
+
+<Card title="Quick Start" icon="rocket" href="/phala-cloud/getting-started/overview">
+  Deploy your first secure application in minutes
+</Card>
+
+<Card title="Phala Cloud Platform" icon="cloud" href="/phala-cloud/phala-cloud-user-guides/create-cvm/overview">
+  Explore the complete cloud platform features
+</Card>
+
+<Card title="Confidential AI" icon="shield" href="/confidential-ai/gpu-tee/llm-in-tee">
+  Run LLMs in GPU TEE environments
+</Card>
+
+## Core Concepts
+
+Understanding Phala Cloud's architecture:
+
+<CardGroup cols={2}>
+  <Card title="Trusted Execution Environment" icon="lock" href="/phala-cloud/tees-attestation-and-zero-trust-security/attestation">
+    Learn how TEE provides hardware-level security
+  </Card>
+  
+  <Card title="Key Management" icon="key" href="/dstack/design-documents/key-management-protocol">
+    Secure cryptographic key generation and management
+  </Card>
+  
+  <Card title="Dstack SDK" icon="code" href="/dstack/getting-started">
+    Developer tools for building on Phala Cloud
+  </Card>
+</CardGroup>
+
+## Support
+
+Need help? We're here to assist:
+
+- **Documentation Issues**: Report problems with our docs on [GitHub](https://github.com/Phala-Network/phala-docs)
+- **Technical Support**: Join our [Telegram community](https://t.me/+nbhjx1ADG9EyYmI9) for real-time help
+- **Enterprise**: [Contact us](https://cloud.phala.network/contact) for enterprise solutions and partnerships
+
+---
+
+Ready to build secure AI? [Get started with Phala Cloud →](https://cloud.phala.network)
