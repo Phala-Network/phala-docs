@@ -155,25 +155,25 @@
           {
             "group": "Getting Started",
             "pages": [
-              "phala-cloud/getting-started/overview",
-              "phala-cloud/getting-started/sign-up-for-cloud-account",
-              "phala-cloud/getting-started/start-from-cloud-ui",
+              "/phala-cloud/getting-started/overview",
+              "/phala-cloud/getting-started/sign-up-for-cloud-account",
+              "/phala-cloud/getting-started/start-from-cloud-ui",
               {
                 "group": "Explore Templates",
                 "pages": [
-                  "phala-cloud/getting-started/explore-templates/overview",
-                  "phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
-                  "phala-cloud/getting-started/explore-templates/start-from-template"
+                  "/phala-cloud/getting-started/explore-templates/overview",
+                  "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
+                  "/phala-cloud/getting-started/explore-templates/start-from-template"
                 ]
               },
-              "phala-cloud/getting-started/core-concepts-refresher"
+              "/phala-cloud/getting-started/core-concepts-refresher"
             ]
           },
           {
             "group": "TEEs, Attestation & Zero Trust Security",
             "pages": [
-              "phala-cloud/tees-attestation-and-zero-trust-security/attestation",
-              "phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
+              "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+              "/phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
             ]
           },
           {
@@ -182,41 +182,41 @@
               {
                 "group": "Deploy and Manage CVMs",
                 "pages": [
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/overview",
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
                   {
                     "group": "Debugging and Analyzing Logs",
                     "pages": [
-                      "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
-                      "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
-                      "phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
+                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
+                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
+                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
                     ]
                   },
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/resize-resource",
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/upgrade-application",
-                  "phala-cloud/phala-cloud-user-guides/create-cvm/deployment-cheat-sheet"
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/resize-resource",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/upgrade-application",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/deployment-cheat-sheet"
                 ]
               },
               {
                 "group": "Building with TEE",
                 "pages": [
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/access-database",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/create-crypto-wallet",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report",
-                  "phala-cloud/phala-cloud-user-guides/building-with-tee/verify-remote-attestation"
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-database",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/create-crypto-wallet",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report",
+                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/verify-remote-attestation"
                 ]
               },
               {
                 "group": "Advanced Deployment Options",
                 "pages": [
-                  "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
-                  "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/deploy-cvm-with-phala-cloud-api",
-                  "phala-cloud/phala-cloud-user-guides/advanced-deployment-options/setup-a-ci-cd-pipeline"
+                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
+                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/deploy-cvm-with-phala-cloud-api",
+                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/setup-a-ci-cd-pipeline"
                 ]
               }
             ]
@@ -227,51 +227,51 @@
               {
                 "group": "CI/CD Automation",
                 "pages": [
-                  "phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
-                  "phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
+                  "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
+                  "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
                 ]
               },
-              "phala-cloud/be-production-ready/production-checklist",
-              "phala-cloud/be-production-ready/troubleshooting",
-              "phala-cloud/be-production-ready/glossary"
+              "/phala-cloud/be-production-ready/production-checklist",
+              "/phala-cloud/be-production-ready/troubleshooting",
+              "/phala-cloud/be-production-ready/glossary"
             ]
           },
           {
             "group": "Use Cases",
             "pages": [
-              "phala-cloud/use-cases/overview",
-              "phala-cloud/use-cases/tee_with_ai",
-              "phala-cloud/use-cases/tee_with_fhe_and_mpc",
-              "phala-cloud/use-cases/tee_with_zk_and_zkrollup"
+              "/phala-cloud/use-cases/overview",
+              "/phala-cloud/use-cases/tee_with_ai",
+              "/phala-cloud/use-cases/tee_with_fhe_and_mpc",
+              "/phala-cloud/use-cases/tee_with_zk_and_zkrollup"
             ]
           },
           {
             "group": "References",
             "pages": [
-              "phala-cloud/references/overview",
+              "/phala-cloud/references/overview",
               {
                 "group": "Phala Cloud CLI Reference",
                 "pages": [
-                  "phala-cloud/references/tee-cloud-cli/overview",
+                  "/phala-cloud/references/tee-cloud-cli/overview",
                   {
                     "group": "phala",
                     "pages": [
-                      "phala-cloud/references/tee-cloud-cli/phala/overview",
-                      "phala-cloud/references/tee-cloud-cli/phala/auth",
-                      "phala-cloud/references/tee-cloud-cli/phala/cvms",
-                      "phala-cloud/references/tee-cloud-cli/phala/docker",
-                      "phala-cloud/references/tee-cloud-cli/phala/simulator"
+                      "/phala-cloud/references/tee-cloud-cli/phala/overview",
+                      "/phala-cloud/references/tee-cloud-cli/phala/auth",
+                      "/phala-cloud/references/tee-cloud-cli/phala/cvms",
+                      "/phala-cloud/references/tee-cloud-cli/phala/docker",
+                      "/phala-cloud/references/tee-cloud-cli/phala/simulator"
                     ]
                   }
                 ]
               },
-              "phala-cloud/references/cloud-api-beta/overview",
-              "phala-cloud/references/phala-cloud-pricing"
+              "/phala-cloud/references/cloud-api-beta/overview",
+              "/phala-cloud/references/phala-cloud-pricing"
             ]
           },
           {
             "group": "FAQs",
-            "pages": ["phala-cloud/faqs"]
+            "pages": ["/phala-cloud/faqs"]
           }
         ]
       },
@@ -279,19 +279,19 @@
         "tab": "Dstack",
         "icon": "square-terminal",
         "pages": [
-          "dstack/overview",
-          "dstack/local-development",
-          "dstack/getting-started",
-          "dstack/hardware-requirements",
-          "dstack/acknowledgement",
-          "dstack/faqs",
+          "/dstack/overview",
+          "/dstack/local-development",
+          "/dstack/getting-started",
+          "/dstack/hardware-requirements",
+          "/dstack/acknowledgement",
+          "/dstack/faqs",
           {
             "group": "Design Documents",
             "pages": [
-              "dstack/design-documents/whitepaper",
-              "dstack/design-documents/decentralized-root-of-trust",
-              "dstack/design-documents/key-management-protocol",
-              "dstack/design-documents/tee-controlled-domain-certificates"
+              "/dstack/design-documents/whitepaper",
+              "/dstack/design-documents/decentralized-root-of-trust",
+              "/dstack/design-documents/key-management-protocol",
+              "/dstack/design-documents/tee-controlled-domain-certificates"
             ]
           }
         ]
@@ -300,23 +300,23 @@
         "tab": "Network",
         "icon": "square-terminal",
         "pages": [
-          "network/index",
+          "/network/index",
           {
             "group": "LLM in GPU TEE",
             "pages": [
-              "network/gpu-tee/llm-in-tee",
-              "network/gpu-tee/inference-api",
-              "network/gpu-tee/benchmark",
-              "network/gpu-tee/faqs"
+              "/network/gpu-tee/llm-in-tee",
+              "/network/gpu-tee/inference-api",
+              "/network/gpu-tee/benchmark",
+              "/network/gpu-tee/faqs"
             ]
           },
           {
             "group": "Tech Specs",
             "pages": [
-              "network/tech-specs/blockchain/overview",
-              "network/tech-specs/blockchain/blockchain-entities",
-              "network/tech-specs/blockchain/cluster-of-workers",
-              "network/tech-specs/blockchain/secret-key-hierarchy"
+              "/network/tech-specs/blockchain/overview",
+              "/network/tech-specs/blockchain/blockchain-entities",
+              "/network/tech-specs/blockchain/cluster-of-workers",
+              "/network/tech-specs/blockchain/secret-key-hierarchy"
             ]
           },
           {
@@ -325,51 +325,51 @@
               {
                 "group": "Setting Up a Wallet on Phala",
                 "pages": [
-                  "network/references/basic-guidance/overview",
-                  "network/references/basic-guidance/get-pha-and-transfer"
+                  "/network/references/basic-guidance/overview",
+                  "/network/references/basic-guidance/get-pha-and-transfer"
                 ]
               },
               {
                 "group": "SubBridge",
                 "pages": [
-                  "network/references/subbridge/overview",
-                  "network/references/subbridge/cross-chain-transfer",
-                  "network/references/subbridge/supported-assets",
-                  "network/references/subbridge/asset-integration-guide",
-                  "network/references/subbridge/technical-details"
+                  "/network/references/subbridge/overview",
+                  "/network/references/subbridge/cross-chain-transfer",
+                  "/network/references/subbridge/supported-assets",
+                  "/network/references/subbridge/asset-integration-guide",
+                  "/network/references/subbridge/technical-details"
                 ]
               },
-              "network/references/community-builders",
+              "/cloudnetwork/references/community-builders",
               {
                 "group": "Hackathon Guides",
                 "pages": [
-                  "network/references/hackathon-guides/ethglobal-singapore",
-                  "network/references/hackathon-guides/ethglobal-san-francisco",
-                  "network/references/hackathon-guides/ethglobal-bangkok"
+                  "/network/references/hackathon-guides/ethglobal-singapore",
+                  "/network/references/hackathon-guides/ethglobal-san-francisco",
+                  "/network/references/hackathon-guides/ethglobal-bangkok"
                 ]
               },
               {
                 "group": "Advanced Topics",
                 "pages": [
-                  "network/references/advanced-topics/cross-chain-solutions",
-                  "network/references/advanced-topics/system-contract-and-drivers",
-                  "network/references/advanced-topics/run-local-testnet",
-                  "network/references/advanced-topics/sidevm"
+                  "/network/references/advanced-topics/cross-chain-solutions",
+                  "/network/references/advanced-topics/system-contract-and-drivers",
+                  "/network/references/advanced-topics/run-local-testnet",
+                  "/network/references/advanced-topics/sidevm"
                 ]
               },
               {
                 "group": "Support",
                 "pages": [
-                  "network/references/support/overview",
-                  "network/references/support/endpoints",
-                  "network/references/support/resource-limits",
-                  "network/references/support/transaction-costs",
+                  "/network/references/support/overview",
+                  "/network/references/support/endpoints",
+                  "/network/references/support/resource-limits",
+                  "/network/references/support/transaction-costs",
                   "network/references/support/compatibility-matrix",
-                  "network/references/support/block-explorers",
-                  "network/references/support/faucet"
+                  "/network/references/support/block-explorers",
+                  "/network/references/support/faucet"
                 ]
               },
-              "network/references/faq"
+              "/network/references/faq"
             ]
           },
           {
@@ -378,26 +378,26 @@
               {
                 "group": "Basic Info",
                 "pages": [
-                  "network/compute-providers/basic-info/introduction",
-                  "network/compute-providers/basic-info/worker-rewards",
-                  "network/compute-providers/basic-info/budget-balancer",
-                  "network/compute-providers/basic-info/staking-mechanism",
-                  "network/compute-providers/basic-info/requirements-in-phala-khala",
-                  "network/compute-providers/basic-info/confidence-level-and-sgx-function",
-                  "network/compute-providers/basic-info/rent-hardware",
-                  "network/compute-providers/basic-info/error-summary"
+                  "/network/compute-providers/basic-info/introduction",
+                  "/network/compute-providers/basic-info/worker-rewards",
+                  "/network/compute-providers/basic-info/budget-balancer",
+                  "/network/compute-providers/basic-info/staking-mechanism",
+                  "/network/compute-providers/basic-info/requirements-in-phala-khala",
+                  "/network/compute-providers/basic-info/confidence-level-and-sgx-function",
+                  "/network/compute-providers/basic-info/rent-hardware",
+                  "/network/compute-providers/basic-info/error-summary"
                 ]
               },
               {
                 "group": "Run Workers on Phala",
                 "pages": [
-                  "network/compute-providers/run-workers-on-phala/solo-worker-deployment",
-                  "network/compute-providers/run-workers-on-phala/prbv3-deployment",
-                  "network/compute-providers/run-workers-on-phala/using-prbv3-ui",
-                  "network/compute-providers/run-workers-on-phala/prb-worker-deployment",
-                  "network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
-                  "network/compute-providers/run-workers-on-phala/headers-cache-deployment",
-                  "network/compute-providers/run-workers-on-phala/archive-node-deployment"
+                  "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+                  "/network/compute-providers/run-workers-on-phala/prbv3-deployment",
+                  "/network/compute-providers/run-workers-on-phala/using-prbv3-ui",
+                  "/network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+                  "/network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
+                  "/network/compute-providers/run-workers-on-phala/headers-cache-deployment",
+                  "/network/compute-providers/run-workers-on-phala/archive-node-deployment"
                 ]
               },
               {
@@ -406,32 +406,32 @@
                   {
                     "group": "Solo Scripts Guidance - Archived",
                     "pages": [
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing",
-                      "network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing",
+                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
                     ]
                   },
-                  "network/compute-providers/run-workers-on-khala/prbv3-deployment",
-                  "network/compute-providers/run-workers-on-khala/using-prbv3-ui",
-                  "network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3",
-                  "network/compute-providers/run-workers-on-khala/headers-cache-deployment",
-                  "network/compute-providers/run-workers-on-khala/archive-node-deployment",
-                  "network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2",
-                  "network/compute-providers/run-workers-on-khala/prb-worker-deployment",
-                  "network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining",
-                  "network/compute-providers/run-workers-on-khala/khala-worker-rewards",
-                  "network/compute-providers/run-workers-on-khala/troubleshooting"
+                  "/network/compute-providers/run-workers-on-khala/prbv3-deployment",
+                  "/network/compute-providers/run-workers-on-khala/using-prbv3-ui",
+                  "/network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3",
+                  "/network/compute-providers/run-workers-on-khala/headers-cache-deployment",
+                  "/network/compute-providers/run-workers-on-khala/archive-node-deployment",
+                  "/network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2",
+                  "/network/compute-providers/run-workers-on-khala/prb-worker-deployment",
+                  "/network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining",
+                  "/network/compute-providers/run-workers-on-khala/khala-worker-rewards",
+                  "/network/compute-providers/run-workers-on-khala/troubleshooting"
                 ]
               },
               {
                 "group": "Gatekeeper",
                 "pages": [
-                  "network/compute-providers/gatekeeper/overview",
-                  "network/compute-providers/gatekeeper/collator"
+                  "/network/compute-providers/gatekeeper/overview",
+                  "/network/compute-providers/gatekeeper/collator"
                 ]
               }
             ]
