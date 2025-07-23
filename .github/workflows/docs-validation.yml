@@ -46,7 +46,9 @@ jobs:
       - name: 🔗 Check internal links
         run: |
           echo "::group::🔗 Checking internal links"
-          python3 .scripts/check-internal-links.py
+          mkdir -p tmp
+          python3 .scripts/extract_links.py
+          python3 .scripts/check_links.py
           echo "::endgroup::"
 
       - name: ✨ Lint Markdown files
