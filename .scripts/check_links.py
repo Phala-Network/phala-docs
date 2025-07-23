@@ -95,9 +95,12 @@ def check_file_exists(link: str) -> bool:
     return False
 
 def main():
-    # Load extracted links
-    with open('tmp/extracted_links.txt', 'r') as f:
-        links = [line.strip() for line in f.readlines() if line.strip()]
+    # Load extracted links from all .txt files in .scripts/used_links
+    links = []
+    used_links_dir = Path('.scripts/used_links')
+    for txt_file in used_links_dir.glob('*.txt'):
+        with open(txt_file, 'r') as f:
+            links.extend([line.strip() for line in f.readlines() if line.strip()])
 
     # Load docs.json configuration
     docs_config = load_docs_config('docs.json')
