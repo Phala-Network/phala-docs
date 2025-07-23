@@ -6,7 +6,12 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -15,43 +20,37 @@
   },
   "favicon": "/favicon.ico",
   "footer": {
-    "socials": {
-      "discord": "https://discord.gg/phala-network",
-      "github": "https://github.com/Phala-Network",
-      "linkedin": "https://linkedin.com/company/phala-network",
-      "x": "https://x.com/PhalaNetwork"
-    },
     "links": [
       {
         "header": "Phala Cloud",
         "items": [
           {
-            "label": "Getting Started",
-            "href": "https://docs.phala.network/phala-cloud/getting-started/overview"
+            "href": "https://docs.phala.network/phala-cloud/getting-started/overview",
+            "label": "Getting Started"
           },
           {
-            "label": "TEEs, Attestation & Zero Trust Security",
-            "href": "https://docs.phala.network/phala-cloud/tees-attestation-and-zero-trust-security/attestation"
+            "href": "https://docs.phala.network/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+            "label": "TEEs, Attestation & Zero Trust Security"
           },
           {
-            "label": "Phala Cloud User Guides",
-            "href": "https://docs.phala.network/phala-cloud/phala-cloud-user-guides/overview"
+            "href": "https://docs.phala.network/phala-cloud/phala-cloud-user-guides/overview",
+            "label": "Phala Cloud User Guides"
           },
           {
-            "label": "Be Production Ready",
-            "href": "https://docs.phala.network/phala-cloud/be-production-ready/overview"
+            "href": "https://docs.phala.network/phala-cloud/be-production-ready/overview",
+            "label": "Be Production Ready"
           },
           {
-            "label": "Use Cases",
-            "href": "https://docs.phala.network/phala-cloud/use-cases/overview"
+            "href": "https://docs.phala.network/phala-cloud/use-cases/overview",
+            "label": "Use Cases"
           },
           {
-            "label": "References",
-            "href": "https://docs.phala.network/cloud/references/overview"
+            "href": "https://docs.phala.network/cloud/references/overview",
+            "label": "References"
           },
           {
-            "label": "FAQs",
-            "href": "https://docs.phala.network/phala-cloud/faqs"
+            "href": "https://docs.phala.network/phala-cloud/faqs",
+            "label": "FAQs"
           }
         ]
       },
@@ -59,32 +58,32 @@
         "header": "Dstack",
         "items": [
           {
-            "label": "Overview",
-            "href": "https://docs.phala.network/dstack/overview"
+            "href": "https://docs.phala.network/dstack/overview",
+            "label": "Overview"
           },
           {
-            "label": "Local Development",
-            "href": "https://docs.phala.network/dstack/local-development"
+            "href": "https://docs.phala.network/dstack/local-development",
+            "label": "Local Development"
           },
           {
-            "label": "Getting Started",
-            "href": "https://docs.phala.network/dstack/getting-started"
+            "href": "https://docs.phala.network/dstack/getting-started",
+            "label": "Getting Started"
           },
           {
-            "label": "Hardware Requirements",
-            "href": "https://docs.phala.network/dstack/hardware-requirements"
+            "href": "https://docs.phala.network/dstack/hardware-requirements",
+            "label": "Hardware Requirements"
           },
           {
-            "label": "Acknowledgement",
-            "href": "https://docs.phala.network/dstack/acknowledgement"
+            "href": "https://docs.phala.network/dstack/acknowledgement",
+            "label": "Acknowledgement"
           },
           {
-            "label": "FAQs",
-            "href": "https://docs.phala.network/dstack/faqs"
+            "href": "https://docs.phala.network/dstack/faqs",
+            "label": "FAQs"
           },
           {
-            "label": "Design Documents",
-            "href": "https://docs.phala.network/dstack/design-documents"
+            "href": "https://docs.phala.network/dstack/design-documents",
+            "label": "Design Documents"
           }
         ]
       },
@@ -92,20 +91,20 @@
         "header": "Confidential AI",
         "items": [
           {
-            "label": "LLM in GPU TEE",
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/llm-in-tee"
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/llm-in-tee",
+            "label": "LLM in GPU TEE"
           },
           {
-            "label": "GPU TEE Inference API",
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/inference-api"
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/inference-api",
+            "label": "GPU TEE Inference API"
           },
           {
-            "label": "Benchmark",
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/benchmark"
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/benchmark",
+            "label": "Benchmark"
           },
           {
-            "label": "FAQs",
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/faqs"
+            "href": "https://docs.phala.network/confidential-ai/gpu-tee/faqs",
+            "label": "FAQs"
           }
         ]
       },
@@ -113,24 +112,30 @@
         "header": "Network",
         "items": [
           {
-            "label": "LLM in GPU TEE",
-            "href": "https://docs.phala.network/network/llm-in-gpu-tee"
+            "href": "https://docs.phala.network/network/llm-in-gpu-tee",
+            "label": "LLM in GPU TEE"
           },
           {
-            "label": "Tech Specs",
-            "href": "https://docs.phala.network/network/tech-specs"
+            "href": "https://docs.phala.network/network/tech-specs",
+            "label": "Tech Specs"
           },
           {
-            "label": "References",
-            "href": "https://docs.phala.network/network/references"
+            "href": "https://docs.phala.network/network/references",
+            "label": "References"
           },
           {
-            "label": "Compute Providers",
-            "href": "https://docs.phala.network/network/compute-providers"
+            "href": "https://docs.phala.network/network/compute-providers",
+            "label": "Compute Providers"
           }
         ]
       }
-    ]
+    ],
+    "socials": {
+      "discord": "https://discord.gg/phala-network",
+      "github": "https://github.com/Phala-Network",
+      "linkedin": "https://linkedin.com/company/phala-network",
+      "x": "https://x.com/PhalaNetwork"
+    }
   },
   "integrations": {
     "ga4": {
@@ -139,39 +144,40 @@
   },
   "name": "Phala",
   "navbar": {
+    "links": [
+      {
+        "href": "https://discord.gg/phala-network",
+        "icon": "discord",
+        "label": ""
+      },
+      {
+        "href": "https://github.com/Phala-Network/",
+        "icon": "github",
+        "label": ""
+      },
+      {
+        "href": "https://linkedin.com/company/phala-network",
+        "icon": "linkedin",
+        "label": ""
+      },
+      {
+        "href": "https://x.com/PhalaNetwork",
+        "icon": "x",
+        "label": ""
+      }
+    ],
     "primary": {
       "href": "https://cloud.phala.network",
       "label": "Phala Cloud",
       "type": "button"
-    },
-    "links": [
-      {
-        "label": "",
-        "href": "https://discord.gg/phala-network",
-        "icon": "discord"
-      },
-      {
-        "label": "",
-        "href": "https://github.com/Phala-Network/",
-        "icon": "github"
-      },
-      {
-        "label": "",
-        "href": "https://linkedin.com/company/phala-network",
-        "icon": "linkedin"
-      },
-      {
-        "label": "",
-        "href": "https://x.com/PhalaNetwork",
-        "icon": "x"
-      }
-    ]
+    }
   },
   "navigation": {
+    "global": {
+      "anchors": []
+    },
     "tabs": [
       {
-        "tab": "Phala Cloud",
-        "icon": "square-terminal",
         "groups": [
           {
             "group": "Getting Started",
@@ -292,12 +298,15 @@
           },
           {
             "group": "FAQs",
-            "pages": ["/phala-cloud/faqs"]
+            "pages": [
+              "/phala-cloud/faqs"
+            ]
           }
-        ]
+        ],
+        "icon": "square-terminal",
+        "tab": "Phala Cloud"
       },
       {
-        "tab": "Dstack",
         "icon": "square-terminal",
         "pages": [
           "/dstack/overview",
@@ -315,23 +324,61 @@
               "/dstack/design-documents/tee-controlled-domain-certificates"
             ]
           }
-        ]
+        ],
+        "tab": "Dstack"
       },
       {
-        "tab": "Confidential AI",
         "icon": "square-terminal",
         "pages": [
           "/confidential-ai/gpu-tee/llm-in-tee",
           "/confidential-ai/gpu-tee/inference-api",
           "/confidential-ai/gpu-tee/benchmark",
           "/confidential-ai/gpu-tee/faqs"
-        ]
+        ],
+        "tab": "Confidential AI"
       },
       {
-        "tab": "Network",
         "icon": "square-terminal",
         "pages": [
           "/network/index",
+          {
+            "group": "Overview",
+            "pages": [
+              "/overview/phala-network",
+              {
+                "group": "Phala Token",
+                "pages": [
+                  "/overview/pha-token/introduction",
+                  {
+                    "group": "Delegation",
+                    "pages": [
+                      "/overview/pha-token/delegation/overview",
+                      "/overview/pha-token/delegation/delegate-to-stakepool",
+                      "/overview/pha-token/delegation/whats-vault",
+                      "/overview/pha-token/delegation/whats-share",
+                      "/overview/pha-token/delegation/wrappedbalances-and-w-pha",
+                      "/overview/pha-token/delegation/examples-of-delegation",
+                      "/overview/pha-token/delegation/use-phala-app-to-delegate",
+                      "/overview/pha-token/delegation/estimate-your-reward"
+                    ]
+                  },
+                  {
+                    "group": "Governance",
+                    "pages": [
+                      "/overview/pha-token/governance/overview",
+                      "/overview/pha-token/governance/governance-mechanism",
+                      "/overview/pha-token/governance/join-the-council",
+                      "/overview/pha-token/governance/voting-for-councillors",
+                      "/overview/pha-token/governance/apply-for-project-funding",
+                      "/overview/pha-token/governance/khala-governance",
+                      "/overview/pha-token/governance/khala-treasury",
+                      "/overview/pha-token/governance/setup-account-identity"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           {
             "group": "Tech Specs",
             "pages": [
@@ -458,12 +505,10 @@
               }
             ]
           }
-        ]
+        ],
+        "tab": "Network"
       }
-    ],
-    "global": {
-      "anchors": []
-    }
+    ]
   },
   "redirects": [
     {
@@ -591,11 +636,11 @@
       "source": "/tech-specs/blockchain/index"
     },
     {
-      "destination": "/overview/phala-network/gpu-tee",
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/overview/phala-network/confidential-ai-inference"
     },
     {
-      "destination": "/overview/phala-network/gpu-tee",
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/getting-started"
     },
     {
