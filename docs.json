@@ -155,9 +155,9 @@
           {
             "group": "Getting Started",
             "pages": [
-              "cloud/getting-started/overview",
-              "cloud/getting-started/sign-up-for-cloud-account",
-              "cloud/getting-started/start-from-cloud-ui",
+              "phala-cloud/getting-started/overview",
+              "phala-cloud/getting-started/sign-up-for-cloud-account",
+              "phala-cloud/getting-started/start-from-cloud-ui",
               {
                 "group": "Explore Templates",
                 "pages": [
@@ -239,10 +239,10 @@
           {
             "group": "Use Cases",
             "pages": [
-              "cloud/use-cases/overview",
-              "cloud/use-cases/tee_with_ai",
-              "cloud/use-cases/tee_with_fhe_and_mpc",
-              "cloud/use-cases/tee_with_zk_and_zkrollup"
+              "phala-cloud/use-cases/overview",
+              "phala-cloud/use-cases/tee_with_ai",
+              "phala-cloud/use-cases/tee_with_fhe_and_mpc",
+              "phala-cloud/use-cases/tee_with_zk_and_zkrollup"
             ]
           },
           {
@@ -271,7 +271,7 @@
           },
           {
             "group": "FAQs",
-            "pages": ["cloud/faqs"]
+            "pages": ["phala-cloud/faqs"]
           }
         ]
       },
