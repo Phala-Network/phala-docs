@@ -723,7 +723,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/agent-wars-legacy/*"
+      "source": "/agent-wars-legacy/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -731,7 +731,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/agent-wars/*"
+      "source": "/agent-wars/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -739,7 +739,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/ai-agent-contract-legacy/*"
+      "source": "/ai-agent-contract-legacy/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -747,7 +747,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/ai-agent-contract/*"
+      "source": "/ai-agent-contract/:slug*"
     },
     {
       "destination": "/network/compute-providers/basic-info/introduction",
@@ -755,7 +755,7 @@
     },
     {
       "destination": "/network/compute-providers/basic-info/introduction",
-      "source": "compute-providers/basic-info/*"
+      "source": "compute-providers/basic-info/:slug*"
     },
     {
       "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
@@ -763,7 +763,7 @@
     },
     {
       "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
-      "source": "compute-providers/run-workers-on-phala/*"
+      "source": "compute-providers/run-workers-on-phala/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -847,11 +847,11 @@
     },
     {
       "destination": "/network/compute-providers",
-      "source": "/en-us/mine/*"
+      "source": "/en-us/mine/:slug*"
     },
     {
       "destination": "/network/compute-providers/gatekeeper",
-      "source": "en-us/maintain/gatekeeper/*"
+      "source": "en-us/maintain/gatekeeper/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -879,11 +879,11 @@
     },
     {
       "destination": "/network/references/subbridge/overview",
-      "source": "/en-us/general/subbridge/*"
+      "source": "/en-us/general/subbridge/:slug*"
     },
     {
       "destination": "/network/references/subbridge/overview",
-      "source": "/other-products/subbridge/*"
+      "source": "/other-products/subbridge/:slug*"
     },
     {
       "destination": "/network/references/subbridge/overview",
@@ -891,7 +891,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/product-agent-wars/*"
+      "source": "/product-agent-wars/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -899,15 +899,15 @@
     },
     {
       "destination": "/network",
-      "source": "/en-us/general/*"
+      "source": "/en-us/general/:slug*"
     },
     {
       "destination": "/dstack",
-      "source": "/dstack-a-flashbots-x-project/*"
+      "source": "/dstack-a-flashbots-x-project/:slug*"
     },
     {
       "destination": "/phala-cloud",
-      "source": "/developer-guides/*"
+      "source": "/developer-guides/:slug*"
     },
     {
       "destination": "/dstack",
@@ -923,7 +923,7 @@
     },
     {
       "destination": "/network/references/archived-projects",
-      "source": "/tech-specs/ai-agent-contract/*"
+      "source": "/tech-specs/ai-agent-contract/:slug*"
     },
     {
       "destination": "/overview/pha-token",
@@ -931,7 +931,7 @@
     },
     {
       "destination": "/overview/pha-token",
-      "source": "/tech-specs/pha-token/*"
+      "source": "/tech-specs/pha-token/:slug*"
     },
     {
       "destination": "/network/compute-providers",

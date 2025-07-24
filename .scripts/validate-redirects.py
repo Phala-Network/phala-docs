@@ -6,6 +6,7 @@ Extracts all available page paths and checks that redirect targets are valid
 
 import json
 import sys
+import re
 from typing import Set, List, Dict, Any
 
 
@@ -104,6 +105,45 @@ def get_all_available_paths(docs_config: Dict[str, Any]) -> Set[str]:
     return all_paths_with_parents
 
 
+def matches_mintlify_pattern(path: str, pattern: str) -> bool:
+    """Check if a path matches a Mintlify wildcard pattern like /:slug*"""
+    # Convert Mintlify pattern to regex step by step
+
+    # First, replace :slug* with a placeholder to avoid conflicts
+    regex_pattern = pattern.replace(':slug*', '__SLUG_WILDCARD__')
+
+    # Escape all special regex characters
+    regex_pattern = re.escape(regex_pattern)
+
+    # Now replace our placeholder with the actual regex pattern
+    # :slug* should match at least one path segment and optionally more
+    regex_pattern = regex_pattern.replace('__SLUG_WILDCARD__', '[^/]+.*')
+
+    # Ensure we match the full string
+    regex_pattern = f'^{regex_pattern}$'
+
+    try:
+        return bool(re.match(regex_pattern, path))
+    except re.error:
+        # Fallback to exact match if regex fails
+        return path == pattern
+
+def path_matches_any_available(destination: str, available_paths: Set[str]) -> bool:
+    """Check if destination matches any available path, including wildcard patterns"""
+    # Normalize destination path for comparison
+    normalized_destination = "/" + normalize_url(destination) if normalize_url(destination) else destination
+
+    # First check exact match
+    if normalized_destination in available_paths:
+        return True
+
+    # Then check if any available path matches as a wildcard pattern
+    for available_path in available_paths:
+        if matches_mintlify_pattern(normalized_destination, available_path):
+            return True
+
+    return False
+
 def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -> List[Dict[str, str]]:
     """Validate that all redirect destinations point to valid paths"""
     invalid_redirects = []
@@ -115,10 +155,8 @@ def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -
         source = redirect.get("source", "")
         destination = redirect.get("destination", "")
 
-        # Normalize destination path for comparison
-        normalized_destination = "/" + normalize_url(destination) if normalize_url(destination) else destination
-
-        if normalized_destination not in available_paths:
+        # Check if destination matches any available path (exact or pattern)
+        if not path_matches_any_available(destination, available_paths):
             invalid_redirects.append({
                 "source": source,
                 "destination": destination,

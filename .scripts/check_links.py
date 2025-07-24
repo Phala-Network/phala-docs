@@ -7,7 +7,7 @@ Check all extracted documentation links for coverage:
 Note: File existence is handled by Mintlify build process, so we focus on link coverage.
 """
 import json
-import fnmatch
+import re
 from pathlib import Path
 from typing import Set, List, Dict, Any
 
@@ -89,7 +89,7 @@ def get_all_redirect_links(docs_config: dict) -> Set[str]:
 
 
 def find_matching_redirect(link: str, redirects: List[Dict[str, str]]) -> str:
-    """Find a redirect destination for a link, supporting wildcard patterns"""
+    """Find a redirect destination for a link, supporting Mintlify wildcard patterns like /:slug*"""
     for redirect in redirects:
         source = redirect["source"]
         destination = redirect["destination"]
@@ -98,14 +98,41 @@ def find_matching_redirect(link: str, redirects: List[Dict[str, str]]) -> str:
         if link == source:
             return destination
 
-        # Check for wildcard match using fnmatch
-        if fnmatch.fnmatch(link, source):
-            # For wildcard patterns, we might need to substitute parts
-            # For now, return the destination as-is
-            # TODO: Could implement more sophisticated pattern substitution
-            return destination
+        # Check for Mintlify wildcard match (/:slug* pattern)
+        if matches_mintlify_pattern(link, source):
+            # For wildcard patterns, substitute the captured slug if needed
+            return substitute_slug_in_destination(link, source, destination)
 
     return None
+
+def matches_mintlify_pattern(link: str, pattern: str) -> bool:
+    """Check if a link matches a Mintlify wildcard pattern like /:slug*"""
+    # Convert Mintlify pattern to regex step by step
+
+    # First, replace :slug* with a placeholder to avoid conflicts
+    regex_pattern = pattern.replace(':slug*', '__SLUG_WILDCARD__')
+
+    # Escape all special regex characters
+    regex_pattern = re.escape(regex_pattern)
+
+    # Now replace our placeholder with the actual regex pattern
+    # :slug* should match at least one path segment and optionally more
+    regex_pattern = regex_pattern.replace('__SLUG_WILDCARD__', '[^/]+.*')
+
+    # Ensure we match the full string
+    regex_pattern = f'^{regex_pattern}$'
+
+    try:
+        return bool(re.match(regex_pattern, link))
+    except re.error:
+        # Fallback to exact match if regex fails
+        return link == pattern
+
+def substitute_slug_in_destination(link: str, source_pattern: str, destination: str) -> str:
+    """Substitute captured slug from source pattern into destination if needed"""
+    # For now, return destination as-is since most redirects don't need substitution
+    # This could be enhanced later to support slug substitution in destinations
+    return destination
 
 def generate_parent_paths(path: str) -> Set[str]:
     """Generate all parent paths for a given path"""
