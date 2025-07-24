@@ -31,7 +31,7 @@ New to Phala Cloud? You can start here:
   Explore the complete cloud platform features
 </Card>
 
-<Card title="Confidential AI" icon="shield" href="/confidential-ai/gpu-tee/llm-in-tee">
+<Card title="Confidential AI" icon="shield" href="/phala-cloud/confidential-ai/gpu-tee/llm-in-tee">
   Run LLMs in GPU TEE environments
 </Card>
 

@@ -6,12 +6,7 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "errors": {
     "404": {
@@ -45,8 +40,12 @@
             "label": "Use Cases"
           },
           {
-            "href": "https://docs.phala.network/cloud/references/overview",
+            "href": "https://docs.phala.network/phala-cloud/references/overview",
             "label": "References"
+          },
+          {
+            "href": "https://docs.phala.network/phala-cloud/gpu-tee/llm-in-tee",
+            "label": "Confidential AI"
           },
           {
             "href": "https://docs.phala.network/phala-cloud/faqs",
@@ -91,19 +90,19 @@
         "header": "Confidential AI",
         "items": [
           {
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/llm-in-tee",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
             "label": "LLM in GPU TEE"
           },
           {
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/inference-api",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/inference-api",
             "label": "GPU TEE Inference API"
           },
           {
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/benchmark",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/benchmark",
             "label": "Benchmark"
           },
           {
-            "href": "https://docs.phala.network/confidential-ai/gpu-tee/faqs",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/faqs",
             "label": "FAQs"
           }
         ]
@@ -111,10 +110,6 @@
       {
         "header": "Network",
         "items": [
-          {
-            "href": "https://docs.phala.network/network/llm-in-gpu-tee",
-            "label": "LLM in GPU TEE"
-          },
           {
             "href": "https://docs.phala.network/network/tech-specs",
             "label": "Tech Specs"
@@ -279,6 +274,15 @@
             ]
           },
           {
+            "group": "Confidential AI",
+            "pages": [
+              "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+              "/phala-cloud/confidential-ai/gpu-tee/inference-api",
+              "/phala-cloud/confidential-ai/gpu-tee/benchmark",
+              "/phala-cloud/confidential-ai/gpu-tee/faqs"
+            ]
+          },
+          {
             "group": "References",
             "pages": [
               "/phala-cloud/references/overview",
@@ -304,9 +308,7 @@
           },
           {
             "group": "FAQs",
-            "pages": [
-              "/phala-cloud/faqs"
-            ]
+            "pages": ["/phala-cloud/faqs"]
           }
         ],
         "tab": "Phala Cloud"
@@ -331,16 +333,6 @@
           }
         ],
         "tab": "Dstack"
-      },
-      {
-        "icon": "square-terminal",
-        "pages": [
-          "/confidential-ai/gpu-tee/llm-in-tee",
-          "/confidential-ai/gpu-tee/inference-api",
-          "/confidential-ai/gpu-tee/benchmark",
-          "/confidential-ai/gpu-tee/faqs"
-        ],
-        "tab": "Confidential AI"
       },
       {
         "icon": "square-terminal",
@@ -522,7 +514,7 @@
       "source": "/overview/phala-network/dstack"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/overview/phala-network/gpu-tee"
     },
     {
@@ -662,28 +654,36 @@
       "source": "/tech-specs/blockchain/index"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/overview/phala-network/confidential-ai-inference"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/getting-started"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/confidential-ai-api"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/host-llm-in-tee"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/implementation"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/benchmark",
       "source": "/confidential-ai-inference/benchmark"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/benchmark",
+      "source": "/confidential-ai/gpu-tee/benchmark"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "source": "/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
       "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
@@ -778,11 +778,11 @@
       "source": "/legacy/phala-sdk"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/inference-api",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/inference-api",
       "source": "/llm-in-gpu-tee/inference-api"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/llm-in-gpu-tee/llm-in-tee"
     },
     {
@@ -958,7 +958,7 @@
       "source": "/references/hackathon-guides/ethglobal-sg-hackathon-guide"
     },
     {
-      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/llm-in-gpu-tee"
     },
     {
