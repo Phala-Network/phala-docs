@@ -142,6 +142,10 @@
       "measurementId": "G-RHRW9RL5LG"
     }
   },
+  "logo": {
+    "dark": "/images/phala-dark.png",
+    "light": "/images/phala-light.png"
+  },
   "name": "Phala",
   "navbar": {
     "links": [
@@ -904,10 +908,6 @@
     {
       "destination": "/phala-cloud",
       "source": "/developer-guides/*"
-    },
-    {
-      "destination": "/dstack",
-      "source": "/dstack-a-flashbots-x-project/*"
     },
     {
       "destination": "/dstack",
