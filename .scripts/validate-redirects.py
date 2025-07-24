@@ -9,13 +9,41 @@ import sys
 from typing import Set, List, Dict, Any
 
 
+def normalize_url(url: str) -> str:
+    """Normalize URL by removing leading/trailing slashes and ensuring consistency"""
+    return url.strip().strip("/")
+
+
+def generate_parent_paths(path: str) -> Set[str]:
+    """Generate all parent paths for a given path"""
+    parent_paths = set()
+
+    # Normalize the path
+    clean_path = normalize_url(path)
+    if not clean_path:
+        return parent_paths
+
+    # Split into parts
+    parts = clean_path.split("/")
+
+    # Generate all parent paths
+    for i in range(len(parts)):
+        parent_path = "/".join(parts[:i+1])
+        if parent_path:
+            parent_paths.add("/" + parent_path)
+
+    return parent_paths
+
+
 def extract_pages_from_navigation(nav_item) -> Set[str]:
     """Recursively extract all page paths from navigation structure"""
     pages = set()
 
     if isinstance(nav_item, str):
-        # Single page path
-        pages.add(nav_item)
+        # Single page path - normalize and ensure leading slash
+        normalized = normalize_url(nav_item)
+        if normalized:
+            pages.add("/" + normalized)
     elif isinstance(nav_item, dict):
         if "pages" in nav_item:
             # Group with pages
@@ -34,7 +62,7 @@ def extract_pages_from_navigation(nav_item) -> Set[str]:
 
 
 def get_all_available_paths(docs_config: Dict[str, Any]) -> Set[str]:
-    """Extract all available page paths from docs.json"""
+    """Extract all available page paths from docs.json including implied parent paths"""
     available_paths = set()
 
     # Extract from navigation
@@ -64,7 +92,16 @@ def get_all_available_paths(docs_config: Dict[str, Any]) -> Set[str]:
         if "pages" in nav:
             available_paths.update(extract_pages_from_navigation(nav["pages"]))
 
-    return available_paths
+    # Generate parent paths for all navigation paths
+    all_paths_with_parents = set(available_paths)
+    for path in available_paths:
+        all_paths_with_parents.update(generate_parent_paths(path))
+
+    # Add root path "/" if "/index" exists (common Mintlify convention)
+    if "/index" in all_paths_with_parents:
+        all_paths_with_parents.add("/")
+
+    return all_paths_with_parents
 
 
 def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -> List[Dict[str, str]]:
@@ -78,12 +115,14 @@ def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -
         source = redirect.get("source", "")
         destination = redirect.get("destination", "")
 
-        # Keep destination path as-is (with leading slash) for comparison
-        if destination not in available_paths:
+        # Normalize destination path for comparison
+        normalized_destination = "/" + normalize_url(destination) if normalize_url(destination) else destination
+
+        if normalized_destination not in available_paths:
             invalid_redirects.append({
                 "source": source,
                 "destination": destination,
-                "reason": "Destination path not found in navigation"
+                "reason": "Destination path not found in navigation or parent paths"
             })
 
     return invalid_redirects

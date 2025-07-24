@@ -33,7 +33,7 @@
             "label": "TEEs, Attestation & Zero Trust Security"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/phala-cloud-user-guides/overview",
+            "href": "https://docs.phala.network/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
             "label": "Phala Cloud User Guides"
           },
           {
@@ -178,13 +178,9 @@
     },
     "tabs": [
       {
-        "groups": [
-          {
-            "group": "Phala Cloud",
-            "pages": [
-              "/index"
-            ]
-          },
+        "icon": "square-terminal",
+        "pages": [
+          "/index",
           {
             "group": "Getting Started",
             "pages": [
@@ -309,7 +305,6 @@
             ]
           }
         ],
-        "icon": "square-terminal",
         "tab": "Phala Cloud"
       },
       {
@@ -350,7 +345,7 @@
           {
             "group": "Overview",
             "pages": [
-              "/overview/phala-network/phala-network",
+              "/overview/phala-network",
               {
                 "group": "Phala Token",
                 "pages": [
@@ -444,6 +439,7 @@
                   "/network/references/support/faucet"
                 ]
               },
+              "/network/references/archived-projects",
               "/network/references/faq"
             ]
           },
@@ -582,6 +578,10 @@
       "source": "/overview/pha-token/index"
     },
     {
+      "destination": "/overview/pha-token/introduction",
+      "source": "/overview/pha-token"
+    },
+    {
       "destination": "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
       "source": "/phala-cloud/be-production-ready/ci-cd-automation/index"
     },
@@ -696,6 +696,302 @@
     {
       "destination": "/phala-cloud/getting-started/overview",
       "source": "/ai-agent-contract/getting-started"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "source": "/management"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "source": "/phala-cloud/management"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee",
+      "source": "/phala-cloud/migration"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report",
+      "source": "/phala-cloud/migration/generate-ra-report"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/agent-wars-legacy"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/agent-wars-legacy/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/agent-wars"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/agent-wars/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/ai-agent-contract-legacy"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/ai-agent-contract-legacy/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/ai-agent-contract"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/ai-agent-contract/*"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/introduction",
+      "source": "compute-providers/basic-info"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/introduction",
+      "source": "compute-providers/basic-info/*"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "compute-providers/run-workers-on-phala"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "compute-providers/run-workers-on-phala/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy/builders-program"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/references/builders-program"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy/phala-sdk"
+    },
+    {
+      "destination": "/confidential-ai/gpu-tee/inference-api",
+      "source": "/llm-in-gpu-tee/inference-api"
+    },
+    {
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "source": "/llm-in-gpu-tee/llm-in-tee"
+    },
+    {
+      "destination": "/phala-cloud/references/tee-cloud-cli/overview",
+      "source": "/phala-cloud/tee-cloud-cli"
+    },
+    {
+      "destination": "/network/references/advanced-topics/run-local-testnet",
+      "source": "/references/advanced-topics/run-local-testnet"
+    },
+    {
+      "destination": "/network/references/basic-guidance/overview",
+      "source": "/references/basic-guidance"
+    },
+    {
+      "destination": "/network/references/basic-guidance/get-pha-and-transfer",
+      "source": "/references/basic-guidance/get-pha-and-transfer"
+    },
+    {
+      "destination": "/network/references/subbridge/overview",
+      "source": "/references/subbridge"
+    },
+    {
+      "destination": "/network/references/subbridge/cross-chain-transfer",
+      "source": "/references/subbridge/cross-chain-transfer"
+    },
+    {
+      "destination": "/network/references/support/endpoints",
+      "source": "/references/support/endpoints"
+    },
+    {
+      "destination": "/network/tech-specs/blockchain/blockchain-entities",
+      "source": "/tech-specs/blockchain/blockchain-entities"
+    },
+    {
+      "destination": "/network/tech-specs/blockchain/secret-key-hierarchy",
+      "source": "/tech-specs/blockchain/secret-key-hierarchy"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/v1/developers/phat-contract/features"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy/framehub"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
+      "source": "/cloud/migration/expose-service-port"
+    },
+    {
+      "destination": "/phala-cloud/references/overview",
+      "source": "/phala-cloud/references/phala-cloud-api-and-sdks"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
+      "source": "/cloud/management/check-logs"
+    },
+    {
+      "destination": "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+      "source": "/tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability"
+    },
+    {
+      "destination": "/network/compute-providers",
+      "source": "/en-us/mine/*"
+    },
+    {
+      "destination": "/network/compute-providers/gatekeeper",
+      "source": "en-us/maintain/gatekeeper/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/budget-balancer",
+      "source": "/v1/compute-providers/basic-info/budget-balancer"
+    },
+    {
+      "destination": "/phala-cloud/faqs",
+      "source": "/cloud/faqs"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/overview",
+      "source": "/cloud/getting-started"
+    },
+    {
+      "destination": "/phala-cloud/use-cases/tee_with_fhe_and_mpc",
+      "source": "/cloud/use-cases/tee_with_fhe_and_mpc"
+    },
+    {
+      "destination": "/phala-cloud/use-cases/tee_with_zk_and_zkrollup",
+      "source": "/cloud/use-cases/tee_with_zk_and_zkrollup"
+    },
+    {
+      "destination": "/network/references/subbridge/overview",
+      "source": "/en-us/general/subbridge/*"
+    },
+    {
+      "destination": "/network/references/subbridge/overview",
+      "source": "/other-products/subbridge/*"
+    },
+    {
+      "destination": "/network/references/subbridge/overview",
+      "source": "/other-products/subbridge"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/product-agent-wars/*"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/references/phala-sdk"
+    },
+    {
+      "destination": "/network",
+      "source": "/en-us/general/*"
+    },
+    {
+      "destination": "/dstack",
+      "source": "/dstack-a-flashbots-x-project/*"
+    },
+    {
+      "destination": "/phala-cloud",
+      "source": "/developer-guides/*"
+    },
+    {
+      "destination": "/dstack",
+      "source": "/dstack-a-flashbots-x-project/*"
+    },
+    {
+      "destination": "/dstack",
+      "source": "/overview/phala-network/dstack-a-flashbots-x-project"
+    },
+    {
+      "destination": "/phala-cloud",
+      "source": "/overview/scale-blockchains-with-ai-coprocessor"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/tech-specs/ai-agent-contract"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/tech-specs/ai-agent-contract/*"
+    },
+    {
+      "destination": "/overview/pha-token",
+      "source": "/tech-specs/pha-token"
+    },
+    {
+      "destination": "/overview/pha-token",
+      "source": "/tech-specs/pha-token/*"
+    },
+    {
+      "destination": "/network/compute-providers",
+      "source": "/compute-providers"
+    },
+    {
+      "destination": "/network/references/basic-guidance/overview",
+      "source": "/introduction/basic-guidance"
+    },
+    {
+      "destination": "/network/references/basic-guidance/get-pha-and-transfer",
+      "source": "/introduction/basic-guidance/get-pha-and-transfer"
+    },
+    {
+      "destination": "/network/references/hackathon-guides/ethglobal-bangkok",
+      "source": "/references/hackathon-guides/ethglobal-hackathon-guide"
+    },
+    {
+      "destination": "/network/references/hackathon-guides/ethglobal-san-francisco",
+      "source": "/references/hackathon-guides/ethglobal-sf-hackathon-guide"
+    },
+    {
+      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
+      "source": "/references/hackathon-guides/ethglobal-sg-hackathon-guide"
+    },
+    {
+      "destination": "/confidential-ai/gpu-tee/llm-in-tee",
+      "source": "/llm-in-gpu-tee"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/start-from-cloud-ui",
+      "source": "/phala-cloud/create-cvm"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/start-from-cloud-ui",
+      "source": "/phala-cloud/create-cvm/create-with-docker-compose"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
+      "source": "/phala-cloud/getting-started/start-from-cloud-cli"
+    },
+    {
+      "destination": "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
+      "source": "/phala-cloud/launch-an-eliza-agent"
+    },
+    {
+      "destination": "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline",
+      "source": "/phala-cloud/setup-a-ci-cd-pipeline"
+    },
+    {
+      "destination": "/phala-cloud/references",
+      "source": "/references"
+    },
+    {
+      "destination": "/phala-cloud/references",
+      "source": "/tech-specs"
+    },
+    {
+      "destination": "/",
+      "source": "END"
     }
   ],
   "styling": {
