@@ -1,2 +1,0 @@
-# Solo Scripts Guidance
-

@@ -1,6 +1,0 @@
----
-icon: books
----
-
-# Design Documents
-
