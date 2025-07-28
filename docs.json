@@ -181,13 +181,17 @@
         "pages": [
           "/index",
           {
+            "group": "What is Phala Cloud?",
+            "pages": ["/phala-cloud/what-is-phala-cloud/overview"]
+          },
+          {
             "group": "Getting Started",
             "pages": [
               "/phala-cloud/getting-started/overview",
               "/phala-cloud/getting-started/sign-up-for-cloud-account",
               "/phala-cloud/getting-started/start-from-cloud-ui",
               {
-                "group": "Explore Templates",
+                "group": "Explore CVM Templates",
                 "pages": [
                   "/phala-cloud/getting-started/explore-templates/overview",
                   "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
