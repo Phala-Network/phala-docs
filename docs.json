@@ -794,6 +794,10 @@
     },
     {
       "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee",
+      "source": "/migration"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee",
       "source": "/phala-cloud/migration"
     },
     {

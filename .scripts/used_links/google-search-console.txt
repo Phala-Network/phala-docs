@@ -219,3 +219,4 @@ references/support
 llm-in-gpu-tee/faqs
 references/support/compatibility-matrix.md
 compute-providers/basic-info/introduction.md
+migration
