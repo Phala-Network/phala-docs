@@ -215,3 +215,7 @@ tech-specs/pha-token/governance/khala-treasury
 tech-specs/pha-token/governance/setup-account-identity
 tech-specs/pha-token/governance/voting-for-councillors
 v1/compute-providers/basic-info/budget-balancer
+references/support
+llm-in-gpu-tee/faqs
+references/support/compatibility-matrix.md
+compute-providers/basic-info/introduction.md

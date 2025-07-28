@@ -6,7 +6,12 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -182,7 +187,9 @@
           "/index",
           {
             "group": "What is Phala Cloud?",
-            "pages": ["/phala-cloud/what-is-phala-cloud/overview"]
+            "pages": [
+              "/phala-cloud/what-is-phala-cloud/overview"
+            ]
           },
           {
             "group": "Getting Started",
@@ -254,11 +261,15 @@
           },
           {
             "group": "Phala Cloud CLI",
-            "pages": ["/phala-cloud/phala-cloud-cli/overview"]
+            "pages": [
+              "/phala-cloud/phala-cloud-cli/overview"
+            ]
           },
           {
             "group": "GPU CVM",
-            "pages": ["/phala-cloud/gpu-cvm/overview"]
+            "pages": [
+              "/phala-cloud/gpu-cvm/overview"
+            ]
           },
           {
             "group": "Key Management",
@@ -266,7 +277,9 @@
           },
           {
             "group": "Attestation",
-            "pages": ["/phala-cloud/attestation/overview"]
+            "pages": [
+              "/phala-cloud/attestation/overview"
+            ]
           },
           {
             "group": "Image",
@@ -306,7 +319,9 @@
           },
           {
             "group": "FAQs",
-            "pages": ["/phala-cloud/faqs"]
+            "pages": [
+              "/phala-cloud/faqs"
+            ]
           },
           {
             "group": "Best Practices and Successful Case",
@@ -376,7 +391,8 @@
               "/phala-cloud/references/cloud-api-beta/overview",
               "/phala-cloud/references/phala-cloud-pricing"
             ]
-          }
+          },
+          "/phala-cloud/support"
         ],
         "tab": "Phala Cloud"
       },
@@ -497,7 +513,7 @@
                   "/network/references/support/endpoints",
                   "/network/references/support/resource-limits",
                   "/network/references/support/transaction-costs",
-                  "network/references/support/compatibility-matrix",
+                  "/network/references/support/compatibility-matrix",
                   "/network/references/support/block-explorers",
                   "/network/references/support/faucet"
                 ]
@@ -818,19 +834,19 @@
     },
     {
       "destination": "/network/compute-providers/basic-info/introduction",
-      "source": "compute-providers/basic-info"
+      "source": "/compute-providers/basic-info"
     },
     {
       "destination": "/network/compute-providers/basic-info/introduction",
-      "source": "compute-providers/basic-info/:slug*"
+      "source": "/compute-providers/basic-info/:slug*"
     },
     {
       "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
-      "source": "compute-providers/run-workers-on-phala"
+      "source": "/compute-providers/run-workers-on-phala"
     },
     {
       "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
-      "source": "compute-providers/run-workers-on-phala/:slug*"
+      "source": "/compute-providers/run-workers-on-phala/:slug*"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -1057,8 +1073,20 @@
       "source": "/tech-specs"
     },
     {
-      "destination": "/",
-      "source": "END"
+      "destination": "/phala-cloud/confidential-ai/gpu-tee/faqs",
+      "source": "/llm-in-gpu-tee/faqs"
+    },
+    {
+      "destination": "/phala-cloud/support",
+      "source": "/references/support"
+    },
+    {
+      "destination": "/network/references/support/compatibility-matrix",
+      "source": "/references/support/compatibility-matrix.md"
+    },
+    {
+      "destination": "/network/references/support/compatibility-matrix",
+      "source": "/references/support/compatibility-matrix"
     }
   ],
   "styling": {
