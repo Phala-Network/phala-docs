@@ -6,7 +6,12 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -264,6 +269,7 @@
                 ]
               },
               "/phala-cloud/be-production-ready/production-checklist",
+              "/phala-cloud/be-production-ready/performance-report",
               "/phala-cloud/be-production-ready/troubleshooting",
               "/phala-cloud/be-production-ready/glossary"
             ]
@@ -312,7 +318,9 @@
           },
           {
             "group": "FAQs",
-            "pages": ["/phala-cloud/faqs"]
+            "pages": [
+              "/phala-cloud/faqs"
+            ]
           }
         ],
         "tab": "Phala Cloud"
