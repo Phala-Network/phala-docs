@@ -6,12 +6,7 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "errors": {
     "404": {
@@ -207,14 +202,7 @@
             ]
           },
           {
-            "group": "TEEs, Attestation & Zero Trust Security",
-            "pages": [
-              "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
-              "/phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
-            ]
-          },
-          {
-            "group": "Phala Cloud User Guides",
+            "group": "Tutorials",
             "pages": [
               {
                 "group": "Deploy and Manage CVMs",
@@ -256,6 +244,79 @@
                   "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/setup-a-ci-cd-pipeline"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Create CVM",
+            "pages": [
+              "/phala-cloud/getting-started/explore-templates/start-from-template"
+            ]
+          },
+          {
+            "group": "Phala Cloud CLI",
+            "pages": ["/phala-cloud/phala-cloud-cli/overview"]
+          },
+          {
+            "group": "GPU CVM",
+            "pages": ["/phala-cloud/gpu-cvm/overview"]
+          },
+          {
+            "group": "Key Management",
+            "pages": []
+          },
+          {
+            "group": "Attestation",
+            "pages": ["/phala-cloud/attestation/overview"]
+          },
+          {
+            "group": "Image",
+            "pages": []
+          },
+          {
+            "group": "Networking",
+            "pages": []
+          },
+          {
+            "group": "Storage",
+            "pages": []
+          },
+          {
+            "group": "Code Upgrading",
+            "pages": []
+          },
+          {
+            "group": "Security and Privacy",
+            "pages": []
+          },
+          {
+            "group": "Launch and Troubleshooting",
+            "pages": []
+          },
+          {
+            "group": "Logs",
+            "pages": []
+          },
+          {
+            "group": "Monitoring",
+            "pages": []
+          },
+          {
+            "group": "Phala Cloud API",
+            "pages": []
+          },
+          {
+            "group": "FAQs",
+            "pages": ["/phala-cloud/faqs"]
+          },
+          {
+            "group": "Best Practices and Successful Case",
+            "pages": []
+          },
+          {
+            "group": "TEEs, Attestation & Zero Trust Security",
+            "pages": [
+              "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+              "/phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
             ]
           },
           {
@@ -314,12 +375,6 @@
               },
               "/phala-cloud/references/cloud-api-beta/overview",
               "/phala-cloud/references/phala-cloud-pricing"
-            ]
-          },
-          {
-            "group": "FAQs",
-            "pages": [
-              "/phala-cloud/faqs"
             ]
           }
         ],
