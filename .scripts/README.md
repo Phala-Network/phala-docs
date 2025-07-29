@@ -10,5 +10,3 @@ python3 .scripts/validate-redirects.py
 ```
 
 When a new page is added, we should always update used\_links to include it.
-When a new page is added, we should always update used\_links to include it.
-
