@@ -181,7 +181,7 @@
         "pages": [
           "/index",
           {
-            "group": "What is Phala Cloud?",
+            "group": "What is Phala Cloud",
             "pages": ["/phala-cloud/what-is-phala-cloud/overview"]
           },
           {
@@ -305,7 +305,7 @@
             "pages": []
           },
           {
-            "group": "FAQs",
+            "group": "FAQ",
             "pages": ["/phala-cloud/faqs"]
           },
           {
