@@ -154,22 +154,22 @@
       {
         "href": "https://discord.gg/phala-network",
         "icon": "discord",
-        "label": ""
+        "label": "Discord"
       },
       {
         "href": "https://github.com/Phala-Network/",
         "icon": "github",
-        "label": ""
+        "label": "GitHub"
       },
       {
         "href": "https://linkedin.com/company/phala-network",
         "icon": "linkedin",
-        "label": ""
+        "label": "LinkedIn"
       },
       {
         "href": "https://x.com/PhalaNetwork",
         "icon": "x",
-        "label": ""
+        "label": "X"
       }
     ],
     "primary": {
@@ -181,7 +181,8 @@
   "navigation": {
     "tabs": [
       {
-        "icon": "square-terminal",
+        "tab": "Phala Cloud",
+        "icon": "cloud",
         "pages": [
           "/index",
           {
@@ -333,6 +334,7 @@
             "pages": [
               {
                 "group": "CI/CD Automation",
+                "icon": "workflow",
                 "pages": [
                   "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
                   "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
@@ -368,6 +370,7 @@
               "/phala-cloud/references/overview",
               {
                 "group": "Phala Cloud CLI Reference",
+                "icon": "terminal",
                 "pages": [
                   "/phala-cloud/references/tee-cloud-cli/overview",
                   {
@@ -386,12 +389,14 @@
               "/phala-cloud/references/phala-cloud-pricing"
             ]
           },
-          "/phala-cloud/support"
-        ],
-        "tab": "Phala Cloud"
+          {
+            "group": "Support",
+            "pages": ["/phala-cloud/support"]
+          }
+        ]
       },
       {
-        "icon": "square-terminal",
+        "icon": "terminal",
         "pages": [
           "/dstack/overview",
           "/dstack/local-development",
@@ -412,7 +417,7 @@
         "tab": "Dstack"
       },
       {
-        "icon": "square-terminal",
+        "icon": "network",
         "pages": [
           "/network/index",
           {
