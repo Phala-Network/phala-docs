@@ -1,5 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "styling": {
+    "codeblocks": "system"
+  },
   "colors": {
     "dark": "#9FDC00",
     "light": "#E8FF7A",
@@ -14,6 +18,9 @@
     }
   },
   "favicon": "/favicon.ico",
+  "icons": {
+    "library": "lucide"
+  },
   "footer": {
     "links": [
       {
@@ -172,9 +179,6 @@
     }
   },
   "navigation": {
-    "global": {
-      "anchors": []
-    },
     "tabs": [
       {
         "icon": "square-terminal",
@@ -192,6 +196,7 @@
               "/phala-cloud/getting-started/start-from-cloud-ui",
               {
                 "group": "Explore CVM Templates",
+                "icon": "compass",
                 "pages": [
                   "/phala-cloud/getting-started/explore-templates/overview",
                   "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
@@ -206,6 +211,7 @@
             "pages": [
               {
                 "group": "Deploy and Manage CVMs",
+                "icon": "server",
                 "pages": [
                   "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
                   "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
@@ -213,6 +219,7 @@
                   "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
                   {
                     "group": "Debugging and Analyzing Logs",
+                    "icon": "bug",
                     "pages": [
                       "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
                       "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
@@ -226,6 +233,7 @@
               },
               {
                 "group": "Building with TEE",
+                "icon": "shield",
                 "pages": [
                   "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
                   "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
@@ -238,6 +246,7 @@
               },
               {
                 "group": "Advanced Deployment Options",
+                "icon": "terminal",
                 "pages": [
                   "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
                   "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/deploy-cvm-with-phala-cloud-api",
@@ -1077,9 +1086,5 @@
       "destination": "/network/references/support/compatibility-matrix",
       "source": "/references/support/compatibility-matrix"
     }
-  ],
-  "styling": {
-    "codeblocks": "system"
-  },
-  "theme": "mint"
+  ]
 }
