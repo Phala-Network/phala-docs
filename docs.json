@@ -150,28 +150,6 @@
   },
   "name": "Phala",
   "navbar": {
-    "links": [
-      {
-        "href": "https://discord.gg/phala-network",
-        "icon": "discord",
-        "label": "Discord"
-      },
-      {
-        "href": "https://github.com/Phala-Network/",
-        "icon": "github",
-        "label": "GitHub"
-      },
-      {
-        "href": "https://linkedin.com/company/phala-network",
-        "icon": "linkedin",
-        "label": "LinkedIn"
-      },
-      {
-        "href": "https://x.com/PhalaNetwork",
-        "icon": "x",
-        "label": "X"
-      }
-    ],
     "primary": {
       "href": "https://cloud.phala.network",
       "label": "Phala Cloud",
