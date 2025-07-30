@@ -164,10 +164,6 @@
         "pages": [
           "/index",
           {
-            "group": "What is Phala Cloud",
-            "pages": ["/phala-cloud/what-is-phala-cloud/overview"]
-          },
-          {
             "group": "Getting Started",
             "pages": [
               "/phala-cloud/getting-started/overview",
@@ -298,7 +294,10 @@
           },
           {
             "group": "Best Practices and Successful Case",
-            "pages": []
+            "pages": [
+              "https://docs.phala.network/phala-cloud/be-production-ready/overview"
+            ],
+            "href": "https://docs.phala.network/phala-cloud/be-production-ready/overview"
           },
           {
             "group": "TEEs, Attestation & Zero Trust Security",
