@@ -5,48 +5,23 @@ title: Core Concepts Refresher
 icon: "lightbulb"
 ---
 
-<table data-view="cards" data-full-width="true">
-  <thead>
-    <tr>
-      <th data-hidden data-card-cover data-type="files"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td
-          style={{ maxWidth: "400px", height: "auto", cursor: "pointer" }}
-      >
-        <img
-          src="/images/cvm (1).jpg"
-          alt="Confidential VM (CVM)"
-        />
-        <a
-         href="/phala-cloud/phala-cloud-user-guides/create-cvm/overview">
-          Confidential VM (CVM)
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img
-          src="/images/KMS (1).jpg"
-          alt="Key Management Service (KMS)"
-          style={{ maxWidth: "400px", height: "auto", cursor: "pointer" }}
-        />
-        <a href="/dstack/design-documents/key-management-protocol">
-          Key Management Service (KMS)
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img
-          src="/images/confidential-ai-inference-overview.png"
-          alt="GPU TEE"
-          style={{ maxWidth: "400px", height: "auto", cursor: "pointer" }}
-        />
-        <a href="/phala-cloud/confidential-ai/gpu-tee/llm-in-tee">GPU TEE</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<Columns cols={3}>
+  <Card
+    img="/images/cvm (1).jpg"
+    href="/phala-cloud/phala-cloud-user-guides/create-cvm/overview"
+  >
+    Confidential VM (CVM)
+  </Card>
+  <Card
+    img="/images/KMS (1).jpg"
+    href="/dstack/design-documents/key-management-protocol"
+  >
+    Key Management Service (KMS)
+  </Card>
+  <Card
+    img="/images/confidential-ai-inference-overview.png"
+    href="/phala-cloud/confidential-ai/gpu-tee/llm-in-tee"
+  >
+    GPU TEE
+  </Card>
+</Columns>
