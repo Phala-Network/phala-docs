@@ -1,2 +1,0 @@
-# Phala Cloud Pricing
-
