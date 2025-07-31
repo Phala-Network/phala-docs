@@ -191,13 +191,11 @@
                 "group": "CVM",
                 "icon": "play",
                 "pages": [
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/resize-resource",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/upgrade-application",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/deployment-cheat-sheet"
+                  "/phala-cloud/cvm/overview",
+                  "/phala-cloud/cvm/create-with-docker-compose",
+                  "/phala-cloud/cvm/set-secure-environment-variables",
+                  "/phala-cloud/cvm/create-with-private-docker-image",
+                  "/phala-cloud/cvm/deployment-cheat-sheet"
                 ]
               },
               "/phala-cloud/phala-cloud-cli/overview",
@@ -231,14 +229,51 @@
                 ]
               },
               {
+                "group": "Storage",
+                "icon": "database",
+                "pages": ["/phala-cloud/storage/access-database"]
+              },
+              {
+                "group": "Code Upgrading",
+                "icon": "git-branch",
+                "pages": [
+                  "/phala-cloud/upgrading/upgrade-application",
+                  "/phala-cloud/upgrading/resize-resource"
+                ]
+              },
+              {
+                "group": "Security and Privacy",
+                "icon": "shield",
+                "pages": [
+                  "/phala-cloud/security-and-privacy/set-secure-environment-variables",
+                  "/phala-cloud/security-and-privacy/create-crypto-wallet",
+                  "/phala-cloud/security-and-privacy/privacy"
+                ]
+              },
+              {
                 "group": "Troubleshooting",
                 "icon": "bug",
                 "pages": [
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
+                  "/phala-cloud/troubleshooting/private-log-viewer",
+                  "/phala-cloud/troubleshooting/debug-your-application"
                 ]
-              }
+              },
+              {
+                "group": "Monitoring",
+                "icon": "chart-line",
+                "pages": [
+                  "/phala-cloud/troubleshooting/public-logs",
+                  "/phala-cloud/troubleshooting/serials-logs",
+                  "/phala-cloud/monitoring/private-log-viewer"
+                ]
+              },
+              {
+                "group": "Phala Cloud API",
+                "icon": "terminal",
+                "pages": []
+              },
+              "/phala-cloud/faqs",
+              "/phala-cloud/best-ractices-and-successful-case"
             ]
           },
 
