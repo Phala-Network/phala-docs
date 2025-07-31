@@ -162,25 +162,86 @@
         "tab": "Phala Cloud",
         "icon": "cloud",
         "pages": [
-          "/index",
           {
-            "group": "Getting Started",
+            "group": "Phala Cloud",
             "pages": [
-              "/phala-cloud/getting-started/overview",
-              "/phala-cloud/getting-started/sign-up-for-cloud-account",
-              "/phala-cloud/getting-started/start-from-cloud-ui",
+              "/phala-cloud/what-is/what-is-phala-cloud",
               {
-                "group": "Explore CVM Templates",
-                "icon": "compass",
+                "group": "Get started tutorial",
+                "icon": "book-open",
                 "pages": [
-                  "/phala-cloud/getting-started/explore-templates/overview",
-                  "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
-                  "/phala-cloud/getting-started/explore-templates/start-from-template"
+                  "/phala-cloud/getting-started/sign-up-for-cloud-account",
+                  "/phala-cloud/getting-started/start-from-cloud-ui",
+                  {
+                    "group": "CVM Templates",
+                    "pages": [
+                      "/phala-cloud/getting-started/explore-templates/overview",
+                      "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
+                      "/phala-cloud/getting-started/explore-templates/start-from-template"
+                    ]
+                  },
+                  "/phala-cloud/getting-started/attestation",
+                  {
+                    "group": "Debugging and Analyzing",
+                    "pages": []
+                  }
                 ]
               },
-              "/phala-cloud/getting-started/core-concepts-refresher"
+              {
+                "group": "CVM",
+                "icon": "play",
+                "pages": [
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/resize-resource",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/upgrade-application",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/deployment-cheat-sheet"
+                ]
+              },
+              "/phala-cloud/phala-cloud-cli/overview",
+              "/phala-cloud/gpu-cvm/overview",
+              {
+                "group": "Key Management",
+                "icon": "key",
+                "pages": [
+                  "/phala-cloud/key-management/key-management-protocol",
+                  "/phala-cloud/key-management/cloud-vs-onchain-kms",
+                  "/phala-cloud/key-management/generate-and-persist-key"
+                ]
+              },
+              {
+                "group": "Attestation",
+                "icon": "shield",
+                "pages": [
+                  "/phala-cloud/attestation/overview",
+                  "/phala-cloud/attestation/get-attestation",
+                  "/phala-cloud/attestation/verifying-attestation"
+                ]
+              },
+              "/phala-cloud/image/overview",
+              {
+                "group": "Networking",
+                "icon": "network",
+                "pages": [
+                  "/phala-cloud/networking/overview",
+                  "/phala-cloud/networking/expose-service-port",
+                  "/phala-cloud/networking/setting-up-custom-domain"
+                ]
+              },
+              {
+                "group": "Troubleshooting",
+                "icon": "bug",
+                "pages": [
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
+                  "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
+                ]
+              }
             ]
           },
+
           {
             "group": "Tutorials",
             "pages": [
@@ -366,6 +427,7 @@
               "/phala-cloud/references/phala-cloud-pricing"
             ]
           },
+          "/phala-cloud/support",
           {
             "group": "Support",
             "pages": ["/phala-cloud/support"]
