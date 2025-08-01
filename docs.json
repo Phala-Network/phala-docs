@@ -178,6 +178,7 @@
                   "/phala-cloud/getting-started/explore-templates/start-from-template"
                 ]
               },
+              "/phala-cloud/getting-started/performance-report",
               "/phala-cloud/getting-started/core-concepts-refresher"
             ]
           },
@@ -318,7 +319,6 @@
                 ]
               },
               "/phala-cloud/be-production-ready/production-checklist",
-              "/phala-cloud/be-production-ready/performance-report",
               "/phala-cloud/be-production-ready/troubleshooting",
               "/phala-cloud/be-production-ready/glossary"
             ]
