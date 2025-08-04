@@ -198,7 +198,21 @@
                   "/phala-cloud/cvm/deployment-cheat-sheet"
                 ]
               },
-              "/phala-cloud/phala-cloud-cli/overview",
+              {
+                "group": "Phala Cloud CLI",
+                "icon": "terminal",
+                "pages": [
+                  "/phala-cloud/phala-cloud-cli/overview",
+                  "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
+                  {
+                    "group": "CI/CD Automation",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
+                      "/phala-cloud/phala-cloud-cli/ci-cd-automation/ci-cd-integration-best-practices"
+                    ]
+                  }
+                ]
+              },
               "/phala-cloud/gpu-cvm/overview",
               {
                 "group": "Key Management",
@@ -270,7 +284,7 @@
               {
                 "group": "Phala Cloud API",
                 "icon": "terminal",
-                "pages": []
+                "pages": ["/phala-cloud/phala-cloud-api/overview"]
               },
               "/phala-cloud/faqs",
               "/phala-cloud/best-ractices-and-successful-case"
@@ -280,41 +294,6 @@
           {
             "group": "Tutorials",
             "pages": [
-              {
-                "group": "Deploy and Manage CVMs",
-                "icon": "server",
-                "pages": [
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image",
-                  {
-                    "group": "Debugging and Analyzing Logs",
-                    "icon": "bug",
-                    "pages": [
-                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
-                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/private-log-viewer",
-                      "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/debug-your-application"
-                    ]
-                  },
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/resize-resource",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/upgrade-application",
-                  "/phala-cloud/phala-cloud-user-guides/create-cvm/deployment-cheat-sheet"
-                ]
-              },
-              {
-                "group": "Building with TEE",
-                "icon": "shield",
-                "pages": [
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-database",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/create-crypto-wallet",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report",
-                  "/phala-cloud/phala-cloud-user-guides/building-with-tee/verify-remote-attestation"
-                ]
-              },
               {
                 "group": "Advanced Deployment Options",
                 "icon": "terminal",
