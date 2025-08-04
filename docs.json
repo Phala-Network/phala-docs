@@ -313,8 +313,8 @@
                 "group": "Monitoring",
                 "icon": "chart-line",
                 "pages": [
-                  "/phala-cloud/troubleshooting/public-logs",
-                  "/phala-cloud/troubleshooting/serials-logs",
+                  "/phala-cloud/monitoring/public-logs",
+                  "/phala-cloud/monitoring/serials-logs",
                   "/phala-cloud/monitoring/private-log-viewer"
                 ]
               },
