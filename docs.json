@@ -224,7 +224,22 @@
                   }
                 ]
               },
-              "/phala-cloud/gpu-cvm/overview",
+              {
+                "group": "GPU CVM",
+                "icon": "microchip",
+                "pages": [
+                  "/phala-cloud/gpu/overview",
+                  {
+                    "group": "Confidential AI",
+                    "pages": [
+                      "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+                      "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
+                      "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+                      "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs"
+                    ]
+                  }
+                ]
+              },
               {
                 "group": "Key Management",
                 "icon": "key",
@@ -301,24 +316,6 @@
               },
               "/phala-cloud/faqs",
               "/phala-cloud/best-ractices-and-successful-case"
-            ]
-          },
-          {
-            "group": "Use Cases",
-            "pages": [
-              "/phala-cloud/use-cases/overview",
-              "/phala-cloud/use-cases/tee_with_ai",
-              "/phala-cloud/use-cases/tee_with_fhe_and_mpc",
-              "/phala-cloud/use-cases/tee_with_zk_and_zkrollup"
-            ]
-          },
-          {
-            "group": "Confidential AI",
-            "pages": [
-              "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
-              "/phala-cloud/confidential-ai/gpu-tee/inference-api",
-              "/phala-cloud/confidential-ai/gpu-tee/benchmark",
-              "/phala-cloud/confidential-ai/gpu-tee/faqs"
             ]
           },
           {
