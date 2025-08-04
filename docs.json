@@ -195,7 +195,9 @@
                   "/phala-cloud/cvm/create-with-docker-compose",
                   "/phala-cloud/cvm/set-secure-environment-variables",
                   "/phala-cloud/cvm/create-with-private-docker-image",
-                  "/phala-cloud/cvm/deployment-cheat-sheet"
+                  "/phala-cloud/cvm/deployment-cheat-sheet",
+                  "/phala-cloud/cvm/production-checklist",
+                  "/phala-cloud/cvm/performance-report"
                 ]
               },
               {
@@ -259,6 +261,7 @@
                 "group": "Security and Privacy",
                 "icon": "shield",
                 "pages": [
+                  "/phala-cloud/security-and-privacy/security-architecture",
                   "/phala-cloud/security-and-privacy/set-secure-environment-variables",
                   "/phala-cloud/security-and-privacy/create-crypto-wallet",
                   "/phala-cloud/security-and-privacy/privacy"
@@ -268,6 +271,7 @@
                 "group": "Troubleshooting",
                 "icon": "bug",
                 "pages": [
+                  "/phala-cloud/troubleshooting/troubleshooting",
                   "/phala-cloud/troubleshooting/private-log-viewer",
                   "/phala-cloud/troubleshooting/debug-your-application"
                 ]
@@ -288,114 +292,6 @@
               },
               "/phala-cloud/faqs",
               "/phala-cloud/best-ractices-and-successful-case"
-            ]
-          },
-
-          {
-            "group": "Tutorials",
-            "pages": [
-              {
-                "group": "Advanced Deployment Options",
-                "icon": "terminal",
-                "pages": [
-                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
-                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/deploy-cvm-with-phala-cloud-api",
-                  "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/setup-a-ci-cd-pipeline"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Create CVM",
-            "pages": [
-              "/phala-cloud/getting-started/explore-templates/start-from-template"
-            ]
-          },
-          {
-            "group": "Phala Cloud CLI",
-            "pages": ["/phala-cloud/phala-cloud-cli/overview"]
-          },
-          {
-            "group": "GPU CVM",
-            "pages": ["/phala-cloud/gpu-cvm/overview"]
-          },
-          {
-            "group": "Key Management",
-            "pages": []
-          },
-          {
-            "group": "Attestation",
-            "pages": ["/phala-cloud/attestation/overview"]
-          },
-          {
-            "group": "Image",
-            "pages": []
-          },
-          {
-            "group": "Networking",
-            "pages": []
-          },
-          {
-            "group": "Storage",
-            "pages": []
-          },
-          {
-            "group": "Code Upgrading",
-            "pages": []
-          },
-          {
-            "group": "Security and Privacy",
-            "pages": []
-          },
-          {
-            "group": "Launch and Troubleshooting",
-            "pages": []
-          },
-          {
-            "group": "Logs",
-            "pages": []
-          },
-          {
-            "group": "Monitoring",
-            "pages": []
-          },
-          {
-            "group": "Phala Cloud API",
-            "pages": []
-          },
-          {
-            "group": "FAQ",
-            "pages": ["/phala-cloud/faqs"]
-          },
-          {
-            "group": "Best Practices and Successful Case",
-            "pages": [
-              "https://docs.phala.network/phala-cloud/be-production-ready/overview"
-            ],
-            "href": "https://docs.phala.network/phala-cloud/be-production-ready/overview"
-          },
-          {
-            "group": "TEEs, Attestation & Zero Trust Security",
-            "pages": [
-              "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
-              "/phala-cloud/tees-attestation-and-zero-trust-security/security-architecture"
-            ]
-          },
-          {
-            "group": "Be Production Ready",
-            "pages": [
-              {
-                "group": "CI/CD Automation",
-                "icon": "workflow",
-                "pages": [
-                  "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
-                  "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
-                ]
-              },
-              "/phala-cloud/be-production-ready/production-checklist",
-              "/phala-cloud/be-production-ready/performance-report",
-              "/phala-cloud/be-production-ready/troubleshooting",
-              "/phala-cloud/be-production-ready/glossary"
             ]
           },
           {
