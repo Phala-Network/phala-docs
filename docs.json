@@ -218,8 +218,17 @@
                   {
                     "group": "CI/CD Automation",
                     "pages": [
-                      "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
-                      "/phala-cloud/phala-cloud-cli/ci-cd-automation/ci-cd-integration-best-practices"
+                      "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline"
+                    ]
+                  },
+                  {
+                    "group": "CLI Reference",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/overview",
+                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/auth",
+                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/cvms",
+                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
+                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/simulator"
                     ]
                   }
                 ]
@@ -317,36 +326,6 @@
               "/phala-cloud/faqs",
               "/phala-cloud/best-ractices-and-successful-case"
             ]
-          },
-          {
-            "group": "References",
-            "pages": [
-              "/phala-cloud/references/overview",
-              {
-                "group": "Phala Cloud CLI Reference",
-                "icon": "terminal",
-                "pages": [
-                  "/phala-cloud/references/tee-cloud-cli/overview",
-                  {
-                    "group": "phala",
-                    "pages": [
-                      "/phala-cloud/references/tee-cloud-cli/phala/overview",
-                      "/phala-cloud/references/tee-cloud-cli/phala/auth",
-                      "/phala-cloud/references/tee-cloud-cli/phala/cvms",
-                      "/phala-cloud/references/tee-cloud-cli/phala/docker",
-                      "/phala-cloud/references/tee-cloud-cli/phala/simulator"
-                    ]
-                  }
-                ]
-              },
-              "/phala-cloud/references/cloud-api-beta/overview",
-              "/phala-cloud/references/phala-cloud-pricing"
-            ]
-          },
-          "/phala-cloud/support",
-          {
-            "group": "Support",
-            "pages": ["/phala-cloud/support"]
           }
         ]
       },
