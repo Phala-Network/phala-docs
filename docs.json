@@ -204,16 +204,6 @@
                     "pages": [
                       "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline"
                     ]
-                  },
-                  {
-                    "group": "CLI Reference",
-                    "pages": [
-                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/overview",
-                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/auth",
-                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/cvms",
-                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
-                      "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/simulator"
-                    ]
                   }
                 ]
               },
@@ -302,9 +292,26 @@
                 ]
               },
               {
-                "group": "Phala Cloud API",
-                "icon": "terminal",
-                "pages": ["/phala-cloud/phala-cloud-api/overview"]
+                "group": "References",
+                "icon": "book",
+                "pages": [
+                  "/phala-cloud/references/overview",
+                  "/phala-cloud/references/performance-report",
+                  {
+                    "group": "Phala Cloud API",
+                    "pages": ["/phala-cloud/phala-cloud-api/overview"]
+                  },
+                  {
+                    "group": "CLI Reference",
+                    "pages": [
+                      "/phala-cloud/references/phala-cloud-cli/phala/overview",
+                      "/phala-cloud/references/phala-cloud-cli/phala/auth",
+                      "/phala-cloud/references/phala-cloud-cli/phala/cvms",
+                      "/phala-cloud/references/phala-cloud-cli/phala/docker",
+                      "/phala-cloud/references/phala-cloud-cli/phala/simulator"
+                    ]
+                  }
+                ]
               },
               {
                 "group": "Successful Cases",
@@ -533,6 +540,14 @@
       "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port"
     },
     {
+      "destination": "/phala-cloud/networking/overview",
+      "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee"
+    },
+    {
+      "destination": "/phala-cloud/attestation/get-attestation",
+      "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report"
+    },
+    {
       "destination": "/phala-cloud/cvm/create-with-docker-compose",
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose"
     },
@@ -565,11 +580,11 @@
       "source": "/phala-cloud/tees-attestation-and-zero-trust-security/attestation"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/overview",
+      "destination": "/phala-cloud/cases/overview",
       "source": "/phala-cloud/use-cases/overview"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
+      "destination": "/phala-cloud/cases/tee_with_zk_and_zkrollup",
       "source": "/phala-cloud/use-cases/tee_with_zk_and_zkrollup"
     },
     {
@@ -589,11 +604,11 @@
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
+      "destination": "/phala-cloud/references/phala-cloud-cli/phala/docker",
       "source": "/phala-cloud/references/tee-cloud-cli/phala/docker"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/overview",
+      "destination": "/phala-cloud/cases/overview",
       "source": "/phala-cloud/use-cases"
     },
     {
@@ -601,7 +616,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
+      "destination": "/phala-cloud/references/phala-cloud-cli/phala/docker",
       "source": "/phala-cloud/references/tee-cloud-cli"
     },
     {
@@ -625,7 +640,7 @@
       "source": "/cloud/getting-started/getting-started"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/overview",
+      "destination": "/phala-cloud/cases/overview",
       "source": "/cloud/use-cases/use-cases"
     },
     {
@@ -777,6 +792,14 @@
       "source": "/confidential-ai/gpu-tee/benchmark"
     },
     {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "source": "/phala-cloud/confidential-ai-inference/benchmark"
+    },
+    {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "source": "/phala-cloud/confidential-ai/gpu-tee/benchmark"
+    },
+    {
       "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai/gpu-tee/llm-in-tee"
     },
@@ -834,6 +857,10 @@
     },
     {
       "destination": "/network/references/archived-projects",
+      "source": "/product-agent-wars"
+    },
+    {
+      "destination": "/network/references/archived-projects",
       "source": "/ai-agent-contract-legacy"
     },
     {
@@ -881,8 +908,16 @@
       "source": "/llm-in-gpu-tee/inference-api"
     },
     {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
+      "source": "/phala-cloud/confidential-ai/gpu-tee/inference-api"
+    },
+    {
       "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/llm-in-gpu-tee/llm-in-tee"
+    },
+    {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "source": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
       "destination": "/phala-cloud/phala-cloud-cli/overview",
@@ -949,8 +984,16 @@
       "source": "/en-us/mine/:slug*"
     },
     {
+      "destination": "/network/compute-providers",
+      "source": "/en-us/mine"
+    },
+    {
       "destination": "/network/compute-providers/gatekeeper",
       "source": "en-us/maintain/gatekeeper/:slug*"
+    },
+    {
+      "destination": "/network/compute-providers/gatekeeper",
+      "source": "/en-us/maintain/gatekeeper"
     },
     {
       "destination": "/network/references/archived-projects",
@@ -969,11 +1012,11 @@
       "source": "/cloud/getting-started"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
+      "destination": "/phala-cloud/cases/tee_with_fhe_and_mpc",
       "source": "/cloud/use-cases/tee_with_fhe_and_mpc"
     },
     {
-      "destination": "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
+      "destination": "/phala-cloud/cases/tee_with_zk_and_zkrollup",
       "source": "/cloud/use-cases/tee_with_zk_and_zkrollup"
     },
     {
@@ -1001,15 +1044,27 @@
       "source": "/en-us/general/:slug*"
     },
     {
-      "destination": "/dstack",
+      "destination": "/network",
+      "source": "/en-us/general"
+    },
+    {
+      "destination": "/dstack/overview",
       "source": "/dstack-a-flashbots-x-project/:slug*"
+    },
+    {
+      "destination": "/dstack/overview",
+      "source": "/dstack-a-flashbots-x-project"
     },
     {
       "destination": "/phala-cloud",
       "source": "/developer-guides/:slug*"
     },
     {
-      "destination": "/dstack",
+      "destination": "/phala-cloud/getting-started/overview",
+      "source": "/developer-guides"
+    },
+    {
+      "destination": "/dstack/overview",
       "source": "/overview/phala-network/dstack-a-flashbots-x-project"
     },
     {
@@ -1081,6 +1136,10 @@
       "source": "/phala-cloud/setup-a-ci-cd-pipeline"
     },
     {
+      "destination": "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
+      "source": "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline"
+    },
+    {
       "destination": "/phala-cloud/cvm/overview",
       "source": "/references"
     },
@@ -1093,6 +1152,10 @@
       "source": "/llm-in-gpu-tee/faqs"
     },
     {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
+      "source": "/phala-cloud/confidential-ai/gpu-tee/faqs"
+    },
+    {
       "destination": "/phala-cloud/support",
       "source": "/references/support"
     },
@@ -1103,6 +1166,14 @@
     {
       "destination": "/network/references/support/compatibility-matrix",
       "source": "/references/support/compatibility-matrix"
+    },
+    {
+      "destination": "/phala-cloud/references/overview",
+      "source": "/phala-cloud/references"
+    },
+    {
+      "destination": "/phala-cloud/cases/tee_with_fhe_and_mpc",
+      "source": "/phala-cloud/use-cases/tee_with_fhe_and_mpc"
     }
   ],
   "styling": {
