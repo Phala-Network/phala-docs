@@ -31,7 +31,7 @@
             "label": "Getting Started"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+            "href": "https://docs.phala.network/phala-cloud/attestation/overview",
             "label": "TEEs, Attestation & Zero Trust Security"
           },
           {
@@ -97,19 +97,19 @@
         "header": "Confidential AI",
         "items": [
           {
-            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
             "label": "LLM in GPU TEE"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/inference-api",
+            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
             "label": "GPU TEE Inference API"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/benchmark",
+            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
             "label": "Benchmark"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/confidential-ai/gpu-tee/faqs",
+            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
             "label": "FAQs"
           }
         ]
@@ -170,6 +170,7 @@
                 "group": "Getting Started",
                 "icon": "book-open",
                 "pages": [
+                  "/phala-cloud/getting-started/overview",
                   "/phala-cloud/getting-started/sign-up-for-cloud-account",
                   "/phala-cloud/getting-started/start-from-cloud-ui",
                   {
@@ -327,7 +328,7 @@
                 ]
               },
               "/phala-cloud/faqs",
-              "/phala-cloud/best-ractices-and-successful-case"
+              "/phala-cloud/support"
             ]
           }
         ]
@@ -565,7 +566,7 @@
       "source": "/overview/phala-network/dstack"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/overview/phala-network/gpu-tee"
     },
     {
@@ -581,7 +582,7 @@
       "source": "/cloud/getting-started/getting-started"
     },
     {
-      "destination": "/phala-cloud/use-cases/overview",
+      "destination": "/phala-cloud/cases/use-cases/overview",
       "source": "/cloud/use-cases/use-cases"
     },
     {
@@ -629,11 +630,11 @@
       "source": "/overview/pha-token"
     },
     {
-      "destination": "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
       "source": "/phala-cloud/be-production-ready/ci-cd-automation/index"
     },
     {
-      "destination": "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices",
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
       "source": "/phala-cloud/be-production-ready/index"
     },
     {
@@ -645,39 +646,39 @@
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/index"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications",
+      "destination": "/phala-cloud/networking/overview",
       "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/index"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
+      "destination": "/phala-cloud/monitoring/public-logs",
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/index"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/index"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/phala-cloud/phala-cloud-user-guides/index"
     },
     {
-      "destination": "/phala-cloud/references/cloud-api-beta/overview",
+      "destination": "/phala-cloud/phala-cloud-api/overview",
       "source": "/phala-cloud/references/cloud-api-beta/index"
     },
     {
-      "destination": "/phala-cloud/references/overview",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/phala-cloud/references/index"
     },
     {
-      "destination": "/phala-cloud/references/tee-cloud-cli/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
       "source": "/phala-cloud/references/tee-cloud-cli/index"
     },
     {
-      "destination": "/phala-cloud/references/tee-cloud-cli/phala/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
       "source": "/phala-cloud/references/tee-cloud-cli/phala/index"
     },
     {
-      "destination": "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+      "destination": "/phala-cloud/attestation/overview",
       "source": "/phala-cloud/tees-attestation-and-zero-trust-security/index"
     },
     {
@@ -705,35 +706,35 @@
       "source": "/tech-specs/blockchain/index"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/overview/phala-network/confidential-ai-inference"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/getting-started"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/confidential-ai-api"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/host-llm-in-tee"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai-inference/implementation"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
       "source": "/confidential-ai-inference/benchmark"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
       "source": "/confidential-ai/gpu-tee/benchmark"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
@@ -753,23 +754,23 @@
       "source": "/ai-agent-contract/getting-started"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/management"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/phala-cloud/management"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee",
+      "destination": "/phala-cloud/upgrading/upgrade-application",
       "source": "/migration"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee",
+      "destination": "/phala-cloud/upgrading/upgrade-application",
       "source": "/phala-cloud/migration"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee/generate-ra-report",
+      "destination": "/phala-cloud/attestation/get-attestation",
       "source": "/phala-cloud/migration/generate-ra-report"
     },
     {
@@ -833,15 +834,15 @@
       "source": "/legacy/phala-sdk"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/inference-api",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
       "source": "/llm-in-gpu-tee/inference-api"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/llm-in-gpu-tee/llm-in-tee"
     },
     {
-      "destination": "/phala-cloud/references/tee-cloud-cli/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
       "source": "/phala-cloud/tee-cloud-cli"
     },
     {
@@ -885,19 +886,19 @@
       "source": "/legacy/framehub"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port",
+      "destination": "/phala-cloud/networking/expose-service-port",
       "source": "/cloud/migration/expose-service-port"
     },
     {
-      "destination": "/phala-cloud/references/overview",
+      "destination": "/phala-cloud/phala-cloud-api/overview",
       "source": "/phala-cloud/references/phala-cloud-api-and-sdks"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs",
+      "destination": "/phala-cloud/monitoring/public-logs",
       "source": "/cloud/management/check-logs"
     },
     {
-      "destination": "/phala-cloud/tees-attestation-and-zero-trust-security/attestation",
+      "destination": "/phala-cloud/attestation/overview",
       "source": "/tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability"
     },
     {
@@ -925,11 +926,11 @@
       "source": "/cloud/getting-started"
     },
     {
-      "destination": "/phala-cloud/use-cases/tee_with_fhe_and_mpc",
+      "destination": "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
       "source": "/cloud/use-cases/tee_with_fhe_and_mpc"
     },
     {
-      "destination": "/phala-cloud/use-cases/tee_with_zk_and_zkrollup",
+      "destination": "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
       "source": "/cloud/use-cases/tee_with_zk_and_zkrollup"
     },
     {
@@ -1013,7 +1014,7 @@
       "source": "/references/hackathon-guides/ethglobal-sg-hackathon-guide"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
       "source": "/llm-in-gpu-tee"
     },
     {
@@ -1025,10 +1026,6 @@
       "source": "/phala-cloud/create-cvm/create-with-docker-compose"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
-      "source": "/phala-cloud/create-cvm/create-with-docker-compose"
-    },
-    {
       "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
       "source": "/phala-cloud/getting-started/start-from-cloud-cli"
     },
@@ -1037,19 +1034,19 @@
       "source": "/phala-cloud/launch-an-eliza-agent"
     },
     {
-      "destination": "/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline",
+      "destination": "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
       "source": "/phala-cloud/setup-a-ci-cd-pipeline"
     },
     {
-      "destination": "/phala-cloud/references",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/references"
     },
     {
-      "destination": "/phala-cloud/references",
+      "destination": "/phala-cloud/cvm/overview",
       "source": "/tech-specs"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/gpu-tee/faqs",
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
       "source": "/llm-in-gpu-tee/faqs"
     },
     {
