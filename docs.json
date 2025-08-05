@@ -167,7 +167,7 @@
             "pages": [
               "/phala-cloud/what-is/what-is-phala-cloud",
               {
-                "group": "Get started tutorial",
+                "group": "Getting Started",
                 "icon": "book-open",
                 "pages": [
                   "/phala-cloud/getting-started/sign-up-for-cloud-account",
@@ -180,20 +180,7 @@
                       "/phala-cloud/getting-started/explore-templates/start-from-template"
                     ]
                   },
-                  "/phala-cloud/getting-started/attestation",
-                  {
-                    "group": "Debugging and Analyzing",
-                    "pages": []
-                  },
-                  {
-                    "group": "Use Cases",
-                    "pages": [
-                      "/phala-cloud/getting-started/use-cases/overview",
-                      "/phala-cloud/getting-started/use-cases/tee_with_ai",
-                      "/phala-cloud/getting-started/use-cases/tee_with_fhe_and_mpc",
-                      "/phala-cloud/getting-started/use-cases/tee_with_zk_and_zkrollup"
-                    ]
-                  }
+                  "/phala-cloud/getting-started/attestation"
                 ]
               },
               {
@@ -322,6 +309,23 @@
                 "group": "Phala Cloud API",
                 "icon": "terminal",
                 "pages": ["/phala-cloud/phala-cloud-api/overview"]
+              },
+              {
+                "group": "Successful Cases",
+                "icon": "star",
+
+                "pages": [
+                  "/phala-cloud/cases/best-practices-and-successful-case",
+                  {
+                    "group": "Use Cases",
+                    "pages": [
+                      "/phala-cloud/cases/use-cases/overview",
+                      "/phala-cloud/cases/use-cases/tee_with_ai",
+                      "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
+                      "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup"
+                    ]
+                  }
+                ]
               },
               "/phala-cloud/faqs",
               "/phala-cloud/best-ractices-and-successful-case"
