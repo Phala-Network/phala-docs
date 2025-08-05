@@ -6,12 +6,7 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "errors": {
     "404": {
@@ -268,9 +263,7 @@
               {
                 "group": "Storage",
                 "icon": "database",
-                "pages": [
-                  "/phala-cloud/storage/access-database"
-                ]
+                "pages": ["/phala-cloud/storage/access-database"]
               },
               {
                 "group": "Code Updates",
@@ -311,18 +304,16 @@
               {
                 "group": "Phala Cloud API",
                 "icon": "terminal",
-                "pages": [
-                  "/phala-cloud/phala-cloud-api/overview"
-                ]
+                "pages": ["/phala-cloud/phala-cloud-api/overview"]
               },
               {
                 "group": "Successful Cases",
                 "icon": "star",
                 "pages": [
-                  "/phala-cloud/cases/use-cases/overview",
-                  "/phala-cloud/cases/use-cases/tee_with_ai",
-                  "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
-                  "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
+                  "/phala-cloud/cases/overview",
+                  "/phala-cloud/cases/tee_with_ai",
+                  "/phala-cloud/cases/tee_with_fhe_and_mpc",
+                  "/phala-cloud/cases/tee_with_zk_and_zkrollup",
                   "/phala-cloud/cases/best-practices-and-successful-case"
                 ]
               },
