@@ -75,7 +75,7 @@ that maintains the performance advantages of VM-level TEE solutions while addres
 
 ### Portable Confidential Container
 
-Containerization has revolutionized cloud-native application deployment by providing unparalleled portability and scalability through effective data separation. These capabilities are particularly critical for Trusted Execution Environment (TEE) applications, as they directly address the inherent limitations above:
+Containerization has revolutionized cloud-native application deployment by providing unparalleled portability and scalability through effective data separation. These capabilities are particularly critical for TEE applications, as they directly address the inherent limitations above:
 
 * **Security Reliability**: Containerized applications can be seamlessly migrated from compromised TEE hardware to secure instances, preserving code integrity. Combined with our secure data migration mechanism that ensures both forward and backward secrecy, this approach significantly mitigates privacy leakage risks even when individual TEE instances are compromised.
 * **Censorship Resistance**: The architecture’s inherent scalability provides robust defense against Denial-of-Service attacks. Additionally, by decoupling data storage from execution environments, established data availability solutions can be readily integrated to ensure persistent access to application data.
@@ -226,7 +226,7 @@ Our decentralized code management framework bridges these two worlds by placing 
 </Frame>
 
 Our architecture consists of two complementary components: on-chain governance smart contracts and off-chain TEE execution environments connected through dstack-kms. This design establishes the on-chain contracts as the definitive root-of-trust for the entire system. Every\
-operation — from initial deployment to code upgrades — must first be initiated and authorized through the governance contracts before off-chain TEE instances can execute these operations.
+operation — from initial deployment to code updates — must first be initiated and authorized through the governance contracts before off-chain TEE instances can execute these operations.
 
 The governance framework implements a two-tier structure:
 
@@ -237,7 +237,7 @@ The governance framework implements a two-tier structure:
 The enforcement mechanism operates through dstack-kms, which will only provide application\
 secrets to TEE instances running code versions explicitly authorized by the governance contracts. This creates a cryptographically enforced governance system where unauthorized code versions cannot access application data, regardless of administrative privileges.
 
-To illustrate this mechanism, consider a code upgrade process for an application using a multi-\
+To illustrate this mechanism, consider a code update process for an application using a multi-\
 signature AppAuth contract:
 
 1. Developers publish the new code version and submit its cryptographic hash to the AppAuth\

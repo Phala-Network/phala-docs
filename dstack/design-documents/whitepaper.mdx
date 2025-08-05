@@ -226,7 +226,7 @@ Our decentralized code management framework bridges these two worlds by placing 
 </Frame>
 
 Our architecture consists of two complementary components: on-chain governance smart contracts and off-chain TEE execution environments connected through dstack-kms. This design establishes the on-chain contracts as the definitive root-of-trust for the entire system. Every\
-operation — from initial deployment to code upgrades — must first be initiated and authorized through the governance contracts before off-chain TEE instances can execute these operations.
+operation — from initial deployment to code updates — must first be initiated and authorized through the governance contracts before off-chain TEE instances can execute these operations.
 
 The governance framework implements a two-tier structure:
 
@@ -237,7 +237,7 @@ The governance framework implements a two-tier structure:
 The enforcement mechanism operates through dstack-kms, which will only provide application\
 secrets to TEE instances running code versions explicitly authorized by the governance contracts. This creates a cryptographically enforced governance system where unauthorized code versions cannot access application data, regardless of administrative privileges.
 
-To illustrate this mechanism, consider a code upgrade process for an application using a multi-\
+To illustrate this mechanism, consider a code update process for an application using a multi-\
 signature AppAuth contract:
 
 1. Developers publish the new code version and submit its cryptographic hash to the AppAuth\

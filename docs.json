@@ -1,16 +1,17 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
-  "styling": {
-    "codeblocks": "system"
-  },
   "colors": {
     "dark": "#9FDC00",
     "light": "#E8FF7A",
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -18,9 +19,6 @@
     }
   },
   "favicon": "/favicon.ico",
-  "icons": {
-    "library": "lucide"
-  },
   "footer": {
     "links": [
       {
@@ -139,6 +137,9 @@
       "x": "https://x.com/PhalaNetwork"
     }
   },
+  "icons": {
+    "library": "lucide"
+  },
   "integrations": {
     "ga4": {
       "measurementId": "G-RHRW9RL5LG"
@@ -159,7 +160,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Phala Cloud",
         "icon": "cloud",
         "pages": [
           {
@@ -268,10 +268,12 @@
               {
                 "group": "Storage",
                 "icon": "database",
-                "pages": ["/phala-cloud/storage/access-database"]
+                "pages": [
+                  "/phala-cloud/storage/access-database"
+                ]
               },
               {
-                "group": "Code Upgrading",
+                "group": "Code Updates",
                 "icon": "git-branch",
                 "pages": [
                   "/phala-cloud/upgrading/upgrade-application",
@@ -298,7 +300,7 @@
                 ]
               },
               {
-                "group": "Monitoring",
+                "group": "Logging & Monitoring",
                 "icon": "chart-line",
                 "pages": [
                   "/phala-cloud/monitoring/public-logs",
@@ -309,29 +311,27 @@
               {
                 "group": "Phala Cloud API",
                 "icon": "terminal",
-                "pages": ["/phala-cloud/phala-cloud-api/overview"]
+                "pages": [
+                  "/phala-cloud/phala-cloud-api/overview"
+                ]
               },
               {
                 "group": "Successful Cases",
                 "icon": "star",
                 "pages": [
-                  "/phala-cloud/cases/best-practices-and-successful-case",
-                  {
-                    "group": "Use Cases",
-                    "pages": [
-                      "/phala-cloud/cases/use-cases/overview",
-                      "/phala-cloud/cases/use-cases/tee_with_ai",
-                      "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
-                      "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup"
-                    ]
-                  }
+                  "/phala-cloud/cases/use-cases/overview",
+                  "/phala-cloud/cases/use-cases/tee_with_ai",
+                  "/phala-cloud/cases/use-cases/tee_with_fhe_and_mpc",
+                  "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
+                  "/phala-cloud/cases/best-practices-and-successful-case"
                 ]
               },
               "/phala-cloud/faqs",
               "/phala-cloud/support"
             ]
           }
-        ]
+        ],
+        "tab": "Phala Cloud"
       },
       {
         "icon": "terminal",
@@ -1113,5 +1113,9 @@
       "destination": "/network/references/support/compatibility-matrix",
       "source": "/references/support/compatibility-matrix"
     }
-  ]
+  ],
+  "styling": {
+    "codeblocks": "system"
+  },
+  "theme": "maple"
 }
