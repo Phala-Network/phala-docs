@@ -189,7 +189,8 @@
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
                   "/phala-cloud/cvm/production-checklist",
-                  "/phala-cloud/cvm/performance-report"
+                  "/phala-cloud/cvm/performance-report",
+                  "/phala-cloud/cvm/image/overview"
                 ]
               },
               {
@@ -250,7 +251,6 @@
                   "/phala-cloud/attestation/verifying-attestation"
                 ]
               },
-              "/phala-cloud/image/overview",
               {
                 "group": "Networking",
                 "icon": "network",
