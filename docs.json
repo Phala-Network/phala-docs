@@ -313,7 +313,6 @@
               {
                 "group": "Successful Cases",
                 "icon": "star",
-
                 "pages": [
                   "/phala-cloud/cases/best-practices-and-successful-case",
                   {
@@ -530,6 +529,38 @@
   },
   "redirects": [
     {
+      "destination": "/phala-cloud/getting-started/overview",
+      "source": "/phala-cloud/phala-cloud-user-guides"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
+      "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli"
+    },
+    {
+      "destination": "/phala-cloud/networking/setting-up-custom-domain",
+      "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain"
+    },
+    {
+      "destination": "/phala-cloud/cvm/create-with-private-docker-image",
+      "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
+      "source": "/phala-cloud/references/tee-cloud-cli/phala/docker"
+    },
+    {
+      "destination": "/phala-cloud/cases/use-cases/overview",
+      "source": "/phala-cloud/use-cases"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
+      "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/tee-cloud-cli/phala/docker",
+      "source": "/phala-cloud/references/tee-cloud-cli"
+    },
+    {
       "destination": "/dstack/overview",
       "source": "/overview/phala-network/dstack"
     },
@@ -610,7 +641,7 @@
       "source": "/phala-cloud/getting-started/explore-templates/index"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
+      "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/index"
     },
     {
@@ -706,7 +737,7 @@
       "source": "/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
+      "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
       "source": "/cloud/getting-started/start-from-cloud-cli"
     },
     {
@@ -990,11 +1021,15 @@
       "source": "/phala-cloud/create-cvm"
     },
     {
-      "destination": "/phala-cloud/getting-started/start-from-cloud-ui",
+      "destination": "/phala-cloud/cvm/create-with-docker-compose",
       "source": "/phala-cloud/create-cvm/create-with-docker-compose"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli",
+      "destination": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose",
+      "source": "/phala-cloud/create-cvm/create-with-docker-compose"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
       "source": "/phala-cloud/getting-started/start-from-cloud-cli"
     },
     {
