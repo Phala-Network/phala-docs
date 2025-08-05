@@ -530,6 +530,58 @@
   },
   "redirects": [
     {
+      "destination": "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
+      "source": "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices"
+    },
+    {
+      "destination": "/phala-cloud/networking/overview",
+      "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications"
+    },
+    {
+      "destination": "/phala-cloud/networking/expose-service-port",
+      "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port"
+    },
+    {
+      "destination": "/phala-cloud/cvm/create-with-docker-compose",
+      "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-docker-compose"
+    },
+    {
+      "destination": "/phala-cloud/monitoring/public-logs",
+      "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/debugging-and-analyzing-logs/check-logs"
+    },
+    {
+      "destination": "/phala-cloud/cvm/overview",
+      "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/overview"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-api/overview",
+      "source": "/phala-cloud/references/cloud-api-beta/overview"
+    },
+    {
+      "destination": "/phala-cloud/cvm/overview",
+      "source": "/phala-cloud/references/overview"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "/phala-cloud/references/tee-cloud-cli/overview"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "/phala-cloud/references/tee-cloud-cli/phala/overview"
+    },
+    {
+      "destination": "/phala-cloud/attestation/overview",
+      "source": "/phala-cloud/tees-attestation-and-zero-trust-security/attestation"
+    },
+    {
+      "destination": "/phala-cloud/cases/use-cases/overview",
+      "source": "/phala-cloud/use-cases/overview"
+    },
+    {
+      "destination": "/phala-cloud/cases/use-cases/tee_with_zk_and_zkrollup",
+      "source": "/phala-cloud/use-cases/tee_with_zk_and_zkrollup"
+    },
+    {
       "destination": "/phala-cloud/getting-started/overview",
       "source": "/phala-cloud/phala-cloud-user-guides"
     },
