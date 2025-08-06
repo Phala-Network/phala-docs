@@ -228,7 +228,8 @@
                 "pages": [
                   "/phala-cloud/key-management/key-management-protocol",
                   "/phala-cloud/key-management/cloud-vs-onchain-kms",
-                  "/phala-cloud/key-management/generate-and-persist-key"
+                  "/phala-cloud/key-management/generate-and-persist-key",
+                  "/phala-cloud/key-management/create-crypto-wallet"
                 ]
               },
               {
@@ -268,7 +269,6 @@
                 "pages": [
                   "/phala-cloud/security-and-privacy/security-architecture",
                   "/phala-cloud/security-and-privacy/set-secure-environment-variables",
-                  "/phala-cloud/security-and-privacy/create-crypto-wallet",
                   "/phala-cloud/security-and-privacy/privacy"
                 ]
               },
