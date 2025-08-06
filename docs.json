@@ -259,8 +259,8 @@
                 "group": "Code Updates",
                 "icon": "git-branch",
                 "pages": [
-                  "/phala-cloud/upgrading/upgrade-application",
-                  "/phala-cloud/upgrading/resize-resource"
+                  "/phala-cloud/update/upgrade-application",
+                  "/phala-cloud/update/resize-resource"
                 ]
               },
               {
@@ -828,11 +828,11 @@
       "source": "/phala-cloud/management"
     },
     {
-      "destination": "/phala-cloud/upgrading/upgrade-application",
+      "destination": "/phala-cloud/update/upgrade-application",
       "source": "/migration"
     },
     {
-      "destination": "/phala-cloud/upgrading/upgrade-application",
+      "destination": "/phala-cloud/update/upgrade-application",
       "source": "/phala-cloud/migration"
     },
     {
