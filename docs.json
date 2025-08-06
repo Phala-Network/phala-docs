@@ -188,7 +188,6 @@
                   "/phala-cloud/cvm/set-secure-environment-variables",
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
-                  "/phala-cloud/cvm/production-checklist",
                   "/phala-cloud/cvm/performance-report",
                   "/phala-cloud/cvm/image/overview"
                 ]
@@ -291,6 +290,7 @@
                   "/phala-cloud/monitoring/private-log-viewer"
                 ]
               },
+              "/phala-cloud/production-checklist",
               {
                 "group": "References",
                 "icon": "book",
