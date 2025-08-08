@@ -6,7 +6,12 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -253,7 +258,9 @@
               {
                 "group": "Storage",
                 "icon": "database",
-                "pages": ["/phala-cloud/storage/access-database"]
+                "pages": [
+                  "/phala-cloud/storage/access-database"
+                ]
               },
               {
                 "group": "Code Updates",
@@ -299,7 +306,9 @@
                   "/phala-cloud/references/performance-report",
                   {
                     "group": "Phala Cloud API",
-                    "pages": ["/phala-cloud/phala-cloud-api/overview"]
+                    "pages": [
+                      "/phala-cloud/phala-cloud-api/overview"
+                    ]
                   },
                   {
                     "group": "CLI Reference",
@@ -1174,6 +1183,10 @@
     {
       "destination": "/phala-cloud/cases/tee_with_fhe_and_mpc",
       "source": "/phala-cloud/use-cases/tee_with_fhe_and_mpc"
+    },
+    {
+      "destination": "/overview/pha-token/introduction",
+      "source": "/developers/phat-contract/pay-for-cloud-service"
     }
   ],
   "styling": {
