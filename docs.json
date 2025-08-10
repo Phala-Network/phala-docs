@@ -1188,6 +1188,50 @@
     {
       "destination": "/overview/pha-token/introduction",
       "source": "/developers/phat-contract/pay-for-cloud-service"
+    },
+    {
+      "destination": "/phala-cloud/troubleshooting/debug-your-application",
+      "source": "/test"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-api/overview",
+      "source": "/phala-cloud/references/cloud-api-beta/cvm"
+    },
+    {
+      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "source": "/llm-in-gpu-tee/benchmark"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy/information"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "/legacy/ai-agent-contract/phala-agent-gateway"
+    },
+    {
+      "destination": "/network/references/subbridge/technical-details",
+      "source": "/references/subbridge/technical-details"
+    },
+    {
+      "destination": "/network/references/hackathon-guides/ethglobal-bangkok",
+      "source": "/references/hackathon-guides"
+    },
+    {
+      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
+      "source": "/references/hackathon-guides/ethglobal-singapore"
+    },
+    {
+      "destination": "/phala-cloud/faqs",
+      "source": "/references/faq"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "/dstack/tee-cloud-cli"
+    },
+    {
+      "destination": "/network/references/advanced-topics/run-local-testnet",
+      "source": "references/advanced-topics/scripts/run/pruntime.sh"
     }
   ],
   "styling": {
