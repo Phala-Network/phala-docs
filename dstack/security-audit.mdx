@@ -10,9 +10,9 @@ Phala Network engaged zkSecurity to conduct a comprehensive security audit of th
 
 ## Audit Overview
 
-**Auditor:** zkSecurity  
-**Engagement Period:** May 26 - June 13, 2025  
-**Audit Team:** Two security consultants  
+**Auditor:** zkSecurity
+**Engagement Period:** May 26 - June 13, 2025
+**Audit Team:** Two security consultants
 **Report Date:** May 26, 2025
 
 ### Scope
@@ -65,79 +65,21 @@ The highest-severity finding identified that Dstack was using OVMF Configuration
 
 **Status:** ✅ **Addressed** - Dstack team implemented the recommended OVMF Configuration B.
 
-## Security Architecture Insights
-
-### TEE Measurement Integrity
-
-The audit validated Dstack's approach to TEE measurements using Intel TDX Runtime Measurement Registers (RTMRs):
-
-- **RTMR0-2**: Boot process measurements (firmware, kernel, command-line)
-- **RTMR3**: Application-specific events and Docker compose hash
-- **MRTD**: Immutable root trust measurement
-
-### Remote Attestation (RATLS)
-
-Dstack's implementation of Remote Attestation TLS was reviewed, covering:
-
-- TLS certificate binding to TEE measurements
-- Quote generation and verification
-- Event log replay for measurement validation
-- Integration with custom Certificate Authority
-
-### Production Hardening
-
-The audit examined production image hardening, identifying areas for improvement:
-
-- Removal of debug tools and terminal access
-- Minimization of attack surface
-- Proper service isolation
-- Secure boot process validation
-
-## Strategic Recommendations
-
-### Documentation Enhancement
-The audit emphasized the need for comprehensive documentation covering:
-- Design rationales for security decisions
-- Hardening choices in production images
-- Trust boundary definitions
-- Threat model specifications
-
-### Additional Security Audits
-Recommended areas for future security reviews:
-- **dstack-kms**: Key management service flows
-- **dcap-qvl**: Custom Rust implementation of Intel's quote verification library
-
 ## Implementation Status
 
 The Dstack team has been proactive in addressing audit findings:
 
-✅ **Fixed**: OVMF configuration upgraded to secure mode  
-✅ **Fixed**: Production image hardening improvements  
-✅ **Fixed**: Symbolic link vulnerability patched  
-✅ **Fixed**: Terminal binary removal from production  
-✅ **Enhanced**: Documentation and security guides added  
+✅ **Fixed**: OVMF configuration upgraded to secure mode
+✅ **Fixed**: Production image hardening improvements
+✅ **Fixed**: Symbolic link vulnerability patched
+✅ **Fixed**: Terminal binary removal from production
+✅ **Enhanced**: Documentation and security guides added
 
 ## Access Full Report
 
 <Card title="Download Complete Audit Report" icon="shield-check" href="/images/audits/dstack-audit.pdf">
   Access the complete 39-page security audit report with detailed technical findings, recommendations, and implementation guidance.
 </Card>
-
-## Security Best Practices
-
-Based on the audit findings, consider these security practices when deploying Dstack:
-
-### For Developers
-- Use immutable Docker image digests instead of mutable tags
-- Validate environment variable integrity
-- Implement proper measurement verification
-- Follow the production deployment checklist
-
-### For Operators
-- Use production-hardened images in live environments
-- Implement proper monitoring and logging
-- Validate attestation reports before trusting CVMs
-- Regular security configuration reviews
 
 ## Related Documentation
 
