@@ -1,12 +1,12 @@
 ---
 title: "Dstack Security Audit"
-description: "Third-party security audit of Dstack by zkSecurity covering system architecture, TEE integration, and production hardening"
+description: "Third-party security audit of dstack by zkSecurity covering system architecture, TEE integration, and production hardening"
 icon: "shield-check"
 ---
 
 # Dstack Security Audit
 
-Phala Network engaged zkSecurity to conduct a comprehensive security audit of the Dstack project in May 2025. This audit provides an independent assessment of Dstack's security architecture, implementation quality, and production readiness.
+Phala Network engaged zkSecurity to conduct a comprehensive security audit of the dstack project in May 2025. This audit provides an independent assessment of dstack's security architecture, implementation quality, and production readiness.
 
 ## Audit Overview
 
@@ -59,7 +59,7 @@ The audit identified **12 findings** across different risk levels:
 
 ### Critical Finding: OVMF Configuration
 
-The highest-severity finding identified that Dstack was using OVMF Configuration A, which trusts the Virtual Machine Manager (VMM). The audit recommended moving to Configuration B, which places the VMM outside the Trusted Computing Base (TCB).
+The highest-severity finding identified that dstack was using OVMF Configuration A, which trusts the Virtual Machine Manager (VMM). The audit recommended moving to Configuration B, which places the VMM outside the Trusted Computing Base (TCB).
 
 **Impact:** This configuration choice affects the fundamental trust model of the TEE environment.
 
@@ -67,7 +67,7 @@ The highest-severity finding identified that Dstack was using OVMF Configuration
 
 ## Implementation Status
 
-The Dstack team has been proactive in addressing audit findings:
+The dstack team has been proactive in addressing audit findings:
 
 ✅ **Fixed**: OVMF configuration upgraded to secure mode
 ✅ **Fixed**: Production image hardening improvements
@@ -85,7 +85,7 @@ The Dstack team has been proactive in addressing audit findings:
 
 <CardGroup cols={2}>
   <Card title="Dstack Overview" href="/dstack/overview">
-    Learn about Dstack's architecture and core concepts
+    Learn about dstack's architecture and core concepts
   </Card>
   <Card title="Security Architecture" href="/phala-cloud/security-and-privacy/security-architecture">
     Understand Phala Cloud's security model
@@ -100,4 +100,4 @@ The Dstack team has been proactive in addressing audit findings:
 
 ---
 
-This independent security audit demonstrates Phala Network's commitment to security transparency and continuous improvement of the Dstack platform. The findings and recommendations help ensure that Dstack provides robust security guarantees for confidential computing workloads.
+This independent security audit demonstrates Phala Network's commitment to security transparency and continuous improvement of the dstack platform. The findings and recommendations help ensure that dstack provides robust security guarantees for confidential computing workloads.
