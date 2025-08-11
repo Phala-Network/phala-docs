@@ -274,6 +274,7 @@
                 "group": "Security and Privacy",
                 "icon": "shield",
                 "pages": [
+                  "/phala-cloud/security-and-privacy/security-audit",
                   "/phala-cloud/security-and-privacy/security-architecture",
                   "/phala-cloud/security-and-privacy/set-secure-environment-variables",
                   "/phala-cloud/security-and-privacy/privacy"
@@ -344,12 +345,10 @@
         "icon": "terminal",
         "pages": [
           "/dstack/overview",
-          "/dstack/local-development",
           "/dstack/getting-started",
+          "/dstack/security-audit",
+          "/dstack/local-development",
           "/dstack/hardware-requirements",
-          "/dstack/acknowledgement",
-          "/dstack/media-kit",
-          "/dstack/faqs",
           {
             "group": "Design Documents",
             "pages": [
@@ -358,7 +357,10 @@
               "/dstack/design-documents/key-management-protocol",
               "/dstack/design-documents/tee-controlled-domain-certificates"
             ]
-          }
+          },
+          "/dstack/acknowledgement",
+          "/dstack/media-kit",
+          "/dstack/faqs"
         ],
         "tab": "Dstack"
       },
