@@ -17,7 +17,7 @@ Make sure you have gone through the [Sign-up for Cloud Account](/phala-cloud/get
 Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cloud [dashboard](https://cloud.phala.network/dashboard). Once there, you need to:
 
 1. Set your application **Name** (e.g. "hello-world")
-2.  Paste the config file to describe your service in docker compose format as **compose.yml**. In this tutorial, we deploy a basic jupyter-notebook without any code change.
+2. Paste the config file to describe your service in docker compose format as docker compose file. In this tutorial, we deploy a basic jupyter-notebook without any code change.
 
     <Frame caption="Docker Compose File">
         <img src="/images/create-cvm-02.png" alt="" />
@@ -51,7 +51,6 @@ Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cl
     </Frame>
 
 5.  Click the **Deploy** button to start the deployment process. You will need to wait for a few minutes as the cloud sets everything up. In the meantime, you can enter the CVM details page by clicking the CVM card, and choose **Logs** > **serial** to view the OS log outputs. Note this is the logs of CVM, not your application logs.
-
 
     <div align="center"><Frame caption="The CVM is starting">
         <img src="/images/create-cvm-05.png" alt="" />
@@ -93,12 +92,11 @@ The logs of the container **jupyter** also can be found in above image.
 
 1.  Check the default RA Report. We provide a default [Remote Attestation Report](https://sgx101.gitbook.io/sgx101/sgx-bootstrap/attestation#remote-attestation-primitives) (also known as TEE Proof), which is displayed in the CVM detailed page. To view the entire report, click **View Details → Attestations**.\
 
-
     <Frame caption="Attestations">
         <img src="/images/create-cvm-10.png" alt="" />
     </Frame>
-2.  By clicking the **Check Attestation** button in the certificate chain section, you will be redirected to the [TEE Proof Explorer](https://proof.t16z.com/), where you can verify the quote. You can share this quote with anyone, as it serves as proof that your program is running inside a genuine TEE.\
 
+2.  By clicking the **Check Attestation** button in the certificate chain section, you will be redirected to the [TEE Proof Explorer](https://proof.t16z.com/), where you can verify the quote. You can share this quote with anyone, as it serves as proof that your program is running inside a genuine TEE.\
 
     <Frame caption="Check Attestation">
         <img src="/images/create-cvm-11.png" alt="" />
