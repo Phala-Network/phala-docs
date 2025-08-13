@@ -1,5 +1,6 @@
 ---
 title: Get Attestation and Verifying
+description: Security features and remote attestation capabilities of Phala Cloud
 ---
 
 
@@ -9,116 +10,30 @@ Remote Attestation (RA) is a critical security mechanism in Trusted Execution En
 
 Let’s get into it!
 
-## Attestation Report Overview
+### How to get Attestation Report
 
-An attestation report (or "quote") is a cryptographically signed document containing evidence about the TEE environment, including hardware measurements, runtime measurements, and application-specific data. The Attestation Key sealed by the manufactory in the Quoting Enclave will be used to sign the quote when received request from Challenger. When the remote Challenger receives this report, it can validate that the environment meets expected security properties before trusting it with sensitive data or operations.
+You can get full attestation report at the **CVM Dashboard→Attestation** page.
 
-<Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-8025-945f-ce263a7b96e3.jpg" alt="" />
+<Frame caption="Attestation Report">
+    <img src="/images/getting-started/attestation-01.png" alt="" />
 </Frame>
 
-Source: [https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/attestation-services.html](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/attestation-services.html)
 
-### Key Fields in a TDX Attestation Report
+## How to verify attestation?
 
-Here is an example report generated on Phala Cloud:
+Scroll down and click the button of `Check Attestation` in section of `Certificate Chain → App Cert`.
 
-```bash
-{
-      "tee_tcb_svn": "06010300000000000000000000000000",
-      "mr_seam": "5b38e33a6487958b72c3c12a938eaa5e3fd4510c51aeeab58c7d5ecee41d7c436489d6c8e4f92f160b7cad34207b00c1",
-      "mr_signer_seam": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      "seam_attributes": "0000000000000000",
-      "td_attributes": "0000001000000000",
-      "xfam": "e702060000000000",
-      "mr_td": "c68518a0ebb42136c12b2275164f8c72f25fa9a34392228687ed6e9caeb9c0f1dbd895e9cf475121c029dc47e70e91fd",
-      "mr_config_id": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      "mr_owner": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      "mr_owner_config": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      "rt_mr0": "85e0855a6384fa1c8a6ab36d0dcbfaa11a5753e5a070c08218ae5fe872fcb86967fd2449c29e22e59dc9fec998cb6547",
-      "rt_mr1": "9b43f9f34a64bc7191352585be0da1774a1499e698ba77cbf6184547d53d1770d6524c1cfa00b86352f273fc272a8cfe",
-      "rt_mr2": "7cc2dadd5849bad220ab122c4fbf25a74dc91cc12702447d3b5cac0f49b2b139994f5cd936b293e5f0f14dea4262d668",
-      "rt_mr3": "2c482b5b34f6902293bc203696f407241bfa319d2410a04c604d1021888d6028bf4bd280ff859ee270a0429aac5f0d82",
-      "report_data": "afab9790acb13c4c651c1933a22b5f0663ef22927120dd08cc8291d7e0912d8b1c36eb75cf661a64735042f8e81bbe42cb9ab310ca95bf8d36c44cb8835c901f"
-}
-```
-
-You can check those information at the **CVM Dashboard→Attestation** page.
-
-<Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-80f6-822d-ddfca969efb5.jpg" alt="" />
+<Frame caption="Check Attestation">
+    <img src="/images/getting-started/attestation-02.png" alt="" />
 </Frame>
 
-When you deployed your application on Phala Cloud, you can verify the RTMR3 with the data shown in dashboard attestation page. You can do it with a community tool called [rtmr3-calculator](https://rtmr3-calculator.vercel.app/).
+It will navigate to **TEE Attestation Explorer** to get the verification report of the attestation.
 
-<Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-802e-9b07-eca33e760a18.jpg" alt="" />
+<Frame caption="Attestation Verification Report">
+    <img src="/images/getting-started/attestation-03.png" alt="" />
 </Frame>
 
-_The source code of the rtmr3-calculator:_ [_https://github.com/propeller-heads/rtmr3-calculator_](https://github.com/propeller-heads/rtmr3-calculator)
-
-## Verification Process
-
-When verifying an attestation report, follow these steps:
-
-1. **Verify Signature**: Ensure the attestation report is properly signed by a valid TEE certificate.
-2. **Verify Certificate Chain**: Validate the entire certificate chain back to a trusted root.
-3. **Check Hardware Identity**: Verify MRSEAM, and TCB values match known-good values.
-4. **Verify System Measurements**: Ensure MRTD, RTMR0-2 values match your security policy.
-5. **Verify Application Measurements**: Check that RTMR3 contains the expected hash of your application components.
-6. **Verify ReportData**: If you used a challenge-response mechanism, verify the reportData contains the expected response.
-
-### Common Verification Targets
-
-In a typical attestation verification flow, you'll check:
-
-<Steps>
-<Step>
-**Hardware Integrity**: Ensuring genuine, up-to-date, and properly configured TEE hardware.
-
-* Fields: `tee_tcb_svn` (or **tcbStatus**, **advisoryIds**), `MRSEAM`
-</Step>
-
-<Step>
-**System Integrity**: Verifying the System running in the TEE.
-
-* Fields: `MRTD`, `RTMR0`, `RTMR1`, `RTMR2`
-</Step>
-
-<Step>
-**Application Integrity**: Verifying the application running in the TEE is the expected one.
-
-* Fields: `RTMR3`
-</Step>
-
-<Step>
-**Identity Authentication**: Confirming the TEE has the expected identity for secure communication.
-
-* This often involves TLS certificates, blockchain wallet addresses, or other identity proofs embedded in `reportData`
-</Step>
-</Steps>
-
-### dstack-Specific Verification
-
-When working with dstack TEE deployments, pay special attention to:
-
-1. **app-id Verification**: This field is relevant when the CVM is deployed with KMS, which generates application keys based on the app-id.
-2. **compose-hash Verification**: The manifest hash of the currently executing application. This determines the application code executing within the TEE.
-3. **key-provider Verification**: Indicates who distributed the keys for the App. The key is used to encrypt the root filesystem of the CVM. Therefore, it’s important to verify this field.
-4. **reportData**: TLS certificates, blockchain wallet addresses, and social proofs like Twitter handles can be verified through the reportData field.
+This attestation verification report confirms that the attestation is **VERIFIED**. All relevant details are displayed in the image above.
 
 Check more instructions [here](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md) on how Dstack attestation work.
 
-## Conclusion
-
-Understanding attestation reports is crucial for developers working with TEE environments. By correctly interpreting these fields, you can verify that your application is running in a genuine, secure environment with the expected configuration and code.
-
-For more detailed information on Intel TDX attestation, refer to the Intel TDX Module documentation. For dstack-specific attestation flows, consult the dstack documentation and GitHub repository at [https://github.com/dstack-TEE/dstack](https://github.com/dstack-TEE/dstack).
-
-Full verification script: [https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)
-
-## Public PCCS Server
-
-We host a public PCCS server: `https://pccs.phala.network/sgx/certification/v4/`.
-
-When you want to run a local verifier like [`dcap-qvl`](https://github.com/Phala-Network/dcap-qvl), you can use this PCCS server to get the quote collaterals for verification.
