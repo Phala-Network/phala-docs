@@ -1,5 +1,5 @@
 ---
-description: Quick start guide for deploying confidential applications on Phala Cloud.
+description: Get started quickly with Next.js and Python templates on Phala Cloud.
 title: NextJS & Python
 ---
 
@@ -15,7 +15,7 @@ Also, make sure you have gone through the [Sign-up for Cloud Account](/phala-clo
 </Note>
 
 <Tabs>
-<Tab title="next.js Template">
+<Tab title="Next.js Template">
 ### Phala Cloud Next.js Starter
 
 This is a template for developing a [Next.js](https://nextjs.org/)-based app with boilerplate code targeting deployment on [Phala Cloud](https://cloud.phala.network/) and [DStack](https://github.com/dstack-TEE/dstack/). It includes the SDK by default to make integration with TEE features easier. This repo also includes a default Dockerfile and docker-compose.yml for deployment.
@@ -109,7 +109,7 @@ You can copy and paste the `docker-compose.yml` file from this repo to see the e
 Go to your Phala Cloud dashboard and click Deploy. You will have an option for deploying via docker compose file. Click on this option to deploy.
 
 <Frame>
-    <img src="/images/image (10).png" alt="Screenshot" />
+    <img src="/images/create-cvm-01.png" alt="Screenshot" />
 </Frame>
 
 You will come to a CVM configuration page. Click on **Advanced** and replace the default docker compose contents with the following (Make sure to replace the `<docker-username>`with your own:
@@ -125,8 +125,8 @@ services:
       - /var/run/tappd.sock:/var/run/tappd.sock
 ```
 
-<Frame>
-    <img src="/images/image (1) (1) (1).png" alt="Screenshot" />
+<Frame caption="Docker Compose Example">
+    <img src="/images/getting-started/phala-cloud-templates-01.png" alt="Screenshot" />
 </Frame>
 
 #### Deploy via Phala Cloud CLI
@@ -134,7 +134,7 @@ services:
 For those using the CLI, you can deploy from the terminal with:
 
 <Note type="warning">
-Make sure to change the `image`field to match your published docker image (ex: `hashwarlock/my-app:latest`)
+Make sure to change the `image` field to match your published docker image (ex: `0xii/my-app:latest`)
 </Note>
 
 ```sh
@@ -146,38 +146,40 @@ npx phala cvms create -c docker-compose.yml -n my-app
 Your application should be deployed now to your Phala Cloud dashboard. Go to the **Network** tab to be able to open your application.
 
 <Frame>
-    <img src="/images/image (3) (1).png" alt="Screenshot" />
+    <img src="/images/getting-started/phala-cloud-templates-02.png" alt="Screenshot" />
 </Frame>
 
 <Frame>
-    <img src="/images/image (2) (1) (1).png" alt="Screenshot" />
+    <img src="/images/getting-started/phala-cloud-templates-03.png" alt="Screenshot" />
 </Frame>
 
 <Tab title="Python Template">
+
 ## Phala Cloud Python Starter
 
-This is a template for developing a [FastAPI](https://fastapi.tiangolo.com/)-based app with boilerplate code targeting deployment on [Phala Cloud](https://cloud.phala.network/) and [DStack](https://github.com/dstack-TEE/dstack/). It includes the SDK by default to make integration with TEE features easier. This repo also includes a default Dockerfile and docker-compose.yml for deployment.
+This is a template for developing a [FastAPI](https://fastapi.tiangolo.com/)-based app with boilerplate code targeting deployment on [Phala Cloud](https://cloud.phala.network/) and [Dstack](https://github.com/dstack-TEE/dstack). It includes the SDK by default to make integration with TEE features easier. This repo also includes a default Dockerfile and docker-compose.yml for deployment.
 
 ### Development
 
 In this tutorial, we'll start with venv and pip. First, you need to clone this repo:
 
-```
+```bash
 git clone --depth 1 https://github.com/Phala-Network/phala-cloud-python-starter.git
 ```
 
 Next, let's initialize the development environment with venv & pip:
 
-```
+```bash
 python -m venv venv
 source venv/bin/activate
+
 python -m pip install -r requirements.txt
 cp env.example .env
 ```
 
 We also need to download the DStack simulator:
 
-```
+```bash
 # Mac
 wget https://github.com/Leechael/tappd-simulator/releases/download/v0.1.4/tappd-simulator-0.1.4-aarch64-apple-darwin.tgz
 tar -xvf tappd-simulator-0.1.4-aarch64-apple-darwin.tgz
@@ -193,7 +195,7 @@ cd tappd-simulator-0.1.4-x86_64-linux-musl
 
 Once the simulator is running, you need to open another terminal to start your FastAPI development server:
 
-```
+```bash
 # Activate the Python venv
 source venv/bin/activate
 
@@ -205,14 +207,14 @@ By default, the FastAPI development server will listen on port 8000. Open [http:
 
 #### Build and Publish with Docker CLI
 
-```shell
+```bash
 docker build . -t <docker-username>/my-app:latest
 docker push <docker-username>/my-app:latest
 ```
 
 #### Build and Publish with Phala Cloud CLI
 
-```sh
+```bash
 npx phala docker build -i my-app -t latest -f ./Dockerfile
 npx phala docker push -i <docker-username>/my-app:latest
 ```
@@ -228,7 +230,7 @@ You can copy and paste the `docker-compose.yml` file from this repo to see the e
 Go to your Phala Cloud dashboard and click Deploy. You will have an option for deploying via docker compose file. Click on this option to deploy.
 
 <Frame>
-    <img src="/images/image (10).png" alt="Screenshot" />
+    <img src="/images/create-cvm-01.png" alt="Screenshot" />
 </Frame>
 
 You will come to a CVM configuration page. Click on **Advanced** and replace the default docker compose contents with the following (Make sure to replace the `<docker-username>`with your own:
@@ -245,36 +247,38 @@ services:
 ```
 
 <Frame>
-    <img src="/images/image (4) (1).png" alt="Screenshot" />
+    <img src="/images/getting-started/phala-cloud-templates-04.png" alt="Screenshot" />
 </Frame>
 
 Now you can interact with your application by going to the **Network** tab and making calls like the following.
 
 <Frame>
-    <img src="/images/image (5) (1).png" alt="Screenshot" />
+    <img src="/images/getting-started/phala-cloud-templates-05.png" alt="Screenshot" />
 </Frame>
 
-<Frame>
-    <img src="/images/image (6) (1).png" alt="/tdx_quote" />
+<Frame caption="/tdx_quote">
+    <img src="/images/getting-started/phala-cloud-templates-06.png" alt="Screenshot" />
 </Frame>
 
 <Frame caption="/derive_key">
-    <img src="/images/image (7) (1).png" alt="" />
-
+    <img src="/images/getting-started/phala-cloud-templates-07.png" alt="Screenshot" />
 </Frame>
 
-<Frame caption="/eth_account">
-    <img src="/images/image (8) (1).png" alt="" />
+And output of **GET /eth_account**
+```json
+{
+    "address":"0xf75647Ec8372BF710D95ad634EDb1ED198CeAE6C"
+}
+```
 
-</Frame>
-
+Output of **GET /sol_account**
+```json
+{
+    "address":"5JPbG1BP7pZQWsoqQsyCLSvs56SpC2ZAgSHLouVX5Vdn"
+}
+```
 </Tab>
-
-<Frame caption="/sol_account">
-    <img src="/images/image (9) (1).png" alt="" />
-
-</Frame>
 
 ## Conclusion
 
-The last 2 tutorials were key to understanding the basics of deploying a Docker app on a TEE Server. Now you are ready to start building on Dstack! For more info on the design of Dstack, check out the [Design Documents](/dstack/design-documents).
+The last 2 tutorials were key to understanding the basics of deploying a Docker app on a TEE Server. Now you are ready to start building on Dstack! For more info on the design of Dstack, check out the [Design Documents](/dstack/design-documents/whitepaper).
