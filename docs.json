@@ -215,14 +215,20 @@
                 "group": "GPU CVM",
                 "icon": "microchip",
                 "pages": [
-                  "/phala-cloud/gpu/overview",
                   {
-                    "group": "Confidential AI",
+                    "group": "Confidential Model",
                     "pages": [
-                      "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
-                      "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
-                      "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
-                      "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs"
+                      "/phala-cloud/confidential-ai/confidential-model/overview",
+                      "/phala-cloud/confidential-ai/confidential-model/llm-in-tee",
+                      "/phala-cloud/confidential-ai/confidential-model/inference-api",
+                      "/phala-cloud/confidential-ai/confidential-model/benchmark",
+                      "/phala-cloud/confidential-ai/confidential-model/faqs"
+                    ]
+                  },
+                  {
+                    "group": "Confidential GPU",
+                    "pages": [
+                      "/phala-cloud/confidential-ai/confidential-gpu/overview"
                     ]
                   }
                 ]
