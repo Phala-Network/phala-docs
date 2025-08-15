@@ -1,0 +1,400 @@
+---
+description: A simple guide to get you started with Phala Cloud's remote attestation service - a comprehensive solution for storing, sharing, and verifying Intel SGX and TDX attestation quotes.
+title: API Quickstart Guide
+---
+
+## Quick Start
+
+### 1. Upload and Verify a Quote
+
+Upload your attestation quote to Phala Cloud for secure storage and cryptographic verification.
+
+**Requirements:**
+- File must be a binary quote file (typically 4-6KB for TDX, varies for SGX)
+- Supported formats: SGX DCAP quotes, TDX quotes with ECDSA-256 signatures
+- File must contain valid certificate chains for verification
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+      -H "Content-Type: multipart/form-data" \
+      -F "file=@quote.bin"
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    // Assuming you have a file input element
+    const fileInput = document.querySelector('input[type="file"]');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    console.log('Verification result:', result);
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import requests
+
+    # Upload and verify a quote file
+    with open('quote.bin', 'rb') as f:
+        files = {'file': f}
+        response = requests.post(
+            'https://cloud-api.phala.network/api/v1/attestations/verify',
+            files=files
+        )
+    
+    result = response.json()
+    print(f"Success: {result['success']}")
+    print(f"Verified: {result['quote']['verified']}")
+    print(f"Checksum: {result['checksum']}")
+    ```
+  </Tab>
+</Tabs>
+
+**Response:**
+```json
+{
+  "success": true,
+  "quote": {
+    "header": {
+      "version": 4,
+      "ak_type": "ECDSA_P256",
+      "tee_type": "TEE_TDX",
+      "qe_vendor": "0x939a7233f79c4ca9940a0db3957f0607",
+      "user_data": "0x65004f4410967df7fc6a1faf0d9b6fc000000000"
+    },
+    "body": {
+      "mrtd": "0xc68518a0ebb42136c12b2275164f8c72f25fa9a34392228687ed6e9caeb9c0f1dbd895e9cf475121c029dc47e70e91fd",
+      "rtmr0": "0x0bb3d6375f94482cdd24b767e4a0d720348527c4f2ab433d77f842b9394fa1638bb6df83fb0a1301f29c71bf60da48bb",
+      "reportdata": "0x00000000000000000000000000000000000000000000000000000000000000001d7ce0146d345b6e3e28b5605db5bbd7502507092f8f1e8f48c5e8f2d0e750f3"
+    },
+    "verified": true
+  },
+  "checksum": "9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139",
+  "quote_collateral": {
+    "tcb_info": "{\"id\":\"TDX\",\"version\":3,\"fmspc\":\"90c06f000000\"}",
+    "qe_identity": "{\"id\":\"TD_QE\",\"version\":2}"
+  }
+}
+```
+
+**Important:** Save the `checksum` from the response - this unique identifier is used to:
+- Retrieve detailed quote information
+- Get verification collateral data  
+- Download the raw quote file
+- View a shareable web report at `http://proof.t16z.com/reports/{checksum}`
+
+### 2. Get Stored Quote Details
+
+Retrieve full details about any quote stored in Phala Cloud using its checksum:
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl "https://cloud-api.phala.network/api/v1/attestations/view/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/view/${checksum}`);
+    
+    if (response.ok) {
+      const quote = await response.json();
+      console.log('TEE Type:', quote.header.tee_type);
+      console.log('MRTD:', quote.body.mrtd);
+      console.log('Verified:', quote.verified);
+    } else {
+      console.error('Quote not found');
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import requests
+
+    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/view/{checksum}')
+    
+    if response.status_code == 200:
+        quote = response.json()
+        print(f"TEE Type: {quote['header']['tee_type']}")
+        print(f"MRTD: {quote['body']['mrtd']}")
+        print(f"Verified: {quote['verified']}")
+        print(f"Uploaded: {quote['uploaded_at']}")
+    else:
+        print('Quote not found')
+    ```
+  </Tab>
+</Tabs>
+
+**Response Example:**
+```json
+{
+  "header": {
+    "version": 4,
+    "ak_type": "ECDSA_P256",
+    "tee_type": "TEE_TDX",
+    "qe_vendor": "0x939a7233f79c4ca9940a0db3957f0607",
+    "user_data": "0x65004f4410967df7fc6a1faf0d9b6fc000000000"
+  },
+  "body": {
+    "mrtd": "0xc68518a0ebb42136c12b2275164f8c72f25fa9a34392228687ed6e9caeb9c0f1dbd895e9cf475121c029dc47e70e91fd",
+    "rtmr0": "0x0bb3d6375f94482cdd24b767e4a0d720348527c4f2ab433d77f842b9394fa1638bb6df83fb0a1301f29c71bf60da48bb",
+    "rtmr1": "0x154e08f5c1f7b1fce4cbfe1c14f3ba67b70044ede2751487279cd1f2e4239dee99a6d45e24ebde6b6a6f5ae49878e0e6",
+    "rtmr2": "0x9edcd363660e85b71c318324996dda756c372d9f6960edbfa863b1e684822eb48dd95e218ae2b78e51ef97f3b8f5c9dc",
+    "rtmr3": "0x6485726f70094502412a81dc0097b3bd67181f6eb8c647fe6ddb47c8efa38e6f35b88bd99a4ece93c9f3d44be45c58a0",
+    "reportdata": "0x00000000000000000000000000000000000000000000000000000000000000001d7ce0146d345b6e3e28b5605db5bbd7502507092f8f1e8f48c5e8f2d0e750f3"
+  },
+  "verified": true,
+  "uploaded_at": "2025-08-15T16:01:28+00:00",
+  "checksum": "9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
+}
+```
+
+### 3. Download Original Quote Data
+
+Download the original binary quote data stored in Phala Cloud (5,006 bytes for this example):
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl "https://cloud-api.phala.network/api/v1/attestations/raw/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139" \
+      --output quote.bin
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/raw/${checksum}`);
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      
+      // Save to file in browser
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${checksum}.bin`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      console.log(`Downloaded ${blob.size} bytes`);
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import requests
+
+    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}')
+    
+    if response.status_code == 200:
+        with open(f'{checksum}.bin', 'wb') as f:
+            f.write(response.content)
+        print(f'Downloaded {len(response.content)} bytes to {checksum}.bin')
+    else:
+        print('Quote not found')
+    ```
+  </Tab>
+</Tabs>
+
+### 4. Get Verification Collateral
+
+Retrieve the cryptographic collateral that Phala Cloud uses for quote verification:
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl "https://cloud-api.phala.network/api/v1/attestations/collateral/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/collateral/${checksum}`);
+    const collateral = await response.json();
+    
+    // Parse the JSON strings inside the collateral
+    const tcbInfo = JSON.parse(collateral.tcb_info);
+    const qeIdentity = JSON.parse(collateral.qe_identity);
+    
+    console.log('Platform FMSPC:', tcbInfo.fmspc);
+    console.log('TCB Issue Date:', tcbInfo.issueDate);
+    console.log('QE Identity Version:', qeIdentity.version);
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import requests
+    import json
+
+    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/collateral/{checksum}')
+    collateral = response.json()
+    
+    # Parse the JSON strings inside the collateral
+    tcb_info = json.loads(collateral['tcb_info'])
+    qe_identity = json.loads(collateral['qe_identity'])
+    
+    print(f"Platform FMSPC: {tcb_info['fmspc']}")
+    print(f"TCB Issue Date: {tcb_info['issueDate']}")
+    print(f"QE Identity Version: {qe_identity['version']}")
+    ```
+  </Tab>
+</Tabs>
+
+## Understanding the Response
+
+When Phala Cloud verifies your quote, here's what the key fields mean:
+
+- **`success`**: Whether verification completed successfully
+- **`verified`**: Whether the quote passed cryptographic verification (1 = true, 0 = false)
+- **`checksum`**: Unique identifier for this quote (SHA256 hash)
+- **`quote.header.tee_type`**: Either "TEE_SGX" or "TEE_TDX" 
+- **`quote.body.mrtd`**: Measurement of the trusted domain (like a fingerprint of your TD)
+- **`quote.body.rtmr0-3`**: Runtime measurements tracking what's loaded in the TD
+- **`quote.body.reportdata`**: Custom data you can include in the quote (64 bytes)
+- **`quote.header.user_data`**: Additional user data (20 bytes)
+
+## Common Use Cases
+
+### Securing Your Application
+
+1. Generate a quote in your SGX/TDX application
+2. Upload it to Phala Cloud for verification and storage
+3. Check that `verified: true` in the response
+4. Share the `checksum` or web report URL with others
+
+### Building Trust with Remote Parties
+
+1. Store and verify quotes from remote parties using Phala Cloud
+2. Check the `mrtd` value matches expected measurements
+3. Validate `reportdata` contains expected challenge/nonce
+4. Share verification results through web reports
+
+## Error Handling
+
+If Phala Cloud's verification fails, you'll receive different HTTP status codes depending on the issue:
+
+### HTTP 422 Unprocessable Entity (Most Common)
+
+This usually means the uploaded file cannot be processed as a valid attestation quote:
+
+```json
+{
+  "detail": "Invalid quote: malformed quote structure"
+}
+```
+
+**Common causes:**
+- **Wrong file type**: Uploaded a text file, JSON, or other non-binary format instead of raw quote binary
+- **Incomplete quote**: File was truncated during generation or transfer
+- **Invalid quote format**: Quote doesn't follow Intel SGX/TDX DCAP specification
+- **Missing certificate data**: Quote lacks required certificate chains for verification
+- **Corrupted data**: Binary data was modified or corrupted during transfer
+
+### HTTP 400 Bad Request
+
+This occurs when the quote is parseable but fails verification:
+
+```json
+{
+  "detail": "Quote verification failed"
+}
+```
+
+**Common causes:**
+- **Platform not genuine**: Quote didn't come from a real Intel SGX/TDX platform
+- **Revoked certificates**: Platform certificates have been revoked by Intel
+- **Outdated TCB**: Platform firmware (TCB) is out of date
+- **Invalid signatures**: Cryptographic signatures don't match
+
+## Troubleshooting Guide
+
+### 1. Verify Your Quote File
+
+**Check file size:**
+```bash
+# TDX quotes are typically 4-6KB
+# SGX quotes vary but usually 2-8KB
+ls -la quote.bin
+```
+
+**Check file content:**
+```bash
+# Should start with binary data, not text
+hexdump -C quote.bin | head -5
+```
+
+### 2. Test Quote Generation
+
+If you're getting consistent 422 errors:
+
+1. **Verify your quote generation code** produces valid DCAP quotes
+2. **Check certificate inclusion** - quotes must contain certificate chains
+3. **Test with known-good quotes** from Intel samples first
+
+### 3. Platform Issues
+
+For 400 errors after successful upload:
+
+1. **Update platform firmware** to latest TCB version
+2. **Check platform registration** with Intel PCS
+3. **Verify SGX/TDX is properly enabled** in BIOS
+4. **Test quote generation** in a controlled environment
+
+### 4. Network/Transfer Issues
+
+```bash
+# Verify file wasn't corrupted during transfer
+md5sum quote.bin  # Should match source file hash
+
+# Test with curl verbose output
+curl -v -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@quote.bin"
+```
+
+### 5. Getting Help
+
+If problems persist:
+
+1. **Check quote size**: `stat quote.bin` (should be reasonable size, not 0 bytes)
+2. **Verify binary format**: Quote should start with version bytes, not ASCII text
+3. **Test minimal example**: Try with Intel's sample quotes first
+4. **Share error details**: Include the exact error message and file size when reporting issues
+
+## Best Practices
+
+### File Handling
+- Always transfer quote files in **binary mode**
+- Verify file integrity with checksums after transfer
+- Test quote generation with Intel's development tools first
+
+### Error Recovery
+- Implement retry logic for network timeouts
+- Cache verification results to avoid repeated uploads
+- Log detailed error information for debugging
+
+### Development Workflow
+1. **Test locally** with Intel's DCAP verification tools first
+2. **Verify quote format** before uploading to Phala Cloud
+3. **Use staging environment** to test integration
+4. **Monitor verification results** and handle failures gracefully
+
+## Next Steps
+
+- Read the [Detailed API Reference](/phala-cloud/phala-cloud-api/attestations) for complete field descriptions
+- Check out examples for your specific SGX/TDX platform
+- Learn about integrating Phala Cloud's remote attestation service into your application workflow
