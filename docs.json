@@ -6,12 +6,7 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "errors": {
     "404": {
@@ -219,7 +214,6 @@
                     "group": "Confidential Model",
                     "pages": [
                       "/phala-cloud/confidential-ai/confidential-model/overview",
-                      "/phala-cloud/confidential-ai/confidential-model/llm-in-tee",
                       "/phala-cloud/confidential-ai/confidential-model/inference-api",
                       "/phala-cloud/confidential-ai/confidential-model/benchmark",
                       "/phala-cloud/confidential-ai/confidential-model/faqs"
@@ -264,9 +258,7 @@
               {
                 "group": "Storage",
                 "icon": "database",
-                "pages": [
-                  "/phala-cloud/storage/access-database"
-                ]
+                "pages": ["/phala-cloud/storage/access-database"]
               },
               {
                 "group": "Code Updates",
@@ -313,9 +305,7 @@
                   "/phala-cloud/references/performance-report",
                   {
                     "group": "Phala Cloud API",
-                    "pages": [
-                      "/phala-cloud/phala-cloud-api/overview"
-                    ]
+                    "pages": ["/phala-cloud/phala-cloud-api/overview"]
                   },
                   {
                     "group": "CLI Reference",
