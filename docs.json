@@ -210,21 +210,16 @@
                 "group": "GPU CVM",
                 "icon": "microchip",
                 "pages": [
+                  "/phala-cloud/confidential-ai/overview",
                   {
                     "group": "Confidential Model",
                     "pages": [
-                      "/phala-cloud/confidential-ai/confidential-model/overview",
-                      "/phala-cloud/confidential-ai/confidential-model/inference-api",
-                      "/phala-cloud/confidential-ai/confidential-model/benchmark",
-                      "/phala-cloud/confidential-ai/confidential-model/faqs"
+                      "/phala-cloud/confidential-ai/confidential-model/confidential-model"
                     ]
                   },
-                  {
-                    "group": "Confidential GPU",
-                    "pages": [
-                      "/phala-cloud/confidential-ai/confidential-gpu/overview"
-                    ]
-                  }
+                  "/phala-cloud/confidential-ai/confidential-gpu/overview",
+                  "/phala-cloud/confidential-ai/benchmark",
+                  "/phala-cloud/confidential-ai/faqs"
                 ]
               },
               {
