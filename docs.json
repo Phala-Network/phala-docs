@@ -239,7 +239,8 @@
                 "pages": [
                   "/phala-cloud/attestation/overview",
                   "/phala-cloud/attestation/get-attestation",
-                  "/phala-cloud/attestation/verifying-attestation"
+                  "/phala-cloud/attestation/verifying-attestation",
+                  "/phala-cloud/attestation/api-quickstart"
                 ]
               },
               {
@@ -301,7 +302,10 @@
                   "/phala-cloud/references/performance-report",
                   {
                     "group": "Phala Cloud API",
-                    "pages": ["/phala-cloud/phala-cloud-api/overview"]
+                    "pages": [
+                      "/phala-cloud/phala-cloud-api/overview",
+                      "/phala-cloud/phala-cloud-api/attestations"
+                    ]
                   },
                   {
                     "group": "CLI Reference",
