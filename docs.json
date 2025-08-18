@@ -1227,6 +1227,98 @@
     {
       "destination": "/network/references/advanced-topics/run-local-testnet",
       "source": "references/advanced-topics/scripts/run/pruntime.sh"
+    },
+    {
+      "destination": "/phala-cloud/production-checklist",
+      "source": "phala-cloud/be-production-ready"
+    },
+    {
+      "destination": "/phala-cloud/what-is/what-is-phala-cloud",
+      "source": "phala-cloud/references/phala-cloud-pricing"
+    },
+    {
+      "destination": "/phala-cloud/networking/expose-service-port",
+      "source": "phala-cloud/migration/expose-service-port"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "phala-cloud/phala-cloud-cli/.env"
+    },
+    {
+      "destination": "/phala-cloud/cvm/performance-report",
+      "source": "phala-cloud/cvm/performance-report"
+    },
+    {
+      "destination": "/network/references/support/faucet",
+      "source": "references/support/faucet"
+    },
+    {
+      "destination": "/phala-cloud/storage/access-database",
+      "source": "phala-cloud/migration/access-database"
+    },
+    {
+      "destination": "/phala-cloud/cvm/overview",
+      "source": "my-app:latest"
+    },
+    {
+      "destination": "/phala-cloud/references/phala-cloud-cli/phala/simulator",
+      "source": "phala-cloud/tee-cloud-cli/phala/simulator"
+    },
+    {
+      "destination": "/phala-cloud/what-is/what-is-phala-cloud",
+      "source": "phala-cloud/glossary"
+    },
+    {
+      "destination": "/phala-cloud/cvm/set-secure-environment-variables",
+      "source": "phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables"
+    },
+    {
+      "destination": "/phala-cloud/troubleshooting/debug-your-application",
+      "source": "test"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-api/overview",
+      "source": "phala-cloud/references/cloud-api-beta/cvm"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/staking-mechanism",
+      "source": "~/changes/PGQtvYy7SnIp37A6DgSi/compute-providers/basic-info/staking-mechanism"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "dstack/tee-cloud-cli"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/introduction",
+      "source": "compute-providers/basic-info"
+    },
+    {
+      "destination": "/phala-cloud/cvm/overview",
+      "source": "var/run/tappd.sock:/var/run/tappd.sock"
+    },
+    {
+      "destination": "/network/references/support/compatibility-matrix",
+      "source": "references/support/compatibility-matrix.md"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/introduction",
+      "source": "compute-providers/basic-info/introduction.md"
+    },
+    {
+      "destination": "/phala-cloud/monitoring/public-logs",
+      "source": "cloud/management/check-logs"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "agent-wars-legacy/getting-started/create-and-play-with-social-agents"
+    },
+    {
+      "destination": "/phala-cloud/networking/expose-service-port",
+      "source": "cloud/migration/expose-service-port"
+    },
+    {
+      "destination": "/network/references/archived-projects",
+      "source": "legacy/framehub"
     }
   ],
   "styling": {
