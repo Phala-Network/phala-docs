@@ -214,7 +214,8 @@
                   {
                     "group": "Confidential Model",
                     "pages": [
-                      "/phala-cloud/confidential-ai/confidential-model/confidential-model"
+                      "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
+                      "/phala-cloud/confidential-ai/confidential-model/confidential-ai-models"
                     ]
                   },
                   "/phala-cloud/confidential-ai/confidential-gpu/overview",
