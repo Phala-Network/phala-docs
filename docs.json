@@ -90,19 +90,19 @@
         "header": "Confidential AI",
         "items": [
           {
-            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/overview",
             "label": "LLM in GPU TEE"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
             "label": "GPU TEE Inference API"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/benchmark",
             "label": "Benchmark"
           },
           {
-            "href": "https://docs.phala.network/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
+            "href": "https://docs.phala.network/phala-cloud/confidential-ai/faqs",
             "label": "FAQs"
           }
         ]
@@ -629,7 +629,7 @@
       "source": "/overview/phala-network/dstack"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/overview/phala-network/gpu-tee"
     },
     {
@@ -769,43 +769,43 @@
       "source": "/tech-specs/blockchain/index"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/overview/phala-network/confidential-ai-inference"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/confidential-ai-inference/getting-started"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/confidential-ai-inference/confidential-ai-api"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/confidential-ai-inference/host-llm-in-tee"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/confidential-ai-inference/implementation"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/benchmark",
       "source": "/confidential-ai-inference/benchmark"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/benchmark",
       "source": "/confidential-ai/gpu-tee/benchmark"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/benchmark",
       "source": "/phala-cloud/confidential-ai-inference/benchmark"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/benchmark",
       "source": "/phala-cloud/confidential-ai/gpu-tee/benchmark"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
@@ -909,19 +909,19 @@
       "source": "/legacy/phala-sdk"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
       "source": "/llm-in-gpu-tee/inference-api"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
       "source": "/phala-cloud/confidential-ai/gpu-tee/inference-api"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/llm-in-gpu-tee/llm-in-tee"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/phala-cloud/confidential-ai/gpu-tee/llm-in-tee"
     },
     {
@@ -1117,7 +1117,7 @@
       "source": "/references/hackathon-guides/ethglobal-sg-hackathon-guide"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/llm-in-tee",
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/llm-in-gpu-tee"
     },
     {
@@ -1153,11 +1153,11 @@
       "source": "/tech-specs"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
+      "destination": "/phala-cloud/confidential-ai/faqs",
       "source": "/llm-in-gpu-tee/faqs"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/faqs",
+      "destination": "/phala-cloud/confidential-ai/faqs",
       "source": "/phala-cloud/confidential-ai/gpu-tee/faqs"
     },
     {
@@ -1193,7 +1193,7 @@
       "source": "/phala-cloud/references/cloud-api-beta/cvm"
     },
     {
-      "destination": "/phala-cloud/gpu/confidential-ai/gpu-tee/benchmark",
+      "destination": "/phala-cloud/confidential-ai/benchmark",
       "source": "/llm-in-gpu-tee/benchmark"
     },
     {
