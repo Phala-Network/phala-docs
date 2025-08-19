@@ -9,28 +9,71 @@ title: Attestation API
 
 Upload an SGX or TDX attestation quote to Phala Cloud for secure storage and cryptographic verification.
 
-**Request:**
-- **Method**: `POST`
-- **Content-Type**: `multipart/form-data`
-- **Body**: Binary quote file (4-6KB for TDX, 2-8KB for SGX)
+**Request Options:**
 
-**File Requirements:**
-- Must be a valid Intel SGX DCAP or TDX quote in binary format
+The endpoint supports three input formats:
+
+1. **File Upload** (multipart/form-data)
+2. **Hex String JSON** (application/json)  
+3. **Hex String Form Data** (application/x-www-form-urlencoded)
+
+**Quote Requirements:**
+- Must be a valid Intel SGX DCAP or TDX quote (4-6KB for TDX, 2-8KB for SGX)
 - Must contain complete certificate chains for verification
 - Supported signature types: ECDSA-P256
 - Quote must be generated from a genuine Intel SGX/TDX platform
 
+#### Option 1: File Upload
+
+**Request:**
+- **Method**: `POST`
+- **Content-Type**: `multipart/form-data`
+- **Body**: Binary quote file in the `file` field
+
+#### Option 2: Hex String JSON
+
+**Request:**
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+- **Body**: JSON object with `hex` field containing quote data as hexadecimal string
+
+#### Option 3: Hex String Form Data
+
+**Request:**
+- **Method**: `POST`
+- **Content-Type**: `application/x-www-form-urlencoded`
+- **Body**: Form data with `hex` field containing quote data as hexadecimal string
+
+**Hex String Format:**
+- Supports both with and without `0x` prefix (e.g., `0x48656c6c6f` or `48656c6c6f`)
+- Case insensitive (both uppercase and lowercase hex digits accepted)
+- Whitespace is automatically trimmed
+
 <Tabs>
-  <Tab title="cURL">
+  <Tab title="File Upload - cURL">
     ```bash
     curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
       -H "Content-Type: multipart/form-data" \
       -F "file=@quote.bin"
     ```
   </Tab>
-  <Tab title="JavaScript">
+  <Tab title="Hex JSON - cURL">
+    ```bash
+    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+      -H "Content-Type: application/json" \
+      -d '{"hex": "0x48656c6c6f20576f726c64..."}'
+    ```
+  </Tab>
+  <Tab title="Hex Form - cURL">
+    ```bash
+    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -d "hex=48656c6c6f20576f726c64..."
+    ```
+  </Tab>
+  <Tab title="File Upload - JavaScript">
     ```javascript
-    // Assuming you have a file input element
+    // Upload binary file
     const fileInput = document.querySelector('input[type="file"]');
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
@@ -47,7 +90,27 @@ Upload an SGX or TDX attestation quote to Phala Cloud for secure storage and cry
     }
     ```
   </Tab>
-  <Tab title="Python">
+  <Tab title="Hex JSON - JavaScript">
+    ```javascript
+    // Send hex string as JSON
+    const hexData = "0x48656c6c6f20576f726c64..."; // Your quote as hex
+    
+    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ hex: hexData })
+    });
+
+    const verification = await response.json();
+    if (verification.success) {
+      console.log('Quote verified:', verification.quote.verified);
+      console.log('Checksum:', verification.checksum);
+    }
+    ```
+  </Tab>
+  <Tab title="File Upload - Python">
     ```python
     import requests
 
@@ -58,6 +121,42 @@ Upload an SGX or TDX attestation quote to Phala Cloud for secure storage and cry
             'https://cloud-api.phala.network/api/v1/attestations/verify',
             files=files
         )
+    
+    verification = response.json()
+    if verification['success']:
+        print(f"Quote verified: {verification['quote']['verified']}")
+        print(f"Checksum: {verification['checksum']}")
+    ```
+  </Tab>
+  <Tab title="Hex JSON - Python">
+    ```python
+    import requests
+
+    # Send quote as hex string
+    hex_data = "0x48656c6c6f20576f726c64..."  # Your quote as hex
+    
+    response = requests.post(
+        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        json={'hex': hex_data}
+    )
+    
+    verification = response.json()
+    if verification['success']:
+        print(f"Quote verified: {verification['quote']['verified']}")
+        print(f"Checksum: {verification['checksum']}")
+    ```
+  </Tab>
+  <Tab title="Hex Form - Python">
+    ```python
+    import requests
+
+    # Send quote as hex form data
+    hex_data = "48656c6c6f20576f726c64..."  # Your quote as hex (no 0x prefix needed)
+    
+    response = requests.post(
+        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        data={'hex': hex_data}
+    )
     
     verification = response.json()
     if verification['success']:
@@ -91,7 +190,30 @@ Upload an SGX or TDX attestation quote to Phala Cloud for secure storage and cry
 
 **Error Responses:**
 
-- **422 Unprocessable Entity**: Quote file cannot be parsed
+- **400 Bad Request**: Input validation errors
+  ```json
+  {
+    "detail": "Either 'file' or 'hex' must be provided"
+  }
+  ```
+  ```json
+  {
+    "detail": "Only one of 'file' or 'hex' should be provided"
+  }
+  ```
+  ```json
+  {
+    "detail": "Invalid JSON hex: Invalid hex string: non-hexadecimal number found in fromhex() arg at position 0"
+  }
+  ```
+  ```json
+  {
+    "detail": "Invalid form hex: Invalid hex string: non-hexadecimal number found in fromhex() arg at position 0"
+  }
+  ```
+  *Common causes: Missing input, providing both file and hex, invalid hex characters, empty hex string*
+
+- **422 Unprocessable Entity**: Quote data cannot be parsed
   ```json
   {
     "detail": "Invalid quote: malformed quote structure"
