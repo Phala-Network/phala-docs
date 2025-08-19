@@ -10,21 +10,39 @@ title: API Quickstart Guide
 Upload your attestation quote to Phala Cloud for secure storage and cryptographic verification.
 
 **Requirements:**
-- File must be a binary quote file (typically 4-6KB for TDX, varies for SGX)
+- Quote data must be a valid SGX DCAP or TDX quote (typically 4-6KB for TDX, varies for SGX)
 - Supported formats: SGX DCAP quotes, TDX quotes with ECDSA-256 signatures
-- File must contain valid certificate chains for verification
+- Quote must contain valid certificate chains for verification
+
+**Input Options:**
+- **File Upload**: Binary quote file via multipart/form-data
+- **Hex String**: Quote data as hexadecimal string (JSON or form data)
 
 <Tabs>
-  <Tab title="cURL">
+  <Tab title="File Upload - cURL">
     ```bash
     curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
       -H "Content-Type: multipart/form-data" \
       -F "file=@quote.bin"
     ```
   </Tab>
-  <Tab title="JavaScript">
+  <Tab title="Hex JSON - cURL">
+    ```bash
+    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+      -H "Content-Type: application/json" \
+      -d '{"hex": "0x48656c6c6f20576f726c64..."}'
+    ```
+  </Tab>
+  <Tab title="Hex Form - cURL">
+    ```bash
+    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -d "hex=48656c6c6f20576f726c64..."
+    ```
+  </Tab>
+  <Tab title="File Upload - JavaScript">
     ```javascript
-    // Assuming you have a file input element
+    // Upload binary file
     const fileInput = document.querySelector('input[type="file"]');
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
@@ -38,7 +56,24 @@ Upload your attestation quote to Phala Cloud for secure storage and cryptographi
     console.log('Verification result:', result);
     ```
   </Tab>
-  <Tab title="Python">
+  <Tab title="Hex JSON - JavaScript">
+    ```javascript
+    // Send hex string as JSON
+    const hexData = "0x48656c6c6f20576f726c64..."; // Your quote as hex
+    
+    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ hex: hexData })
+    });
+
+    const result = await response.json();
+    console.log('Verification result:', result);
+    ```
+  </Tab>
+  <Tab title="File Upload - Python">
     ```python
     import requests
 
@@ -56,8 +91,43 @@ Upload your attestation quote to Phala Cloud for secure storage and cryptographi
     print(f"Checksum: {result['checksum']}")
     ```
   </Tab>
-</Tabs>
+  <Tab title="Hex JSON - Python">
+    ```python
+    import requests
 
+    # Send quote as hex string
+    hex_data = "0x48656c6c6f20576f726c64..."  # Your quote as hex
+    
+    response = requests.post(
+        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        json={'hex': hex_data}
+    )
+    
+    result = response.json()
+    print(f"Success: {result['success']}")
+    print(f"Verified: {result['quote']['verified']}")
+    print(f"Checksum: {result['checksum']}")
+    ```
+  </Tab>
+  <Tab title="Hex Form - Python">
+    ```python
+    import requests
+
+    # Send quote as hex form data
+    hex_data = "48656c6c6f20576f726c64..."  # Your quote as hex (no 0x prefix needed)
+    
+    response = requests.post(
+        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        data={'hex': hex_data}
+    )
+    
+    result = response.json()
+    print(f"Success: {result['success']}")
+    print(f"Verified: {result['quote']['verified']}")
+    print(f"Checksum: {result['checksum']}")
+    ```
+  </Tab>
+</Tabs>
 **Response:**
 ```json
 {
@@ -287,9 +357,31 @@ When Phala Cloud verifies your quote, here's what the key fields mean:
 
 If Phala Cloud's verification fails, you'll receive different HTTP status codes depending on the issue:
 
+### HTTP 400 Bad Request (Input Validation)
+
+This occurs when there are problems with the request format or hex string validation:
+
+```json
+{
+  "detail": "Either 'file' or 'hex' must be provided"
+}
+```
+
+```json
+{
+  "detail": "Invalid JSON hex: Invalid hex string: non-hexadecimal number found in fromhex() arg at position 0"
+}
+```
+
+**Common causes:**
+- **Missing input**: No file or hex data provided
+- **Invalid hex format**: Hex string contains non-hexadecimal characters
+- **Empty hex string**: Hex field is empty or only contains whitespace
+- **Both inputs provided**: Both file and hex data sent in same request
+
 ### HTTP 422 Unprocessable Entity (Most Common)
 
-This usually means the uploaded file cannot be processed as a valid attestation quote:
+This usually means the quote data cannot be processed as a valid attestation quote:
 
 ```json
 {
@@ -299,14 +391,15 @@ This usually means the uploaded file cannot be processed as a valid attestation 
 
 **Common causes:**
 - **Wrong file type**: Uploaded a text file, JSON, or other non-binary format instead of raw quote binary
+- **Invalid hex data**: Hex string doesn't represent valid quote data
 - **Incomplete quote**: File was truncated during generation or transfer
 - **Invalid quote format**: Quote doesn't follow Intel SGX/TDX DCAP specification
 - **Missing certificate data**: Quote lacks required certificate chains for verification
 - **Corrupted data**: Binary data was modified or corrupted during transfer
 
-### HTTP 400 Bad Request
+### HTTP 400 Bad Request (Verification Failed)
 
-This occurs when the quote is parseable but fails verification:
+This occurs when the quote is parseable but fails cryptographic verification:
 
 ```json
 {
@@ -322,30 +415,90 @@ This occurs when the quote is parseable but fails verification:
 
 ## Troubleshooting Guide
 
-### 1. Verify Your Quote File
+### 1. Verify Your Quote Data
 
-**Check file size:**
+**For File Uploads:**
 ```bash
 # TDX quotes are typically 4-6KB
 # SGX quotes vary but usually 2-8KB
 ls -la quote.bin
-```
 
-**Check file content:**
-```bash
 # Should start with binary data, not text
 hexdump -C quote.bin | head -5
 ```
 
-### 2. Test Quote Generation
+**For Hex Strings:**
+```bash
+# Convert file to hex string for testing
+cat quote.bin | hexdump -v -e '/1 "%02x"' > quote.hex
+echo "Quote size: $(wc -c < quote.hex) hex characters"
+
+# Test hex format
+echo "0x$(cat quote.hex)"  # With 0x prefix
+cat quote.hex             # Without prefix
+```
+
+**Validate Hex String:**
+```python
+# Python validation
+import binascii
+
+def validate_hex(hex_str):
+    try:
+        # Remove 0x prefix if present
+        if hex_str.startswith('0x'):
+            hex_str = hex_str[2:]
+        
+        # Convert to bytes
+        data = bytes.fromhex(hex_str)
+        print(f"Valid hex: {len(data)} bytes")
+        return True
+    except ValueError as e:
+        print(f"Invalid hex: {e}")
+        return False
+
+validate_hex("0x48656c6c6f")  # Valid
+validate_hex("invalid_hex")   # Invalid
+```
+
+### 2. Input Format Issues
+
+**Common hex string problems:**
+
+- **Invalid characters**: Only `0-9`, `a-f`, `A-F` allowed
+  ```bash
+  # Good: 48656c6c6f
+  # Bad:  48g56c6c6f (contains 'g')
+  ```
+
+- **Odd length**: Hex strings must have even number of characters
+  ```bash
+  # Good: 48656c6c6f20 (12 chars = 6 bytes)
+  # Bad:  48656c6c6f2   (11 chars = invalid)
+  ```
+
+- **Wrong Content-Type**: Make sure headers match your input format
+  ```bash
+  # For JSON hex
+  curl -H "Content-Type: application/json" -d '{"hex":"..."}'
+  
+  # For form hex
+  curl -H "Content-Type: application/x-www-form-urlencoded" -d "hex=..."
+  
+  # For file upload  
+  curl -H "Content-Type: multipart/form-data" -F "file=@quote.bin"
+  ```
+
+### 3. Test Quote Generation
 
 If you're getting consistent 422 errors:
 
 1. **Verify your quote generation code** produces valid DCAP quotes
 2. **Check certificate inclusion** - quotes must contain certificate chains
 3. **Test with known-good quotes** from Intel samples first
+4. **Validate hex conversion** - ensure binary-to-hex conversion is correct
 
-### 3. Platform Issues
+### 4. Platform Issues
 
 For 400 errors after successful upload:
 
@@ -354,7 +507,7 @@ For 400 errors after successful upload:
 3. **Verify SGX/TDX is properly enabled** in BIOS
 4. **Test quote generation** in a controlled environment
 
-### 4. Network/Transfer Issues
+### 5. Network/Transfer Issues
 
 ```bash
 # Verify file wasn't corrupted during transfer
@@ -366,7 +519,7 @@ curl -v -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
   -F "file=@quote.bin"
 ```
 
-### 5. Getting Help
+### 6. Getting Help
 
 If problems persist:
 
@@ -395,6 +548,6 @@ If problems persist:
 
 ## Next Steps
 
-- Read the [Detailed API Reference](/phala-cloud/phala-cloud-api/attestations) for complete field descriptions
+- Read the [Detailed API Reference](./attestations-reference.md) for complete field descriptions
 - Check out examples for your specific SGX/TDX platform
 - Learn about integrating Phala Cloud's remote attestation service into your application workflow
