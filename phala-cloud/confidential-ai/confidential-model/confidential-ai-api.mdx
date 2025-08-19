@@ -4,11 +4,11 @@ title: Confidential AI API
 ---
 
 
-Phala Cloud provides LLM inference API by connecting to Redpill. By navigating to **Dashboard -> Confidential AI API** page, you will see details.
+Phala Cloud provides various LLM inference API. By navigating to **Dashboard -> Confidential AI API** page, you will see details.
 
 ## Enable API Service
 
-In order to use the API, **user needs to deposit at least $5 in advance to enable a Redpill account** if your balance is not sufficient. You can head to **Dashboard**->**Billing** page then click **Deposit** button to top-up with your bank card or crypto wallet.
+In order to use the API, **user needs to deposit at least $5 in advance to enable Confidential AI API**. If your balance is not sufficient, you can head to **Dashboard**->**Billing** page then click **Deposit** button to top-up with your bank card or crypto wallet.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/confidential-ai-api.png" alt="GPU TEE API" />
@@ -16,13 +16,13 @@ In order to use the API, **user needs to deposit at least $5 in advance to enabl
 
 ## Generate API Key
 
-At the bottom of the page, click the **Enable** button to connect your Cloud account with a Redpill account, and then click the button **Create New API Key**. Copy the key to use when you interact with Redpill API.
+At the bottom of the page, click the **Enable** button and **Create New API Key** to generate your API key. Copy the key to use when you interact with the API key.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/api-keys.png" alt="GPU TEE API Generate Key" />
 </Frame>
 
-[Redpill](https://red-pill.ai/) is a models marketplace that supports private AI inference. It currently supports 6+ models that are running in GPU TEE, you can view them in the models page by clicking the **GPU TEE** checkbox:
+Now we support private AI inference. It currently supports 6+ models that are running in GPU TEE, you can view them in the models page by clicking the **GPU TEE** checkbox:
 
 * [**DeepSeek: DeepSeek V3 0324**](https://redpill.ai/models/phala/deepseek-chat-v3-0324)
 * [**Meta: Llama 3.3 70B Instruct**](https://red-pill.ai/models/phala/llama-3.3-70b-instruct)
@@ -39,7 +39,7 @@ At the bottom of the page, click the **Enable** button to connect your Cloud acc
 
 We provide OpenAI-compatible API for you to send chat requests to the LLM running inside TEE, where you just need to use the API endpoint `https://api.red-pill.ai/v1/chat/completions`. A simple request could be like:
 
-```shell Redpill Confidential Inference Request
+```shell Confidential Inference Request
 curl -X 'POST' \
   'https://api.red-pill.ai/v1/chat/completions' \
   -H 'accept: application/json' \
@@ -73,7 +73,7 @@ data: [DONE]
 
 ## Get TEE Attestation Report
 
-You can verify if the LLM is running in GPU TEE. This can be done by verifying its attestation report. To get the attestation report of the LLM inference, you can do this by sending a POST request to the Redpill API endpoint like below:
+You can verify if the LLM is running in GPU TEE. This can be done by verifying its attestation report. To get the attestation report of the LLM inference, you can do this by sending a POST request to the API endpoint like below:
 
 ```sh
 curl \
@@ -125,7 +125,7 @@ The `signing_address` is the account address generated inside TEE that will be u
 
 `nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See Verify the Attestation for more details.
 
-> Note: The trust chain works as follows: when you verify the attestation report, you trust the model provider (Redpill) and the TEE providers (NVIDIA and Intel). You then trust the open-source, reproducible code by verifying the source code [here](https://github.com/nearai/private-ml-sdk). Finally, you trust the cryptographic key derived inside the TEE. This is why we only need to verify the signature of the message during chat.
+> Note: The trust chain works as follows: when you verify the attestation report, you trust the model provider (Phala Cloud) and the TEE providers (NVIDIA and Intel). You then trust the open-source, reproducible code by verifying the source code [here](https://github.com/nearai/private-ml-sdk). Finally, you trust the cryptographic key derived inside the TEE. This is why we only need to verify the signature of the message during chat.
 
 ## Verify Chat Signature
 
@@ -138,7 +138,7 @@ curl -X 'POST' \
   'https://api.red-pill.ai/v1/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer <REDPILL_API_KEY>' \
+  -H 'Authorization: Bearer <API_KEY>' \
   -d '{
   "messages": [
     {
