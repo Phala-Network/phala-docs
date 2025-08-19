@@ -207,7 +207,7 @@
                 ]
               },
               {
-                "group": "GPU CVM",
+                "group": "Confidential AI",
                 "icon": "microchip",
                 "pages": [
                   "/phala-cloud/confidential-ai/overview",
@@ -1167,10 +1167,6 @@
     {
       "destination": "/phala-cloud/support",
       "source": "/references/support"
-    },
-    {
-      "destination": "/network/references/support/compatibility-matrix",
-      "source": "/references/support/compatibility-matrix"
     },
     {
       "destination": "/network/references/support/compatibility-matrix",
