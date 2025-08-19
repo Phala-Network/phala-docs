@@ -1170,7 +1170,7 @@
     },
     {
       "destination": "/network/references/support/compatibility-matrix",
-      "source": "/references/support/compatibility-matrix.md"
+      "source": "/references/support/compatibility-matrix"
     },
     {
       "destination": "/network/references/support/compatibility-matrix",
@@ -1261,10 +1261,6 @@
       "source": "/phala-cloud/migration/access-database"
     },
     {
-      "destination": "/phala-cloud/cvm/overview",
-      "source": "/my-app:latest"
-    },
-    {
       "destination": "/phala-cloud/references/phala-cloud-cli/phala/simulator",
       "source": "/phala-cloud/tee-cloud-cli/phala/simulator"
     },
@@ -1277,12 +1273,8 @@
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables"
     },
     {
-      "destination": "/network/compute-providers/basic-info/staking-mechanism",
-      "source": "/~/changes/PGQtvYy7SnIp37A6DgSi/compute-providers/basic-info/staking-mechanism"
-    },
-    {
       "destination": "/network/compute-providers/basic-info/introduction",
-      "source": "/compute-providers/basic-info/introduction.md"
+      "source": "/compute-providers/basic-info/introduction"
     },
     {
       "destination": "/network/references/archived-projects",
