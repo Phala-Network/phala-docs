@@ -4,7 +4,7 @@ title: Use AI API
 ---
 
 <Check>
-Run LLMs in secure GPU enclaves with 99% native performance. Our OpenAI-compatible API gives you enterprise-grade privacy without sacrificing speed or ease of use.
+Run LLMs in secure GPU TEE with 99% native performance. Our OpenAI-compatible API gives you enterprise-grade privacy without sacrificing speed or ease of use.
 </Check>
 
 <Tip>
@@ -89,7 +89,7 @@ data: [DONE]
 
 ## Verify Your AI is Running Securely
 
-Every response comes with cryptographic proof that it ran in a secure enclave. Here's how to verify this.
+Every response comes with cryptographic proof that it ran in a secure TEE. Here's how to verify this.
 
 ### Get the Attestation Report
 
@@ -187,7 +187,7 @@ For example, with the previous response ID `chatcmpl-0cdf7629fcfa4135bbdb9936e73
 **Response Fields:**
 - `text`: The message to verify (SHA256 of request + ":" + SHA256 of response)
 - `signature`: The cryptographic signature
-- `signing_address`: The enclave's public key
+- `signing_address`: The public key in TEE
 - `signing_algo`: The signature algorithm used
 
 <Note>Signatures are stored in memory for only 20 minutes after the response is generated.</Note>
