@@ -212,7 +212,7 @@
                 "pages": [
                   "/phala-cloud/confidential-ai/overview",
                   {
-                    "group": "Confidential Model",
+                    "group": "API and Models",
                     "pages": [
                       "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
                       "/phala-cloud/confidential-ai/confidential-model/confidential-ai-models"
