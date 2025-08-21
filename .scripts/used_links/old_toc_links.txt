@@ -162,7 +162,6 @@ references/subbridge/cross-chain-transfer
 references/subbridge/index
 references/support
 references/support/compatibility-matrix
-references/support/compatibility-matrix.md
 references/support/endpoints
 references/support/index
 tech-specs
