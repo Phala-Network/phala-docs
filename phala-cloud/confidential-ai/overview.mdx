@@ -1,52 +1,67 @@
 ---
-description: Run Large Language Models securely in GPU TEE for confidential AI.
+description: Run and inference LLMs securely in GPU TEE for confidential AI.
 title: Overview
 ---
 
-Private AI or called confidential AI addresses critical concerns such as data privacy, secure execution, and computation verifiability, making it indispensable for sensitive applications. As illustrated in the diagram below, people currently cannot fully trust the responses returned by LLMs from services like OpenAI or Meta, due to the lack of cryptographic verification. By running the LLM inside a TEE, we can add verification primitives alongside the returned response, known as a Remote Attestation (RA) Report. This allows users to verify the AI generation results locally without relying on any third parties.
+# Confidential AI
 
-<Frame>
-    <img src="/images/compare-llm-with-tee-or-not.png" alt="Compare LLM with TEE or not" />
-</Frame>
+<img
+  className="block dark:hidden my-0 pointer-events-none"
+  src="/images/confidential-ai/confidential-ai-overview.jpeg"
+/>
 
-Phala Cloud provides two major products to provide GPU TEE for confidential AI.
+Run AI models with enterprise-grade security without sacrificing performance. Phala Cloud Confidential AI protects your models and data using GPU TEE - hardware-isolated environments that keep your AI workloads private and verifiable.
+
+## Why Confidential AI?
+
+Traditional cloud AI deployments expose your models and data to the cloud provider. Confidential AI solves this by running everything inside hardware-protected enclaves. Your models stay private, your data stays secure, and you get cryptographic proof that execution happened in a trusted environment.
+
+## Your Options
+
+Phala Cloud offers two ways to deploy confidential AI:
 
 <Columns cols={2}>
   <Card
-    icon="bot"
+    icon="webhook"
     href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api"
-    title="Confidential Models"
+    title="API and Models"
   >
-    Run Large Language Models in GPU TEE
+    Pre-deployed LLM inference API with OpenAI-compatible interface
   </Card>
   <Card
     icon="microchip"
     title="Confidential GPU"
     href="/phala-cloud/confidential-ai/confidential-gpu/overview"
   >
-    Rent GPU TEE Server to run your own model.
+    Rent dedicated GPU TEE servers for custom model deployment
   </Card>
 </Columns>
 
-**Confidential Models** provide various models to provide hassle-free integration using its OpenAI-compatible format. Deploy seamlessly across cloud, on-premises, or edge environments.
+### API and Models
 
-And if you want to have GPU TEE server to serve your owen GPU service under the protection of TEE, you should choose **Confidential GPU** service. 
+Get started quickly with pre-deployed models running in GPU TEEs. This option works best if you want to:
 
-### Open Source
+- **Use existing code**: Drop-in replacement for OpenAI APIs
+- **Access popular models**: DeepSeek, Llama, GPT-OSS, and Qwen models ready to use
+- **Verify execution**: Get attestation reports proving your code ran in TEE
+- **Pay as you go**: Only pay for what you use
 
-The implementation for running LLMs in GPU TEE is also available in the [private-ml-sdk](https://github.com/nearai/private-ml-sdk) GitHub repository. This project is built by Phala Network and was made possible through a grant from NEARAI. The SDK provides the necessary tools and infrastructure to deploy and run LLMs securely within GPU TEE.
+### Confidential GPU
 
-<Frame>
-    <img src="/images/confidential-ai/confidential-model/private-ml-sdk-repo.png" alt="" />
+Deploy your own models on dedicated GPU TEE servers. Choose this when you need:
+
+- **Custom models**: Run your own fine-tuned or proprietary models
+- **High performance**: H200, H100, and B200 GPUs available
+- **Full control**: Configure CPU, RAM, storage, and location
+- **Flexible scaling**: 1 or 8 GPUs per server, various commitment options
+
+## Open Source Foundation
+
+The underlying technology is open source. Check out the [private-ml-sdk](https://github.com/nearai/private-ml-sdk) repository to see how LLMs run securely in GPU TEEs. This project was built by Phala Network with support from NEARAI.
+
+<Frame caption="Open Source Implementation: Private ML SDK">
+  <img
+    src="/images/confidential-ai/confidential-model/private-ml-sdk-repo.png"
+    alt=""
+  />
 </Frame>
-
-## References
-
-1. [HCC-Whitepaper](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/HCC-Whitepaper-v1.0.pdf)
-2. [Intel SGX DCAP Orientation](https://www.intel.com/content/dam/develop/public/us/en/documents/intel-sgx-dcap-ecdsa-orientation.pdf)
-3. [Phala's dcap-qvl](https://github.com/Phala-Network/dcap-qvl)
-4. [Automata's Solidity Implementation](https://github.com/automata-network/automata-dcap-attestation)
-5. [Phala Nvidia H200 TEE Benchmark Paper](https://arxiv.org/pdf/2409.03992)
-6. [Phala DeRoT Post on FlashBots forum](https://collective.flashbots.net/t/early-thoughts-on-decentralized-root-of-trust/3868)
-7. [Phala Key Management Protocol Post on Flashbots forum](https://collective.flashbots.net/t/key-management-protocol-for-decentralized-root-of-trust/4004)
-8. [Private ML SDK](https://github.com/nearai/private-ml-sdk)
