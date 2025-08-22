@@ -203,7 +203,7 @@ references/phala-sdk
 references/subbridge
 references/subbridge/cross-chain-transfer
 references/subbridge/technical-details
-references/support/compatibility-matrix.md
+references/support/compatibility-matrix
 references/support/endpoints
 tech-specs
 tech-specs/ai-agent-contract

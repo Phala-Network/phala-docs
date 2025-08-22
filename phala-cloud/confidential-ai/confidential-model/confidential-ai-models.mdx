@@ -3,26 +3,41 @@ description: Deploy and manage AI models in a secure, confidential computing env
 title: Deploy Models
 ---
 
-If you want to deploy exclusive LLM service on GPU TEE, Confidential AI Models service is what you want.
+<Note>
+Deploy your AI models in a secure, isolated environment with hardware-level protection. Phala Cloud's Confidential AI Models service runs your models inside TEE on GPU hardware, ensuring your data and model weights stay private.
+</Note>
 
-## Choose LLM Models
+## Deploy Your Model
 
-Click **Confidential AI Models** tab on Phala Cloud dashboard. Choose the model you want to deployh and click button of **Deploy**.
-
+Navigate to the **Confidential AI Models** tab in your Phala Cloud dashboard. You'll see available model templates ready for deployment.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/confidential-ai-models-01.png" alt="Confidential AI Models" />
 </Frame>
 
-1. Set the model service **Name** (e.g., "qwen3-8b-d7a7s")
-2. Choose model in **Model template** (e.g., "qwen3")
-3. **Node & Image**: Usually, leave this option for default value
-4. Choose instance type in **Resource Plan**
-5. Set a specific date of **Scheduled Destroy** and time when this instance will be automatically destroyed. Leave empty for no automatic destruction.
-6. Finally, review the spec in **Deployment Summary** and click **Deploy** button.
+<Note>
+Don't see your preferred model? We can add custom models—just reach out through [Support](/phala-cloud/support).
+</Note>
+
+Pick your model and hit **Deploy** to get started.
+
+## Configure Your Deployment
+
+You'll need to fill in a few details to customize your setup:
+
+1. **Service Name**: Give your deployment a memorable name (e.g., "qwen3-8b-d7a7s")
+2. **Model Template**: Select your preferred model (e.g., "qwen3")
+3. **Node & Image**: Keep the default settings unless you have specific requirements
+4. **Resource Plan**: Choose the instance type that matches your workload needs
+5. **Scheduled Destroy**: Set an auto-destruction date if needed, or leave empty for manual control
+6. **Review**: Check your configuration in the deployment summary
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/confidential-ai-models-02.png" alt="Deploy LLM Model" />
 </Frame>
 
-Congratulations! You exclusive confidential AI model service will be ready soon.
+Review your settings and click **Deploy** to launch.
+
+<Note>
+Our team will contact you directly to complete the rest of the configuration and guide you through the final steps.
+</Note>

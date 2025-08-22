@@ -1,35 +1,44 @@
 ---
-description: Secure LLM inference API running in GPU TEE for confidential AI computing.
+description: Get started quickly with pre-deployed models running in GPU TEE with OpenAI-compatible interface.
 title: Use AI API
 ---
 
-## Overview
+<Check>
+Run LLMs in secure GPU TEE with 99% native performance. Our OpenAI-compatible API gives you enterprise-grade privacy without sacrificing speed or ease of use.
+</Check>
 
-Phala Cloud provides a simple, powerfull and efficiency API to help you access majory LLM through a unified , which could help you use hassle-free integration using its OpenAI-compatible format. Deploy your application seamlessly across cloud, on-premises, or edge environments.
+<Tip>
+Your data stays encrypted during processing, and you can verify the integrity of every response. This gives you enterprise-grade privacy with the simplicity of a standard API.
+</Tip>
 
-Phala Cloud provides various LLM inference API. By navigating to **Dashboard -> Confidential AI API** page, you will see details.
+## What You'll Build
 
-## Enable API Service
+You'll set up secure AI inference that runs in trusted hardware. Your models process data in encrypted GPU enclaves while maintaining near-native performance. Every response comes with cryptographic proof that it ran securely.
 
-In order to use the API, **user needs to deposit at least $5 in advance to enable Confidential AI API**. If your balance is not sufficient, you can head to **Dashboard**->**Billing** page then click **Deposit** button to top-up with your bank card or crypto wallet.
+## Quick Start
+
+### 1. Add Funds
+
+You need at least $5 in your account. Go to **Dashboard** → **Billing** and click **Deposit**.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/confidential-ai-api.png" alt="GPU TEE API" />
 </Frame>
 
-## Generate API Key
+### 2. Enable the API
 
-At the bottom of the page, click the **Enable** button and **Create New API Key** to generate your API key. Copy the key to use when you interact with the API key.
+Navigate to **Dashboard** → **Confidential AI API** and click **Enable**. Then create your first API key.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/api-keys.png" alt="GPU TEE API Generate Key" />
 </Frame>
 
-Now we support private AI inference. It currently supports 6+ models that are running in GPU TEE, you can view them in the models page by clicking the **GPU TEE** checkbox:
+### 3. Choose Your Model
+
+We support 6+ models running in GPU TEE. Click the **GPU TEE** checkbox to see all options:
 
 * [**DeepSeek: DeepSeek V3 0324**](https://redpill.ai/models/phala/deepseek-chat-v3-0324)
-* [**Meta: Llama 3.3 70B Instruct**](https://red-pill.ai/models/phala/llama-3.3-70b-instruct)
-* [**DeepSeek: DeepSeek V3 0324**](https://redpill.ai/models/phala/deepseek-chat-v3-0324)
+* [**Meta: Llama 3.3 70B Instruct**](https://redpill.ai/models/phala/llama-3.3-70b-instruct)
 * [**OpenAI: GPT OSS 120B**](https://redpill.ai/models/phala/gpt-oss-120b)
 * [**Qwen: Qwen3 Coder**](https://redpill.ai/models/phala/qwen3-coder)
 * [**Qwen2.5 7B Instruct**](https://redpill.ai/models/phala/qwen-2.5-7b-instruct)
@@ -38,16 +47,22 @@ Now we support private AI inference. It currently supports 6+ models that are ru
     <img src="/images/confidential-ai/confidential-model/redpill-models.png" alt="Models in TEE" />
 </Frame>
 
-## Chat With Private AI
+## Make Your First Request
 
-We provide OpenAI-compatible API for you to send chat requests to the LLM running inside TEE, where you just need to use the API endpoint `https://api.red-pill.ai/v1/chat/completions`. A simple request could be like:
+Use our OpenAI-compatible endpoint to chat with secure AI:
 
-```shell Confidential Inference Request
+```http
+https://api.redpill.ai/v1/chat/completions
+```
+
+Here's a simple example:
+
+```shell
 curl -X 'POST' \
-  'https://api.red-pill.ai/v1/chat/completions' \
+  'https://api.redpill.ai/v1/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer <The API Key you generated previously>' \
+  -H 'Authorization: Bearer <YOUR_API_KEY>' \
   -d '{
   "messages": [
     {
@@ -64,29 +79,31 @@ curl -X 'POST' \
 }'
 ```
 
-**Sample Response**
+You'll get a streaming response like this:
 
-```sh Streaming Output
-...
-
+```sh
 data: {"id":"chatcmpl-0cdf7629fcfa4135bbdb9936e737e95c","object":"chat.completion.chunk","created":1740415146,"model":"/mnt/models/deepseek-r1-70b/deepseek-r1-70b.guff","choices":[{"index":0,"delta":{"content":""},"logprobs":null,"finish_reason":"stop","stop_reason":128001}]}
 
 data: [DONE]
 ```
 
-## Get TEE Attestation Report
+## Verify Your AI is Running Securely
 
-You can verify if the LLM is running in GPU TEE. This can be done by verifying its attestation report. To get the attestation report of the LLM inference, you can do this by sending a POST request to the API endpoint like below:
+Every response comes with cryptographic proof that it ran in a secure TEE. Here's how to verify this.
+
+### Get the Attestation Report
+
+Request an attestation report for any model:
 
 ```sh
 curl \
-  'https://api.red-pill.ai/v1/attestation/report?model=phala/deepseek-chat-v3-0324' \
+  'https://api.redpill.ai/v1/attestation/report?model=phala/deepseek-chat-v3-0324' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer <The API Key you generated previously>'
+  -H 'Authorization: Bearer <YOUR_API_KEY>'
 ```
 
-The response will be like:
+The response includes:
 
 ```sh
 {
@@ -103,15 +120,13 @@ The response will be like:
 }
 ```
 
-The `signing_address` is the account address generated inside TEE that will be used to sign the chat message later.
+The `signing_address` is a cryptographic key generated inside the TEE. It's used to sign chat responses, proving they came from the verified hardware.
 
-The `all_attestations` is the list of all the attestations of all GPU nodes since we add more TEE nodes to serve the inference requests. You can utilize the `signing_address` from the `all_attestations` to select the appropriate TEE node for verifying its integrity.
+The `all_attestations` list contains attestations from all GPU nodes in our network. Use any `signing_address` from this list to verify the integrity of that specific node.
 
-## Verify Attestation Report
+### Verify GPU Attestation
 
-### GPU Attestation Report
-
-You can copy the value of nvidia\_payload as the whole payload as followed to verify:
+Copy the `nvidia_payload` and verify with NVIDIA:
 
 ```sh
 curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
@@ -120,49 +135,21 @@ curl -X POST https://nras.attestation.nvidia.com/v3/attest/gpu \
  -d "<NVIDIA_PAYLOAD_FROM_ABOVE>"
 ```
 
-### TDX Attestation Report
+### Verify Intel TDX Attestation
 
-You can verify the Intel TDX Attestation Report, aka quote with the value of `intel_quote` at [TEE Attestation Explorer](https://proof.t16z.com/).
+Verify the Intel TDX attestation quote using the `intel_quote` value at the [TEE Attestation Explorer](https://proof.t16z.com/).
 
-The `signing_address` is the account address generated inside TEE that will be used to sign the chat response. You can go to https://etherscan.io/verifiedSignatures, click Verify Signature, and paste the `signing_address` and message response to verify it.
+## Verify Chat Signatures
 
-`nvidia_payload` and `intel_quote` are the attestation report from NVIDIA TEE and Intel TEE respectively. You can use them to verify the integrity of the TEE. See Verify the Attestation for more details.
+Every chat response includes a cryptographic signature. Here's how to verify them.
 
-> Note: The trust chain works as follows: when you verify the attestation report, you trust the model provider (Phala Cloud) and the TEE providers (NVIDIA and Intel). You then trust the open-source, reproducible code by verifying the source code [here](https://github.com/nearai/private-ml-sdk). Finally, you trust the cryptographic key derived inside the TEE. This is why we only need to verify the signature of the message during chat.
+### Get the Signature
 
-## Verify Chat Signature
+When you chat with an LLM, the response contains an `id` field.
 
-If you chat with the LLM, the response will contain an `id` which you can use to get the chat Signature later.
+<Note>Use this ID to retrieve the signature within 20 minutes.</Note>
 
-**Sample Request**
-
-```sh
-curl -X 'POST' \
-  'https://api.red-pill.ai/v1/chat/completions' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer <API_KEY>' \
-  -d '{
-  "messages": [
-    {
-      "content": "You are a helpful assistant.",
-      "role": "system"
-    },
-    {
-      "content": "What is your model name?",
-      "role": "user"
-    }
-  ],
-  "stream": true,
-  "model": "phala/deepseek-chat-v3-0324"
-}'
-```
-
-That sha256 of the request body is **e5542b0757e0b9d05bfa4a15da7bac97a03bd35d21b648ec492152708e795ff9**
-
-(note: in this example, there is no new line in the end of request)
-
-**Simple Response**
+**Sample Response**
 
 ```
 ...
@@ -172,20 +159,19 @@ data: {"id":"chatcmpl-0cdf7629fcfa4135bbdb9936e737e95c","object":"chat.completio
 data: [DONE]
 ```
 
-The sha256sum of response body is 7a97926adb2044fd598b392eee98ad8f7c39ea3a47747ca968ef755bbf57c211
+The SHA256 hash of the response body is: **7a97926adb2044fd598b392eee98ad8f7c39ea3a47747ca968ef755bbf57c211**
 
-(note: in this example, there are two new line in the end of response)
+The response `id` is calculated as: `sha256sum(sha256sum(request_body) + sha256sum(response_body))`
 
-The `id` is calculated by sha256sum(sha256sum(request\_body) + sha256sum(response\_body)).
+### Request the Signature
 
-### Request Chat Signature
+Use the response `id` to get the signature:
 
-By default, you can query another API with the value of id in the response in 30 minutes.
+```sh
+GET https://api.redpill.ai/v1/signature/{request_id}?model={model_id}&signing_algo=ecdsa
+```
 
-Request\
-GET `https://api.red-pill.ai/v1/signature/{request_id}?model={model_id}&signing_algo=ecdsa`
-
-For example, the response in the previous section, the id is `chatcmpl-0cdf7629fcfa4135bbdb9936e737e95c`:
+For example, with the previous response ID `chatcmpl-0cdf7629fcfa4135bbdb9936e737e95c`:
 
 **Response**
 
@@ -198,23 +184,21 @@ For example, the response in the previous section, the id is `chatcmpl-0cdf7629f
 }
 ```
 
-* text: the message you may want to verify. It is joined by the sha256 of the HTTP request body, and of the HTTP response body, separated by a colon :.
-* signature: the signature data.
-* signing\_algo: The cryptographic scheme that the signer private key generated.
+**Response Fields:**
+- `text`: The message to verify (SHA256 of request + ":" + SHA256 of response)
+- `signature`: The cryptographic signature
+- `signing_address`: The public key in TEE
+- `signing_algo`: The signature algorithm used
 
-Exactly match the value we calculated in the sample in previous section.
+<Note>Signatures are stored in memory for only 20 minutes after the response is generated.</Note>
 
-**Limitation**
+### Verify on Etherscan
 
-Since the resource limitation, the signature will be kept in the memory for 5 minutes since the response is generated.
+Go to [Etherscan's Signature Verification](https://etherscan.io/verifiedSignatures) and click "Verify Signature":
 
-### Verify Signature on etherscan
-
-Go to https://etherscan.io/verifiedSignatures, click Verify Signature:
-
-* Address: You can get the address from the attestation API. The address should be same if the service did not restart.
-* Message: see the Response of the Signature section. You can also calculate the sha256 by yourself.
-* Signature Hash: See the Signature section.
+- **Address**: Use the `signing_address` from the attestation API
+- **Message**: Use the `text` field from the signature response
+- **Signature Hash**: Use the `signature` field from the signature response
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/signature-verification.png" alt="GPU TEE API Verify Signature" />
