@@ -67,7 +67,7 @@ Current no. There’s a public tracking issue for Terraform: https://github.com/
 
 The cloud CVM supports to expose both HTTP-over-TLS (Zero Trust HTTPS), and TCP-over-tls. You can check our example to expose ssh or other TCP ports here: https://github.com/Dstack-TEE/dstack-examples/tree/main/tcp-port-forwarding
 
-Under the hood, the TEE wraps the tcp ports you have exposed in docker with TLS. The gateway then routes the TLS traffic based on SNI, the domain name attached to the every TLS connection. TLS is needed because it's the only way to multiplex the tcp traffic. When using the tcp-port-forwarding example, it automatically helps you set up the domain and TLS certificate securely in TEE (thus “Zero Trust”), and reverse-proxy the incoming traffic to your tcp port. You can also manually accept TLS traffic in your CVM and handle the certificate on the application level.
+Under the hood, the TEE wraps the tcp ports you have exposed in docker with TLS. The gateway then routes the TLS traffic based on SNI, the domain name attached to every TLS connection. TLS is needed because it's the only way to multiplex the tcp traffic. When using the tcp-port-forwarding example, it automatically helps you set up the domain and TLS certificate securely in TEE (thus “Zero Trust”), and reverse-proxy the incoming traffic to your tcp port. You can also manually accept TLS traffic in your CVM and handle the certificate on the application level.
 
 ### Is there a simulator or free tier available for testing?
 
