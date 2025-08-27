@@ -619,7 +619,7 @@ Contains metadata about the quote and platform.
 - **`tee_type`** (string): Trusted execution environment type:
   - `"TEE_SGX"`: Intel Software Guard Extensions
   - `"TEE_TDX"`: Intel Trust Domain Extensions
-- **`qe_vendor`** (string): Quoting Enclave vendor identifier (hex-encoded)
+- **`qe_vendor`** (string): Quoting vendor identifier (hex-encoded)
 - **`user_data`** (string): User-defined data included in the quote (hex-encoded, 20 bytes)
 
 ### QuoteBody
@@ -701,7 +701,7 @@ Cryptographic collateral required for quote verification.
 - **`tcb_info_issuer_chain`** (string): Certificate chain for TCB info verification
 - **`tcb_info`** (string): JSON string containing Trusted Computing Base information
 - **`tcb_info_signature`** (string): Signature over the TCB info (hex-encoded)
-- **`qe_identity_issuer_chain`** (string): Certificate chain for Quoting Enclave identity
+- **`qe_identity_issuer_chain`** (string): Certificate chain for Quoting identity
 - **`qe_identity`** (string): JSON string containing QE identity information
 - **`qe_identity_signature`** (string): Signature over the QE identity (hex-encoded)
 

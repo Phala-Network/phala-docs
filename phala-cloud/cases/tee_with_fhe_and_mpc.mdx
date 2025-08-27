@@ -29,7 +29,7 @@ Check out earlier thoughts on **[SGX as 2FA for FHE/MPC](https://ethresear.ch/t/
 - Threshold schemes vulnerable to withholding attacks that prevent result finalization
 
 ## TEE as a 2FA Mechanism: Architectural Overview
-TEEs provide hardware-enforced isolation for sensitive operations, combining the benefits of secure enclaves (e.g., Intel TDX) with cryptographic protocols. When integrated with FHE/MPC, TEEs act as a secondary trust layer, ensuring:
+TEEs provide hardware-enforced isolation for sensitive operations, combining the benefits of TEE with cryptographic protocols. When integrated with FHE/MPC, TEEs act as a secondary trust layer, ensuring:
 
 - **Secure Key Generation/Storage**: Cryptographic keys are generated and stored within the TEE, isolated from the host OS or untrusted applications.
 
