@@ -8,7 +8,7 @@ title: Staking Mechanism
 
 Unlike Polkadot or other Proof-of-Stake consensus systems, Phala can manage as many as one million CPU cores from over 100k nodes, which requires our staking mechanism to outperform existing PoS in both performance and efficiency. That’s why we propose **Stake Delegation**, which introduces an extra role of StakePool into our system to connect computing nodes with PHA holders. Anyone can create a StakePool, and a PHA holder can delegate their PHA to the pool. Then the pool Owner can manage and stake for any Workers belonging to the pool.
 
-To secure the cloud of workers and the assigned jobs, the network will set a [Confidence Level](/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level)[ ](/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level)for each worker’s CPU and require Staking (a delegation) to mine. Each worker can only earn value V if it first stakes several PHA tokens based on its CPU score, after which it can enter the staking system and start supplying compute power.
+To secure the cloud of workers and the assigned jobs, the network will set a [Worker Confidence Level](/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level) for each worker’s CPU and require Staking (a delegation) to mine. Each worker can only earn value V if it first stakes several PHA tokens based on its CPU score, after which it can enter the staking system and start supplying compute power.
 
 Suppose a worker misbehaves or fails to respond. In that case, it will be punished by slashing the V, which strongly incentivizes participants to ensure their workers are running properly and disincentivizes attempts to cheat.
 
@@ -33,14 +33,14 @@ Suppose a worker misbehaves or fails to respond. In that case, it will be punish
 
 As shown in the initial image of Figure 1 above,
 
-* Owner-A creates Worker {A, B, C, D};
+* Owner-A creates Worker `{A, B, C, D}`;
 * Owner-A creates Pool-1;
 * Owner-B creates Pool-2;
 
 Illustrated in the secondary visualization of Figure 1, a StakePool can add or manage a Worker only if the Operator of the Worker is the Owner of the pool. In this case,
 
-* Since Owner-A is both the Owner of Pool-1 and the Operator of Worker {A, B, C, D}, Pool-1 can bind Worker {A, B, C, D} to it, and Pool-1 can stake its PHA tokens for these Workers;
-* Owner-B is the Owner of Pool-2, while Pool-2 cannot add or manage any one of Worker {A, B, C, D} since Owner-B is not their Operator;
+* Since Owner-A is both the Owner of Pool-1 and the Operator of Worker `{A, B, C, D}`, Pool-1 can bind Worker `{A, B, C, D}` to it, and Pool-1 can stake its PHA tokens for these Workers;
+* Owner-B is the Owner of Pool-2, while Pool-2 cannot add or manage any one of Worker `{A, B, C, D}` since Owner-B is not their Operator;
 
 > **Other cases:**
 >
@@ -64,7 +64,7 @@ It is worth noting that during the staking, all the PHA tokens are kept at Deleg
 
 Figure 2, its secondary state, shows the full lifecycle of our mining process:
 
-1. Pool-1 is created, and it adds Worker {A, B, C, D};
+1. Pool-1 is created, and it adds Worker `{A, B, C, D}`;
 2. A PHA holder delegates his/her PHA tokens to Pool-1;
 3. Pool-1 stakes Delegator’s PHA from its Workers;
 4. The Workers starting mining;
@@ -113,7 +113,7 @@ When there are free tokens in a pool, its Owner has multiple choices:
 Assuming Worker-A and Worker-B require staking of 2000 PHA, respectively. And Worker-C and Worker-C require staking of 3000 PHA, respectively. If Delegators stake 7000 PHA in total to the StakePool:
 
 * Since all the Workers in Pool-1 require a minimum total staking of 10000 PHA, the amount of PHA in the pool is not enough for all the Workers to start mining;
-* Pool-1 could choose to only start Worker {A, B, C};
+* Pool-1 could choose to only start Worker `{A, B, C}`;
 
 ### Case 2: Commission Setup and Reward Distribution <a href="#case-2-commission-setup-and-reward-distribution" id="case-2-commission-setup-and-reward-distribution"></a>
 
@@ -124,19 +124,19 @@ Assuming Worker-A and Worker-B require staking of 2000 PHA, respectively. And Wo
 
 **Scenario 1 in Figure 4** shows the whole process of reward distribution and the commission rate’s effect on it:
 
-1. Pool-1 is created, and it adds Worker {A, B, C, D} with a minimum total staking of 10000 PHA. Its Commission is set to 60%;
+1. Pool-1 is created, and it adds Worker `{A, B, C, D}` with a minimum total staking of 10000 PHA. Its Commission is set to 60%;
 2. 5 Delegators each delegates 1400 PHA to the pool. Now there are 7000 PHA in the pool;
-3. Pool-1 stakes 7000 PHA for the Worker {A, B, C}, and Worker-D has no staking since there are not enough PHA;
-4. Worker {A, B, C} start mining;
+3. Pool-1 stakes 7000 PHA for the Worker `{A, B, C}`, and Worker-D has no staking since there are not enough PHA;
+4. Worker `{A, B, C}` start mining;
 5. Phala Blockchain rewards 10 PHA to Pool-1 for its computing power;
 6. Pool-1 divides its rewards into two parts according to the 60% Commission: 4 PHA is distributed equally to the 5 Delegators, with 0.8 PHA for each; 6 PHA to the pool Owner;
 
 **Scenario 2 in Figure 4** shows the case of reward distribution when there are Free Delegation since the delegated tokens are more than those that have been staked:
 
-1. Pool-1 is created, and it adds Worker {A, B, C, D} with a minimum total staking of 10000 PHA. Its Commission is set to 60%;
+1. Pool-1 is created, and it adds Worker `{A, B, C, D}` with a minimum total staking of 10000 PHA. Its Commission is set to 60%;
 2. 5 Delegators each delegate 1400 PHA to the pool, and one more Delegator-Rich delegates 5000 PHA. Now there are 12000 PHA in the pool;
 3. Pool-1 only stakes the necessary amount of tokens for each Worker (10000 PHA in total), and leaves 2000 PHA Free Delegation;
-4. Worker {A, B, C, D} start mining;
+4. Worker `{A, B, C, D}` start mining;
 5. Phala Blockchain rewards 10 PHA to Pool-1 for its computing power;
 6. Pool-1 divides its rewards into two parts according to the 60% Commission: 4 PHA is distributed to the Delegators, with 0.47 PHA for normal Delegator and 1.6 PHA for Delegator-Rich;
 7. 6 PHA is rewarded to the pool Owner;
