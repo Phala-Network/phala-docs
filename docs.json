@@ -1276,6 +1276,10 @@
     {
       "destination": "/network/references/archived-projects",
       "source": "/agent-wars-legacy/getting-started/create-and-play-with-social-agents"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/overview",
+      "source": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api"
     }
   ],
   "styling": {
