@@ -171,25 +171,29 @@ relaychain:
   select_policy: Failover # or Random
   data_sources:
     - !SubstrateWebSocketSource
-      endpoint: ws://{node-ip}:9945
+      endpoint: `ws://{node-ip}:9945`
       pruned: false
 parachain:
   select_policy: Failover
   data_sources:
     - !SubstrateWebSocketSource
-      endpoint: ws://{node-ip}:9944
+      endpoint: `ws://{node-ip}:9944`
       pruned: false
 ```
 
-> There are 2 parameters here that need to be user-defined: ws://{node-ip}:9945 & ws://{node-ip}:9944;
->
-> You need to replace {node-ip} with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
->
-> If you don't need the PRBv3 connect to the headers-cache, delete the part of&#x20;
->
-> `- !HeadersCacheHttpSource`&#x20;
->
-> `endpoint: http://`{headerscache-ip}`:21111`
+<Tip>
+There are 2 parameters here that need to be user-defined:
+
+`ws://{node-ip}:9945` & `ws://{node-ip}:9944`
+
+You need to replace `{node-ip}` with the IP of the server where the node is located. If you are running the node and PRB on the same server, use your own ip there.
+
+If you don't need the PRBv3 connect to the headers-cache, delete the part of&#x20;
+
+- `!HeadersCacheHttpSource`
+
+- `endpoint: http://{headerscache-ip}:21111`
+</Tip>
 
 After entering the content, save and return to the previous directory.
 
