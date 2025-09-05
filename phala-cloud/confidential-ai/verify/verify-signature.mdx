@@ -7,7 +7,7 @@ title: Verify Signature
 
 Signature verification proves your AI responses came from verified TEE hardware. This prevents tampering and ensures response authenticity. Every Confidential AI API response includes a cryptographic signature you can verify.
 
-Here we provide a [ Full Signature Verification Example](https://github.com/nearai/private-ml-sdk/blob/08a43908558a90370fcd109ad23f46a719675255/vllm-proxy/docs/signature_verification_example.py) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
+Here we provide a [ Full Signature Verification Example](https://github.com/Phala-Network/confidential-ai-verifier/blob/631cb5bdf2a4bc13d19fffaba7637d44dcbcc03d/examples/signature_verifier.py#L313) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
 Here we explain the key processes of verifying.
 
@@ -21,9 +21,9 @@ When you finish the request, parse `chat_id` from the response and then get the 
 chat_id = result["chat_id"]
 response_hash = result["response_hash"]
 ...
-# Request the signature
+# Retrieve the signature
 sig_response = requests.get(
-    f"{BASE_URL}/v1/signature/{chat_id}",
+    f"{BASE_URL}/v1/signature/{chat_id}?model={MODEL}",
     headers={"Authorization": f"Bearer {API_KEY}"},
 )
 ```
