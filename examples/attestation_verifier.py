@@ -3,6 +3,9 @@
 Attestation Verifier for Phala Cloud Confidential AI
 
 This script verifies both GPU and CPU attestation reports from Phala Cloud TEE environments.
+
+Run with:
+    python3 attestation_verifier.py --api-key YOUR_API_KEY [--model MODEL_NAME]
 """
 
 import requests
