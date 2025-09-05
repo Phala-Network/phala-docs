@@ -220,6 +220,14 @@
                     ]
                   },
                   "/phala-cloud/confidential-ai/confidential-gpu/overview",
+                  {
+                    "group": "Verify",
+                    "pages": [
+                      "/phala-cloud/confidential-ai/verify/overview",
+                      "/phala-cloud/confidential-ai/verify/verify-attestation",
+                      "/phala-cloud/confidential-ai/verify/verify-signature"
+                    ]
+                  },
                   "/phala-cloud/confidential-ai/benchmark",
                   "/phala-cloud/confidential-ai/faqs"
                 ]
