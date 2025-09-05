@@ -1,74 +1,77 @@
 ---
 title: Verify Attestation
-description: Learn how to verify TEE hardware, operating system, source code, and distributed root-of-trust attestations
+description: Get cryptographic proof your AI workloads run in genuine TEE hardware with verified software
 ---
+
+## Why verify attestation?
+
+Attestation gives you cryptographic proof that your AI models run in genuine TEE hardware. This ensures no one can tamper with your models or data. Verification confirms the hardware, operating system, and source code are all authentic.
 
 ## Verify TEE hardware
 
-To verify the TEE hardware, you need to check the attestation report for the GPU and CPU. This report contains the necessary information to ensure that the hardware is genuine and running in a secure TEE.
+Start by fetching the attestation report from Phala Cloud's API. This report contains everything you need to verify both GPU and CPU hardware.
 
-Here is a full [example](https://github.com/Phala-Network/phala-docs/blob/main/examples/attestation_verifier.py) of how to verify the attestation report of CPU and GPU. Here we explain the key processes of verifying by code snippets.
-
-### Get the Attestation Report
+### Get the attestation report
 
 ```python Python
-# ...
+import requests
+
 url = f"https://api.redpill.ai/v1/attestation/report?model={model}"
+headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json", 
+    "Authorization": f"Bearer {api_key}"
+}
 response = requests.get(url, headers=headers)
+report = response.json()
 ```
 
-The response will be a JSON object containing `nvidia_payload`, `intel_quote`, and `signing_address`:
+The response includes three key pieces:
 
-- The `signing_address` is a cryptographic key generated inside the TEE. It's used to sign chat responses, proving they came from the verified hardware, details in the [Verify Signature](./verify-signature) guide.
-- The `nvidia_payload` contains the attestation report for NVIDIA GPUs.
-- The `intel_quote` contains the attestation quote for Intel TDX CPUs.
+- `nvidia_payload`: GPU attestation data for NVIDIA verification
+- `intel_quote`: CPU attestation quote for Intel TDX verification  
+- `signing_address`: Cryptographic key that signs your AI responses
 
-### Verify GPU Attestation
+### Verify NVIDIA GPU attestation
 
-Copy the `nvidia_payload` and verify with NVIDIA by sending a POST request to NVIDIA Attestation Service.
+Send the NVIDIA payload to their attestation service for verification:
 
 ```python Python
 url = "https://nras.attestation.nvidia.com/v3/attest/gpu"
-response = requests.post(
-    url, headers=headers, data=nvidia_payload)
+headers = {"accept": "application/json", "content-type": "application/json"}
+response = requests.post(url, headers=headers, data=report['nvidia_payload'])
+gpu_result = response.json()
 ```
 
-The response will include a `jwt` one or mutiple token depends on the number of GPUs. Decode this token to get the attestation results:
+The response includes JWT tokens - one for each GPU. Decode them to check attestation results:
 
 ```python Python
-jwt_payload = parse_jwt_token(actual_jwt)
-# Overall Attestation Result
-print(jwt_payload.get('x-nvidia-overall-att-result')
+# For each GPU token
+jwt_payload = parse_jwt_token(gpu_token)
+result = jwt_payload.get('x-nvidia-overall-att-result')
+print(f"GPU attestation result: {result}")  # Should be 'true'
 ```
 
-The `x-nvidia-overall-att-result` field indicates the overall attestation result for the GPU. If the value is `true`, the GPU attestation was valid and verified.
+### Verify Intel TDX CPU attestation
 
-### Verify Intel TDX Attestation
+Copy the Intel quote and verify it at the [TEE Attestation Explorer](https://proof.t16z.com/). Paste the `intel_quote` value into the verification tool to confirm CPU authenticity.
 
-Verify the Intel TDX attestation quote using the `intel_quote` value at the [TEE Attestation Explorer](https://proof.t16z.com/). Copy the `intel_quote` value and paste it into the input box, then click "Verify" to see the verification results.
+## Verify operating system integrity
 
-## Verify Operating System
+Check the `event_log` in your attestation report. This log contains hashes of every software component loaded during boot. Compare these against known good values to ensure your OS hasn't been modified.
 
-To verify the operating system, you need to check that the dstack OS (CVM) is a valid trusted computing base with no backdoors.
+The event log provides a complete chain of trust from hardware boot to application execution.
 
-Check the `event_log` in attestation report to verify the integrity of the OS. The `event_log` contains a list of measurements (hashes) of the software components loaded during the boot process. Compare these measurements against known good values to ensure that the OS has not been tampered with.
+## Verify source code authenticity  
 
-The detailed difinition of `event_log` can be found in the [What is Attestation](/phala-cloud/attestation/overview)
+The `info` field contains a hash of your docker compose configuration and application image. Verify this hash matches your expected source code to prevent tampering.
 
-## Verify Source Code
+This ensures your AI model and its environment match what you deployed originally.
 
-To verify the source code, you need to check that the docker compose file with application image and configuration is secure.
+## Verify distributed root-of-trust
 
-Check the `info` field in the attestation report to verify the source code. The `info` field contains the hash of the docker compose file with application image and configuration. Compare this hash against the known good value to ensure that the source code has not been tampered with.
-
-The detailed difinition of `info` can be found in the [dstack-Specific Verification](/phala-cloud/attestation/overview#dstack-specific-verification)
-
-## Verify Distributed Root-of-Trust
-
-To verify the distributed root-of-trust, you need to check the KMS of dstack, ensuring no unauthorized access. 
-
-More details about KMS can be found in the [dstack Key Management Service](/dstack/overview)
+Phala Cloud uses a KMS with distributed trust. The attestation report includes KMS verification data to confirm no unauthorized access occurred.
 
 <Tip>
-Congratulations! You have successfully verified the attestation, and next you can proceed to [Verify Signature](./verify-signature) to ensure the integrity of the chat responses.
+Great! You've now verified the hardware, OS, and source code. Next, [verify response signatures](./verify-signature) to ensure your AI outputs are authentic.
 </Tip>

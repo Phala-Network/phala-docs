@@ -3,25 +3,28 @@ description: Learn how to verify the integrity of your Confidential AI API reque
 title: Verify Signature
 ---
 
-## Overview
+## Why verify signatures?
 
-Here we provide a [Signature Verification Example](https://github.com/nearai/private-ml-sdk/blob/08a43908558a90370fcd109ad23f46a719675255/vllm-proxy/docs/signature_verification_example.py) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
+Signature verification proves your AI responses came from verified TEE hardware. This prevents tampering and ensures response authenticity. Every Confidential AI API response includes a cryptographic signature you can verify.
 
-Here we explain the key processes of verifying by simplified code snippets.
+Here we provide a [ Full Signature Verification Example](https://github.com/nearai/private-ml-sdk/blob/08a43908558a90370fcd109ad23f46a719675255/vllm-proxy/docs/signature_verification_example.py) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
-## Get the Signature
+Here we explain the key processes of verifying.
+
+## Get the signature
 
 When you finish the request, parse `chat_id` from the response and then get the signature:
 
 ```python Python
 ...
-result = process_response_stream(response, calculate_hash=True)
+# Parse `chat_id` from the response result
 chat_id = result["chat_id"]
 response_hash = result["response_hash"]
 ...
+# Request the signature
 sig_response = requests.get(
     f"{BASE_URL}/v1/signature/{chat_id}",
-    headers={"Authorization": f"Bearer {AUTH_TOKEN}"},
+    headers={"Authorization": f"Bearer {API_KEY}"},
 )
 ```
 
@@ -29,10 +32,10 @@ The key fields in the signature response are:
 
 - `text`: It contains the request body hash and response body hash separated by `:`.
 - `signature`: The cryptographic signature of the `text` signed by the `signing_address` account in TEE.
-- `signing_address`: The public key of the account in TEE that signed the signature.
-- `signing_algo`: The signature algorithm used
+- `signing_address`: The public key of the account generated in TEE that signed the signature.
+- `signing_algo`: The signature algorithm used.
 
-## Verify Signature
+## Verify signature
 
 The verification process involves the following steps:
 
@@ -50,3 +53,30 @@ Or you could try verifying on Etherscan. Go to [Etherscan’s Signature Verifica
 - Signature Hash: Use the `signature` field from the signature response
 
 Click **Continue** to see the signature verification result.
+
+## How signature verification works
+
+The signature proves two things:
+
+1. **Request integrity**: The `text` field contains hashes of both your request and the AI's response
+2. **Hardware authenticity**: The signature comes from the TEE's `signing_address` you verified earlier
+
+When you verify the signature, you confirm:
+- The response matches what the TEE generated
+- No one tampered with the data in transit
+- The response came from genuine TEE hardware
+
+## Verify using Etherscan (optional)
+
+You can also verify signatures visually using [Etherscan Tool](https://etherscan.io/verifiedSignatures):
+
+1. Enter the `signing_address` from your attestation report
+2. Paste the `text` field from the signature response  
+3. Enter the `signature` value
+4. Click verify to see the confirmation
+
+This gives you a visual confirmation that everything matches correctly.
+
+<Tip>
+Signature verification completes your trust chain. You've now verified the hardware, software, and response authenticity - your AI workload is fully secured!
+</Tip>
