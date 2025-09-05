@@ -1,0 +1,52 @@
+---
+description: Learn how to verify the integrity of your Confidential AI API requests.
+title: Verify Signature
+---
+
+## Overview
+
+Here we provide a [Signature Verification Example](https://github.com/nearai/private-ml-sdk/blob/08a43908558a90370fcd109ad23f46a719675255/vllm-proxy/docs/signature_verification_example.py) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
+
+Here we explain the key processes of verifying by simplified code snippets.
+
+## Get the Signature
+
+When you finish the request, parse `chat_id` from the response and then get the signature:
+
+```python Python
+...
+result = process_response_stream(response, calculate_hash=True)
+chat_id = result["chat_id"]
+response_hash = result["response_hash"]
+...
+sig_response = requests.get(
+    f"{BASE_URL}/v1/signature/{chat_id}",
+    headers={"Authorization": f"Bearer {AUTH_TOKEN}"},
+)
+```
+
+The key fields in the signature response are:
+
+- `text`: It contains the request body hash and response body hash separated by `:`.
+- `signature`: The cryptographic signature of the `text` signed by the `signing_address` account in TEE.
+- `signing_address`: The public key of the account in TEE that signed the signature.
+- `signing_algo`: The signature algorithm used
+
+## Verify Signature
+
+The verification process involves the following steps:
+
+```python Python
+message = encode_defunct(text=text)
+recovered_address = Account.recover_message(message, signature=signature)
+return recovered_address.lower() == signing_address.lower()
+# True means the signature is valid
+```
+
+Or you could try verifying on Etherscan. Go to [Etherscan’s Signature Verification](https://etherscan.io/verifiedSignatures) and click **Verify Signature** button, then fill in the following fields:
+
+- Address: Use the `signing_address` from the attestation API
+- Message: Use the `text` field from the signature response
+- Signature Hash: Use the `signature` field from the signature response
+
+Click **Continue** to see the signature verification result.

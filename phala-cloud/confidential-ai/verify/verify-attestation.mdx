@@ -1,0 +1,74 @@
+---
+title: Verify Attestation
+description: Learn how to verify TEE hardware, operating system, source code, and distributed root-of-trust attestations
+---
+
+## Verify TEE hardware
+
+To verify the TEE hardware, you need to check the attestation report for the GPU and CPU. This report contains the necessary information to ensure that the hardware is genuine and running in a secure TEE.
+
+Here is a full [example](https://github.com/Phala-Network/phala-docs/blob/main/examples/attestation_verifier.py) of how to verify the attestation report of CPU and GPU. Here we explain the key processes of verifying by code snippets.
+
+### Get the Attestation Report
+
+```python Python
+# ...
+url = f"https://api.redpill.ai/v1/attestation/report?model={model}"
+response = requests.get(url, headers=headers)
+```
+
+The response will be a JSON object containing `nvidia_payload`, `intel_quote`, and `signing_address`:
+
+- The `signing_address` is a cryptographic key generated inside the TEE. It's used to sign chat responses, proving they came from the verified hardware, details in the [Verify Signature](./verify-signature) guide.
+- The `nvidia_payload` contains the attestation report for NVIDIA GPUs.
+- The `intel_quote` contains the attestation quote for Intel TDX CPUs.
+
+### Verify GPU Attestation
+
+Copy the `nvidia_payload` and verify with NVIDIA by sending a POST request to NVIDIA Attestation Service.
+
+```python Python
+url = "https://nras.attestation.nvidia.com/v3/attest/gpu"
+response = requests.post(
+    url, headers=headers, data=nvidia_payload)
+```
+
+The response will include a `jwt` one or mutiple token depends on the number of GPUs. Decode this token to get the attestation results:
+
+```python Python
+jwt_payload = parse_jwt_token(actual_jwt)
+# Overall Attestation Result
+print(jwt_payload.get('x-nvidia-overall-att-result')
+```
+
+The `x-nvidia-overall-att-result` field indicates the overall attestation result for the GPU. If the value is `true`, the GPU attestation was valid and verified.
+
+### Verify Intel TDX Attestation
+
+Verify the Intel TDX attestation quote using the `intel_quote` value at the [TEE Attestation Explorer](https://proof.t16z.com/). Copy the `intel_quote` value and paste it into the input box, then click "Verify" to see the verification results.
+
+## Verify Operating System
+
+To verify the operating system, you need to check that the dstack OS (CVM) is a valid trusted computing base with no backdoors.
+
+Check the `event_log` in attestation report to verify the integrity of the OS. The `event_log` contains a list of measurements (hashes) of the software components loaded during the boot process. Compare these measurements against known good values to ensure that the OS has not been tampered with.
+
+The detailed difinition of `event_log` can be found in the [What is Attestation](/phala-cloud/attestation/overview)
+
+## Verify Source Code
+
+To verify the source code, you need to check that the docker compose file with application image and configuration is secure.
+
+Check the `info` field in the attestation report to verify the source code. The `info` field contains the hash of the docker compose file with application image and configuration. Compare this hash against the known good value to ensure that the source code has not been tampered with.
+
+The detailed difinition of `info` can be found in the [dstack-Specific Verification](/phala-cloud/attestation/overview#dstack-specific-verification)
+
+## Verify Distributed Root-of-Trust
+
+To verify the distributed root-of-trust, you need to check the KMS of dstack, ensuring no unauthorized access. 
+
+More details about KMS can be found in the [dstack Key Management Service](/dstack/overview)
+
+<Tip>
+Congratulations! You have successfully verified the attestation, and next you can proceed to [Verify Signature](./verify-signature) to ensure the integrity of the chat responses.
+</Tip>
