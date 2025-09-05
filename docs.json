@@ -223,6 +223,7 @@
                   {
                     "group": "Verify",
                     "pages": [
+                      "/phala-cloud/confidential-ai/verify/overview",
                       "/phala-cloud/confidential-ai/verify/verify-attestation",
                       "/phala-cloud/confidential-ai/verify/verify-signature"
                     ]
