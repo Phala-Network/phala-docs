@@ -188,7 +188,6 @@
                   "/phala-cloud/cvm/set-secure-environment-variables",
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
-                  "/phala-cloud/cvm/performance-report",
                   "/phala-cloud/cvm/image/overview"
                 ]
               },
@@ -1259,7 +1258,7 @@
       "source": "/phala-cloud/phala-cloud-cli/.env"
     },
     {
-      "destination": "/phala-cloud/cvm/performance-report",
+      "destination": "/phala-cloud/references/performance-report",
       "source": "/phala-cloud/cvm/performance-report"
     },
     {
@@ -1295,12 +1294,12 @@
       "source": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/confidential-gpu/confidential-ai-models",
-      "source": "/phala-cloud/confidential-ai/confidential-gpu/model-template"
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/confidential-ai-models"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/confidential-gpu/overview",
-      "source": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee"
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/overview"
     }
   ],
   "styling": {
