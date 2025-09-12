@@ -6,7 +6,12 @@
     "primary": "#93c606"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "errors": {
     "404": {
@@ -241,9 +246,9 @@
                 "icon": "key",
                 "pages": [
                   "/phala-cloud/key-management/key-management-protocol",
-                  "/phala-cloud/key-management/cloud-vs-onchain-kms",
-                  "/phala-cloud/key-management/generate-and-persist-key",
-                  "/phala-cloud/key-management/create-crypto-wallet"
+                  "/phala-cloud/key-management/get-a-key",
+                  "/phala-cloud/key-management/create-crypto-wallet",
+                  "/phala-cloud/key-management/cloud-vs-onchain-kms"
                 ]
               },
               {
@@ -268,7 +273,9 @@
               {
                 "group": "Storage",
                 "icon": "database",
-                "pages": ["/phala-cloud/storage/access-database"]
+                "pages": [
+                  "/phala-cloud/storage/access-database"
+                ]
               },
               {
                 "group": "Code Updates",
@@ -329,7 +336,8 @@
                       "/phala-cloud/references/phala-cloud-cli/phala/docker",
                       "/phala-cloud/references/phala-cloud-cli/phala/simulator"
                     ]
-                  }
+                  },
+                  "/phala-cloud/references/migration-from-dstack-v03"
                 ]
               },
               {
@@ -1300,6 +1308,10 @@
     {
       "destination": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee",
       "source": "/phala-cloud/confidential-ai/confidential-gpu/overview"
+    },
+    {
+      "destination": "/phala-cloud/key-management/get-a-key",
+      "source": "/phala-cloud/key-management/generate-and-persist-key"
     }
   ],
   "styling": {

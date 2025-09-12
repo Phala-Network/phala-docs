@@ -1,0 +1,312 @@
+---
+title: Migration from dstack v0.3
+description: Complete migration guide from dstack OS v0.3.x to v0.5.x
+---
+
+This guide covers all breaking changes when upgrading from dstack OS v0.3.x to v0.5.x.
+
+## Docker Compose Changes
+
+### Socket Path Update
+
+Update your `docker-compose.yml` file:
+
+```yaml
+# OLD (v0.3.x)
+services:
+  app:
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+
+# NEW (v0.5.x)
+services:
+  app:
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+```
+
+## Guest SDK Changes
+
+### Client Initialization
+
+**JavaScript:**
+```javascript
+// OLD (v0.3.x): TappdClient
+import { TappdClient } from '@phala/dstack-sdk';
+const client = new TappdClient();
+
+// NEW (v0.5.x): DstackClient
+import { DstackClient } from '@phala/dstack-sdk';
+const client = new DstackClient();
+```
+
+**Python:**
+```python
+# OLD (v0.3.x): TappdClient
+from tappd_client import TappdClient
+client = TappdClient()
+
+# NEW (v0.5.x): DstackClient
+from dstack_sdk import DstackClient
+client = DstackClient()
+```
+
+### Key Derivation Methods
+
+The ambiguous `deriveKey()` method is now split for clarity:
+
+**JavaScript:**
+```javascript
+// OLD (v0.3.x): Single method for all key types
+const key = await client.deriveKey('some-id');
+
+// NEW (v0.5.x): Purpose-specific methods
+const cryptoKey = await client.getKey('wallet/ethereum/v1');  // For deterministic keys
+// Note: getTlsKey() is available for TLS certificates but is for advanced use only
+```
+
+**Python:**
+```python
+# OLD (v0.3.x): Single method for all key types
+key = client.derive_key('some-id')
+
+# NEW (v0.5.x): Purpose-specific methods
+crypto_key = client.get_key('wallet/ethereum/v1')  # For deterministic keys
+# Note: get_tls_key() is available for TLS certificates but is for advanced use only
+```
+
+### ⚠️ CRITICAL: Wallet Helper Functions - ADDRESS WILL CHANGE
+
+**Important:** The secure functions apply SHA256 hashing which results in DIFFERENT wallet addresses. Plan your migration carefully!
+
+**JavaScript Migration:**
+```javascript
+// OLD (v0.3.x): Insecure functions
+import { TappdClient } from '@phala/dstack-sdk';
+import { toViemAccount, toKeypair } from '@phala/dstack-sdk';
+
+const client = new TappdClient();
+const keyResult = await client.deriveKey('wallet');
+const ethAccount = toViemAccount(keyResult);    // ❌ Uses raw key directly
+const solKeypair = toKeypair(keyResult);        // ❌ Uses raw key directly
+// ethAccount.address = 0xAAA...
+
+// NEW (v0.5.x): Secure functions with SHA256 hashing
+import { DstackClient } from '@phala/dstack-sdk';
+import { toViemAccountSecure } from '@phala/dstack-sdk/viem';
+import { toKeypairSecure } from '@phala/dstack-sdk/solana';
+
+const client = new DstackClient();
+const keyResult = await client.getKey('wallet/ethereum/v1');
+const ethAccount = toViemAccountSecure(keyResult);  // ✅ SHA256 hashed for security
+const solKeypair = toKeypairSecure(keyResult);      // ✅ SHA256 hashed for security
+// ethAccount.address = 0xBBB... (DIFFERENT ADDRESS!)
+```
+
+**Python Migration:**
+```python
+# OLD (v0.3.x): Legacy helper methods
+from tappd_client import TappdClient
+client = TappdClient()
+key_result = client.derive_key('wallet')
+eth_account = client.to_account(key_result)    # Uses raw key directly
+sol_keypair = client.to_keypair(key_result)    # Uses raw key directly
+# eth_account.address = 0xAAA...
+
+# NEW (v0.5.x): Secure helper methods
+from dstack_sdk import DstackClient
+client = DstackClient()
+key_result = client.get_key('wallet/ethereum/v1')
+eth_account = client.to_account_secure(key_result)  # SHA256 hashed for security
+sol_keypair = client.to_keypair_secure(key_result)  # SHA256 hashed for security
+# eth_account.address = 0xBBB... (DIFFERENT ADDRESS!)
+```
+
+### Migration Strategy for Wallets
+
+Since wallet addresses will change, you need to plan your migration:
+
+1. **For new applications**: Use secure functions from the start
+2. **For existing applications with funds**:
+   - Deploy both old and new wallet systems in parallel
+   - Transfer funds from old wallets to new secure wallets
+   - Update all references to wallet addresses
+   - Only deprecate old system after confirming all funds are migrated
+
+3. **If you must keep the same address** (NOT RECOMMENDED):
+   ```javascript
+   // You can still use the insecure function with DstackClient
+   // BUT THIS IS A SECURITY RISK - only use temporarily during migration
+   import { toViemAccount } from '@phala/dstack-sdk/viem';  // Legacy, insecure
+   const account = toViemAccount(keyResult);  // Same address as before, but vulnerable
+   ```
+
+### Remote Attestation
+
+Quote generation now requires manual hashing for data larger than 64 bytes:
+
+**JavaScript:**
+```javascript
+// OLD (v0.3.x): Automatic hashing with algorithm selection
+const quote = await client.tdxQuote(largeData, 'sha256');
+
+// NEW (v0.5.x): Manual hashing required, max 64 bytes
+import crypto from 'crypto';
+const hash = crypto.createHash('sha256').update(largeData).digest();
+const quote = await client.getQuote(hash.slice(0, 32));
+```
+
+**Python:**
+```python
+# OLD (v0.3.x): Automatic hashing with algorithm selection
+quote = client.tdx_quote(large_data, 'sha256')
+
+# NEW (v0.5.x): Manual hashing required, max 64 bytes
+import hashlib
+hash_value = hashlib.sha256(large_data).digest()
+quote = client.get_quote(hash_value[:32])
+```
+
+## New Features in v0.5.x
+
+### Event Emission (Advanced)
+
+Extends RTMR3 with custom events. This is an advanced feature for attestation purposes.
+
+```javascript
+// JavaScript
+await client.emitEvent('custom_event', { data: 'value' });
+```
+
+```python
+# Python
+client.emit_event('custom_event', {'data': 'value'})
+```
+
+**Note:** Not available in simulator. Requires dstack OS v0.5.0+.
+
+### KMS Public Key Verification
+
+When deploying with encrypted environment variables, the SDK now includes a function to verify that encryption keys from the KMS are legitimate, preventing man-in-the-middle attacks.
+
+**JavaScript:**
+```javascript
+import { verifyEnvEncryptPublicKey } from '@phala/dstack-sdk';
+
+// When deploying, you'll receive a public key and signature from the KMS API
+const kmsResponse = await fetch('https://kms-api/GetAppEnvEncryptPubKey', {
+  method: 'POST',
+  body: JSON.stringify({ app_id: 'your-app-id' })
+});
+const { public_key, signature } = await kmsResponse.json();
+
+// Verify the key is legitimate before using it
+const publicKeyBytes = Buffer.from(public_key, 'hex');
+const signatureBytes = Buffer.from(signature, 'hex');
+
+const kmsIdentity = verifyEnvEncryptPublicKey(
+  publicKeyBytes, 
+  signatureBytes, 
+  'your-app-id'
+);
+
+if (!kmsIdentity) {
+  throw new Error('Invalid KMS key - potential security risk!');
+}
+
+// Now safe to use public_key to encrypt your environment variables
+```
+
+**Python:**
+```python
+from dstack_sdk import verify_env_encrypt_public_key
+import requests
+
+# When deploying, you'll receive a public key and signature from the KMS API
+response = requests.post('https://kms-api/GetAppEnvEncryptPubKey', 
+                         json={'app_id': 'your-app-id'})
+data = response.json()
+
+# Verify the key is legitimate before using it
+public_key_bytes = bytes.fromhex(data['public_key'])
+signature_bytes = bytes.fromhex(data['signature'])
+
+kms_identity = verify_env_encrypt_public_key(
+    public_key_bytes,
+    signature_bytes,
+    'your-app-id'
+)
+
+if not kms_identity:
+    raise Exception('Invalid KMS key - potential security risk!')
+
+# Now safe to use public_key to encrypt your environment variables
+```
+
+## HTTP API Changes
+
+### Endpoint Format
+```bash
+# OLD (v0.3.x)
+curl --unix-socket /var/run/tappd.sock \
+  http://localhost/prpc/Tappd.DeriveKey
+
+# NEW (v0.5.x)
+curl --unix-socket /var/run/dstack.sock \
+  http://dstack/GetKey
+```
+
+## Migration Checklist
+
+1. **Update SDK version**
+   ```bash
+   # JavaScript
+   npm install @phala/dstack-sdk@latest
+   
+   # Python
+   pip install dstack-sdk --upgrade
+   ```
+
+2. **Update docker-compose.yml**
+   - Change socket mount from `/var/run/tappd.sock` to `/var/run/dstack.sock`
+
+3. **Update client code**
+   - Replace `TappdClient` with `DstackClient`
+   - Replace `deriveKey()` with `getKey()`
+
+4. **⚠️ CRITICAL: Plan wallet migration**
+   - Wallet addresses WILL change with secure functions
+   - Transfer funds from old to new wallets
+   - Update all address references
+
+5. **Update attestation code**
+   - Add manual hashing for `getQuote()` if data > 64 bytes
+
+6. **Test thoroughly**
+   - Verify new wallet addresses
+   - Test fund transfers
+   - Test attestation flows
+
+## Common Issues and Solutions
+
+### Issue: Wallet addresses changed unexpectedly
+**Cause**: Using secure functions changes the address due to SHA256 hashing  
+**Solution**: This is expected. Plan migration of funds and update address references
+
+### Issue: Need to keep old wallet address temporarily
+**Cause**: Cannot migrate funds immediately  
+**Solution**: Use legacy functions temporarily (security risk) while planning migration
+
+### Issue: Socket connection errors
+**Cause**: Old socket path in docker-compose.yml  
+**Solution**: Update volume mount to `/var/run/dstack.sock`
+
+### Issue: Quote generation fails
+**Cause**: Data exceeds 64 bytes without hashing  
+**Solution**: Hash data before passing to `getQuote()`
+
+## Need Help?
+
+- [Key Management Guide](/phala-cloud/key-management/get-a-key)
+- [Create Crypto Wallets](/phala-cloud/key-management/create-crypto-wallet)
+- [Attestation Guide](/phala-cloud/attestation/overview)
