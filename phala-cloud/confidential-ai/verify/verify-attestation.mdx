@@ -5,11 +5,13 @@ description: Get cryptographic proof your AI workloads run in genuine TEE hardwa
 
 ## Why verify attestation?
 
-Attestation gives you cryptographic proof that your AI models run in genuine TEE hardware. This ensures no one can tamper with your models or data. Verification confirms the hardware, operating system, and source code are all authentic.
+Attestation ensure that the hardware and software stack are secure and trustworthy. Attestation verification provides assurance that your workloads are protected from tampering and unauthorized access. This verification includes **TEE Hardware Stack** and **TEE Software Stack**.
 
-## Verify TEE hardware
+## Verify TEE hardware stack
 
 Start by fetching the attestation report from Phala Cloud's API. This report contains everything you need to verify both GPU and CPU hardware.
+
+Here we provide a [Hardware TEE Verification Example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py) to help you understand how to verify the attestation.
 
 ### Get the attestation report
 
@@ -56,22 +58,22 @@ print(f"GPU attestation result: {result}")  # Should be 'true'
 
 Copy the Intel quote and verify it at the [TEE Attestation Explorer](https://proof.t16z.com/). Paste the `intel_quote` value into the verification tool to confirm CPU authenticity.
 
-## Verify operating system integrity
+## Verify TEE software stack
+
+### Verify operating system integrity
 
 Check the `event_log` in your attestation report. This log contains hashes of every software component loaded during boot. Compare these against known good values to ensure your OS hasn't been modified.
 
 The event log provides a complete chain of trust from hardware boot to application execution.
 
-## Verify source code authenticity  
+### Verify source code authenticity
 
 The `info` field contains a hash of your docker compose configuration and application image. Verify this hash matches your expected source code to prevent tampering.
 
 This ensures your AI model and its environment match what you deployed originally.
 
-## Verify distributed root-of-trust
+### Verify distributed root-of-trust
 
 Phala Cloud uses a KMS with distributed trust. The attestation report includes KMS verification data to confirm no unauthorized access occurred.
 
-<Tip>
-Great! You've now verified the hardware, OS, and source code. Next, [verify response signatures](./verify-signature) to ensure your AI outputs are authentic.
-</Tip>
+Great! Now, let's verify [Integrity Proof](./verify-signature) to ensure your AI outputs are authentic.

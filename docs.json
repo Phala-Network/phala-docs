@@ -188,7 +188,6 @@
                   "/phala-cloud/cvm/set-secure-environment-variables",
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
-                  "/phala-cloud/cvm/performance-report",
                   "/phala-cloud/cvm/image/overview"
                 ]
               },
@@ -215,11 +214,16 @@
                     "group": "API and Models",
                     "pages": [
                       "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
-                      "/phala-cloud/confidential-ai/confidential-model/confidential-ai-models",
                       "/phala-cloud/confidential-ai/confidential-model/tool-calling"
                     ]
                   },
-                  "/phala-cloud/confidential-ai/confidential-gpu/overview",
+                  {
+                    "group": "GPU",
+                    "pages": [
+                      "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+                      "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee"
+                    ]
+                  },
                   {
                     "group": "Verify",
                     "pages": [
@@ -1254,7 +1258,7 @@
       "source": "/phala-cloud/phala-cloud-cli/.env"
     },
     {
-      "destination": "/phala-cloud/cvm/performance-report",
+      "destination": "/phala-cloud/references/performance-report",
       "source": "/phala-cloud/cvm/performance-report"
     },
     {
@@ -1288,6 +1292,14 @@
     {
       "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/confidential-ai-models"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/overview"
     }
   ],
   "styling": {

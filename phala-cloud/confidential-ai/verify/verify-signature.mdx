@@ -1,13 +1,23 @@
 ---
 description: Learn how to verify the integrity of your Confidential AI API requests.
-title: Verify Signature
+title: Integrity Proof
 ---
 
-## Why verify signatures?
+## Why verify Integrity Proof?
 
-Signature verification proves your AI responses came from verified TEE hardware. This prevents tampering and ensures response authenticity. Every Confidential AI API response includes a cryptographic signature you can verify.
+Integrity proof verification, also signature, proves your AI responses came from verified TEE hardware. This prevents tampering and ensures response authenticity. Every Confidential AI API response includes a cryptographic signature you can verify.
 
-Here we provide a [ Full Signature Verification Example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py#L221) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
+The signature proves two things:
+
+1. **Request integrity**: The `text` field contains hashes of both your request and the AI's response
+2. **Hardware authenticity**: The signature comes from the TEE's `signing_address` you verified earlier
+
+When you verify the signature, you confirm:
+- The response matches what the TEE generated
+- No one tampered with the data in transit
+- The response came from genuine TEE hardware
+
+Here we provide a [Full Signature Verification Example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py#L221) to help you understand how to verify the signature of the response from [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
 Here we explain the key processes of verifying.
 
@@ -46,29 +56,11 @@ return recovered_address.lower() == signing_address.lower()
 # True means the signature is valid
 ```
 
-Or you could try verifying on Etherscan. Go to [Etherscan’s Signature Verification](https://etherscan.io/verifiedSignatures) and click **Verify Signature** button, then fill in the following fields:
-
-- Address: Use the `signing_address` from the attestation API
-- Message: Use the `text` field from the signature response
-- Signature Hash: Use the `signature` field from the signature response
-
-Click **Continue** to see the signature verification result.
-
-## How signature verification works
-
-The signature proves two things:
-
-1. **Request integrity**: The `text` field contains hashes of both your request and the AI's response
-2. **Hardware authenticity**: The signature comes from the TEE's `signing_address` you verified earlier
-
-When you verify the signature, you confirm:
-- The response matches what the TEE generated
-- No one tampered with the data in transit
-- The response came from genuine TEE hardware
+Once you run the verification code, if it returns `True`, it means the signature is valid. This confirms that the response is authentic and untampered.
 
 ## Verify using Etherscan (optional)
 
-You can also verify signatures visually using [Etherscan Tool](https://etherscan.io/verifiedSignatures):
+If you prefer a visual tool, you can also verify signatures on [Etherscan Tool](https://etherscan.io/verifiedSignatures):
 
 1. Enter the `signing_address` from your attestation report
 2. Paste the `text` field from the signature response  
@@ -76,7 +68,3 @@ You can also verify signatures visually using [Etherscan Tool](https://etherscan
 4. Click verify to see the confirmation
 
 This gives you a visual confirmation that everything matches correctly.
-
-<Tip>
-Signature verification completes your trust chain. You've now verified the hardware, software, and response authenticity - your AI workload is fully secured!
-</Tip>
