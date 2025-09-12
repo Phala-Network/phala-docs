@@ -1,39 +1,109 @@
 ---
-description: Deploy confidential applications with Phala Cloud's managed TEE infrastructure.
-title: Secure your Application
+title: Create Crypto Wallets
+description: Generate blockchain wallets with deterministic keys in Phala Cloud
 ---
 
+Create blockchain wallets using deterministic keys derived from your application's root key. Each wallet address is unique to your application and consistently reproducible.
 
-You can derive a deterministic key using the [Dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme) inside Docker. Under the hood, the `TappdClient` derives the key from the application root key.
+## Prerequisites
 
-```javascript
-import { TappdClient } from '@phala/dstack-sdk';
+Your application must be running in the Phala Cloud TEE environment with access to the dstack socket. In your `docker-compose.yml`:
 
-const keyResult = await client.deriveKey('<unique-id>'); // Same unique-id will get same key
-console.log(keyResult.key); // X.509 private key in PEM format
-console.log(keyResult.certificate_chain); // Certificate chain
-const keyBytes = keyResult.asUint8Array(); // Get key as Uint8Array
+```yaml
+services:
+  app:
+    # your app configuration
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
 ```
 
-## Derive wallet using viem
+## Ethereum Wallet
 
-DStack SDK provides a helper function to derive a [viem](https://viem.sh) compatible wallet.
+<CodeGroup dropdown>
+```javascript ethereum.js
+import { DstackClient } from '@phala/dstack-sdk';
+import { toViemAccountSecure } from '@phala/dstack-sdk/viem';
 
-```javascript
-import { toViemAccount } from '@phala/dstack-sdk/viem';
+const client = new DstackClient();
+const keyResult = await client.getKey('wallet/ethereum/mainnet');
+const account = toViemAccountSecure(keyResult);
 
-const keyResult = await client.deriveKey('<unique-id>'); // Same unique-id will get same key
-const account = toViemAccount(keyResult);
-// Use the account with viem operations
+console.log('Address:', account.address);
 ```
 
-## Derive Solana Wallet
+```python ethereum.py
+from dstack_sdk import DstackClient
+from eth_account import Account
 
-If you want to derive a Solana wallet, you can use the following code that derive a Solana wallet based on [Solana Web3.js](https://solana-labs.github.io/solana-web3.js/).
+client = DstackClient()
+result = client.get_key('wallet/ethereum/mainnet')
+account = Account.from_key(result.decode_key())
 
-```javascript
-import { toKeypair } from '@phala/dstack-sdk/solana';
-
-const keyResult = await client.deriveKey('<unique-id>'); // Same unique-id will get same key
-const keypair = toKeypair(keyResult);
+print(f'Address: {account.address}')
 ```
+</CodeGroup>
+
+## Solana Wallet
+
+<CodeGroup dropdown>
+```javascript solana.js
+import { DstackClient } from '@phala/dstack-sdk';
+import { toKeypairSecure } from '@phala/dstack-sdk/solana';
+
+const client = new DstackClient();
+const keyResult = await client.getKey('wallet/solana/mainnet');
+const keypair = toKeypairSecure(keyResult);
+
+console.log('Address:', keypair.publicKey.toBase58());
+```
+
+```python solana.py
+from dstack_sdk import DstackClient
+from solders.keypair import Keypair
+
+client = DstackClient()
+result = client.get_key('wallet/solana/mainnet')
+keypair = Keypair.from_bytes(result.decode_key())
+
+print(f'Address: {keypair.pubkey()}')
+```
+</CodeGroup>
+
+## Important Security Notes
+
+- **Use secure functions**: Always use `toViemAccountSecure()` and `toKeypairSecure()` (not the legacy versions)
+- **Application-specific**: Wallet addresses are unique to your application ID
+- **Deterministic**: Same path always generates the same wallet
+- **Keep keys in TEE**: Never expose private keys outside the secure environment
+
+## Multi-Wallet Support
+
+Generate multiple wallets by using different paths:
+
+<CodeGroup dropdown>
+```javascript multiWallet.js
+// User wallets
+const userWallet = await client.getKey('wallet/user/123/v1');
+
+// Treasury wallet
+const treasury = await client.getKey('wallet/treasury/v1');
+
+// Hot wallet for operations
+const hotWallet = await client.getKey('wallet/hot/v1');
+```
+
+```python multi_wallet.py
+# User wallets
+user_wallet = client.get_key('wallet/user/123/v1')
+
+# Treasury wallet
+treasury = client.get_key('wallet/treasury/v1')
+
+# Hot wallet for operations
+hot_wallet = client.get_key('wallet/hot/v1')
+```
+</CodeGroup>
+
+## Migration from v0.3.x
+
+If you're upgrading from dstack v0.3.x, **wallet addresses will change** when using secure functions. See the [Migration from dstack v0.3](/phala-cloud/references/migration-from-dstack-v03) guide for detailed upgrade instructions and wallet migration strategies.

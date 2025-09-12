@@ -1,0 +1,90 @@
+---
+title: Get a Deterministic Key
+description: Generate deterministic keys for cryptographic operations in Phala Cloud
+---
+
+Generate deterministic 256-bit keys from your application's root key in the TEE. Keys are unique to your application ID, and the same input parameters always produce the same key.
+
+## Prerequisites
+
+Your application must be running in the Phala Cloud TEE environment with access to the dstack socket. In your `docker-compose.yml`:
+
+```yaml
+services:
+  app:
+    # your app configuration
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+```
+
+## Quick Start
+
+<CodeGroup dropdown>
+```javascript index.js
+import { DstackClient } from '@phala/dstack-sdk';
+
+const client = new DstackClient();
+const result = await client.getKey('my-app/encryption/v1');
+const keyBytes = result.key; // Uint8Array(32)
+```
+
+```python main.py
+from dstack_sdk import DstackClient
+
+client = DstackClient()
+result = client.get_key('my-app/encryption/v1')
+key_bytes = result.decode_key()  # 32 bytes
+```
+
+```bash curl.sh
+curl --unix-socket /var/run/dstack.sock -X POST \
+  http://dstack/GetKey \
+  -H 'Content-Type: application/json' \
+  -d '{"path": "my-app/encryption/v1"}'
+```
+</CodeGroup>
+
+## Parameters
+
+- **`path`** (required): Unique identifier for the key. Use forward slashes to organize: `app-name/feature/version`
+
+The same path always generates the same key. Different paths generate different keys.
+
+<Tip>
+**Advanced: Purpose Parameter**
+
+The `getKey()` method accepts an optional second parameter called `purpose`:
+
+```javascript
+const result = await client.getKey('wallet/ethereum', 'mainnet');
+```
+
+This is equivalent to using a longer path: `getKey('wallet/ethereum/mainnet')`. The purpose parameter is purely for organization - use whichever approach feels cleaner to you.
+</Tip>
+
+## Key Properties
+
+- **Application-specific**: Keys are derived from your app's unique master key (tied to app ID)
+- **Deterministic**: Same `path` + `purpose` always generates the same key
+- **Isolated**: Different applications cannot derive each other's keys
+- **32 bytes**: Raw key material suitable for various cryptographic operations
+
+## Common Use Cases
+
+The 32-byte key can be used as:
+- AES-256 encryption key
+- HMAC secret
+- Random number generator seed
+- Input for key derivation functions (KDF)
+- Signing key for custom protocols
+
+## Best Practices
+
+- Use descriptive paths: `app-name/feature/version`
+- Never log or expose keys outside TEE
+- Use different paths for different purposes
+- Version your keys in the path (e.g., `/v1`, `/v2`)
+
+## Migration from v0.3.x
+
+If you're upgrading from dstack v0.3.x, see the [Migration from dstack v0.3](/phala-cloud/references/migration-from-dstack-v03) guide for breaking changes and upgrade instructions.
