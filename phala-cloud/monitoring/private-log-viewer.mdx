@@ -1,58 +1,75 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
+description: Secure your Docker container logs with password-protected access using Dozzle.
 title: Private Log Viewer
 ---
 
 
-## Securing Your Docker Logs
+Protect your container logs with password authentication using [Dozzle](https://github.com/amir20/dozzle). This inline Docker Compose configuration requires no external files or volume mounts.
 
-For enhanced security, you may want to restrict log access to specific individuals. You can configure a private log viewer in your Docker Compose file using open-source tools like [Dozzle](https://github.com/amir20/dozzle).
-
-### Implementation Steps
+## Implementation Steps
 
 1. **Generate Authentication Credentials**
 
-   On your local machine, generate a Dozzle user authority token using the following command:
+   On your local machine, generate a Dozzle user configuration with escaped dollar signs for Docker Compose:
    
    ```bash
-   docker run amir20/dozzle generate --name Admin --email me@email.net --password secret admin | base64 -w 1000
+   docker run --rm amir20/dozzle generate \
+     --name "Admin Name" \
+     --email admin@example.com \
+     --password secret \
+     admin | sed 's/\$/\$\$/g'
    ```
    
-   This example creates a user with:
-   - Username: "Admin"
-   - Password: "secret"
-   - Role: "admin"
+   This creates login credentials (username: `admin`, password: `secret`) with automatic `$` escaping for Docker Compose. The output is ready to paste directly into your configuration.
 
 2. **Configure Dozzle in Docker Compose**
 
-   Add the following services to your Docker Compose file:
+   Copy the output from step 1 and paste it into your docker-compose.yml:
    
    ```yaml
    services:
-     # Setup service to initialize user data
-     setup:
-       image: busybox
-       restart: "no"
-       volumes:
-         - dozzle-data:/dozzle-data/
-       command: >
-         sh -c 'echo "use authority token" | base64 -d > /dozzle-data/users.yml || true'
-   
-     # Dozzle log viewer service
      dozzle:
        container_name: dozzle
        image: amir20/dozzle:latest
-       depends_on:
-         - setup
        environment:
          - DOZZLE_AUTH_PROVIDER=simple
        volumes:
          - /var/run/docker.sock:/var/run/docker.sock
-         - dozzle-data:/data/
+       configs:
+         - source: dozzle_users
+           target: /data/users.yml
        ports:
          - 8080:8080
+   
+   configs:
+     dozzle_users:
+       content: |
+         # Paste the output from step 1 here
+         users:
+             admin:
+                 email: admin@example.com
+                 name: Admin Name
+                 password: $$2a$$11$$JXzfhhgeNnFME75XzGTxKu46K2KI4OAjEL18HodilKkiBIQt8w9ka
+                 filter: ""
    ```
+   
+   The `configs` directive embeds the authentication data directly in docker-compose.yml without needing external files or additional containers.
 
 3. **Access Protected Logs**
 
-   Once deployed, you can access the logs through the container's public endpoint using the credentials you configured. Only authorized users with the correct username and password will be able to view the logs.
+   Once deployed on Phala Cloud, Dozzle will be accessible at:
+   ```
+   https://{app-id}-8080.dstack-{node-name}.phala.network
+   ```
+   
+   Replace `{app-id}` with your App ID and `{node-name}` with your deployment target. You can also find the endpoint in your CVM's **View Details > Network > Endpoint** section.
+   
+   Log in with the secrets (or whatever you set in step 1):
+   - **Username:** `admin`
+   - **Password:** `secret`
+   
+   Only authorized users with valid credentials can view your container logs.
+
+<Tip>
+For production environments with advanced requirements, consider using the Loki and Grafana stack for centralized log aggregation, querying, and visualization.
+</Tip>
