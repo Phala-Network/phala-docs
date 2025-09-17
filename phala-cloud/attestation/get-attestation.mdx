@@ -1,7 +1,6 @@
 ---
-description: Deploy confidential applications with Phala Cloud's managed TEE infrastructure.
-  TEE.
-title: Retrieve
+description: Generate Intel SGX and TDX attestation quotes using DStack SDK and Phala Cloud platform
+title: Generate Attestation
 ---
 
 The cloud will generate a default RA report for your application when it is bootstrapped. You can view this report on the dashboard under the **Attestation** tab and verify it by clicking the **Check** **Attestation** button.
@@ -54,6 +53,17 @@ const rtmrs = quoteResult.replayRtmrs(); // Replay RTMRs
 
 You can implement the above code in your application as an public API that anyone can call to generate a new RA report.
 
-### Conclusion
+### Next Steps
 
-In practice, this is a method to bind the RA report to your application. For example, you can generate a key pair and set the public key as the `user-data`. This way, anyone can verify the execution of your application by extract the public key from the RA report and checking the signature with the public key.
+Once you have your quote generated, you can:
+
+1. **[Verify with API](/phala-cloud/attestation/api-quickstart)** - Upload your quote to Phala Cloud for verification
+2. **[Understand the Data](/phala-cloud/attestation/overview)** - Learn what each field in your quote means
+3. **[API Reference](/phala-cloud/phala-cloud-api/attestations)** - Complete verification service documentation
+
+### Use Cases
+
+The `user-data` field enables powerful applications:
+- **Key Binding**: Set a public key as user-data, then sign messages with the private key
+- **Identity Proof**: Include application identifiers or certificates  
+- **Challenge Response**: Respond to verification challenges from remote parties
