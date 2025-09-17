@@ -1,0 +1,59 @@
+---
+title: Images and Vision
+description: Learn how to use images and vision models in Confidential AI.
+---
+
+## Images and Vision in Confidential AI
+
+Confidential AI supports various images and vision models, enabling you to leverage the power of visual data in a secure and confidential manner.
+
+## Analyze images
+
+You can use vision models to analyze images, including image recognition, object detection, and image classification.
+
+Replace `<API_KEY>` with your actual API key in the examples below.
+
+```python
+from openai import OpenAI
+client = OpenAI(
+    base_url="https://api.redpill.ai/v1",
+    api_key="<API_KEY>",
+)
+response = client.chat.completions.create(
+    model="phala/gemma-3-27b-it",
+    messages=[{
+        "role": "user",
+        "content": [
+            { "type": "text", "text": "What is in this image?" },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Giant_Pandas_having_a_snack.jpg/2560px-Giant_Pandas_having_a_snack.jpg"
+                }
+            }
+        ]
+    }],
+)
+
+print(response.choices[0].message.content)
+```
+
+<Accordion title="Sample output of image analysis request">
+
+```
+Here's what I see in the image:
+
+*   **Giant Pandas:** There are four young giant pandas in the image. They are black and white and appear to be playful.
+*   **Bamboo:** The scene is full of lush, green bamboo. The pandas are among the bamboo and seemingly eating it.
+*   **Greenery:** Besides the bamboo, there is other green vegetation surrounding the pandas.
+*   **Dirt mound:** The pandas are partially sitting on a raised earth mound.
+*   **Outdoor Setting:** It appears to be a natural or zoo-like outdoor enclosure.
+
+The overall impression is of a cute and peaceful scene with baby pandas enjoying their habitat.
+```
+</Accordion>
+
+### Supported Models for Image Analysis
+
+- `phala/gemma-3-27b-it`
+- `phala/qwen2.5-vl-72b-instruct`

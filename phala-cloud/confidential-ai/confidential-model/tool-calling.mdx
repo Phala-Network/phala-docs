@@ -3,15 +3,11 @@ description: Quick guide for how to tool calling (or function calling) of Confid
 title: Tool Calling
 ---
 
-## Overview
+## Tool Calling in Confidential AI
 
-This documentation shows how to use tool calling of Confidential AI API to interact with external tools, such as APIs, databases, or other applications, to gather real-time information or perform actions beyond its pre-trained knowledge.
+Tool calling, also known as function calling, enables AI models to interact with external systems by invoking predefined functions or APIs. This allows the model to access up-to-date information, perform specific actions, or integrate with other services, extending its capabilities beyond static knowledge.
 
-## Supported Models
-
-- phala/deepseek-chat-v3-0324
-- phala/qwen3-coder
-- phala/llama-3.3-70b-instruct
+Here we provide a simple example of tool calling.
 
 ## Define the Tool
 
@@ -195,3 +191,9 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
 }
 ```
 </Accordion>
+
+## Supported Models
+
+- phala/deepseek-chat-v3-0324
+- phala/qwen3-coder
+- phala/llama-3.3-70b-instruct
