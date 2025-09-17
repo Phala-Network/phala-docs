@@ -20,144 +20,140 @@ Upload your attestation quote to Phala Cloud for secure storage and cryptographi
 
 #### File Upload Example
 
-<Tabs>
-  <Tab title="File Upload - cURL">
-    ```bash
-    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
-      -H "Content-Type: multipart/form-data" \
-      -F "file=@quote.bin"
-    ```
-  </Tab>
-  <Tab title="File Upload - JavaScript">
-    ```javascript
-    // Upload binary file
-    const fileInput = document.querySelector('input[type="file"]');
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+<CodeGroup>
 
-    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
-      method: 'POST',
-      body: formData
-    });
+```bash cURL
+curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@quote.bin"
+```
 
-    const result = await response.json();
-    console.log('Verification result:', result);
-    ```
-  </Tab>
-  <Tab title="File Upload - Python">
-    ```python
-    import requests
+```javascript JavaScript
+// Upload binary file
+const fileInput = document.querySelector('input[type="file"]');
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
 
-    # Upload and verify a quote file
-    with open('quote.bin', 'rb') as f:
-        files = {'file': f}
-        response = requests.post(
-            'https://cloud-api.phala.network/api/v1/attestations/verify',
-            files=files
-        )
-    
-    result = response.json()
-    print(f"Success: {result['success']}")
-    print(f"Verified: {result['quote']['verified']}")
-    print(f"Checksum: {result['checksum']}")
-    ```
-  </Tab>
-</Tabs>
+const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+  method: 'POST',
+  body: formData
+});
+
+const result = await response.json();
+console.log('Verification result:', result);
+```
+
+```python Python
+import requests
+
+# Upload and verify a quote file
+with open('quote.bin', 'rb') as f:
+    files = {'file': f}
+    response = requests.post(
+        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        files=files
+    )
+
+result = response.json()
+print(f"Success: {result['success']}")
+print(f"Verified: {result['quote']['verified']}")
+print(f"Checksum: {result['checksum']}")
+```
+
+</CodeGroup>
 
 #### Hex JSON Example
 
-<Tabs>
-  <Tab title="Hex JSON - cURL">
-    ```bash
-    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
-      -H "Content-Type: application/json" \
-      -d '{"hex": "0x48656c6c6f20576f726c64..."}'
-    ```
-  </Tab>
-  <Tab title="Hex JSON - JavaScript">
-    ```javascript
-    // Send hex string as JSON
-    const hexData = "0x48656c6c6f20576f726c64..."; // Your quote as hex
-    
-    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ hex: hexData })
-    });
+<CodeGroup>
 
-    const result = await response.json();
-    console.log('Verification result:', result);
-    ```
-  </Tab>
-  <Tab title="Hex JSON - Python">
-    ```python
-    import requests
+```bash cURL
+curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"hex": "0x48656c6c6f20576f726c64..."}'
+```
 
-    # Send quote as hex string
-    hex_data = "0x48656c6c6f20576f726c64..."  # Your quote as hex
-    
-    response = requests.post(
-        'https://cloud-api.phala.network/api/v1/attestations/verify',
-        json={'hex': hex_data}
-    )
-    
-    result = response.json()
-    print(f"Success: {result['success']}")
-    print(f"Verified: {result['quote']['verified']}")
-    print(f"Checksum: {result['checksum']}")
-    ```
-  </Tab>
-</Tabs>
+```javascript JavaScript
+// Send hex string as JSON
+const hexData = "0x48656c6c6f20576f726c64..."; // Your quote as hex
+
+const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ hex: hexData })
+});
+
+const result = await response.json();
+console.log('Verification result:', result);
+```
+
+```python Python
+import requests
+
+# Send quote as hex string
+hex_data = "0x48656c6c6f20576f726c64..."  # Your quote as hex
+
+response = requests.post(
+    'https://cloud-api.phala.network/api/v1/attestations/verify',
+    json={'hex': hex_data}
+)
+
+result = response.json()
+print(f"Success: {result['success']}")
+print(f"Verified: {result['quote']['verified']}")
+print(f"Checksum: {result['checksum']}")
+```
+
+</CodeGroup>
 
 #### Hex Form Example
 
-<Tabs>
+<CodeGroup>
 
-  <Tab title="Hex Form - cURL">
-    ```bash
-    curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
-      -H "Content-Type: application/x-www-form-urlencoded" \
-      -d "hex=48656c6c6f20576f726c64..."
-    ```
-  </Tab>
-  <Tab title="Hex JSON - JavaScript">
-    ```javascript
-    // Send hex string as JSON
-    const hexData = "0x48656c6c6f20576f726c64..."; // Your quote as hex
-    
-    const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ hex: hexData })
-    });
+```bash cURL
+curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "hex=48656c6c6f20576f726c64..."
+```
 
-    const result = await response.json();
-    console.log('Verification result:', result);
-    ```
-  </Tab>
-  <Tab title="Hex Form - Python">
-    ```python
-    import requests
+```javascript JavaScript
+// Send hex string as form data
+const hexData = "48656c6c6f20576f726c64..."; // Your quote as hex
 
-    # Send quote as hex form data
-    hex_data = "48656c6c6f20576f726c64..."  # Your quote as hex (no 0x prefix needed)
-    
-    response = requests.post(
-        'https://cloud-api.phala.network/api/v1/attestations/verify',
-        data={'hex': hex_data}
-    )
-    
-    result = response.json()
-    print(f"Success: {result['success']}")
-    print(f"Verified: {result['quote']['verified']}")
-    print(f"Checksum: {result['checksum']}")
-    ```
-  </Tab>
-</Tabs>
+const formData = new URLSearchParams();
+formData.append('hex', hexData);
+
+const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  body: formData
+});
+
+const result = await response.json();
+console.log('Verification result:', result);
+```
+
+```python Python
+import requests
+
+# Send quote as hex form data
+hex_data = "48656c6c6f20576f726c64..."  # Your quote as hex (no 0x prefix needed)
+
+response = requests.post(
+    'https://cloud-api.phala.network/api/v1/attestations/verify',
+    data={'hex': hex_data}
+)
+
+result = response.json()
+print(f"Success: {result['success']}")
+print(f"Verified: {result['quote']['verified']}")
+print(f"Checksum: {result['checksum']}")
+```
+
+</CodeGroup>
 
 **Response:**
 ```json
@@ -218,45 +214,43 @@ Upload your attestation quote to Phala Cloud for secure storage and cryptographi
 
 Retrieve full details about any quote stored in Phala Cloud using its checksum:
 
-<Tabs>
-  <Tab title="cURL">
-    ```bash
-    curl "https://cloud-api.phala.network/api/v1/attestations/view/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
-    ```
-  </Tab>
-  <Tab title="JavaScript">
-    ```javascript
-    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
-    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/view/${checksum}`);
-    
-    if (response.ok) {
-      const quote = await response.json();
-      console.log('TEE Type:', quote.header.tee_type);
-      console.log('MRTD:', quote.body.mrtd);
-      console.log('Verified:', quote.verified);
-    } else {
-      console.error('Quote not found');
-    }
-    ```
-  </Tab>
-  <Tab title="Python">
-    ```python
-    import requests
+<CodeGroup>
 
-    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
-    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/view/{checksum}')
-    
-    if response.status_code == 200:
-        quote = response.json()
-        print(f"TEE Type: {quote['header']['tee_type']}")
-        print(f"MRTD: {quote['body']['mrtd']}")
-        print(f"Verified: {quote['verified']}")
-        print(f"Uploaded: {quote['uploaded_at']}")
-    else:
-        print('Quote not found')
-    ```
-  </Tab>
-</Tabs>
+```bash cURL
+curl "https://cloud-api.phala.network/api/v1/attestations/view/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
+```
+
+```javascript JavaScript
+const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/view/${checksum}`);
+
+if (response.ok) {
+  const quote = await response.json();
+  console.log('TEE Type:', quote.header.tee_type);
+  console.log('MRTD:', quote.body.mrtd);
+  console.log('Verified:', quote.verified);
+} else {
+  console.error('Quote not found');
+}
+```
+
+```python Python
+import requests
+
+checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/view/{checksum}')
+
+if response.status_code == 200:
+    quote = response.json()
+    print(f"TEE Type: {quote['header']['tee_type']}")
+    print(f"MRTD: {quote['body']['mrtd']}")
+    print(f"Verified: {quote['verified']}")
+    print(f"Uploaded: {quote['uploaded_at']}")
+else:
+    print('Quote not found')
+```
+
+</CodeGroup>
 
 **Response Example:**
 ```json
@@ -286,96 +280,92 @@ Retrieve full details about any quote stored in Phala Cloud using its checksum:
 
 Download the original binary quote data stored in Phala Cloud (5,006 bytes for this example):
 
-<Tabs>
-  <Tab title="cURL">
-    ```bash
-    curl "https://cloud-api.phala.network/api/v1/attestations/raw/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139" \
-      --output quote.bin
-    ```
-  </Tab>
-  <Tab title="JavaScript">
-    ```javascript
-    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
-    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/raw/${checksum}`);
-    
-    if (response.ok) {
-      const blob = await response.blob();
-      
-      // Save to file in browser
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${checksum}.bin`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      console.log(`Downloaded ${blob.size} bytes`);
-    }
-    ```
-  </Tab>
-  <Tab title="Python">
-    ```python
-    import requests
+<CodeGroup>
 
-    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
-    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}')
-    
-    if response.status_code == 200:
-        with open(f'{checksum}.bin', 'wb') as f:
-            f.write(response.content)
-        print(f'Downloaded {len(response.content)} bytes to {checksum}.bin')
-    else:
-        print('Quote not found')
-    ```
-  </Tab>
-</Tabs>
+```bash cURL
+curl "https://cloud-api.phala.network/api/v1/attestations/raw/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139" \
+  --output quote.bin
+```
+
+```javascript JavaScript
+const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/raw/${checksum}`);
+
+if (response.ok) {
+  const blob = await response.blob();
+  
+  // Save to file in browser
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${checksum}.bin`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  console.log(`Downloaded ${blob.size} bytes`);
+}
+```
+
+```python Python
+import requests
+
+checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}')
+
+if response.status_code == 200:
+    with open(f'{checksum}.bin', 'wb') as f:
+        f.write(response.content)
+    print(f'Downloaded {len(response.content)} bytes to {checksum}.bin')
+else:
+    print('Quote not found')
+```
+
+</CodeGroup>
 
 ### 4. Get Verification Collateral
 
 Retrieve the cryptographic collateral that Phala Cloud uses for quote verification:
 
-<Tabs>
-  <Tab title="cURL">
-    ```bash
-    curl "https://cloud-api.phala.network/api/v1/attestations/collateral/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
-    ```
-  </Tab>
-  <Tab title="JavaScript">
-    ```javascript
-    const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
-    const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/collateral/${checksum}`);
-    const collateral = await response.json();
-    
-    // Parse the JSON strings inside the collateral
-    const tcbInfo = JSON.parse(collateral.tcb_info);
-    const qeIdentity = JSON.parse(collateral.qe_identity);
-    
-    console.log('Platform FMSPC:', tcbInfo.fmspc);
-    console.log('TCB Issue Date:', tcbInfo.issueDate);
-    console.log('QE Identity Version:', qeIdentity.version);
-    ```
-  </Tab>
-  <Tab title="Python">
-    ```python
-    import requests
-    import json
+<CodeGroup>
 
-    checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
-    response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/collateral/{checksum}')
-    collateral = response.json()
-    
-    # Parse the JSON strings inside the collateral
-    tcb_info = json.loads(collateral['tcb_info'])
-    qe_identity = json.loads(collateral['qe_identity'])
-    
-    print(f"Platform FMSPC: {tcb_info['fmspc']}")
-    print(f"TCB Issue Date: {tcb_info['issueDate']}")
-    print(f"QE Identity Version: {qe_identity['version']}")
-    ```
-  </Tab>
-</Tabs>
+```bash cURL
+curl "https://cloud-api.phala.network/api/v1/attestations/collateral/9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139"
+```
+
+```javascript JavaScript
+const checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139';
+const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/collateral/${checksum}`);
+const collateral = await response.json();
+
+// Parse the JSON strings inside the collateral
+const tcbInfo = JSON.parse(collateral.tcb_info);
+const qeIdentity = JSON.parse(collateral.qe_identity);
+
+console.log('Platform FMSPC:', tcbInfo.fmspc);
+console.log('TCB Issue Date:', tcbInfo.issueDate);
+console.log('QE Identity Version:', qeIdentity.version);
+```
+
+```python Python
+import requests
+import json
+
+checksum = '9540fda5e6416c9d02bae726b146be58bee3caccfe7f874dbc68c808a13b1139'
+response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/collateral/{checksum}')
+collateral = response.json()
+
+# Parse the JSON strings inside the collateral
+tcb_info = json.loads(collateral['tcb_info'])
+qe_identity = json.loads(collateral['qe_identity'])
+
+print(f"Platform FMSPC: {tcb_info['fmspc']}")
+print(f"TCB Issue Date: {tcb_info['issueDate']}")
+print(f"QE Identity Version: {qe_identity['version']}")
+```
+
+</CodeGroup>
 
 ## Understanding the Response
 
