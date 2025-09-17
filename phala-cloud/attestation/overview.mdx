@@ -1,7 +1,6 @@
 ---
-description: Security features and remote attestation capabilities of Phala Cloud
-  TEE.
-title: What is Attestation
+description: Understanding remote attestation reports, verification process, and key fields in TEE security
+title: Understanding Attestation
 ---
 
 
@@ -210,13 +209,19 @@ When working with dstack TEE deployments, pay special attention to:
 
 Check more instructions [here](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md) on how Dstack attestation work.
 
-## Conclusion
+## Next Steps
 
-Understanding attestation reports is crucial for developers working with TEE environments. By correctly interpreting these fields, you can verify that your application is running in a genuine, secure environment with the expected configuration and code.
+Now that you understand attestation data, explore these practical guides:
 
-For more detailed information on Intel TDX attestation, refer to the Intel TDX Module documentation. For dstack-specific attestation flows, consult the dstack documentation and GitHub repository at [https://github.com/dstack-TEE/dstack](https://github.com/dstack-TEE/dstack).
+- **[Generate Attestation](/phala-cloud/attestation/get-attestation)** - Create quotes using dstack SDK
+- **[API Quick Start](/phala-cloud/attestation/api-quickstart)** - Verify quotes with Phala Cloud API  
+- **[API Reference](/phala-cloud/phala-cloud-api/attestations)** - Complete endpoint documentation
 
-Full verification script: [https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)
+## External Resources
+
+- **Intel TDX Module Documentation** - Official Intel specifications
+- **dstack Attestation Guide** - [https://github.com/dstack-TEE/dstack/blob/master/attestation.md](https://github.com/dstack-TEE/dstack/blob/master/attestation.md)
+- **Verification Script Example** - [https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)
 
 ## Public PCCS Server
 

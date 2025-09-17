@@ -56,19 +56,17 @@ Next, install the following on your system:
 * [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config)
 * [OpenSSL](https://www.openssl.org/) development package
 
-<Tabs>
-<Tab title="apt">
-```bash
+<CodeGroup>
+
+```bash apt
 sudo apt install -y build-essential pkg-config libssl-dev protobuf-compiler
 ```
-</Tab>
 
-<Tab title="dnf">
-```bash
+```bash dnf
 sudo dnf install -y gcc protobuf-compiler pkg-config openssl-devel openssl1.1
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 ## Deploy via devPHAse
 
@@ -84,41 +82,37 @@ Currently, `npm` and `npx` commands do not work and will report an error `invali
 
 ### 1) Install devPHAse and required libs
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn init
 yarn add -D typescript ts-node
 yarn add -D @devphase/cli
 yarn add -D @devphase/service
 ```
-</Tab>
 
-<Tab title="npm">
-```bash
+```bash npm
 npm init
 npm install -D typescript ts-node
 npm install -D @devphase/cli
 npm install -D @devphase/service
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 ### 2) Init project
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase init
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase init
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 Your directory will be initiated with all required files and template Flipper contract.
 
@@ -138,45 +132,41 @@ Your directory will be initiated with all required files and template Flipper co
 
 ### 3) Prepare environment
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase check
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase check
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 This command will ensure the proper stack (node, pruntime, pherry) is ready to run. Download stack from official repository. Verify dependencies.
 
 #### Output:
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase check
 [StackBinaryDownloader] Creating stack directory
   ✔ Checking configuration file
   ✔ Check dependencies
   ✔ Checking Phala stack binaries
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase check
 [StackBinaryDownloader] Creating stack directory
   ✔ Checking configuration file
   ✔ Check dependencies
   ✔ Checking Phala stack binaries
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 You will see a new directory called `stacks/` has been created
 
@@ -194,25 +184,23 @@ Now you are ready to go.
 
 ### 4) Compile contract
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase contract compile -c flipper
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase contract compile -c flipper
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase contract compile -c flipper
 [MultiContractExecutor] Criteria: flipper
 [MultiContractExecutor] Matched contracts:
@@ -222,10 +210,8 @@ yarn devphase contract compile -c flipper
   ✔ flipper
 Done in 32.49s.
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase contract compile -c flipper
 [MultiContractExecutor] Criteria: flipper
 [MultiContractExecutor] Matched contracts:
@@ -234,8 +220,8 @@ npx devphase contract compile -c flipper
   ❯ flipper
   ✔ flipper
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 This command will:
 
@@ -262,31 +248,25 @@ New files:
 Currently, `npm` and `npx` commands do not work and will report an error `invalid format for V0 (detected) contract metadata`. Opt to use `yarn` until the problem is resolved.
 </Note>
 
-<Tabs>
-<Tab title="yarn w/o logger">
-```bash
+<CodeGroup>
+
+```bash Yarn w/o logger
 yarn devphase contract test -t flipper
 ```
-</Tab>
 
-<Tab title="yarn w/ logger">
-```bash
+```bash Yarn w/ logger
 yarn devphase contract test -t flipper -m 3
 ```
-</Tab>
 
-<Tab title="npx w/o logger ">
-```bash
+```bash npx w/o logger
 npx devphase contract test -t flipper
 ```
-</Tab>
 
-<Tab title="npx w/ logger">
-```basic
+```bash npx w/ logger
 yarn devphase contract test -t flipper -m 3
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 devPHAse in default config will:
 
@@ -298,9 +278,9 @@ devPHAse in default config will:
 
 #### Output:
 
-<Tabs>
-<Tab title="yarn w/o logger">
-```bash
+<CodeGroup>
+
+```bash Yarn w/o logger
 yarn devphase contract test -t flipper
 [StackBinaryDownloader] Preparing Phala stack release nightly-2024-03-13
   ✔ Checking releases directory
@@ -347,10 +327,8 @@ yarn devphase contract test -t flipper
 [StackManager] node exited
 Done in 33.00s.
 ```
-</Tab>
 
-<Tab title="yarn w/ logger">
-```bash
+```bash Yarn w/ logger
 yarn devphase contract test -t flipper -m 3
 [StackBinaryDownloader] Preparing Phala stack release nightly-2024-03-13
   ✔ Checking releases directory
@@ -412,8 +390,8 @@ Logs from pink server:
 [StackManager] node exited
 Done in 59.67s.
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 New directories created for logs.
 
@@ -438,19 +416,17 @@ This command will start and keep running all stack components. However, network 
 Currently, `npm` and `npx` commands do not work and will report an error `invalid format for V0 (detected) contract metadata`. Opt to use `yarn` until the problem is resolved.
 </Note>
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase stack run --save-logs
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase stack run --save-logs
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 ### 7) Configure network
 
@@ -460,19 +436,17 @@ Now let's configure the network to enable your local environment to deploy a Pha
 Currently, `npm` and `npx` commands do not work and will report an error `invalid format for V0 (detected) contract metadata`. Opt to use `yarn` until the problem is resolved.
 </Note>
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase stack setup -m 3
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase stack setup -m 3
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
@@ -510,19 +484,17 @@ Now all required network components should be ready for Phat Contract deployment
 Currently, `npm` and `npx` commands do not work and will report an error `invalid format for V0 (detected) contract metadata`. Opt to use `yarn` until the problem is resolved.
 </Note>
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase contract test -t flipper -e
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase contract test -t flipper -e
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
@@ -574,19 +546,17 @@ Done in 24.33s.
 
 DevPHAse will run script on specified environment. If environment provides a PinkLogger - logs will be saved locally.
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase script scripts/deploy.ts
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase script scripts/deploy.ts
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
@@ -606,19 +576,17 @@ Done in 9.62s.
 
 Using the contract ID from the previous script `0x8e132d6bdebe37824b31df98669063d52d25d7eb0c40358c7f0e47876bc8a879` modify contractIds variable in `scripts/get-logs.ts` then execute the script to get logs.
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase script scripts/get-logs.ts
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase script scripts/get-logs.ts
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
@@ -662,19 +630,17 @@ You can specify to run commands on any network - including PoC6 Testnet or Phala
 
 #### Deploy contract command
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase help contract deploy
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase help contract deploy
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
@@ -702,19 +668,17 @@ Done in 0.99s.
 
 #### Call contract command
 
-<Tabs>
-<Tab title="yarn">
-```bash
+<CodeGroup>
+
+```bash Yarn
 yarn devphase help contract call
 ```
-</Tab>
 
-<Tab title="npx">
-```bash
+```bash npx
 npx devphase help contract call
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 #### Output:
 
