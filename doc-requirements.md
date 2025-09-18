@@ -68,10 +68,10 @@ Ask: Does this read like a story I'm being guided through, or like an API refere
 
 Different documentation types serve different purposes. Never mix them up:
 
-- **Quickstart**: 5 minutes to success, nothing more. If it's 596 lines, it's not a quickstart.
-- **Reference**: Complete technical specifications. Every field, every parameter. Comprehensiveness over brevity.
-- **Overview**: Conceptual understanding, not implementation details.
-- **How-to**: Step-by-step implementation with clear purpose.
+- Tutorials: Learning-oriented content for new users
+- How-to guides: Task-oriented guidance for specific problems
+- Explanations: Understanding-oriented conceptual discussions
+- Reference: Information-oriented technical descriptions
 
 Bad example:
 A "quickstart" that includes full API specifications, conceptual explanations, and multiple advanced scenarios.

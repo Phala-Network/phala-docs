@@ -1,0 +1,101 @@
+---
+title: Enable SSH Access  
+description: Connect to your CVM via SSH for debugging and management
+---
+
+<Warning>
+SSH access is only available when you deploy with a **Development OS** image. Select "Development" as the OS type when creating your CVM. Production OS images have SSH disabled for security.
+</Warning>
+
+This guide shows you how to SSH into your CVM through the secure gateway tunnel.
+
+## Prerequisites
+
+- SSH client on your local machine
+- OpenSSL installed
+- CVM deployed with Development OS
+
+## Step 1: Set Root Credentials
+
+When deploying your CVM, set one of these environment variables:
+
+**For password authentication:**
+- Add `DSTACK_ROOT_PASSWORD` as a secure environment variable
+
+**For key-based authentication (recommended):**
+- Add `DSTACK_ROOT_PUBLIC_KEY` with your SSH public key
+
+If you need to add credentials after deployment, use "Code Update" in the dashboard to modify environment variables.
+
+## Step 2: Configure Your SSH Client
+
+Add this to your `~/.ssh/config` file:
+
+```bash
+Host my-cvm
+    HostName <app-id>-22.<cluster>.phala.network
+    User root
+    Port 443
+    ProxyCommand openssl s_client -quiet -connect %h:%p
+```
+
+Replace:
+- `<app-id>` with your application ID (find it in the dashboard)
+- `<cluster>` with your cluster (e.g., `us`)
+
+## Step 3: Connect
+
+```bash
+ssh my-cvm
+```
+
+That's it. You're now connected to your CVM through the secure gateway tunnel.
+
+<Note>
+**macOS users:** If you encounter connection timeouts, you may have LibreSSL instead of OpenSSL. Install OpenSSL via Homebrew (`brew install openssl`) and update your ProxyCommand to use the full path to the Homebrew OpenSSL binary.
+</Note>
+
+## What You Can Do
+
+Once connected, you have full access to debug and manage your CVM:
+
+```bash
+# Check containers
+docker ps -a
+docker logs <container-name>
+
+# Monitor resources
+htop
+docker stats
+
+# Debug networking
+curl http://localhost:8080
+netstat -tulpn
+wg show
+```
+
+## Security Notes
+
+- SSH traffic is tunneled through TLS via the gateway
+- Only your code inside the TEE can see the decrypted SSH session
+- Use key-based authentication for production debugging
+- Remember to switch to Production OS when you're done debugging
+
+## Troubleshooting
+
+**Permission denied?**
+- Verify your credentials are set in environment variables
+- Use "Code Update" to add them if forgotten during deployment
+
+**Connection timeout?**
+- Check your OpenSSL version: `openssl version`
+- macOS users: ensure you're using OpenSSL, not LibreSSL
+
+**Connection refused?**
+- Confirm you deployed with Development OS, not Production OS
+
+## Next Steps
+
+- [Monitor logs](/phala-cloud/monitoring/public-logs)
+- [Set up custom domains](/phala-cloud/networking/how-to/setup-custom-domain)
+- [Learn about security](/phala-cloud/networking/security)

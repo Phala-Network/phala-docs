@@ -1,0 +1,50 @@
+---
+title: Networking Quickstart
+description: Deploy a service with public HTTPS access in under 5 minutes
+---
+
+This quickstart shows you how to deploy a web service with public HTTPS access.
+
+## Deploy Your First Service
+
+Create a file named `docker-compose.yml`:
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+```
+
+Deploy through the [Phala Cloud Dashboard](https://cloud.phala.network):
+1. Click "Create CVM"
+2. Select "docker-compose.yml"
+3. Paste the file above
+4. Click "Deploy"
+
+## Access Your Service
+
+After deployment completes (about 2 minutes), find your endpoint in the dashboard:
+
+```
+https://<app-id>-8000.us.phala.network
+```
+
+The format is always `<app-id>-<port>.<cluster>.phala.network`. Your app ID is generated automatically.
+
+Click the link to see the nginx welcome page. Your service is now publicly accessible via HTTPS.
+
+## What You've Deployed
+
+Your nginx container is now:
+- Running in a Confidential Virtual Machine (Intel TDX)
+- Accessible via HTTPS with automatic TLS certificates
+- Connected through secure WireGuard tunneling
+
+## Next Steps
+
+- [Expose multiple ports](/phala-cloud/networking/how-to/expose-http-service)
+- [Set up a custom domain](/phala-cloud/networking/how-to/setup-custom-domain)
+- [Connect a database](/phala-cloud/networking/how-to/expose-tcp-service)
+- [Understand the security model](/phala-cloud/networking/security)

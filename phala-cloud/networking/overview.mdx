@@ -1,12 +1,70 @@
 ---
-description: Deploy confidential applications with Phala Cloud's managed TEE infrastructure.
-title: Overview
+title: Networking Architecture
+description: How Phala Cloud handles networking for your confidential applications - secure by default, simple to use
 ---
 
+Phala Cloud provides secure networking for your applications by default. Every connection is encrypted and every service runs in isolation.
 
-To export your service publicly, you need to configure the PORT exposing when deploying your application. After deployment, click **View Details** in the top-right corner of the CVM instance card and switch to the **Network** tab below. You will see the list of **Endpoint** there. These URLs are generated automatically by parsing the PORT configurations in the Docker Compose file. The format for the URL prefix is `<app id or instance id>-<port>.<server cluster>.phala.network`.
+## How It Works
 
-<Frame caption="access-cvm">
-    <img src="/images/cloud-network-page.png" alt="access-cvm" />
+When you deploy an application to Phala Cloud, we automatically set up secure networking for you. Your app runs inside a Confidential Virtual Machine (CVM) that's completely isolated from other applications.
 
-</Frame>
+Here's what happens when someone connects to your app:
+
+First, their request hits our gateway - think of it as a smart load balancer that knows where every application lives. The gateway creates a secure tunnel to your CVM using WireGuard (like a VPN). Your application never sees raw internet traffic.
+
+The result is enterprise-grade security without manual configuration. VPN tunnels, firewall rules, and certificates are handled automatically.
+
+## Your Application's Network
+
+Every application gets a public URL automatically:
+```
+https://<app-id>-<port>.us.phala.network
+```
+
+This URL routes to your application through our secure gateway. If you expose multiple ports, each gets its own endpoint. For example, port 8080 becomes `<app-id>-8080.us.phala.network`.
+
+Want your own domain like `api.mycompany.com`? Add the dstack-ingress container to your deployment. It handles SSL certificates from Let's Encrypt automatically.
+
+## What Makes This Secure?
+
+Traditional cloud networking trusts the network itself. If you're inside the network, you're trusted. That's how breaches spread.
+
+Phala Cloud uses zero-trust networking instead. Even inside our network, nothing is trusted by default. Every connection must prove it's legitimate through cryptographic verification.
+
+Your CVM can even prove it's running in secure hardware. This is called Remote Attestation - it's like showing an ID that can't be faked. Clients can verify they're talking to your real application, not an imposter.
+
+## Common Networking Tasks
+
+**Need to expose a web service?**
+Just add ports to your docker-compose.yml. We handle the rest.
+
+**Want to connect a database?**
+Expose the database port with TLS passthrough. Your database stays encrypted end-to-end.
+
+**Building a gRPC service?**
+We support HTTP/2 natively. Add the 'g' suffix to your port and you're ready.
+
+**Need to restrict outbound traffic?**
+CVMs have controlled egress by default. You decide what your app can access.
+
+## The Two Main Components
+
+### dstack-gateway
+This is our main gateway that handles all incoming traffic. It provides load balancing, automatic TLS, and secure routing to your applications. You don't interact with it directly - it just works in the background.
+
+### dstack-ingress (Optional)
+Add this to your deployment when you need custom domains. It integrates with your DNS provider (Cloudflare, Linode, or Namecheap) to set up your domain and manage SSL certificates.
+
+## What's Next?
+
+Ready to deploy something? The [quickstart](/phala-cloud/networking/quickstart) gets you running in 5 minutes.
+
+Need to do something specific? Check our how-to guides:
+- [Expose an HTTP service](/phala-cloud/networking/how-to/expose-http-service)
+- [Set up a custom domain](/phala-cloud/networking/how-to/setup-custom-domain)
+- [Enable SSH access](/phala-cloud/networking/how-to/enable-ssh-access)
+
+Want all the technical details? See the [complete reference](/phala-cloud/networking/reference).
+
+Curious about security? Dive into our [security architecture](/phala-cloud/networking/security).

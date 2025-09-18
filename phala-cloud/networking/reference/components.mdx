@@ -1,0 +1,266 @@
+---
+title: Network Architecture
+description: How networking components affect your application's performance and design
+---
+
+Understanding how Phala Cloud routes your traffic helps you design better applications. This reference explains the key components and their performance implications.
+
+## Traffic Routing
+
+Every request to your application follows a specific path that affects latency and throughput.
+
+### The Request Journey
+
+When a client connects to `abc123-8080.us.phala.network`, here's what happens:
+
+1. **TLS Handshake** (1-2ms): Client establishes secure connection to gateway
+2. **SNI Routing** (<1ms): Gateway reads the hostname to determine target CVM
+3. **WireGuard Tunnel** (<1ms): Encrypted forwarding to your container
+4. **Container Processing**: Your application handles the request
+
+Total network overhead: approximately 2-3ms on top of your application's response time.
+
+### Routing Decisions
+
+The gateway makes routing decisions based on your URL pattern:
+
+```
+abc123-8080.us.phala.network   → TLS termination → HTTP to container
+abc123-5432s.us.phala.network  → TLS passthrough → Raw TLS to container  
+abc123-50051g.us.phala.network → HTTP/2 enabled → gRPC to container
+```
+
+**Why this matters for your app:**
+- Default mode handles TLS for you - simplest for web apps
+- Passthrough mode (`s`) preserves client certificates for databases
+- gRPC mode (`g`) enables HTTP/2 multiplexing for better streaming performance
+
+## Load Balancing
+
+When you scale to multiple instances, the gateway automatically distributes traffic.
+
+### How Instances Are Selected
+
+The gateway maintains a health-based selection algorithm:
+
+1. Tracks the last successful connection to each instance
+2. Considers instances "healthy" if contacted within 5 minutes
+3. Routes new connections to the most recently healthy instances
+
+**Design implications:**
+- Instances that stop responding are automatically removed from rotation
+- New instances are added to rotation as soon as they establish connection
+- No need for explicit health check endpoints (though you can add them)
+
+### Session Affinity
+
+Currently, there's no session affinity (sticky sessions). Each request may go to a different instance.
+
+**Architecture considerations:**
+- Use external storage (Redis, database) for session data
+- Design stateless services when possible
+- Consider client-side state management for real-time features
+
+## TLS Handling
+
+How TLS is handled significantly affects your application design.
+
+### TLS Termination (Default)
+
+The gateway handles all TLS complexity:
+- Manages certificates automatically
+- Decrypts traffic before forwarding
+- Your app receives plain HTTP
+
+**When to use:** Most web applications, APIs, microservices.
+
+### TLS Passthrough
+
+Your application handles TLS directly:
+- Gateway forwards encrypted traffic as-is
+- You manage certificates in your container
+- Enables advanced TLS features like mutual TLS
+
+**When to use:** Databases requiring TLS, services needing client certificates, custom protocols.
+
+## Custom Domains
+
+Adding custom domains involves an additional ingress component that affects architecture.
+
+### How It Works
+
+When you add a custom domain ingress:
+
+1. It obtains certificates from Let's Encrypt (1-2 minutes initially)
+2. Creates DNS records pointing to your CVM
+3. Proxies traffic from your domain to your application
+
+**Performance impact:**
+- Additional hop adds ~1ms latency
+- Certificate renewal happens automatically (zero downtime)
+- DNS propagation takes 2-15 minutes depending on provider
+
+### DNS Provider Performance
+
+Your choice of DNS provider affects initial setup time:
+
+| Provider | Setup Time | Best For |
+|----------|------------|----------|
+| Cloudflare | 1-2 min | Production apps needing fast changes |
+| Linode | 2-5 min | Apps already on Linode infrastructure |
+| Namecheap | 5-15 min | Development and testing |
+
+## Network Security Boundaries
+
+Understanding security boundaries helps you design secure applications.
+
+### What's Encrypted Where
+
+```
+Client → [TLS] → Gateway → [WireGuard] → CVM → [Plain] → Container
+```
+
+- **Client to Gateway**: Standard TLS encryption
+- **Gateway to CVM**: WireGuard tunnel encryption
+- **Inside CVM**: Unencrypted between containers
+
+**Security implications:**
+- Inter-container traffic within same CVM is not encrypted
+- Use TLS passthrough for end-to-end encryption needs
+- Gateway operators cannot see traffic contents (zero-trust)
+
+### Isolation Levels
+
+Each CVM operates in complete isolation:
+- Separate WireGuard tunnel with unique keys
+- Independent IP address space
+- Memory encryption via Intel TDX hardware
+
+**What this means for multi-tenant apps:**
+- Safe to run different customers in different CVMs
+- Cannot share memory or files between CVMs
+- Network segmentation is enforced at hardware level
+
+## Performance Considerations
+
+Key metrics that affect your application design.
+
+### Latency Budget
+
+Where latency comes from in your stack:
+
+| Component | Latency | Can Optimize? |
+|-----------|---------|---------------|
+| TLS handshake | 10-30ms (first connection) | Use connection pooling |
+| Gateway routing | 1-2ms | No (fixed overhead) |
+| WireGuard tunnel | <1ms | No (fixed overhead) |
+| Your application | Variable | Yes - your code |
+
+### Throughput Limits
+
+Practical limits you'll encounter:
+
+- **Single connection**: Limited by instance bandwidth (typically 1-10 Gbps)
+- **Concurrent connections**: Thousands per instance (memory dependent)
+- **New connections/sec**: Hundreds per instance (CPU dependent)
+
+**Scaling strategies:**
+- Scale horizontally for more concurrent connections
+- Use connection pooling to reduce handshake overhead
+- Enable HTTP/2 for multiplexing (`g` suffix for gRPC)
+
+### Resource Planning
+
+Each network connection consumes resources:
+
+- **Memory**: ~10-50KB per active connection
+- **CPU**: Highest during TLS handshake
+- **Bandwidth**: Shared across all connections
+
+Plan your instance size based on expected concurrent connections, not just throughput.
+
+## Observable Behavior
+
+What you can monitor to understand network health.
+
+### From Your Application
+
+Metrics available to your code:
+
+- Connection count via `netstat` or `/proc/net/tcp`
+- Response times in your application logs
+- Failed connections in your error logs
+
+### From Outside
+
+What external monitoring sees:
+
+- HTTPS endpoint availability
+- TLS certificate status at `/evidences/` (custom domains)
+- Response time including network overhead
+
+### Common Patterns
+
+Network patterns that indicate issues:
+
+- **Sudden latency spike**: Possible instance overload or failover
+- **Connection refused**: Container not listening on expected port
+- **TLS errors**: Wrong mode (check `s` or `g` suffix usage)
+- **Intermittent failures**: Could indicate unhealthy instances in rotation
+
+## Architecture Best Practices
+
+Design patterns that work well with this network architecture.
+
+### For Stateless Services
+
+- Let the gateway handle load balancing
+- Use external storage for any shared state
+- Design for horizontal scaling from day one
+
+### For Stateful Services
+
+- Use TLS passthrough mode for database protocols
+- Consider single-instance deployment for consistency
+- Implement your own health checks for complex state
+
+### For Real-time Applications
+
+- Use WebSocket over default HTTPS mode
+- Implement reconnection logic (no session affinity)
+- Consider client-side state reconciliation
+
+### For Microservices
+
+- Keep inter-service communication within same CVM when possible
+- Use gRPC mode (`g` suffix) for service-to-service calls
+- Design for eventual consistency across CVMs
+
+## Making Architecture Decisions
+
+Quick decision framework based on network architecture:
+
+**Choose default mode when:**
+- Building standard web applications
+- Want automatic TLS management
+- Need simple load balancing
+
+**Choose TLS passthrough when:**
+- Running databases with TLS requirements
+- Need client certificate authentication
+- Using non-HTTP protocols over TLS
+
+**Choose custom domains when:**
+- Need branded URLs for production
+- Require specific domain features
+- Building multi-tenant applications
+
+**Scale horizontally when:**
+- Need more concurrent connections
+- Want automatic failover
+- Building stateless services
+
+**Scale vertically when:**
+- Running stateful services
+- Need maximum single-connection throughput
+- Have high memory requirements per connection

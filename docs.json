@@ -266,8 +266,28 @@
                 "icon": "network",
                 "pages": [
                   "/phala-cloud/networking/overview",
-                  "/phala-cloud/networking/expose-service-port",
-                  "/phala-cloud/networking/setting-up-custom-domain"
+                  "/phala-cloud/networking/quickstart",
+                  {
+                    "group": "How-To Guides",
+                    "pages": [
+                      "/phala-cloud/networking/how-to/expose-http-service",
+                      "/phala-cloud/networking/how-to/setup-custom-domain",
+                      "/phala-cloud/networking/how-to/enable-ssh-access",
+                      "/phala-cloud/networking/how-to/expose-tcp-service",
+                      "/phala-cloud/networking/how-to/setup-grpc-service",
+                      "/phala-cloud/networking/how-to/tls-passthrough",
+                      "/phala-cloud/networking/how-to/egress-security"
+                    ]
+                  },
+                  {
+                    "group": "Reference",
+                    "pages": [
+                      "/phala-cloud/networking/reference/specifications",
+                      "/phala-cloud/networking/reference/components"
+                    ]
+                  },
+                  "/phala-cloud/networking/security",
+                  "/phala-cloud/networking/troubleshooting"
                 ]
               },
               {

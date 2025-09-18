@@ -1,0 +1,91 @@
+---
+title: Networking Reference
+description: Quick lookup for URL patterns, environment variables, and configuration parameters
+---
+
+## URL Patterns
+
+| Pattern | Protocol | Example |
+|---------|----------|---------|
+| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `abc123-8080.us.phala.network` |
+| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `abc123-50051g.us.phala.network` |
+| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `abc123-5432s.us.phala.network` |
+| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `abc123-22.us.phala.network` |
+
+- All external connections use port 443
+- `{app-id}` is auto-generated on deployment
+- `{port}` matches your container's exposed port
+- `{cluster}` is regional (us, eu, asia)
+
+## Environment Variables
+
+### Auto-populated
+| Variable | Value | Example |
+|----------|-------|---------|
+| `DSTACK_APP_ID` | Application identifier | `abc123def456` |
+| `DSTACK_GATEWAY_DOMAIN` | Regional domain | `us.phala.network` |
+
+### SSH Access
+| Variable | Type | Purpose |
+|----------|------|---------|
+| `DSTACK_ROOT_PASSWORD` | string | Root password (dev images only) |
+| `DSTACK_ROOT_PUBLIC_KEY` | string | SSH public key (dev images only) |
+
+### Custom Domains
+| Variable | Required | Type | Purpose |
+|----------|----------|------|---------|
+| `DOMAIN` | Yes | string | Custom domain name |
+| `TARGET_ENDPOINT` | Yes | string | `http://service:port` or `grpc://service:port` |
+| `GATEWAY_DOMAIN` | Yes | string | `_.${DSTACK_GATEWAY_DOMAIN}` |
+| `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
+| `SET_CAA` | No | boolean | Enable CAA records (default: false) |
+| `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
+
+### DNS Provider Credentials
+| Provider | Variables | Required Permissions |
+|----------|-----------|---------------------|
+| Cloudflare | `CLOUDFLARE_API_TOKEN` | Zone:Read, DNS:Edit |
+| Linode | `LINODE_API_TOKEN` | Domains:Read/Write |
+| Namecheap | `NAMECHEAP_USERNAME`, `NAMECHEAP_API_KEY`, `NAMECHEAP_CLIENT_IP` | API enabled |
+
+## Protocol Support
+
+| Protocol | Default Mode | Passthrough Mode |
+|----------|--------------|------------------|
+| HTTP/1.1 | ✅ | ✅ |
+| HTTP/2 | ✅ (with `g` suffix) | ✅ |
+| WebSocket | ✅ | ✅ |
+| TCP+TLS | ❌ | ✅ (with `s` suffix) |
+| UDP | ❌ | ❌ |
+
+## Docker Images
+
+| Component | Image | Hash |
+|-----------|-------|------|
+| Custom domains | `kvin/dstack-ingress` | `sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd` |
+
+## Rate Limits
+
+### DNS Providers
+| Provider | API Limits | Certificate Speed |
+|----------|------------|-------------------|
+| Cloudflare | 1200 req/5min | 1-2 minutes |
+| Linode | 800 req/hour | 2-5 minutes |
+| Namecheap | 50 req/hour | 5-15 minutes |
+
+### Let's Encrypt
+| Limit | Rate |
+|-------|------|
+| Certificates per domain | 50/week |
+| Duplicate certificates | 5/week |
+| Failed validations | 5/hour per hostname |
+
+## SSH Configuration
+
+| Setting | Value |
+|---------|-------|
+| Connection method | TCP over TLS via gateway |
+| External port | 443 |
+| SSH config | `ProxyCommand openssl s_client -quiet -connect %h:%p` |
+| User | `root` |
+| Availability | Development images only |
