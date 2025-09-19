@@ -1321,6 +1321,18 @@
     {
       "destination": "/phala-cloud/key-management/get-a-key",
       "source": "/phala-cloud/key-management/generate-and-persist-key"
+    },
+    {
+      "destination": "phala-cloud/networking/expose-http-service",
+      "source": "/phala-cloud/networking/expose-service-port"
+    },
+    {
+      "destination": "phala-cloud/networking/expose-http-service",
+      "source": "/phala-cloud/networking/protect-cvm-endpoint"
+    },
+    {
+      "destination": "/phala-cloud/networking/setup-custom-domain",
+      "source": "/phala-cloud/networking/setting-up-custom-domain"
     }
   ],
   "styling": {
