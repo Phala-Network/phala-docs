@@ -1,70 +1,65 @@
 ---
-title: Networking Architecture
-description: How Phala Cloud handles networking for your confidential applications - secure by default, simple to use
+title: Networking Overview
+description: Automatic HTTPS endpoints for your containers with zero configuration
 ---
 
-Phala Cloud provides secure networking for your applications by default. Every connection is encrypted and every service runs in isolation.
+Phala Cloud gives you automatic HTTPS endpoints for your containers. Deploy your service and get a secure public URL - no configuration needed.
 
-## How It Works
+## What You Get
 
-When you deploy an application to Phala Cloud, we automatically set up secure networking for you. Your app runs inside a Confidential Virtual Machine (CVM) that's completely isolated from other applications.
+Every container you deploy gets:
+- Public HTTPS endpoints that just works
+- Automatic TLS certificates (no Let's Encrypt setup)
+- Access the internet by any protocols
+- Built-in load balancing
 
-Here's what happens when someone connects to your app:
-
-First, their request hits our gateway - think of it as a smart load balancer that knows where every application lives. The gateway creates a secure tunnel to your CVM using WireGuard (like a VPN). Your application never sees raw internet traffic.
-
-The result is enterprise-grade security without manual configuration. VPN tunnels, firewall rules, and certificates are handled automatically.
-
-## Your Application's Network
-
-Every application gets a public URL automatically:
+Your application URL looks like this:
 ```
 https://<app-id>-<port>.us.phala.network
 ```
 
-This URL routes to your application through our secure gateway. If you expose multiple ports, each gets its own endpoint. For example, port 8080 becomes `<app-id>-8080.us.phala.network`.
+Deploy on port 8080? Your URL is `https://abc123-8080.us.phala.network`. Deploy on port 3000? It's `https://abc123-3000.us.phala.network`. Simple.
 
-Want your own domain like `api.mycompany.com`? Add the dstack-ingress container to your deployment. It handles SSL certificates from Let's Encrypt automatically.
+## Zero Configuration Required
 
-## What Makes This Secure?
+Just define your service in docker-compose.yml:
 
-Traditional cloud networking trusts the network itself. If you're inside the network, you're trusted. That's how breaches spread.
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+```
 
-Phala Cloud uses zero-trust networking instead. Even inside our network, nothing is trusted by default. Every connection must prove it's legitimate through cryptographic verification.
+Deploy it and you're done. No reverse proxy setup. No certificate management. No firewall rules. It just works.
 
-Your CVM can even prove it's running in secure hardware. This is called Remote Attestation - it's like showing an ID that can't be faked. Clients can verify they're talking to your real application, not an imposter.
+## Use Your Own Domain
 
-## Common Networking Tasks
+Want `api.mycompany.com` instead of the default URL? Add the dstack-ingress container to your deployment. It handles DNS setup and SSL certificates automatically through your DNS provider (Cloudflare, Linode, or Namecheap).
 
-**Need to expose a web service?**
-Just add ports to your docker-compose.yml. We handle the rest.
+## Beyond HTTP
 
-**Want to connect a database?**
-Expose the database port with TLS passthrough. Your database stays encrypted end-to-end.
+Phala Cloud handles more than just web services:
 
-**Building a gRPC service?**
-We support HTTP/2 natively. Add the 'g' suffix to your port and you're ready.
+**Databases**: Expose PostgreSQL or MySQL with automatic TLS encryption. Your database connections are secure by default.
 
-**Need to restrict outbound traffic?**
-CVMs have controlled egress by default. You decide what your app can access.
+**gRPC Services**: Full HTTP/2 support for modern microservices. Just add a 'g' to your URL suffix.
 
-## The Two Main Components
+**TCP Services**: Any TCP protocol works - Redis, custom game servers, message queues. All get automatic TLS wrapping.
 
-### dstack-gateway
-This is our main gateway that handles all incoming traffic. It provides load balancing, automatic TLS, and secure routing to your applications. You don't interact with it directly - it just works in the background.
-
-### dstack-ingress (Optional)
-Add this to your deployment when you need custom domains. It integrates with your DNS provider (Cloudflare, Linode, or Namecheap) to set up your domain and manage SSL certificates.
+**SSH Access**: Debug your containers with SSH access (development mode only).
 
 ## What's Next?
 
 Ready to deploy something? The [quickstart](/phala-cloud/networking/quickstart) gets you running in 5 minutes.
 
-Need to do something specific? Check our how-to guides:
-- [Expose an HTTP service](/phala-cloud/networking/how-to/expose-http-service)
-- [Set up a custom domain](/phala-cloud/networking/how-to/setup-custom-domain)
-- [Enable SSH access](/phala-cloud/networking/how-to/enable-ssh-access)
+Need to do something specific? Check our guides:
+- [Expose an HTTP service](/phala-cloud/networking/expose-http-service)
+- [Set up a custom domain](/phala-cloud/networking/setup-custom-domain)
+- [Enable SSH access](/phala-cloud/networking/enable-ssh-access)
+- [Configure gRPC services](/phala-cloud/networking/setup-grpc-service)
 
-Want all the technical details? See the [complete reference](/phala-cloud/networking/reference).
+Want the technical details? See our [architecture deep dive](/phala-cloud/networking/architecture).
 
-Curious about security? Dive into our [security architecture](/phala-cloud/networking/security).
+Questions about security? Check our [security model](/phala-cloud/networking/security).

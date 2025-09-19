@@ -68,9 +68,7 @@ volumes:
   cert-data:  # Persistent storage for SSL certificates
 ```
 
-### Understanding TARGET_ENDPOINT
-
-The `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
+You will need to set `DOMAIN` and `TARGET_ENDPOINT` based on your deployment. The `DOMAIN` variable defines the domain name to expose the web service. The `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
 
 - `http://app:80` - Forward to service named "app" on port 80
 - `http://api:3000` - Forward to service named "api" on port 3000
@@ -78,7 +76,7 @@ The `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
 
 ## Step 3: Configure Environment Variables
 
-In the Phala Cloud dashboard, add these secure environment variables:
+In the Phala Cloud dashboard, add these encrypted secrets:
 
 - `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
 - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
@@ -163,7 +161,7 @@ The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
 ## Security Features
 
 When `SET_CAA=true` is enabled:
-- CAA records restrict certificate issuance to your specific Let's Encrypt account
+- CAA records restrict certificate issuance to the TEE managed Let's Encrypt account
 - Only certificates requested from within your TEE can be issued
 - Certificate transparency logs can be monitored for unauthorized certificates
 
@@ -179,7 +177,11 @@ Generated evidences successfully
 Next renewal check in 12 hours
 ```
 
-### Common Issues
+### Certbot Error: "too many certificates (5) already issued for this exact set of identifiers"
+
+You may forget to attached the data volume.
+
+### Other Common Issues
 
 **DNS not propagating**: Wait 2-5 minutes for DNS changes to propagate globally.
 
@@ -191,6 +193,6 @@ Next renewal check in 12 hours
 
 ## Next Steps
 
-- [Expose TCP services](/phala-cloud/networking/how-to/expose-tcp-service)
+- [Expose TCP services](expose-tcp-service)
 - [Learn about domain attestation](/phala-cloud/networking/security)
-- [Set up gRPC with custom domain](/phala-cloud/networking/how-to/setup-grpc-service)
+- [Set up gRPC with custom domain](setup-grpc-service)

@@ -3,7 +3,7 @@ title: Network Security Model
 description: How network traffic is secured and isolated in Phala Cloud
 ---
 
-Every network connection in Phala Cloud is encrypted at least twice. Here's how the network security works and what it means for your application architecture.
+Every network connection in Phala Cloud is end-to-end encrypted. Here's how the network security works and what it means for your application architecture.
 
 ## Traffic Encryption Layers
 
@@ -17,13 +17,13 @@ When a client calls `https://abc123-8080.us.phala.network/api`, the request trav
 Client → [TLS 1.3] → Gateway → [WireGuard] → CVM → [Plain HTTP] → Your Container
 ```
 
-The gateway terminates TLS and re-encrypts with WireGuard before forwarding to your CVM. This double encryption means even if someone compromises the gateway, they still can't decrypt the WireGuard tunnel to your application.
+The gateway terminates TLS and re-encrypts with WireGuard before forwarding to your CVM. The gateway is deployed in Phala Cloud TEE to ensure the traffic is always end-to-end encrypted.
 
-Inside the CVM, traffic between your containers is unencrypted by default. If you need encryption there too, implement it in your application layer.
+Inside the CVM, traffic between your containers is encrypted in the CVM memory and protected by TEE.
 
 ### TLS Passthrough Mode
 
-Sometimes you need TLS all the way to your application. Add the `s` suffix to your URL:
+Sometimes you need unmodified TLS all the way to your application. Add the `s` suffix to your URL:
 
 ```
 Client → [TLS] → Gateway → [WireGuard + TLS] → CVM → [TLS] → Your Container
@@ -31,7 +31,7 @@ Client → [TLS] → Gateway → [WireGuard + TLS] → CVM → [TLS] → Your Co
 
 The gateway sees encrypted bytes and forwards them without decryption. Your container handles the TLS termination. Use this for:
 
-- PostgreSQL/MySQL with `sslmode=require`
+- PostgreSQL/MySQL with `sslmode=require` and self managed certificates
 - Services that verify client certificates
 - Custom protocols that manage their own TLS
 
@@ -69,23 +69,33 @@ services:
 
 This internal traffic never leaves the CVM's memory space, which is already hardware-encrypted.
 
-### Outbound Connections
+### Outbound Connections (Egress)
 
-Your containers can make outbound connections freely:
+CVMs have full outbound internet connectivity with privacy protections through TEE isolation.
 
-```javascript
-// This works normally
-await fetch('https://api.openai.com/v1/completions');
+**Supported Protocols**:
+Your containers can use any standard internet protocol:
+- TCP/UDP for basic connectivity
+- HTTP/HTTPS for web services and APIs
+- WebSocket for real-time communication
+- gRPC for modern microservices
+- Database protocols (PostgreSQL, MySQL, Redis)
+- Email protocols (SMTP, POP3, IMAP)
+- File transfer protocols (FTP, SFTP)
+- ICMP for ping utility
 
-// So does this
-const redis = new Redis({
-  host: 'redis.example.com',
-  port: 6379,
-  tls: {} // Your choice to use TLS
-});
-```
+**Isolation from Host**:
+While your CVM has full internet access, it's isolated from the host:
+- Cannot access host's `127.0.0.1` services
+- Limited access to host's local network
+- Cannot discover or attack host infrastructure
 
-The host can see that a connection was made but can't see the content (it's in the WireGuard tunnel).
+**Privacy Protection**:
+The combination of WireGuard tunneling and TEE isolation means:
+- Host sees a connection was made but not the content
+- Memory contents remain encrypted and isolated
+- No data leakage to host or other CVMs
+- Application behavior stays private even with network monitoring
 
 ## How SNI Routing Works
 
@@ -144,9 +154,7 @@ Understanding what's protected and what isn't helps you make architectural decis
 
 ### What the Network Security Provides
 
-**Protection from eavesdropping**: Multiple encryption layers prevent packet sniffing.
-
-**Gateway compromise resilience**: Even if the gateway is compromised, WireGuard tunnel remains secure.
+**Cloud insider attack resilience**: All the traffic is end-to-end encrypted by default. Even the cloud provider can't access your data.
 
 **CVM isolation**: Network segmentation prevents lateral movement between CVMs.
 
@@ -274,3 +282,16 @@ netstat -an | grep ESTABLISHED | wc -l
 ```
 
 Remember: the host can't run these commands inside your CVM. Only you can debug your own traffic.
+
+## Advanced Privacy Patterns
+
+### Anonymous Hosting with Tor
+
+For maximum privacy, you can combine TEE security with Tor hidden services. This provides both confidential computing and network anonymity:
+
+- Deploy a Tor hidden service inside your CVM
+- Use internal Docker networking between Tor and your application
+- Request TEE attestation based on the `.onion` address
+- Clients can verify both the Tor anonymity and TEE authenticity
+
+This pattern is useful for whistleblowing platforms, private communications, or any service requiring both computational and network privacy. Check the dstack-examples repository for a complete Tor hidden service implementation.

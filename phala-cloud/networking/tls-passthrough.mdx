@@ -1,0 +1,135 @@
+---
+title: Configure TLS Passthrough
+description: Set up end-to-end encryption with TLS passthrough for databases and custom protocols
+---
+
+TLS passthrough forwards encrypted traffic directly to your service, enabling end-to-end encryption and advanced TLS features like client certificates.
+
+## When to Use TLS Passthrough
+
+Phala Cloud networking infra always ensure end-to-end encryption. You can still choose TLS-termination in TEE protected gateway or passthrough model.
+
+**Use passthrough when you need:**
+- Client certificate authentication (mTLS)
+- Custom TLS configurations
+- Database connections with specific TLS requirements
+
+**Use TLS termination when you need:**
+- Simple HTTP/HTTPS services
+- Automatic certificate management
+- Load balancing with health checks
+- Maximum compatibility with clients
+
+## How TLS Passthrough Works
+
+1. Client connects with TLS to `<app-id>-<port>s.us.phala.network:443`
+2. Gateway detects the `s` suffix in the SNI and enables passthrough mode
+3. Gateway forwards the encrypted TLS stream directly to your service without decryption
+4. Your service handles the TLS handshake and decryption
+5. All traffic remains encrypted between client and your application
+
+The `s` suffix immediately after the port number tells the gateway to use passthrough mode instead of TLS termination.
+
+## When TLS Passthrough is Actually Useful
+
+TLS passthrough is practical for services that need to handle TLS themselves, typically when using custom domains with dstack-ingress or for specific protocols that require end-to-end TLS control.
+
+### Custom Domain with Self-Managed TLS
+
+When using your own domain with dstack-ingress, you might want to handle TLS directly:
+
+```yaml
+services:
+  api:
+    image: your-api:latest
+    ports:
+      - "8443:8443"  # Custom HTTPS port
+    environment:
+      # TLS cert data from environment variables (encrypted deployment)
+      TLS_CERT_PEM: ${TLS_CERT_PEM}
+      TLS_KEY_PEM: ${TLS_KEY_PEM}
+      PORT: 8443
+      TLS_ENABLED: "true"
+```
+
+Then clients connect via TLS passthrough:
+```bash
+curl https://abc123-8443s.us.phala.network/api/status
+```
+
+Your application handles the TLS termination and can implement custom certificate validation, cipher selection, or client certificate requirements.
+
+### Proxying External TLS Services
+
+Building a proxy that preserves TLS context:
+
+```yaml
+services:
+  tls-proxy:
+    image: nginx:alpine
+    ports:
+      - "9443:9443"
+    environment:
+      UPSTREAM_HOST: external-api.example.com
+      UPSTREAM_PORT: 443
+    # Nginx configured to proxy raw TLS streams
+```
+
+### gRPC with Custom TLS Configuration
+
+When you need specific TLS settings for gRPC:
+
+```yaml
+services:
+  grpc-server:
+    image: your-grpc:latest
+    ports:
+      - "50051:50051"
+    environment:
+      GRPC_TLS_CERT: ${GRPC_TLS_CERT}
+      GRPC_TLS_KEY: ${GRPC_TLS_KEY}
+      # Custom cipher suites, client cert requirements, etc.
+```
+
+**Practical note**: TLS passthrough is most useful when you have custom domains (via dstack-ingress) or need to implement specific TLS behaviors that the gateway's automatic TLS termination doesn't support.
+
+## Security Considerations
+
+### Benefits of TLS Passthrough
+- **Client certificate support**: Enable mTLS authentication
+- **Custom TLS settings**: Full control over TLS configuration
+- **Zero gateway trust**: Gateway cannot inspect or modify traffic
+
+### Limitations
+- **Certificate management**: You handle all certificate operations
+- **No load balancer health checks**: Gateway cannot inspect traffic for health
+- **Client compatibility**: Clients must support your TLS configuration
+- **Debugging difficulty**: Encrypted traffic harder to troubleshoot
+
+### Best Practices
+- Pass certificate data via encrypted environment variables
+- Use well-known certificate authorities when possible
+- Test TLS configuration with standard clients
+- Monitor application logs for TLS-related errors
+
+## Troubleshooting
+
+**Connection refused?**
+- Confirm you're using the `s` suffix in the URL: `<app-id>-<port>s.domain:443`
+- Verify service is configured for TLS and listening on the correct port
+- Check port mapping in docker-compose.yml
+
+**TLS handshake failures?**
+- Ensure your application is properly handling TLS
+- Check that certificates are loaded correctly from environment variables
+- Verify cipher suite compatibility between client and server
+
+**Gateway routing issues?**
+- Confirm the URL format includes the `s` suffix immediately after the port
+- Test with tools like `socat` or the Python port forwarder from dstack-examples
+
+## Next Steps
+
+- [Learn about network security](/phala-cloud/networking/security)
+- [Set up custom domains](setup-custom-domain)
+- [Understand network architecture](/phala-cloud/networking/architecture)

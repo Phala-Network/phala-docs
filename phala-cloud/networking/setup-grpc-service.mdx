@@ -7,11 +7,13 @@ This guide shows you how to deploy gRPC services with native HTTP/2 support and 
 
 ## How gRPC Works Through the Gateway
 
-gRPC services get special treatment:
+gRPC services get special HTTP/2 treatment:
 1. Add a `g` suffix to your port: `<app-id>-<port>g.<cluster>.phala.network`
-2. Gateway enables HTTP/2 via ALPN negotiation
-3. gRPC traffic flows over HTTP/2 with automatic TLS
+2. Gateway detects the `g` suffix and enables HTTP/2 via ALPN negotiation
+3. gRPC traffic flows over HTTP/2 with automatic TLS termination
 4. Your service handles standard gRPC calls without TLS configuration
+
+**Note**: The `g` suffix enables HTTP/2 for any service, not just gRPC. You can use it for any HTTP/2-compatible application that benefits from multiplexing, server push, or header compression.
 
 ## Deploy Your gRPC Service
 
@@ -86,7 +88,7 @@ volumes:
   cert-data:
 ```
 
-Then connect to: `api.mycompany.com:443`
+Then connect to: `api.mycompany.com`. Learn more details at [Set up custom domains](setup-custom-domain).
 
 ## Testing with grpcurl
 
@@ -112,10 +114,6 @@ grpcurl -d '{"name": "world"}' \
 - Best for REST APIs and web applications
 - No gRPC-specific optimizations
 
-## High Availability
-
-Deploy multiple CVMs with the same configuration. The gateway automatically load balances across healthy instances based on WireGuard handshake activity.
-
 ## Internal vs External
 
 ```yaml
@@ -139,6 +137,6 @@ services:
 
 ## Next Steps
 
-- [Expose TCP services](/phala-cloud/networking/how-to/expose-tcp-service)
-- [Set up custom domains](/phala-cloud/networking/how-to/setup-custom-domain)
+- [Expose TCP services](expose-tcp-service)
+- [Set up custom domains](setup-custom-domain)
 - [Learn about security](/phala-cloud/networking/security)
