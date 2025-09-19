@@ -1,0 +1,211 @@
+---
+title: Set Up a Custom Domain
+description: Use your own domain with automatic SSL certificates
+---
+
+This guide shows you how to use your own domain (like `api.mycompany.com`) instead of the default Phala Cloud domain.
+
+## Prerequisites
+
+- A domain with DNS hosted on Cloudflare (Linode and Namecheap also supported)
+- Access to your DNS provider's API token
+- A deployed CVM application
+
+## Step 1: Create DNS API Token
+
+<Tabs>
+  <Tab title="Cloudflare">
+    1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
+    2. Select your domain
+    3. Go to **Get Your API Token**
+    4. Click **Create Token**
+    5. Use the **Edit zone DNS** template
+    6. Select your domain in **Zone Resources**
+    7. Click **Continue to summary** and create the token
+    8. Copy the token for later use
+  </Tab>
+
+  <Tab title="Linode">
+    1. Go to [Linode Cloud Manager](https://cloud.linode.com/)
+    2. Click on your profile → **API Tokens**
+    3. Create a **Personal Access Token** with Read/Write access to Domains
+    4. Copy the token for later use
+  </Tab>
+
+  <Tab title="Namecheap">
+    1. Enable API access in your [Namecheap account](https://www.namecheap.com/myaccount/login/)
+    2. Go to **Profile → Tools → API Access**
+    3. Note your username and API key
+  </Tab>
+</Tabs>
+
+## Step 2: Add dstack-ingress to Your Deployment
+
+Update your `docker-compose.yml` to include the dstack-ingress container:
+
+```yaml
+services:
+  dstack-ingress:
+    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    ports:
+      - "443:443"
+    environment:
+      - DOMAIN=api.mycompany.com  # Your custom domain
+      - TARGET_ENDPOINT=http://app:80  # Your app's internal endpoint
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - cert-data:/etc/letsencrypt
+    restart: unless-stopped
+
+  app:
+    image: your-app:latest  # Your application
+    # No ports exposed here - dstack-ingress handles external access
+
+volumes:
+  cert-data:  # Persistent storage for SSL certificates
+```
+
+You will need to set `DOMAIN` and `TARGET_ENDPOINT` based on your deployment. The `DOMAIN` variable defines the domain name to expose the web service. The `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
+
+- `http://app:80` - Forward to service named "app" on port 80
+- `http://api:3000` - Forward to service named "api" on port 3000
+- Use the service name from docker-compose, not localhost
+
+## Step 3: Configure Environment Variables
+
+In the Phala Cloud dashboard, add these encrypted secrets:
+
+<Tabs>
+  <Tab title="Cloudflare">
+    - `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+
+  <Tab title="Linode">
+    - `LINODE_API_TOKEN`: Your API token from Step 1
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+
+  <Tab title="Namecheap">
+    - `NAMECHEAP_USERNAME`: Your Namecheap username
+    - `NAMECHEAP_API_KEY`: Your API key from Step 1
+    - `NAMECHEAP_CLIENT_IP`: Your whitelisted IP address
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+</Tabs>
+
+## Step 4: Deploy
+
+Deploy your updated docker-compose.yml through the dashboard. The first deployment takes a few minutes as it:
+
+1. Configures DNS records
+2. Requests SSL certificate from Let's Encrypt
+3. Sets up the reverse proxy
+
+## Step 5: Verify
+
+After deployment, you can:
+
+1. **Access your domain**: Visit `https://api.mycompany.com`
+2. **Check certificate**: Your browser should show a valid Let's Encrypt certificate
+3. **Verify evidence**: Visit `https://api.mycompany.com/evidences/` to see attestation data
+
+## Multiple Services with Custom Domains
+
+You can use multiple custom domains in one deployment:
+
+```yaml
+services:
+  # API with custom domain
+  api-ingress:
+    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    ports:
+      - "443:443"
+    environment:
+      - DOMAIN=api.mycompany.com
+      - TARGET_ENDPOINT=http://api:8080
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - api-cert-data:/etc/letsencrypt
+
+  # Frontend with custom domain  
+  web-ingress:
+    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    ports:
+      - "444:443"  # Different host port
+    environment:
+      - DOMAIN=app.mycompany.com
+      - TARGET_ENDPOINT=http://frontend:3000
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - web-cert-data:/etc/letsencrypt
+
+  api:
+    image: my-api:latest
+  
+  frontend:
+    image: my-frontend:latest
+
+volumes:
+  api-cert-data:
+  web-cert-data:
+```
+
+## Why We Pin Infrastructure Images
+
+The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
+- **Auditability**: Anyone can verify the exact infrastructure code handling domains
+- **Immutability**: The ingress behavior never changes unexpectedly
+- **Security**: Prevents infrastructure image substitution
+- **Reproducibility**: Domain handling is consistent across all deployments
+
+## Security Features
+
+When `SET_CAA=true` is enabled:
+- CAA records restrict certificate issuance to the TEE managed Let's Encrypt account
+- Only certificates requested from within your TEE can be issued
+- Certificate transparency logs can be monitored for unauthorized certificates
+
+## Troubleshooting
+
+### Check Logs
+
+Look for dstack-ingress container logs in the dashboard:
+
+```
+Successfully received certificate.
+Generated evidences successfully
+Next renewal check in 12 hours
+```
+
+### Certbot Error: "too many certificates (5) already issued for this exact set of identifiers"
+
+You may forget to attached the data volume.
+
+### Other Common Issues
+
+**DNS not propagating**: Wait 2-5 minutes for DNS changes to propagate globally.
+
+**Certificate request failed**: Verify your API token has permission to edit DNS records.
+
+**Connection refused**: Ensure `TARGET_ENDPOINT` points to the correct service:port.
+
+**CAA record conflicts**: Some providers (like Linode) don't allow CAA and CNAME on the same subdomain. The system will automatically use A records instead.
+
+## Next Steps
+
+- [Expose TCP services](expose-tcp-service)
+- [Learn about domain attestation](/phala-cloud/networking/security)
+- [Set up gRPC with custom domain](setup-grpc-service)

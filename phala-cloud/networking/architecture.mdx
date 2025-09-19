@@ -1,0 +1,206 @@
+---
+title: Architecture
+description: Understanding how Phala Cloud routes and secures your network traffic
+---
+
+## Request Journey
+
+When a client connects to `appid-8080.dstack-prod5.phala.network`, the request follows a specific path that affects both security and performance.
+
+### The Complete Path
+
+```
+Client → [TLS 1.3] → Gateway → [WireGuard] → CVM → [Plain HTTP] → Your Container
+```
+
+Each step serves a purpose:
+
+**TLS Handshake (10-30ms first connection, 1-2ms subsequent)**: Client establishes secure connection using standard TLS 1.3. The gateway presents a valid certificate for `*.phala.network`.
+
+**SNI Routing (\<1ms)**: Gateway extracts the hostname from the TLS handshake to determine which CVM and port to route to. No decryption of request data happens yet.
+
+**WireGuard Tunnel (\<1ms)**: Traffic gets re-encrypted with WireGuard before forwarding to your CVM. This creates defense-in-depth - even if the gateway is compromised, traffic to your CVM remains encrypted.
+
+**Container Processing**: Inside the CVM's trusted environment, traffic is decrypted and forwarded to your container on the specified port.
+
+Total network overhead: approximately 2-3ms on top of your application's response time for established connections.
+
+## How Routing Works
+
+The gateway makes intelligent routing decisions based on URL patterns and health status.
+
+### URL Pattern Routing
+
+The URL structure tells the gateway how to handle your traffic:
+
+```
+deadbeef111111111111111111111111-8080.dstack-prod5.phala.network   → TLS termination → HTTP to container
+deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network  → TLS passthrough → Raw TLS to container
+deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network → HTTP/2 enabled → gRPC to container
+```
+
+The suffixes change the behavior:
+- No suffix: Standard HTTP/HTTPS with TLS termination
+- `s` suffix: TLS passthrough for end-to-end encryption
+- `g` suffix: HTTP/2 with ALPN negotiation for gRPC
+
+### Load Balancing
+
+When you scale to multiple CVMs, the gateway automatically distributes traffic based on health and availability.
+
+**Health Detection:**
+The gateway tracks each instance using WireGuard handshakes. An instance is considered healthy if it completed a handshake within the last 5 minutes. Unhealthy instances are automatically removed from the rotation without any configuration needed from you.
+
+**Instance Selection:**
+The gateway uses a "connect top N" strategy, attempting to connect to multiple healthy instances and selecting the first one that responds successfully. This provides both load distribution and automatic failover.
+
+**Session Handling:**
+Currently there's no session affinity. Each request may hit a different instance, so design your applications to be stateless or use external session storage like Redis.
+
+For WebSocket connections, the TCP connection stays with one instance for its lifetime, but reconnections might hit a different instance.
+
+## Network Isolation
+
+Each CVM gets complete network isolation from others and the host.
+
+### CVM Boundaries
+
+Your CVM operates in its own network segment with:
+- A unique WireGuard keypair generated on deployment
+- An isolated IP address in the 10.0.0.0/8 range
+- No routes to other CVMs on the same host
+- No access to the host's network services
+
+You cannot ping another CVM, connect to the host's localhost, or even discover what other CVMs exist. This isolation happens at the kernel level using network namespaces.
+
+### Container Networking Inside CVM
+
+Within your CVM, containers communicate normally through Docker's bridge network:
+
+```yaml
+services:
+  frontend:
+    # Reaches backend at http://backend:3000
+  backend:
+    # Connects to database at postgres://db:5432
+  db:
+    # All internal traffic stays in CVM memory
+```
+
+This internal traffic never touches the network - it stays within the CVM's encrypted memory space.
+
+## Performance Characteristics
+
+Understanding performance helps you make architectural decisions.
+
+### Latency Budget
+
+Where latency comes from in your network stack:
+
+| Component | Latency | Can Optimize? |
+|-----------|---------|---------------|
+| TLS handshake | 10-30ms (first connection) | Use connection pooling |
+| Gateway routing | 1-2ms | No (fixed overhead) |
+| WireGuard tunnel | \<1ms | No (fixed overhead) |
+| Your application | Variable | Yes - your code |
+
+For established connections with keep-alive, expect 2-3ms total network overhead.
+
+### Throughput Capabilities
+
+Practical limits you'll encounter:
+
+**Single connection**: Limited by instance bandwidth, typically 1-10 Gbps depending on your CVM size.
+
+**Concurrent connections**: Each connection uses ~10-50KB of memory. A 4GB instance can handle thousands of concurrent connections.
+
+**New connections/second**: CPU-bound by TLS handshakes. Expect hundreds to low thousands per second depending on instance size.
+
+### Scaling Strategies
+
+Scale horizontally when you need:
+- More concurrent connections
+- Higher new connection rate
+- Automatic failover
+
+Scale vertically when you need:
+- Maximum single-connection throughput
+- Lowest possible latency
+- Stateful services that can't be distributed
+
+## Security Considerations
+
+The network architecture provides multiple security boundaries.
+
+### What's Encrypted Where
+
+Different encryption applies at each layer:
+- **Client to Gateway**: Standard TLS 1.3 encryption
+- **Gateway to CVM**: WireGuard with perfect forward secrecy
+- **Inside CVM**: Unencrypted between containers (but in encrypted memory)
+- **CVM Memory**: Hardware-encrypted via Intel TDX
+
+### Trust Boundaries
+
+You don't need to trust:
+- The gateway operator (can't see WireGuard-encrypted traffic)
+- Other CVMs on the same host (complete isolation)
+- The host operating system (TEE protection)
+
+You do need to trust:
+- Your own application code
+- The TDX hardware security
+- DNS resolution (use DNSSEC where possible)
+
+## Common Architectural Patterns
+
+Patterns that work well with this network architecture.
+
+### Microservices in Single CVM
+
+Deploy related microservices together:
+```yaml
+services:
+  api:
+    ports: ["8080:8080"]
+  worker:
+    # Talks to API via internal network
+  cache:
+    # Shared by all services
+```
+
+Benefits: No network latency between services, shared cache layer, simpler deployment.
+
+### Database with Application
+
+Co-locate databases with their applications:
+```yaml
+services:
+  app:
+    ports: ["3000:3000"]
+  postgres:
+    # Only accessible from app
+```
+
+Benefits: Zero network latency to database, data never leaves CVM, simpler backup strategy.
+
+### API Gateway Pattern
+
+Use one CVM as an API gateway:
+```yaml
+services:
+  gateway:
+    ports: ["443:443"]
+    environment:
+      BACKEND_1: https://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network
+      BACKEND_2: https://def456-8080.dstack-prod5.phala.network
+```
+
+Benefits: Single entry point, centralized auth, routing logic in your control.
+
+## Next Steps
+
+Now that you understand the architecture:
+- [Set up your first service](/phala-cloud/networking/quickstart)
+- [Configure custom domains](/phala-cloud/networking/setup-custom-domain)
+- [Learn about security features](/phala-cloud/networking/security)

@@ -266,8 +266,17 @@
                 "icon": "network",
                 "pages": [
                   "/phala-cloud/networking/overview",
-                  "/phala-cloud/networking/expose-service-port",
-                  "/phala-cloud/networking/setting-up-custom-domain"
+                  "/phala-cloud/networking/quickstart",
+                  "/phala-cloud/networking/expose-http-service",
+                  "/phala-cloud/networking/setup-custom-domain",
+                  "/phala-cloud/networking/enable-ssh-access",
+                  "/phala-cloud/networking/expose-tcp-service",
+                  "/phala-cloud/networking/setup-grpc-service",
+                  "/phala-cloud/networking/tls-passthrough",
+                  "/phala-cloud/networking/architecture",
+                  "/phala-cloud/networking/specifications",
+                  "/phala-cloud/networking/security",
+                  "/phala-cloud/networking/troubleshooting"
                 ]
               },
               {
@@ -566,7 +575,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/access-your-applications"
     },
     {
-      "destination": "/phala-cloud/networking/expose-service-port",
+      "destination": "/phala-cloud/networking/expose-http-service",
       "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/expose-service-port"
     },
     {
@@ -626,7 +635,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options/start-from-cloud-cli"
     },
     {
-      "destination": "/phala-cloud/networking/setting-up-custom-domain",
+      "destination": "/phala-cloud/networking/setup-custom-domain",
       "source": "/phala-cloud/phala-cloud-user-guides/building-with-tee/setting-up-custom-domain"
     },
     {
@@ -994,7 +1003,7 @@
       "source": "/legacy/framehub"
     },
     {
-      "destination": "/phala-cloud/networking/expose-service-port",
+      "destination": "/phala-cloud/networking/expose-http-service",
       "source": "/cloud/migration/expose-service-port"
     },
     {
@@ -1258,7 +1267,7 @@
       "source": "/phala-cloud/references/phala-cloud-pricing"
     },
     {
-      "destination": "/phala-cloud/networking/expose-service-port",
+      "destination": "/phala-cloud/networking/expose-http-service",
       "source": "/phala-cloud/migration/expose-service-port"
     },
     {

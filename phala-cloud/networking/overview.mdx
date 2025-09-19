@@ -1,12 +1,65 @@
 ---
-description: Deploy confidential applications with Phala Cloud's managed TEE infrastructure.
 title: Overview
+description: Automatic HTTPS endpoints for your containers with zero configuration
 ---
 
+Phala Cloud gives you automatic HTTPS endpoints for your containers. Deploy your service and get a secure public URL - no configuration needed.
 
-To export your service publicly, you need to configure the PORT exposing when deploying your application. After deployment, click **View Details** in the top-right corner of the CVM instance card and switch to the **Network** tab below. You will see the list of **Endpoint** there. These URLs are generated automatically by parsing the PORT configurations in the Docker Compose file. The format for the URL prefix is `<app id or instance id>-<port>.<server cluster>.phala.network`.
+## What You Get
 
-<Frame caption="access-cvm">
-    <img src="/images/cloud-network-page.png" alt="access-cvm" />
+Every container you deploy gets:
+- Public HTTPS endpoints that just work
+- Automatic TLS certificates (no Let's Encrypt setup)
+- Full internet access with any protocol
+- Built-in load balancing
 
-</Frame>
+Your application URL looks like this:
+```
+https://<app-id>-<port>.dstack-prod5.phala.network
+```
+
+Deploy on port 8080? Your URL is `https://appid-8080.dstack-prod5.phala.network`. Deploy on port 3000? It's `https://appid-3000.dstack-prod5.phala.network`. Simple.
+
+## Zero Configuration Required
+
+Just define your service in docker-compose.yml:
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+```
+
+Deploy it and you're done. No reverse proxy setup. No certificate management. No firewall rules. It just works.
+
+## Use Your Own Domain
+
+Want `api.mycompany.com` instead of the default URL? Add the dstack-ingress container to your deployment. It handles DNS setup and SSL certificates automatically through your DNS provider (Cloudflare, Linode, or Namecheap).
+
+## Beyond HTTP
+
+Phala Cloud handles more than just web services:
+
+**Databases**: Expose PostgreSQL or MySQL with automatic TLS encryption. Your database connections are secure by default.
+
+**gRPC Services**: Full HTTP/2 support for modern microservices. Just add a 'g' to your URL suffix.
+
+**TCP Services**: Any TCP protocol works - Redis, custom game servers, message queues. All get automatic TLS wrapping.
+
+**SSH Access**: Debug your containers with SSH access (development mode only).
+
+## What's Next?
+
+Ready to deploy something? The [quickstart](/phala-cloud/networking/quickstart) gets you running in 5 minutes.
+
+Need to do something specific? Check our guides:
+- [Expose an HTTP service](/phala-cloud/networking/expose-http-service)
+- [Set up a custom domain](/phala-cloud/networking/setup-custom-domain)
+- [Enable SSH access](/phala-cloud/networking/enable-ssh-access)
+- [Configure gRPC services](/phala-cloud/networking/setup-grpc-service)
+
+Want the technical details? See our [architecture deep dive](/phala-cloud/networking/architecture).
+
+Questions about security? Check our [security model](/phala-cloud/networking/security).

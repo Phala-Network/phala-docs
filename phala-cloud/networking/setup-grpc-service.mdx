@@ -1,0 +1,144 @@
+---
+title: Set Up gRPC Services
+description: Deploy gRPC services with HTTP/2 and automatic TLS
+---
+
+This guide shows you how to deploy gRPC services with native HTTP/2 support and automatic TLS encryption.
+
+## How gRPC Works Through the Gateway
+
+gRPC services get special HTTP/2 treatment:
+1. Add a `g` suffix to your port: `<app-id>-<port>g.<cluster>.phala.network`
+2. Gateway detects the `g` suffix and enables HTTP/2 via ALPN negotiation
+3. gRPC traffic flows over HTTP/2 with automatic TLS termination
+4. Your service handles standard gRPC calls without TLS configuration
+
+**Note**: The `g` suffix enables HTTP/2 for any service, not just gRPC. You can use it for any HTTP/2-compatible application that benefits from multiplexing, server push, or header compression.
+
+## Deploy Your gRPC Service
+
+```yaml
+services:
+  grpc-server:
+    image: your-grpc-service:latest
+    ports:
+      - "50051:50051"  # Standard gRPC port
+    environment:
+      GRPC_PORT: 50051
+      # No TLS config needed - gateway handles it
+```
+
+Access your gRPC service at: `<app-id>-50051g.dstack-prod5.phala.network:443`
+
+Note the `g` suffix - this tells the gateway to enable HTTP/2.
+
+## Connect from Clients
+
+<CodeGroup>
+```go Go
+// Go client
+conn, err := grpc.Dial(
+    "<app-id>-50051g.dstack-prod5.phala.network:443",
+    grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+        ServerName: "<app-id>-50051g.dstack-prod5.phala.network",
+    })),
+)
+```
+
+```python Python
+# Python client
+channel = grpc.secure_channel(
+    '<app-id>-50051g.dstack-prod5.phala.network:443',
+    grpc.ssl_channel_credentials()
+)
+```
+
+```javascript Node.js
+// Node.js client
+const credentials = grpc.credentials.createSsl();
+const client = new YourService(
+    '<app-id>-50051g.dstack-prod5.phala.network:443',
+    credentials
+);
+```
+</CodeGroup>
+
+## gRPC with Custom Domains
+
+Use dstack-ingress for custom domains:
+
+```yaml
+services:
+  dstack-ingress:
+    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    ports:
+      - "443:443"
+    environment:
+      - DOMAIN=api.mycompany.com
+      - TARGET_ENDPOINT=grpc://grpc-server:50051  # Note: grpc:// prefix
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    volumes:
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - cert-data:/etc/letsencrypt
+
+  grpc-server:
+    image: your-grpc-service:latest
+
+volumes:
+  cert-data:
+```
+
+Then connect to: `api.mycompany.com`. Learn more details at [Set up custom domains](setup-custom-domain).
+
+## Testing with grpcurl
+
+```bash
+# List services
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
+
+# Call a method
+grpcurl -d '{"name": "world"}' \
+    <app-id>-50051g.dstack-prod5.phala.network:443 \
+    your.service.v1.YourService/SayHello
+```
+
+## Key Differences
+
+**gRPC (with `g` suffix):**
+- Native HTTP/2 with ALPN negotiation
+- Optimal performance for gRPC protocols
+- Proper streaming support
+
+**Regular HTTP:**
+- Standard HTTP/1.1 or HTTP/2
+- Best for REST APIs and web applications
+- No gRPC-specific optimizations
+
+## Internal vs External
+
+```yaml
+services:
+  grpc-client:
+    environment:
+      GRPC_SERVER: grpc-server:50051  # Internal: direct connection
+      
+  grpc-server:
+    ports:
+      - "50051:50051"  # External: HTTP/2 via gateway
+```
+
+## Troubleshooting
+
+**No HTTP/2 negotiation?** Use the `g` suffix and verify ALPN support.
+
+**Connection refused?** Check port mapping and service status.
+
+**TLS errors?** Connect to port 443 with correct hostname.
+
+## Next Steps
+
+- [Expose TCP services](expose-tcp-service)
+- [Set up custom domains](setup-custom-domain)
+- [Learn about security](/phala-cloud/networking/security)

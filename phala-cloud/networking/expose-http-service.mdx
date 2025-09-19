@@ -1,0 +1,155 @@
+---
+title: Expose an HTTP Service
+description: Step-by-step guide to expose HTTP services with automatic HTTPS
+---
+
+This guide shows you how to expose HTTP services from your Docker containers to the public internet with automatic HTTPS.
+
+## Prerequisites
+
+- A Phala Cloud account
+- A Docker image that runs an HTTP service
+
+## Step 1: Define Your Service
+
+Create a `docker-compose.yml` file with port mapping:
+
+```yaml
+services:
+  api:
+    image: your-image:latest
+    ports:
+      - "8080:3000"  # Maps container port 3000 to public port 8080
+```
+
+The format is `"HOST_PORT:CONTAINER_PORT"`, following standard Docker behavior:
+- `HOST_PORT`: The port number that appears in your public URL
+- `CONTAINER_PORT`: The port your application listens on inside the container
+
+## Step 2: Deploy Your Service
+
+1. Open the [Phala Cloud Dashboard](https://cloud.phala.network)
+2. Click "Create CVM"
+3. Select "docker-compose.yml" deployment method
+4. Paste your configuration
+5. Add any secure environment variables if needed
+6. Click "Deploy"
+
+## Step 3: Access Your Endpoint
+
+After deployment completes, find your endpoint in the Network tab:
+
+```
+https://<app-id>-8080.dstack-prod5.phala.network
+```
+
+Click the link to test your service. The connection is automatically secured with TLS.
+
+## Multiple Ports Per Service
+
+A single service can expose any number of ports, just like in Docker:
+
+```yaml
+services:
+  app:
+    image: my-app:latest
+    ports:
+      - "3000:3000"  # Web interface
+      - "8080:8080"  # API endpoint
+      - "9090:9090"  # Metrics endpoint
+      - "4000:4000"  # WebSocket server
+```
+
+This creates four public endpoints for the same service:
+- `https://<app-id>-3000.dstack-prod5.phala.network`
+- `https://<app-id>-8080.dstack-prod5.phala.network`
+- `https://<app-id>-9090.dstack-prod5.phala.network`
+- `https://<app-id>-4000.dstack-prod5.phala.network`
+
+## Multiple Services Example
+
+You can also deploy multiple services, each with their own ports:
+
+```yaml
+services:
+  frontend:
+    image: my-frontend:latest
+    ports:
+      - "3000:3000"  # Frontend on port 3000
+  
+  api:
+    image: my-api:latest
+    ports:
+      - "8080:8080"  # API on port 8080
+      - "8081:8081"  # API admin on port 8081
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+  
+  admin:
+    image: my-admin:latest
+    ports:
+      - "9000:9000"  # Admin panel on port 9000
+```
+
+## Health Checks
+
+Add health checks to ensure your service is ready before receiving traffic:
+
+```yaml
+services:
+  api:
+    image: your-image:latest
+    ports:
+      - "8080:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+## Internal Communication
+
+Services within the same deployment can communicate using service names:
+
+```yaml
+services:
+  frontend:
+    image: my-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://api:8080  # Internal communication
+  
+  api:
+    image: my-api:latest
+    ports:
+      - "8080:8080"
+```
+
+The frontend can reach the API at `http://api:8080` internally, while external users access it at `https://<app-id>-8080.dstack-prod5.phala.network`.
+
+## Zero-Trust Security
+
+All traffic follows zero-trust principles:
+- External traffic arrives encrypted via TLS at the gateway
+- The gateway forwards it through WireGuard tunnels to your CVM
+- **Only your code inside the TEE can decrypt and see the traffic**
+- Not even Phala Cloud operators or you as the developer can inspect the traffic
+- The hardware-based isolation ensures complete privacy
+
+This means your application handles sensitive data with true confidentiality. Credit cards, API keys, personal information - all remain private to your code alone.
+
+## Security Notes
+
+- All external traffic is encrypted with TLS
+- Internal service-to-service communication uses the Docker network
+- Don't expose ports you don't need public access to
+- Use secure environment variables for sensitive data
+
+## Next Steps
+
+- [Set up a custom domain](setup-custom-domain)
+- [Add gRPC support](setup-grpc-service)
+- [Learn about security features](/phala-cloud/networking/security)

@@ -1,0 +1,91 @@
+---
+title: Reference
+description: Quick lookup for URL patterns, environment variables, and configuration parameters
+---
+
+## URL Patterns
+
+| Pattern | Protocol | Example |
+|---------|----------|---------|
+| `{app-id}.{cluster}.phala.network` | HTTP/HTTPS to port 80 (default) | `abc123.dstack-prod5.phala.network` |
+| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `deadbeef111111111111111111111111-8080.dstack-prod5.phala.network` |
+| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network` |
+| `{app-id}s.{cluster}.phala.network` | TLS passthrough to port 443 (default) | `abc123s.dstack-prod5.phala.network` |
+| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network` |
+| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `deadbeef111111111111111111111111-22.dstack-prod5.phala.network` |
+
+**Default Port Behaviors:**
+- No port specified = routes to port 80 for HTTP or port 443 for TLS passthrough
+- All external connections use port 443 regardless of internal port
+- `{app-id}` is auto-generated on deployment
+- `{port}` matches your container's exposed port
+- `{cluster}` is regional (us, eu, asia)
+
+## Auto-populated Environment Variables
+
+You can use these variables in your docker-compose file:
+
+| Variable | Value | Example |
+|----------|-------|---------|
+| `DSTACK_APP_ID` | Application identifier | `abc123def456` |
+| `DSTACK_GATEWAY_DOMAIN` | Regional domain | `us.phala.network` |
+
+## Environment Variables
+
+The variables you can change to config networking features.
+
+### SSH Access
+| Variable | Type | Purpose |
+|----------|------|---------|
+| `DSTACK_ROOT_PASSWORD` | string | Root password (dev images only) |
+| `DSTACK_ROOT_PUBLIC_KEY` | string | SSH public key (dev images only) |
+
+### Custom Domains
+| Variable | Required | Type | Purpose |
+|----------|----------|------|---------|
+| `DOMAIN` | Yes | string | Custom domain name |
+| `TARGET_ENDPOINT` | Yes | string | `http://service:port` or `grpc://service:port` |
+| `GATEWAY_DOMAIN` | Yes | string | `_.${DSTACK_GATEWAY_DOMAIN}` |
+| `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
+| `SET_CAA` | No | boolean | Enable CAA records (default: false) |
+| `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
+
+### DNS Provider Credentials
+| Provider | Variables | Required Permissions |
+|----------|-----------|---------------------|
+| Cloudflare | `CLOUDFLARE_API_TOKEN` | Zone:Read, DNS:Edit |
+| Linode | `LINODE_API_TOKEN` | Domains:Read/Write |
+| Namecheap | `NAMECHEAP_USERNAME`, `NAMECHEAP_API_KEY`, `NAMECHEAP_CLIENT_IP` | API enabled |
+
+## Protocol Support
+
+| Protocol | Default Mode | TLS Passthrough Mode | Egress Traffic |
+|----------|--------------|----------------------|----------------|
+| HTTP/1.1 | ✅ | ✅ | ✅ |
+| HTTP/2 | ✅ (with `g` suffix) | ✅ | ✅ |
+| WebSocket | ✅ | ✅ | ✅ |
+| TCP | ❌ | ✅ (with `s` suffix) | ✅ |
+| UDP | ⚠️  (NAT travesal) | N/A | ✅ |
+
+## Docker Images
+
+| Component | Image | Hash |
+|-----------|-------|------|
+| Custom domains | `kvin/dstack-ingress` | `sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd` |
+
+## Rate Limits
+
+### DNS Providers
+| Provider | API Limits | Certificate Speed |
+|----------|------------|-------------------|
+| Cloudflare | 1200 req/5min | 1-2 minutes |
+| Linode | 800 req/hour | 2-5 minutes |
+| Namecheap | 50 req/hour | 5-15 minutes |
+
+### Let's Encrypt
+| Limit | Rate |
+|-------|------|
+| Certificates per domain | 50/week |
+| Duplicate certificates | 5/week |
+| Failed validations | 5/hour per hostname |
+

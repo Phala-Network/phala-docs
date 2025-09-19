@@ -1,0 +1,303 @@
+---
+title: Troubleshooting
+description: Diagnosing and fixing common networking issues
+---
+
+This guide helps you diagnose and resolve networking problems in Phala Cloud.
+
+## Connection Refused
+
+Your service isn't responding on the expected port.
+
+### Quick Checks
+
+```bash
+# 1. SSH into CVM (development OS only)
+ssh my-cvm
+
+# 2. Check if container is running
+docker ps
+
+# 3. Check container logs for errors
+docker logs <container-name> --tail 50
+
+# 4. Test local connectivity
+curl http://localhost:8080
+```
+
+### Common Causes
+
+**Port not exposed in docker-compose.yml:**
+```yaml
+services:
+  app:
+    ports:
+      - "8080:8080"  # Add this
+```
+
+**Service binding to localhost instead of all interfaces:**
+```javascript
+// Wrong - only localhost can connect
+app.listen(3000, '127.0.0.1');
+
+// Right - accepts external connections
+app.listen(3000, '0.0.0.0');
+```
+
+**Container crashed on startup:**
+```bash
+# Check exit code and reason
+docker ps -a
+docker logs <container-name>
+```
+
+## Connection Timeout
+
+The connection hangs without immediate response.
+
+### Diagnosis Steps
+
+```bash
+# 1. Test if gateway is reachable
+curl -I https://<app-id>-8080.dstack-prod5.phala.network
+
+# 2. Check TLS handshake
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443
+
+# 3. Inside CVM, check if service is listening
+netstat -tulpn | grep 8080
+```
+
+### Common Causes
+
+**Service still starting:** Some applications take time to initialize. Check logs for startup progress.
+
+**Wrong URL format:**
+```bash
+# Correct - always use port 443 externally
+https://<app-id>-8080.dstack-prod5.phala.network
+
+# Wrong - don't add port to URL
+https://<app-id>-8080.dstack-prod5.phala.network:8080
+```
+
+## TLS/Certificate Errors
+
+### TLS Handshake Failed
+
+For default mode (TLS termination):
+```bash
+# Test the connection
+curl -v https://<app-id>-8080.dstack-prod5.phala.network
+
+# Check certificate details
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443 \
+  -servername <app-id>-8080.dstack-prod5.phala.network
+```
+
+For passthrough mode (`s` suffix):
+```bash
+# Your service must handle TLS
+# Inside CVM, verify TLS is configured
+curl https://localhost:8080
+```
+
+### Certificate Hostname Mismatch
+
+In passthrough mode, you have two options:
+
+**Option 1: Use a custom domain with dstack-ingress**
+```bash
+# Your certificate CN should match your custom domain
+openssl x509 -in server.crt -text -noout | grep CN
+# Should show: CN=your-domain.com
+```
+
+**Option 2: Configure your service to ignore hostname validation**
+```javascript
+// For development only - accepts any certificate
+const server = https.createServer({
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt'),
+  // Don't verify hostname
+  requestCert: false
+});
+```
+
+Note: You cannot get a valid certificate for `*.phala.network` domains. Use passthrough mode primarily with custom domains or for protocols that handle certificates differently (like some databases).
+
+## Custom Domain Issues
+
+### DNS Not Resolving
+
+```bash
+# Check if DNS records exist
+dig CNAME your-domain.com
+
+# Check TXT record for app identification
+dig TXT your-domain.com
+
+# View ingress container logs
+docker logs <dstack-ingress-container>
+```
+
+### Certificate Not Issued
+
+For custom domains using dstack-ingress:
+```bash
+# Check certificate evidence
+curl https://your-domain.com/evidences/
+
+# Files available:
+# - acme-account.json
+# - cert.pem
+# - sha256sum.txt
+# - quote.json
+```
+
+DNS propagation takes:
+- Cloudflare: ~2 minutes
+- Linode: ~5 minutes
+- Namecheap: ~2 minutes
+
+### CAA Record Blocking Certificate
+
+If you previously used `SET_CAA=true` and then wiped certificates/account, old CAA records may block new certificate issuance:
+
+```bash
+# Check existing CAA records
+dig CAA your-domain.com
+
+# If you see old accounturi values, they need to be removed
+# Example output that would block:
+# your-domain.com. 300 IN CAA 128 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/123456789"
+```
+
+**Solution options:**
+
+1. **Wait for dstack-ingress to update CAA**: If `SET_CAA=true`, it will attempt to replace old CAA records, but DNS propagation may cause initial failures.
+
+2. **Manually remove old CAA records**: Use your DNS provider's control panel to delete CAA records before redeploying.
+
+3. **Disable CAA temporarily**: Set `SET_CAA=false` to avoid CAA checks during certificate issuance.
+
+Note: Namecheap doesn't support CAA records via API, so this issue won't occur with Namecheap as DNS provider.
+
+## gRPC Connection Failed
+
+### HTTP/2 Not Available
+
+```bash
+# Must use 'g' suffix for gRPC
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
+
+# Without 'g' suffix, HTTP/2 isn't enabled
+grpcurl <app-id>-50051.dstack-prod5.phala.network:443 list  # Will fail
+```
+
+### Testing gRPC Service
+
+```bash
+# From outside
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
+
+# Inside CVM (without TLS)
+grpcurl -plaintext localhost:50051 list
+```
+
+## SSH Access Denied
+
+### Development OS Required
+
+SSH only works with development OS images. Production images have SSH disabled.
+
+### Check Configuration
+
+```bash
+# Verify environment variables are set
+DSTACK_ROOT_PASSWORD=yourpassword
+# OR
+DSTACK_ROOT_PUBLIC_KEY=ssh-rsa AAAA...
+
+# Test connection
+ssh -v my-cvm
+
+# Test ProxyCommand directly
+openssl s_client -connect <app-id>-22.dstack-prod5.phala.network:443
+```
+
+### macOS OpenSSL Issue
+
+macOS uses LibreSSL which may cause issues:
+```bash
+# Install OpenSSL via Homebrew
+brew install openssl
+
+# Update SSH config
+ProxyCommand /opt/homebrew/bin/openssl s_client -quiet -connect %h:%p
+```
+
+## Debugging Commands
+
+### From Outside CVM
+
+```bash
+# Test HTTPS endpoint
+curl -v https://<app-id>-8080.dstack-prod5.phala.network
+
+# Check TLS certificate
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443
+
+# DNS lookup
+dig <app-id>-8080.dstack-prod5.phala.network
+```
+
+### Inside CVM (SSH Required)
+
+```bash
+# Container status
+docker ps -a
+
+# Container logs
+docker logs <container> --tail 100
+
+# Network interfaces
+ip addr show
+
+# Port listeners
+netstat -tulpn
+
+# Test outbound connectivity
+curl -I https://example.com
+```
+
+## Common Patterns
+
+### Service Works Locally but Not Externally
+
+1. Check port is exposed in docker-compose.yml
+2. Verify service binds to 0.0.0.0, not 127.0.0.1
+3. Confirm URL format is correct (no port number in URL)
+
+### Intermittent Connection Failures
+
+Could indicate unhealthy instances if you have multiple replicas. The gateway removes unhealthy instances from rotation after 5 minutes without WireGuard handshake.
+
+### Works with curl but Not Application
+
+Check if your application:
+- Supports SNI (Server Name Indication)
+- Uses correct TLS version (1.2 or 1.3)
+- Handles redirects properly
+
+## Getting Support
+
+When reporting issues, provide:
+
+1. **Application ID** from your deployment
+2. **Exact URL** you're trying to access
+3. **Error message** (complete output)
+4. **Container logs**: `docker logs <container> --tail 100`
+5. **Test results** from debugging commands above
+
+The more specific information you provide, the faster issues can be resolved.

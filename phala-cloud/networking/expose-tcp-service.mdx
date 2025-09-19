@@ -1,0 +1,136 @@
+---
+title: Expose TCP Services
+description: Expose TCP services like databases with automatic TLS encryption
+---
+
+This guide shows you how to expose TCP services (databases, message queues, custom protocols) with automatic TLS encryption through the gateway.
+
+## How It Works
+
+When you expose a TCP port, the gateway automatically wraps your traffic in TLS:
+1. Client connects via TLS to `<app-id>-<port>.<cluster>.phala.network`
+2. Gateway terminates TLS and decrypts the traffic
+3. Gateway forwards plain TCP to your service inside the CVM
+4. Your service doesn't need to handle TLS - the gateway does it for you
+
+This gives you encrypted connections without configuring certificates in your service.
+
+## Example: PostgreSQL Database
+
+```yaml
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: myapp
+      POSTGRES_USER: dbuser
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+```
+
+After deployment, connect to your database:
+```bash
+# Direct TLS connection (if client supports it)
+psql "postgresql://dbuser:password@<app-id>-5432.dstack-prod5.phala.network:443/myapp?sslmode=require"
+```
+
+## Example: Custom TCP Service
+
+```yaml
+services:
+  tcp-server:
+    image: your-tcp-service:latest
+    ports:
+      - "9000:9000"  # Your custom port
+    environment:
+      # No TLS configuration needed - gateway handles it
+      PORT: 9000
+```
+
+## Connecting with TLS-to-TCP Conversion
+
+Many existing clients don't support connecting to TLS-wrapped TCP services. Use these methods to convert TLS back to plain TCP on your local machine:
+
+### Port Forwarding Methods
+
+<CodeGroup>
+```bash socat (Linux/macOS)
+# Forward local port 5432 to PostgreSQL
+socat TCP-LISTEN:5432,bind=127.0.0.1,fork,reuseaddr \
+      OPENSSL:<app-id>-5432.dstack-prod5.phala.network:443
+
+# Now connect normally
+psql -h 127.0.0.1 -p 5432 -U dbuser myapp
+
+# Forward local port 9000 to custom service
+socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr \
+      OPENSSL:<app-id>-9000.dstack-prod5.phala.network:443
+
+# Connect with any TCP client
+telnet 127.0.0.1 9000
+```
+
+```bash Python (Cross-platform)
+# Download the script from dstack-examples
+# https://github.com/Dstack-TEE/dstack-examples/blob/main/tcp-port-forwarding/port_forwarder.py
+
+# Forward local port 5432 to PostgreSQL
+python3 port_forwarder.py 5432 <app-id>-5432.dstack-prod5.phala.network
+
+# Connect normally
+psql -h 127.0.0.1 -p 5432 -U dbuser myapp
+```
+</CodeGroup>
+
+## Benefits
+
+- **Automatic encryption**: No need to configure TLS in your service
+- **Zero-trust security**: All external connections are encrypted
+- **Client compatibility**: Use TLS-to-TCP conversion for legacy clients
+- **Simple deployment**: Just expose the port, TLS is automatic
+
+## Internal vs External Access
+
+Services can communicate internally without TLS:
+```yaml
+services:
+  app:
+    image: my-app:latest
+    environment:
+      # Internal: plain connection
+      DB_HOST: postgres
+      DB_PORT: 5432
+      
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"  # External: TLS-wrapped by gateway
+```
+
+External clients use TLS, internal services use plain connections for better performance.
+
+## Troubleshooting
+
+**Connection refused?**
+- Verify the port is exposed in docker-compose.yml
+- Check the service is running: SSH in and run `docker ps`
+
+**TLS handshake failed?**
+- Ensure you're connecting to port 443 (not the service port)
+- Use the correct hostname for TLS verification
+
+**socat not found?**
+- Install it: `apt install socat` (Ubuntu) or `brew install socat` (macOS)
+- Or use the Python script alternative
+
+## Next Steps
+
+- [Set up gRPC services](setup-grpc-service)
+- [Enable TLS passthrough](tls-passthrough) for end-to-end encryption
+- [Configure custom domains](setup-custom-domain)
