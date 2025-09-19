@@ -13,30 +13,31 @@ This guide shows you how to use your own domain (like `api.mycompany.com`) inste
 
 ## Step 1: Create DNS API Token
 
-### For Cloudflare
+<Tabs>
+  <Tab title="Cloudflare">
+    1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
+    2. Select your domain
+    3. Go to **Get Your API Token**
+    4. Click **Create Token**
+    5. Use the **Edit zone DNS** template
+    6. Select your domain in **Zone Resources**
+    7. Click **Continue to summary** and create the token
+    8. Copy the token for later use
+  </Tab>
 
-1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Select your domain
-3. Go to **Get Your API Token**
-4. Click **Create Token**
-5. Use the **Edit zone DNS** template
-6. Select your domain in **Zone Resources**
-7. Click **Continue to summary** and create the token
-8. Copy the token for later use
+  <Tab title="Linode">
+    1. Go to [Linode Cloud Manager](https://cloud.linode.com/)
+    2. Click on your profile → **API Tokens**
+    3. Create a **Personal Access Token** with Read/Write access to Domains
+    4. Copy the token for later use
+  </Tab>
 
-### For Linode
-
-1. Go to [Linode Cloud Manager](https://cloud.linode.com/)
-2. Click on your profile → **API Tokens**
-3. Create a **Personal Access Token** with Read/Write access to Domains
-4. Copy the token for later use
-
-### For Namecheap
-
-1. Enable API access in your [Namecheap account](https://www.namecheap.com/myaccount/login/)
-2. Go to **Profile → Tools → API Access**
-3. Note your username and API key
-4. Whitelist your IP address
+  <Tab title="Namecheap">
+    1. Enable API access in your [Namecheap account](https://www.namecheap.com/myaccount/login/)
+    2. Go to **Profile → Tools → API Access**
+    3. Note your username and API key
+  </Tab>
+</Tabs>
 
 ## Step 2: Add dstack-ingress to Your Deployment
 
@@ -78,12 +79,24 @@ You will need to set `DOMAIN` and `TARGET_ENDPOINT` based on your deployment. Th
 
 In the Phala Cloud dashboard, add these encrypted secrets:
 
-- `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
-- `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+<Tabs>
+  <Tab title="Cloudflare">
+    - `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
 
-For other DNS providers:
-- Linode: Use `LINODE_API_TOKEN` instead
-- Namecheap: Use `NAMECHEAP_USERNAME`, `NAMECHEAP_API_KEY`, and `NAMECHEAP_CLIENT_IP`
+  <Tab title="Linode">
+    - `LINODE_API_TOKEN`: Your API token from Step 1
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+
+  <Tab title="Namecheap">
+    - `NAMECHEAP_USERNAME`: Your Namecheap username
+    - `NAMECHEAP_API_KEY`: Your API key from Step 1
+    - `NAMECHEAP_CLIENT_IP`: Your whitelisted IP address
+    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+</Tabs>
 
 ## Step 4: Deploy
 

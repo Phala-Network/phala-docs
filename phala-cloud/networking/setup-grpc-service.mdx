@@ -34,7 +34,8 @@ Note the `g` suffix - this tells the gateway to enable HTTP/2.
 
 ## Connect from Clients
 
-```go
+<CodeGroup>
+```go Go
 // Go client
 conn, err := grpc.Dial(
     "<app-id>-50051g.dstack-prod5.phala.network:443",
@@ -44,7 +45,7 @@ conn, err := grpc.Dial(
 )
 ```
 
-```python
+```python Python
 # Python client
 channel = grpc.secure_channel(
     '<app-id>-50051g.dstack-prod5.phala.network:443',
@@ -52,7 +53,7 @@ channel = grpc.secure_channel(
 )
 ```
 
-```javascript
+```javascript Node.js
 // Node.js client
 const credentials = grpc.credentials.createSsl();
 const client = new YourService(
@@ -60,6 +61,7 @@ const client = new YourService(
     credentials
 );
 ```
+</CodeGroup>
 
 ## gRPC with Custom Domains
 

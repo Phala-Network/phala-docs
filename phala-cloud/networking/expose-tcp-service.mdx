@@ -57,20 +57,17 @@ services:
 
 Many existing clients don't support connecting to TLS-wrapped TCP services. Use these methods to convert TLS back to plain TCP on your local machine:
 
-### Using socat (Linux/macOS)
+### Port Forwarding Methods
 
-Forward a local TCP port to your service through the TLS gateway:
-
-```bash
+<CodeGroup>
+```bash socat (Linux/macOS)
 # Forward local port 5432 to PostgreSQL
 socat TCP-LISTEN:5432,bind=127.0.0.1,fork,reuseaddr \
       OPENSSL:<app-id>-5432.dstack-prod5.phala.network:443
 
 # Now connect normally
 psql -h 127.0.0.1 -p 5432 -U dbuser myapp
-```
 
-```bash
 # Forward local port 9000 to custom service
 socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr \
       OPENSSL:<app-id>-9000.dstack-prod5.phala.network:443
@@ -79,17 +76,17 @@ socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr \
 telnet 127.0.0.1 9000
 ```
 
-### Using Python Script (Cross-platform)
+```bash Python (Cross-platform)
+# Download the script from dstack-examples
+# https://github.com/Dstack-TEE/dstack-examples/blob/main/tcp-port-forwarding/port_forwarder.py
 
-For Windows or when socat isn't available, use the [port_forwarder.py script](https://github.com/Dstack-TEE/dstack-examples/blob/main/tcp-port-forwarding/port_forwarder.py) from dstack-examples:
-
-```bash
 # Forward local port 5432 to PostgreSQL
 python3 port_forwarder.py 5432 <app-id>-5432.dstack-prod5.phala.network
 
 # Connect normally
 psql -h 127.0.0.1 -p 5432 -U dbuser myapp
 ```
+</CodeGroup>
 
 ## Benefits
 
