@@ -1,5 +1,5 @@
 ---
-title: Network Troubleshooting
+title: Troubleshooting
 description: Diagnosing and fixing common networking issues
 ---
 
@@ -59,10 +59,10 @@ The connection hangs without immediate response.
 
 ```bash
 # 1. Test if gateway is reachable
-curl -I https://<app-id>-8080.us.phala.network
+curl -I https://<app-id>-8080.dstack-prod5.phala.network
 
 # 2. Check TLS handshake
-openssl s_client -connect <app-id>-8080.us.phala.network:443
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443
 
 # 3. Inside CVM, check if service is listening
 netstat -tulpn | grep 8080
@@ -75,10 +75,10 @@ netstat -tulpn | grep 8080
 **Wrong URL format:**
 ```bash
 # Correct - always use port 443 externally
-https://<app-id>-8080.us.phala.network
+https://<app-id>-8080.dstack-prod5.phala.network
 
 # Wrong - don't add port to URL
-https://<app-id>-8080.us.phala.network:8080
+https://<app-id>-8080.dstack-prod5.phala.network:8080
 ```
 
 ## TLS/Certificate Errors
@@ -88,11 +88,11 @@ https://<app-id>-8080.us.phala.network:8080
 For default mode (TLS termination):
 ```bash
 # Test the connection
-curl -v https://<app-id>-8080.us.phala.network
+curl -v https://<app-id>-8080.dstack-prod5.phala.network
 
 # Check certificate details
-openssl s_client -connect <app-id>-8080.us.phala.network:443 \
-  -servername <app-id>-8080.us.phala.network
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443 \
+  -servername <app-id>-8080.dstack-prod5.phala.network
 ```
 
 For passthrough mode (`s` suffix):
@@ -189,17 +189,17 @@ Note: Namecheap doesn't support CAA records via API, so this issue won't occur w
 
 ```bash
 # Must use 'g' suffix for gRPC
-grpcurl <app-id>-50051g.us.phala.network:443 list
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
 
 # Without 'g' suffix, HTTP/2 isn't enabled
-grpcurl <app-id>-50051.us.phala.network:443 list  # Will fail
+grpcurl <app-id>-50051.dstack-prod5.phala.network:443 list  # Will fail
 ```
 
 ### Testing gRPC Service
 
 ```bash
 # From outside
-grpcurl <app-id>-50051g.us.phala.network:443 list
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
 
 # Inside CVM (without TLS)
 grpcurl -plaintext localhost:50051 list
@@ -223,7 +223,7 @@ DSTACK_ROOT_PUBLIC_KEY=ssh-rsa AAAA...
 ssh -v my-cvm
 
 # Test ProxyCommand directly
-openssl s_client -connect <app-id>-22.us.phala.network:443
+openssl s_client -connect <app-id>-22.dstack-prod5.phala.network:443
 ```
 
 ### macOS OpenSSL Issue
@@ -243,13 +243,13 @@ ProxyCommand /opt/homebrew/bin/openssl s_client -quiet -connect %h:%p
 
 ```bash
 # Test HTTPS endpoint
-curl -v https://<app-id>-8080.us.phala.network
+curl -v https://<app-id>-8080.dstack-prod5.phala.network
 
 # Check TLS certificate
-openssl s_client -connect <app-id>-8080.us.phala.network:443
+openssl s_client -connect <app-id>-8080.dstack-prod5.phala.network:443
 
 # DNS lookup
-dig <app-id>-8080.us.phala.network
+dig <app-id>-8080.dstack-prod5.phala.network
 ```
 
 ### Inside CVM (SSH Required)

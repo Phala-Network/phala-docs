@@ -1,5 +1,5 @@
 ---
-title: Configure TLS Passthrough
+title: TLS Passthrough
 description: Set up end-to-end encryption with TLS passthrough for databases and custom protocols
 ---
 
@@ -22,7 +22,7 @@ Phala Cloud networking infra always ensure end-to-end encryption. You can still 
 
 ## How TLS Passthrough Works
 
-1. Client connects with TLS to `<app-id>-<port>s.us.phala.network:443`
+1. Client connects with TLS to `<app-id>-<port>s.dstack-prod5.phala.network:443`
 2. Gateway detects the `s` suffix in the SNI and enables passthrough mode
 3. Gateway forwards the encrypted TLS stream directly to your service without decryption
 4. Your service handles the TLS handshake and decryption
@@ -54,7 +54,7 @@ services:
 
 Then clients connect via TLS passthrough:
 ```bash
-curl https://abc123-8443s.us.phala.network/api/status
+curl https://deadbeef111111111111111111111111-8443s.dstack-prod5.phala.network/api/status
 ```
 
 Your application handles the TLS termination and can implement custom certificate validation, cipher selection, or client certificate requirements.

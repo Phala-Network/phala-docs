@@ -40,7 +40,7 @@ The format is `"HOST_PORT:CONTAINER_PORT"`, following standard Docker behavior:
 After deployment completes, find your endpoint in the Network tab:
 
 ```
-https://<app-id>-8080.us.phala.network
+https://<app-id>-8080.dstack-prod5.phala.network
 ```
 
 Click the link to test your service. The connection is automatically secured with TLS.
@@ -61,10 +61,10 @@ services:
 ```
 
 This creates four public endpoints for the same service:
-- `https://<app-id>-3000.us.phala.network`
-- `https://<app-id>-8080.us.phala.network`
-- `https://<app-id>-9090.us.phala.network`
-- `https://<app-id>-4000.us.phala.network`
+- `https://<app-id>-3000.dstack-prod5.phala.network`
+- `https://<app-id>-8080.dstack-prod5.phala.network`
+- `https://<app-id>-9090.dstack-prod5.phala.network`
+- `https://<app-id>-4000.dstack-prod5.phala.network`
 
 ## Multiple Services Example
 
@@ -128,7 +128,7 @@ services:
       - "8080:8080"
 ```
 
-The frontend can reach the API at `http://api:8080` internally, while external users access it at `https://<app-id>-8080.us.phala.network`.
+The frontend can reach the API at `http://api:8080` internally, while external users access it at `https://<app-id>-8080.dstack-prod5.phala.network`.
 
 ## Zero-Trust Security
 
@@ -139,7 +139,7 @@ All traffic follows zero-trust principles:
 - Not even Phala Cloud operators or you as the developer can inspect the traffic
 - The hardware-based isolation ensures complete privacy
 
-This means your application handles sensitive data with true confidentiality - credit cards, API keys, personal information - all remain private to your code alone.
+This means your application handles sensitive data with true confidentiality. Credit cards, API keys, personal information - all remain private to your code alone.
 
 ## Security Notes
 

@@ -28,7 +28,7 @@ services:
       # No TLS config needed - gateway handles it
 ```
 
-Access your gRPC service at: `<app-id>-50051g.us.phala.network:443`
+Access your gRPC service at: `<app-id>-50051g.dstack-prod5.phala.network:443`
 
 Note the `g` suffix - this tells the gateway to enable HTTP/2.
 
@@ -37,9 +37,9 @@ Note the `g` suffix - this tells the gateway to enable HTTP/2.
 ```go
 // Go client
 conn, err := grpc.Dial(
-    "<app-id>-50051g.us.phala.network:443",
+    "<app-id>-50051g.dstack-prod5.phala.network:443",
     grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
-        ServerName: "<app-id>-50051g.us.phala.network",
+        ServerName: "<app-id>-50051g.dstack-prod5.phala.network",
     })),
 )
 ```
@@ -47,7 +47,7 @@ conn, err := grpc.Dial(
 ```python
 # Python client
 channel = grpc.secure_channel(
-    '<app-id>-50051g.us.phala.network:443',
+    '<app-id>-50051g.dstack-prod5.phala.network:443',
     grpc.ssl_channel_credentials()
 )
 ```
@@ -56,7 +56,7 @@ channel = grpc.secure_channel(
 // Node.js client
 const credentials = grpc.credentials.createSsl();
 const client = new YourService(
-    '<app-id>-50051g.us.phala.network:443',
+    '<app-id>-50051g.dstack-prod5.phala.network:443',
     credentials
 );
 ```
@@ -94,11 +94,11 @@ Then connect to: `api.mycompany.com`. Learn more details at [Set up custom domai
 
 ```bash
 # List services
-grpcurl <app-id>-50051g.us.phala.network:443 list
+grpcurl <app-id>-50051g.dstack-prod5.phala.network:443 list
 
 # Call a method
 grpcurl -d '{"name": "world"}' \
-    <app-id>-50051g.us.phala.network:443 \
+    <app-id>-50051g.dstack-prod5.phala.network:443 \
     your.service.v1.YourService/SayHello
 ```
 

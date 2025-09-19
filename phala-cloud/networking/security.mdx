@@ -1,5 +1,5 @@
 ---
-title: Network Security Model
+title: Security Model
 description: How network traffic is secured and isolated in Phala Cloud
 ---
 
@@ -11,7 +11,7 @@ Your network traffic goes through multiple encryption layers, each protecting ag
 
 ### The Encryption Stack
 
-When a client calls `https://abc123-8080.us.phala.network/api`, the request travels through:
+When a client calls `https://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network/api`, the request travels through:
 
 ```
 Client → [TLS 1.3] → Gateway → [WireGuard] → CVM → [Plain HTTP] → Your Container
@@ -37,7 +37,7 @@ The gateway sees encrypted bytes and forwards them without decryption. Your cont
 
 Example connection string:
 ```bash
-psql "host=abc123-5432s.us.phala.network port=443 sslmode=require"
+psql "host=deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network port=443 sslmode=require"
 ```
 
 ## Network Isolation
@@ -103,18 +103,18 @@ The gateway uses Server Name Indication (SNI) to route traffic without decryptin
 
 ### Standard Mode Routing
 
-For `abc123-8080.us.phala.network`:
+For `deadbeef111111111111111111111111-8080.dstack-prod5.phala.network`:
 
 1. Client sends TLS ClientHello with SNI
-2. Gateway extracts `abc123-8080` from SNI
-3. Looks up which CVM has app-id `abc123`
+2. Gateway extracts `deadbeef111111111111111111111111-8080` from SNI
+3. Looks up which CVM has app-id `deadbeef111111111111111111111111`
 4. Forwards to that CVM's WireGuard tunnel on port 8080
 
 The gateway can see which app and port you're accessing but not the request content.
 
 ### Passthrough Mode Routing
 
-For `abc123-5432s.us.phala.network`:
+For `deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network`:
 
 1. Gateway sees the `s` suffix in SNI
 2. Establishes TCP tunnel without TLS termination
@@ -197,7 +197,7 @@ For managed databases requiring TLS:
 ```javascript
 // Use passthrough mode
 const db = new Pool({
-  host: 'abc123-5432s.us.phala.network',
+  host: 'deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network',
   port: 443,
   ssl: {
     rejectUnauthorized: true,
@@ -220,7 +220,7 @@ For cross-CVM communication:
 
 ```javascript
 // Use public URLs with TLS
-const otherService = 'https://abc456-9000.us.phala.network';
+const otherService = 'https://abc456-9000.dstack-prod5.phala.network';
 ```
 
 ### WebSocket Connections
@@ -229,7 +229,7 @@ WebSockets work over the standard HTTPS endpoint:
 
 ```javascript
 // Client side
-const ws = new WebSocket('wss://abc123-8080.us.phala.network/ws');
+const ws = new WebSocket('wss://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network/ws');
 
 // Server side - no special config needed
 wss.on('connection', (ws) => {
@@ -263,10 +263,10 @@ For passthrough mode issues:
 
 ```bash
 # Test TLS handshake
-openssl s_client -connect abc123-5432s.us.phala.network:443
+openssl s_client -connect deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network:443
 
 # Check certificate
-openssl s_client -connect abc123-5432s.us.phala.network:443 | openssl x509 -text
+openssl s_client -connect deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network:443 | openssl x509 -text
 ```
 
 ### Traffic Analysis

@@ -1,5 +1,5 @@
 ---
-title: Networking Reference
+title: Reference
 description: Quick lookup for URL patterns, environment variables, and configuration parameters
 ---
 
@@ -7,12 +7,12 @@ description: Quick lookup for URL patterns, environment variables, and configura
 
 | Pattern | Protocol | Example |
 |---------|----------|---------|
-| `{app-id}.{cluster}.phala.network` | HTTP/HTTPS to port 80 (default) | `abc123.us.phala.network` |
-| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `abc123-8080.us.phala.network` |
-| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `abc123-50051g.us.phala.network` |
-| `{app-id}s.{cluster}.phala.network` | TLS passthrough to port 443 (default) | `abc123s.us.phala.network` |
-| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `abc123-5432s.us.phala.network` |
-| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `abc123-22.us.phala.network` |
+| `{app-id}.{cluster}.phala.network` | HTTP/HTTPS to port 80 (default) | `abc123.dstack-prod5.phala.network` |
+| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `deadbeef111111111111111111111111-8080.dstack-prod5.phala.network` |
+| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network` |
+| `{app-id}s.{cluster}.phala.network` | TLS passthrough to port 443 (default) | `abc123s.dstack-prod5.phala.network` |
+| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network` |
+| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `deadbeef111111111111111111111111-22.dstack-prod5.phala.network` |
 
 **Default Port Behaviors:**
 - No port specified = routes to port 80 for HTTP or port 443 for TLS passthrough

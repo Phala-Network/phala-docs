@@ -1,13 +1,11 @@
 ---
-title: Network Architecture Deep Dive
+title: Architecture
 description: Understanding how Phala Cloud routes and secures your network traffic
 ---
 
-Understanding how Phala Cloud routes and secures your network traffic helps you design better applications and troubleshoot issues effectively.
-
 ## Request Journey
 
-When a client connects to `abc123-8080.us.phala.network`, the request follows a specific path that affects both security and performance.
+When a client connects to `appid-8080.dstack-prod5.phala.network`, the request follows a specific path that affects both security and performance.
 
 ### The Complete Path
 
@@ -19,9 +17,9 @@ Each step serves a purpose:
 
 **TLS Handshake (10-30ms first connection, 1-2ms subsequent)**: Client establishes secure connection using standard TLS 1.3. The gateway presents a valid certificate for `*.phala.network`.
 
-**SNI Routing (<1ms)**: Gateway extracts the hostname from the TLS handshake to determine which CVM and port to route to. No decryption of request data happens yet.
+**SNI Routing (\<1ms)**: Gateway extracts the hostname from the TLS handshake to determine which CVM and port to route to. No decryption of request data happens yet.
 
-**WireGuard Tunnel (<1ms)**: Traffic gets re-encrypted with WireGuard before forwarding to your CVM. This creates defense-in-depth - even if the gateway is compromised, traffic to your CVM remains encrypted.
+**WireGuard Tunnel (\<1ms)**: Traffic gets re-encrypted with WireGuard before forwarding to your CVM. This creates defense-in-depth - even if the gateway is compromised, traffic to your CVM remains encrypted.
 
 **Container Processing**: Inside the CVM's trusted environment, traffic is decrypted and forwarded to your container on the specified port.
 
@@ -36,9 +34,9 @@ The gateway makes intelligent routing decisions based on URL patterns and health
 The URL structure tells the gateway how to handle your traffic:
 
 ```
-abc123-8080.us.phala.network   → TLS termination → HTTP to container
-abc123-5432s.us.phala.network  → TLS passthrough → Raw TLS to container
-abc123-50051g.us.phala.network → HTTP/2 enabled → gRPC to container
+deadbeef111111111111111111111111-8080.dstack-prod5.phala.network   → TLS termination → HTTP to container
+deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network  → TLS passthrough → Raw TLS to container
+deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network → HTTP/2 enabled → gRPC to container
 ```
 
 The suffixes change the behavior:
@@ -103,7 +101,7 @@ Where latency comes from in your network stack:
 |-----------|---------|---------------|
 | TLS handshake | 10-30ms (first connection) | Use connection pooling |
 | Gateway routing | 1-2ms | No (fixed overhead) |
-| WireGuard tunnel | <1ms | No (fixed overhead) |
+| WireGuard tunnel | \<1ms | No (fixed overhead) |
 | Your application | Variable | Yes - your code |
 
 For established connections with keep-alive, expect 2-3ms total network overhead.
@@ -194,8 +192,8 @@ services:
   gateway:
     ports: ["443:443"]
     environment:
-      BACKEND_1: https://abc123-8080.us.phala.network
-      BACKEND_2: https://def456-8080.us.phala.network
+      BACKEND_1: https://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network
+      BACKEND_2: https://def456-8080.dstack-prod5.phala.network
 ```
 
 Benefits: Single entry point, centralized auth, routing logic in your control.
