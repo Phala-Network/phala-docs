@@ -1,0 +1,82 @@
+---
+title: Structured Output
+description: Learn how to use structured output in Confidential AI
+---
+
+## Structured Output in Confidential AI
+
+Confidential AI supports structured output, enabling you to receive responses in specific formats such as JSON structures. This is particularly useful for applications that require data to be processed or integrated into other systems.
+
+### Example of Structured Output
+
+Replace `<API_KEY>` with your actual API key in the examples below.
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.redpill.ai/v1/chat/completions",
+    headers={
+        "Authorization": "Bearer <API_KEY>",
+        "Content-Type": "application/json",
+    },
+    json={
+        "model": "phala/deepseek-chat-v3-0324",
+        "messages": [
+            {"role": "user", "content": "What is the weather like in Los Angeles?"},
+        ],
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "weather",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "City or location name",
+                        },
+                        "temperature": {
+                            "type": "number",
+                            "description": "Temperature in Celsius",
+                        },
+                        "conditions": {
+                            "type": "string",
+                            "description": "Weather conditions description",
+                        },
+                    },
+                    "required": ["location", "temperature", "conditions"],
+                    "additionalProperties": False,
+                },
+            },
+        },
+    },
+)
+
+data = response.json()
+info = data["choices"][0]["message"]["content"]
+print(info)
+```
+
+
+<Accordion title="Sample output of structured output">
+```json
+{
+   "location":"Los Angeles",
+   "temperature":75,
+   "conditions":"Sunny with a few clouds"
+}
+```
+</Accordion>
+
+
+### Supported Models for Structured Output
+
+Confidential AI supports structured output for the following models:
+
+- `phala/deepseek-chat-v3-0324`
+- `phala/gemma-3-27b-it`
+- `phala/gpt-oss-20b`
+- `phala/gpt-oss-120b`
+- `phala/qwen2.5-vl-72b-instruct`
