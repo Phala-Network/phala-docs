@@ -1,0 +1,221 @@
+---
+title: Domain Attestation
+description: How to verify your data privacy when connecting to TEE applications
+---
+
+## Verify Your Connection Is 100% Private in Under 3 Minutes
+
+Your TEE connection is end-to-end encrypted. Here's how to prove it yourself with simple commands that anyone can run.
+
+This guide covers network privacy verification. For application code verification, check your app's attestation docs. For security concepts, see [Security Model](/phala-cloud/networking/security#certificate-and-domain-security).
+
+## Choose Your Verification Path
+
+| Domain Type | Verification Time | Trust Model |
+|-------------|------------------|-------------|
+| **Phala Cloud** (`*.phala.network`) | 30 seconds | Trust Phala's TEE infrastructure |
+| **Custom Domain** | 3 minutes | Zero-trust cryptographic proof |
+
+## Phala Cloud Domains - 30 Second Verification
+
+Phala Cloud domains use TEE-protected gateways. Run these three commands to verify your security.
+
+### Step 1: Check Certificate Authority
+```bash
+curl -s "https://crt.sh/?q=%.dstack-prod5.phala.network&output=json" | jq -r '.[].issuer_name' | sort -u
+```
+**Expected**: Only "Let's Encrypt" appears. Any other CA means potential compromise.
+
+### Step 2: Verify Domain Protection
+```bash
+dig +short CAA phala.network | grep -c "letsencrypt.org"
+```
+**Expected**: Returns `1` or higher. Zero means CAA protection is missing.
+
+### Step 3: Confirm Your Certificate
+```bash
+echo | openssl s_client -connect YOUR-APP-ID.dstack-prod5.phala.network:443 2>/dev/null | openssl x509 -issuer -noout
+```
+**Expected**: `issuer=CN=R3, O=Let's Encrypt, C=US` or similar Let's Encrypt issuer.
+
+**What you're trusting**: Phala's gateway TEEs are genuine and monitoring works. For zero-trust verification, use custom domains.
+
+## Custom Domains - Zero-Trust Verification
+
+Custom domains provide cryptographic proof that only your TEE controls the certificate. No middlemen, no trust required.
+
+### What You'll Verify
+
+Your TEE publishes cryptographic evidence at `https://your-domain.com/evidences/` that proves:
+1. The TLS certificate is controlled exclusively by this TEE
+2. Intel TDX hardware backs the attestation
+3. No one else can issue certificates for this domain
+
+Live example: [custom-domain-demo.phala.systems/evidences/](https://custom-domain-demo.phala.systems/evidences/)
+
+### Prerequisites
+
+Before starting, you'll need:
+- Your domain name (e.g., `your-domain.com`)
+- `curl`, `jq`, `openssl`, and `dig` commands installed
+- 3 minutes to complete all verifications
+
+### Simple 3-Step Verification
+
+**Example**: We'll use `custom-domain-demo.phala.systems` - just replace with your domain.
+
+#### Step 1: Get the Evidence Files
+
+Your TEE publishes 4 files that prove it controls the certificate:
+
+```bash
+# Download the evidence files (4 files total)
+curl -sO https://your-domain.com/evidences/quote.json
+curl -sO https://your-domain.com/evidences/sha256sum.txt
+curl -sO https://your-domain.com/evidences/cert.pem
+curl -sO https://your-domain.com/evidences/acme-account.json
+
+# Verify the files haven't been tampered with
+sha256sum -c sha256sum.txt
+```
+
+**Expected output**:
+```
+acme-account.json: OK
+cert.pem: OK
+```
+This means the files are authentic.
+
+#### Step 2: Verify the Certificate Matches
+
+Check that the evidence matches what's actually being served:
+
+```bash
+# Compare the served certificate with the evidence certificate
+echo | openssl s_client -connect your-domain.com:443 2>/dev/null | \
+  openssl x509 -fingerprint -sha256 -noout
+openssl x509 -in cert.pem -fingerprint -sha256 -noout
+```
+
+**What to look for**: Both fingerprints should be identical. For example:
+```
+SHA256 Fingerprint=62:89:C4:19:E6:F6:B6:50:11:F9:7D:E1:CF:FD:EE:5A:CE:2C:A3:38:24:F0:DE:5F:9E:2C:01:A3:72:D3:8B:DE
+SHA256 Fingerprint=62:89:C4:19:E6:F6:B6:50:11:F9:7D:E1:CF:FD:EE:5A:CE:2C:A3:38:24:F0:DE:5F:9E:2C:01:A3:72:D3:8B:DE
+```
+
+Now verify the TEE hardware signed these files:
+
+```bash
+# Step 1: Get the hash of sha256sum.txt
+sha256sum sha256sum.txt
+# Output: 7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988  sha256sum.txt
+
+# Step 2: Search for this complete hash in the TDX quote
+cat quote.json | jq -r '.quote' | grep -o "7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988"
+# Output: 7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988
+```
+
+**What this means**: If you see the same 64-character hash in both outputs, Intel TDX hardware has cryptographically signed your evidence files. Copy the hash from step 1 and search for it in step 2 - they must match exactly.
+
+#### Step 3: Check Domain Protection and Timeline
+
+Make sure only this TEE can get certificates for your domain:
+
+```bash
+# Check ALL certificates ever issued for your domain
+curl -s "https://crt.sh/?q=your-domain.com&output=json" | \
+  jq -r '.[] | "\(.not_before) to \(.not_after): \(.issuer_name)"' | head -5
+
+# Get the TEE's ACME account number
+cat acme-account.json | jq -r '.uri'
+
+# Check if your domain is locked to this account
+dig +short CAA your-domain.com
+```
+
+**Example output**:
+```
+# Certificate history (note the dates!)
+2025-08-04T06:10:56 to 2025-11-02T06:10:55: C=US, O=Let's Encrypt, CN=E5  ← Current
+2025-08-04T06:00:18 to 2025-11-02T06:00:17: C=US, O=Let's Encrypt, CN=E5  ← TEE deployment
+
+# ACME account
+https://acme-v02.api.letsencrypt.org/acme/acct/2572685661
+
+# CAA record (contains the same account number)
+0 issue "letsencrypt.org;validationmethods=dns-01;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/2572685661"
+```
+
+**Critical timeline check**: If you see certificates issued BEFORE your TEE was deployed (before CAA was set), verify they're either:
+- Already expired (check the "to" date)
+- Issued by the same ACME account (meaning they were from a previous TEE deployment)
+
+If unexpired certificates exist from before CAA setup, they could potentially intercept traffic!
+
+### Understanding the Results
+
+When all verifications pass, you've proven:
+
+✅ **Exclusive TEE Control**: Only this specific TEE instance has the private key for your TLS certificate
+
+✅ **Hardware-Backed Security**: Intel TDX hardware cryptographically signed the evidence, proving it's a genuine TEE
+
+✅ **Domain Protection**: CAA DNS records prevent anyone else (even with domain access) from issuing certificates
+
+✅ **Complete Chain of Trust**: Every link from TDX hardware → evidence files → certificate → your connection is verified
+
+### Evidence Files Reference
+
+<Frame>
+    <img src="/images/image (21).png" />
+</Frame>
+
+The four evidence files at `/evidences/` work together:
+
+| File | Contains | Proves |
+|------|----------|--------|
+| `quote.json` | TDX attestation with embedded hash | Hardware generated the evidence |
+| `sha256sum.txt` | SHA256 of cert.pem + acme-account.json | Links certificate to ACME account |
+| `cert.pem` | Current TLS certificate | What's being served to clients |
+| `acme-account.json` | ACME account URI | Which account controls certificates |
+
+### Troubleshooting
+
+**"Files not found at /evidences/"**: Ensure your domain uses custom domain setup with `SET_CAA=true`
+
+**"Certificate doesn't match"**: The TEE may have renewed the certificate. Re-download evidence files.
+
+**"Hash not in quote"**: Verify you're checking a production TEE deployment, not a test instance.
+
+**"CAA record missing"**: The domain owner needs to set CAA records pointing to the TEE's ACME account.
+
+### Going Deeper: Application Trust
+
+While you've verified the network connection is secure, the TLS private key is only as trustworthy as the code handling it. The key management software (dstack-ingress) runs inside the TEE and is open-source auditable code. To verify the exact code handling your keys matches what's deployed, check the compose-hash in the TEE's event log against the published source code. This ensures no malicious code can access or leak your private keys.
+
+Learn more: [Application Attestation Documentation](/phala-cloud/attestation)
+
+### Complete Security Checklist
+
+<Note>
+**Network Security** (covered above):
+- ✅ Evidence files verify TEE control
+- ✅ TDX attestation proves hardware backing
+- ✅ CAA records prevent unauthorized certificates
+- ✅ Certificate timeline shows no pre-deployment threats
+
+**Advanced Verification** (for maximum security):
+- ⚠️ Application code trust - Verify compose-hash matches source code
+- ⚠️ Certificate timeline - Ensure no valid pre-CAA certificates exist
+- ⚠️ Continuous monitoring - Watch CT logs for unexpected certificates
+
+For detailed application verification: [Attestation Guide](/phala-cloud/attestation)
+</Note>
+
+### Next Steps
+
+**For monitoring**: Set up alerts on [crt.sh](https://crt.sh) to detect any unexpected certificate issuance.
+
+**For developers**: Enable CAA records with `SET_CAA=true` in your deployment configuration.
+
+**For security teams**: Audit the [dstack-ingress source code](https://github.com/Dstack-TEE/dstack-examples) to verify key handling.
