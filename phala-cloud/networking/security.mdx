@@ -1,297 +1,185 @@
 ---
-title: Security Model
-description: How network traffic is secured and isolated in Phala Cloud
+title: Network Security Architecture
+description: How Phala Cloud keeps your data private even from the cloud provider
 ---
 
-Every network connection in Phala Cloud is end-to-end encrypted. Here's how the network security works and what it means for your application architecture.
+## Complete Network Privacy Through Hardware
 
-## Traffic Encryption Layers
+Phala Cloud runs your applications in hardware-encrypted memory where even the cloud provider can't see your data. Every network connection uses multiple layers of encryption, and you can verify it all cryptographically.
 
-Your network traffic goes through multiple encryption layers, each protecting against different threats.
+## Security Architecture
 
-### The Encryption Stack
+### Defense in Depth
 
-When a client calls `https://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network/api`, the request travels through:
+Phala Cloud implements multiple independent security layers. Each layer assumes others might fail, creating resilient protection:
+
+**Hardware encryption**. Intel TDX encrypts memory with unique per-VM keys. The hypervisor and host OS cannot access these keys—the hardware prevents it.
+
+**Network isolation**. Every packet travels through encrypted tunnels. TLS 1.3 protects client connections, then WireGuard isolates CVM traffic from the host network.
+
+**Certificate security**. TEEs generate ACME accounts inside encrypted memory. Private keys exist nowhere else—they're mathematically bound to the TEE instance.
+
+### Application Responsibility
+
+**Your code, your security**. We protect the infrastructure layer. Application vulnerabilities like SQL injection or authentication bugs remain your responsibility. Think of us as an armored truck: we secure the transport, not what you put inside.
+
+## Network Architecture
+
+### Hardware Isolation
+
+Your application runs in a Confidential VM (CVM) protected by Intel TDX. Here's the architecture:
 
 ```
-Client → [TLS 1.3] → Gateway → [WireGuard] → CVM → [Plain HTTP] → Your Container
+Physical Server
+├── Intel TDX (hardware root of trust)
+├── Your CVM (encrypted with unique key)
+│   ├── WireGuard tunnel (your keypair only)
+│   ├── Docker network (172.x.x.x)
+│   └── Your containers
+└── Someone else's CVM (different encryption key)
+    └── Can't see your traffic or memory
 ```
 
-The gateway terminates TLS and re-encrypts with WireGuard before forwarding to your CVM. The gateway is deployed in Phala Cloud TEE to ensure the traffic is always end-to-end encrypted.
+The key point: each CVM gets its own encryption key from the hardware. The host OS literally cannot decrypt your memory—it doesn't have the key.
 
-Inside the CVM, traffic between your containers is encrypted in the CVM memory and protected by TEE.
+### Traffic Flow
 
-### TLS Passthrough Mode
-
-Sometimes you need unmodified TLS all the way to your application. Add the `s` suffix to your URL:
-
+**Standard HTTPS traffic** follows this path:
 ```
-Client → [TLS] → Gateway → [WireGuard + TLS] → CVM → [TLS] → Your Container
+Browser → TLS 1.3 → Gateway → WireGuard → Your CVM → HTTP → Container
 ```
 
-The gateway sees encrypted bytes and forwards them without decryption. Your container handles the TLS termination. Use this for:
+The gateway (also in a TEE) strips TLS and immediately re-encrypts with WireGuard. Your data is never in plaintext on the host.
 
-- PostgreSQL/MySQL with `sslmode=require` and self managed certificates
-- Services that verify client certificates
-- Custom protocols that manage their own TLS
-
-Example connection string:
-```bash
-psql "host=deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network port=443 sslmode=require"
+**TLS passthrough mode** preserves end-to-end encryption:
+```
+Client → TLS → Gateway → WireGuard[TLS] → Your CVM → TLS → Container
 ```
 
-## Network Isolation
+Add an `s` suffix to your domain (like `app-443s.phala.network`) and the gateway routes without decryption. Your application handles TLS termination directly.
 
-Each CVM gets its own isolated network segment. Here's what that means practically.
+### WireGuard with Mutual Attestation
 
-### CVM Network Boundaries
+WireGuard tunnels between the gateway and your CVM are only established after mutual attestation:
 
-Your CVM has:
-- A unique WireGuard tunnel with its own keypair
-- An isolated IP in the 10.0.0.0/8 range
-- No route to other CVMs or the host
+1. **Attestation First**: Both the gateway TEE and your CVM generate TDX attestation quotes
+2. **Mutual Verification**: Each side verifies the other's attestation before proceeding
+3. **Key Exchange**: Only after successful attestation do they exchange WireGuard public keys
+4. **Tunnel Creation**: WireGuard establishes the encrypted tunnel using ChaCha20-Poly1305
+5. **Continuous Encryption**: All traffic flows through this attested tunnel, invisible to the host
 
-You can't ping another CVM. You can't connect to the host's localhost. You can't even discover what other CVMs exist on the same server.
+This attestation requirement ensures you're always connecting to genuine TEE instances, not imposters. Even after TLS termination at the gateway, your data remains encrypted until it reaches your container.
 
-### Container Networking Inside CVM
+## Zero-Trust HTTPS (zt-https)
 
-Within your CVM, containers communicate normally via Docker's bridge network:
+### How TEEs Control Certificates
+
+Both Phala Cloud domains (via gateway) and custom domains (via dstack-ingress) implement Zero-Trust HTTPS. TEEs generate and control their own ACME accounts:
+
+1. **TEE generates ECDSA keypair**: The private key is created inside TDX-encrypted memory
+2. **Registers with Let's Encrypt**: The TEE establishes its own ACME account
+3. **Seals credentials to hardware**: Keys are stored on encrypted disk, bound to TEE measurements
+4. **Requests certificates**: Only this specific TEE instance can use these credentials
+
+The private keys are stored on an encrypted disk that only the TEE can decrypt. Even with full host access, attackers can't extract these credentials—the hardware prevents it.
+
+### Zero-Trust Certificate Architecture
+
+We implement Zero-Trust HTTPS through three essential mechanisms:
+
+**CAA DNS Records**: Lock your domain to a specific ACME account
+```
+your-domain.com CAA 0 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/YOUR_TEE"
+```
+This prevents anyone else—even with domain control—from getting valid certificates.
+
+**Certificate Transparency Monitoring**: Every certificate issuance gets logged publicly. Monitor these logs to detect any unauthorized certificates immediately.
+
+**Cryptographic Evidence**: Custom domains publish proof at `/evidences/` containing:
+- TDX attestation quote proving hardware backing
+- SHA256 hash linking the certificate to the ACME account
+- The actual certificate and account details
+
+This creates an auditable chain: the hardware signs the evidence, the evidence contains the certificate, and the certificate serves your traffic. Any tampering breaks the cryptographic chain.
+
+### Preventing Timeline Attacks
+
+CAA records only protect future certificate issuance. Existing certificates remain valid until expiration. To ensure complete security:
+
+1. **Check historical certificates**: Review all certificates ever issued for your domain
+2. **Verify expiration**: Ensure pre-deployment certificates have expired
+3. **Revoke if necessary**: Contact the CA to revoke any unexpired legacy certificates
+
+This prevents attackers from using certificates obtained before your TEE deployment.
+
+
+## Compliance and Standards
+
+Phala Cloud's architecture aligns with major regulatory requirements through hardware-enforced security. The platform provides GDPR Article 32 compliance with state-of-the-art encryption (TLS 1.3, WireGuard, TDX), pseudonymization through CVM isolation, and continuous confidentiality.
+
+For HIPAA, we deliver hardware-enforced access controls, attestation-based audit trails, and mandatory end-to-end encryption. PCI DSS requirements are met through hardware network segmentation, FIPS-approved cryptography, and hardware-sealed key management.
+
+Remember: infrastructure security doesn't replace application security. You remain responsible for secure coding practices, authentication, and application-layer compliance requirements.
+
+## Advanced Deployment Patterns
+
+### Cross-Region Architecture
+
+Running globally distributed CVMs? Traffic flows like this:
+```
+CVM_US → WireGuard → Gateway_US → Internet → Gateway_EU → WireGuard → CVM_EU
+```
+
+Expect ~100ms latency per ocean crossing. Data transfer costs apply. Consider regulatory requirements for data movement.
+
+### Maximum Privacy with Tor
+
+Need network-layer anonymity? Deploy Tor inside your CVM:
 
 ```yaml
 services:
-  frontend:
-    # Can reach backend at http://backend:3000
-  backend:
-    # Can reach postgres at postgres://db:5432
-  db:
-    # All internal, no encryption needed
+  tor:
+    image: torproject/tor
+    volumes:
+      - ./torrc:/etc/tor/torrc
+  app:
+    network_mode: "service:tor"
 ```
 
-This internal traffic never leaves the CVM's memory space, which is already hardware-encrypted.
+Users connect via .onion addresses. Traffic correlation becomes nearly impossible. TEE attestation still works.
 
-### Outbound Connections (Egress)
+### TLS Passthrough Applications
 
-CVMs have full outbound internet connectivity with privacy protections through TEE isolation.
-
-**Supported Protocols**:
-Your containers can use any standard internet protocol:
-- TCP/UDP for basic connectivity
-- HTTP/HTTPS for web services and APIs
-- WebSocket for real-time communication
-- gRPC for modern microservices
-- Database protocols (PostgreSQL, MySQL, Redis)
-- Email protocols (SMTP, POP3, IMAP)
-- File transfer protocols (FTP, SFTP)
-- ICMP for ping utility
-
-**Isolation from Host**:
-While your CVM has full internet access, it's isolated from the host:
-- Cannot access host's `127.0.0.1` services
-- Limited access to host's local network
-- Cannot discover or attack host infrastructure
-
-**Privacy Protection**:
-The combination of WireGuard tunneling and TEE isolation means:
-- Host sees a connection was made but not the content
-- Memory contents remain encrypted and isolated
-- No data leakage to host or other CVMs
-- Application behavior stays private even with network monitoring
-
-## How SNI Routing Works
-
-The gateway uses Server Name Indication (SNI) to route traffic without decrypting it.
-
-### Standard Mode Routing
-
-For `deadbeef111111111111111111111111-8080.dstack-prod5.phala.network`:
-
-1. Client sends TLS ClientHello with SNI
-2. Gateway extracts `deadbeef111111111111111111111111-8080` from SNI
-3. Looks up which CVM has app-id `deadbeef111111111111111111111111`
-4. Forwards to that CVM's WireGuard tunnel on port 8080
-
-The gateway can see which app and port you're accessing but not the request content.
-
-### Passthrough Mode Routing
-
-For `deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network`:
-
-1. Gateway sees the `s` suffix in SNI
-2. Establishes TCP tunnel without TLS termination
-3. Your container receives the raw TLS stream
-
-The gateway can't see anything except encrypted bytes.
-
-## Load Balancing and Health Checks
-
-Understanding how the gateway distributes traffic helps you design resilient services.
-
-### Health-Based Routing
-
-The gateway tracks WireGuard handshake times:
-- Last handshake < 5 minutes ago = healthy
-- No recent handshake = unhealthy
-
-Unhealthy instances stop receiving traffic automatically. No need for explicit health endpoints, though you can add them for container-level health.
-
-### Session Affinity
-
-Currently there's no sticky sessions. Requests distribute across healthy instances randomly. Design implications:
-
+For services requiring unmodified TLS:
 ```javascript
-// DON'T: Store session in memory
-req.session.userId = 'user123';
-
-// DO: Use external storage
-await redis.set(`session:${sessionId}`, userData);
-```
-
-For WebSocket connections, the TCP connection stays with one instance for its lifetime. But reconnections might hit a different instance.
-
-## Security Boundaries
-
-Understanding what's protected and what isn't helps you make architectural decisions.
-
-### What the Network Security Provides
-
-**Cloud insider attack resilience**: All the traffic is end-to-end encrypted by default. Even the cloud provider can't access your data.
-
-**CVM isolation**: Network segmentation prevents lateral movement between CVMs.
-
-**Traffic analysis resistance**: WireGuard hides packet sizes and timing patterns.
-
-### What You Still Need to Handle
-
-**Application-layer auth**: Network security doesn't replace authentication.
-
-```javascript
-// Still needed
-if (!req.headers.authorization) {
-  return res.status(401).send('Unauthorized');
+{
+  host: 'app-443s.phala.network',  // Note the 's' suffix
+  port: 443
 }
 ```
 
-**Rate limiting**: Network layer doesn't prevent abuse.
+The `s` suffix enables passthrough mode. Common uses include gRPC services, custom protocols, and applications with client certificate authentication.
 
-```javascript
-// Still recommended
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
-```
+## Security Boundaries
 
-**Input validation**: Network encryption doesn't prevent injection attacks.
+### What TEE Hardware Guarantees
 
-```javascript
-// Still critical
-const sanitized = validator.escape(userInput);
-```
+**Memory encryption**. Each CVM's memory is encrypted with a unique key from the CPU. The host OS doesn't have this key.
 
-## Common Patterns and Solutions
+**Attestation**. You can cryptographically verify what code is running. The hardware signs the measurements.
 
-### Database Connections
+**Isolation**. CVMs can't access each other's memory or networks. Hardware enforces these boundaries.
 
-For managed databases requiring TLS:
+### Scope Boundaries
 
-```javascript
-// Use passthrough mode
-const db = new Pool({
-  host: 'deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network',
-  port: 443,
-  ssl: {
-    rejectUnauthorized: true,
-    ca: fs.readFileSync('server-ca.pem')
-  }
-});
-```
+**Application layer**. Your code's security remains your responsibility. We secure the platform, not the application logic.
 
-### Microservice Communication
+**Availability**. We focus on confidentiality and integrity. Plan redundancy for high availability requirements.
 
-For service-to-service within the same CVM:
 
-```javascript
-// Use internal DNS names, no TLS needed
-const userService = 'http://users:3000';
-const authService = 'http://auth:4000';
-```
+## Technical References
 
-For cross-CVM communication:
-
-```javascript
-// Use public URLs with TLS
-const otherService = 'https://abc456-9000.dstack-prod5.phala.network';
-```
-
-### WebSocket Connections
-
-WebSockets work over the standard HTTPS endpoint:
-
-```javascript
-// Client side
-const ws = new WebSocket('wss://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network/ws');
-
-// Server side - no special config needed
-wss.on('connection', (ws) => {
-  // Connection already secured by gateway TLS
-});
-```
-
-## Debugging Network Issues
-
-### Checking Connectivity
-
-From inside your container:
-
-```bash
-# Test outbound
-curl -I https://example.com
-
-# Check internal DNS
-nslookup other-service
-
-# View network interfaces
-ip addr show
-
-# Check routing table
-ip route
-```
-
-### TLS Debugging
-
-For passthrough mode issues:
-
-```bash
-# Test TLS handshake
-openssl s_client -connect deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network:443
-
-# Check certificate
-openssl s_client -connect deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network:443 | openssl x509 -text
-```
-
-### Traffic Analysis
-
-You can't capture WireGuard traffic (it's encrypted), but you can see container traffic:
-
-```bash
-# Inside container (install tcpdump first)
-tcpdump -i eth0 -n port 80
-
-# Connection count
-netstat -an | grep ESTABLISHED | wc -l
-```
-
-Remember: the host can't run these commands inside your CVM. Only you can debug your own traffic.
-
-## Advanced Privacy Patterns
-
-### Anonymous Hosting with Tor
-
-For maximum privacy, you can combine TEE security with Tor hidden services. This provides both confidential computing and network anonymity:
-
-- Deploy a Tor hidden service inside your CVM
-- Use internal Docker networking between Tor and your application
-- Request TEE attestation based on the `.onion` address
-- Clients can verify both the Tor anonymity and TEE authenticity
-
-This pattern is useful for whistleblowing platforms, private communications, or any service requiring both computational and network privacy. Check the dstack-examples repository for a complete Tor hidden service implementation.
+- [Intel TDX Architecture Specification](https://intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html)
+- [WireGuard Protocol Paper](https://wireguard.com/papers/wireguard.pdf)
+- [RFC 8555: ACME Protocol](https://datatracker.ietf.org/doc/html/rfc8555)
+- [RFC 9162: Certificate Transparency](https://datatracker.ietf.org/doc/html/rfc9162)
