@@ -270,7 +270,6 @@
                 "icon": "network",
                 "pages": [
                   "/phala-cloud/networking/overview",
-                  "/phala-cloud/networking/architecture",
                   "/phala-cloud/networking/quickstart",
                   "/phala-cloud/networking/expose-http-service",
                   "/phala-cloud/networking/setup-custom-domain",
@@ -278,6 +277,7 @@
                   "/phala-cloud/networking/enable-ssh-access",
                   "/phala-cloud/networking/tls-passthrough",
                   "/phala-cloud/networking/setup-grpc-service",
+                  "/phala-cloud/networking/architecture",
                   "/phala-cloud/networking/security",
                   "/phala-cloud/networking/domain-attestation",
                   "/phala-cloud/networking/specifications",
