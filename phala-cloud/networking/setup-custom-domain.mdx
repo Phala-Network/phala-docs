@@ -178,6 +178,20 @@ When `SET_CAA=true` is enabled:
 - Only certificates requested from within your TEE can be issued
 - Certificate transparency logs can be monitored for unauthorized certificates
 
+<Warning>
+**Cloudflare Users**: Cloudflare automatically overrides CAA records at the apex domain (e.g., `example.com`). This prevents domain attestation from working correctly.
+
+**Solution options:**
+1. **Use a subdomain** (recommended): Deploy to `app.example.com` instead of `example.com`
+2. **Disable Cloudflare's CAA management**: See [Cloudflare CAA documentation](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/#caa-records-added-by-cloudflare)
+
+**To verify your CAA record is working:**
+```bash
+dig @1.1.1.1 +short CAA your-domain.com
+```
+Should return the Let's Encrypt account URI with `validationmethods=dns-01;accounturi=...`
+</Warning>
+
 ## Troubleshooting
 
 ### Check Logs
