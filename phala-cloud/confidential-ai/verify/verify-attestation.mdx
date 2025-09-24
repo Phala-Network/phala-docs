@@ -1,79 +1,99 @@
 ---
 title: Verify Attestation
-description: Get cryptographic proof your AI workloads run in genuine TEE hardware with verified software
+description: Learn how to verify  cryptographic proof your AI workloads run in genuine TEE hardware with verified software
 ---
 
-## Why verify attestation?
+## Why attestation matters
 
-Attestation ensure that the hardware and software stack are secure and trustworthy. Attestation verification provides assurance that your workloads are protected from tampering and unauthorized access. This verification includes **TEE Hardware Stack** and **TEE Software Stack**.
+Attestation proves your AI workloads run on genuine TEE hardware with verified software. It gives you confidence that:
+
+- Hardware comes from trusted vendors (NVIDIA, Intel)
+- The entire software stack is authentic and untampered
+- Your workloads are protected from external attacks
 
 ## Verify TEE hardware stack
 
-Start by fetching the attestation report from Phala Cloud's API. This report contains everything you need to verify both GPU and CPU hardware.
+Hardware verification confirms your GPUs and CPUs are genuine and secure. This prevents counterfeit hardware from compromising your AI workloads.
 
-Here we provide a [Hardware TEE Verification Example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py) to help you understand how to verify the attestation.
+You'll verify:
+- **GPU authenticity** - NVIDIA GPUs are genuine and running in TEE mode
+- **CPU authenticity** - Intel CPUs support TEE protections
+- **Cryptographic security** - Hardware security features are operational
+
+Follow this [Python example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py) to verify the full hardware stack.
 
 ### Get the attestation report
 
-```python Python
-import requests
+Fetch the attestation report with a simple [GET request](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L31-L38). The report contains:
 
-url = f"https://api.redpill.ai/v1/attestation/report?model={model}"
-headers = {
-    "accept": "application/json",
-    "Content-Type": "application/json", 
-    "Authorization": f"Bearer {api_key}"
-}
-response = requests.get(url, headers=headers)
-report = response.json()
-```
+- **GPU attestation** - NVIDIA hardware verification data
+- **CPU attestation** - Intel TEE verification data
+- **Signing address** - Public key for signature verification
 
-The response includes three key pieces:
-
-- `nvidia_payload`: GPU attestation data for NVIDIA verification
-- `intel_quote`: CPU attestation quote for Intel TDX verification  
-- `signing_address`: Cryptographic key that signs your AI responses
+Start by verifying GPU and CPU attestation.
 
 ### Verify NVIDIA GPU attestation
 
-Send the NVIDIA payload to their attestation service for verification:
+Verify NVIDIA GPUs by sending the `nvidia_payload` to NVIDIA's attestation service:
 
-```python Python
-url = "https://nras.attestation.nvidia.com/v3/attest/gpu"
-headers = {"accept": "application/json", "content-type": "application/json"}
-response = requests.post(url, headers=headers, data=report['nvidia_payload'])
-gpu_result = response.json()
-```
-
-The response includes JWT tokens - one for each GPU. Decode them to check attestation results:
-
-```python Python
-# For each GPU token
-jwt_payload = parse_jwt_token(gpu_token)
-result = jwt_payload.get('x-nvidia-overall-att-result')
-print(f"GPU attestation result: {result}")  # Should be 'true'
-```
+1. [Send payload for GPU verification](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L43)
+2. [Decode NVIDIA tokens](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L149-L168) - one token per GPU to validate each device
 
 ### Verify Intel TDX CPU attestation
 
-Copy the Intel quote and verify it at the [TEE Attestation Explorer](https://proof.t16z.com/). Paste the `intel_quote` value into the verification tool to confirm CPU authenticity.
+Verify Intel CPUs using the [Intel quote](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L72):
+
+1. Copy the `intel_quote` value
+2. Paste it into the [TEE Attestation Explorer](https://proof.t16z.com/)
+3. Confirm CPU authenticity through the verification tool
 
 ## Verify TEE software stack
 
-### Verify operating system integrity
+With hardware verified, confirm the software stack is authentic and untampered. This ensures:
 
-Check the `event_log` in your attestation report. This log contains hashes of every software component loaded during boot. Compare these against known good values to ensure your OS hasn't been modified.
+- No unauthorized modifications to OS or application code
+- The TEE operates in a trusted security state
+- The trust chain from hardware to application remains intact
 
-The event log provides a complete chain of trust from hardware boot to application execution.
+Verify these software components:
 
-### Verify source code authenticity
+### 1. Verify operating system integrity
 
-The `info` field contains a hash of your docker compose configuration and application image. Verify this hash matches your expected source code to prevent tampering.
+Confirm the TEE runs the expected, unmodified OS using [this verification process](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/verification/osVerification.ts#L13-L27):
 
-This ensures your AI model and its environment match what you deployed originally.
+1. **Measure OS image** - Calculate cryptographic hashes of OS components
+2. **Compare with expected values** - Match against TCB (Trusted Computing Base) values
+3. **Validate registers** - Ensure all system registers are correct
 
-### Verify distributed root-of-trust
 
-Phala Cloud uses a KMS with distributed trust. The attestation report includes KMS verification data to confirm no unauthorized access occurred.
+### 2. Verify source code authenticity
 
-Great! Now, let's verify [Integrity Proof](./verify-signature) to ensure your AI outputs are authentic.
+Verify the application code is unmodified by checking Docker Compose configuration hashes:
+
+1. [Calculate compose hash](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/dataObjects/baseDataObjectGenerator.ts#L341) - Compute SHA256 of Docker Compose config
+2. [Compare with registry](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/utils/dstackContract.ts#L52) - Check against allowed hashes in blockchain smart contract
+3. [Validate event log](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/dataObjects/baseDataObjectGenerator.ts#L341) - Cross-reference with deployment records
+
+### 3. Verify distributed root-of-trust
+
+The distributed root-of-trust (KMS) manages cryptographic keys and authenticates applications. It validates:
+
+- Hardware attestation
+- Operating system integrity
+- Source code authenticity
+
+See [KMS Verifier code](https://github.com/Phala-Network/dstack-verifier/blob/95689c415cad165033c700979cd26225c56c8d1c/src/verifiers/kmsVerifier.ts#L27) for implementation details.
+
+
+### 4. Verify network end-to-end encryption
+
+Ensure TEE controls all communication with [network verification](https://github.com/Phala-Network/dstack-verifier/blob/7d2f5acc04e498dced91334a1b5424040b44535e/src/verifiers/gatewayVerifier.ts#L40):
+
+1. **TEE-controlled keys** - Verify keys are generated and stored in TEE
+2. **Certificate matching** - Ensure TLS certificates match TEE public keys
+3. **DNS CAA records** - Validate Certificate Authority Authorization
+4. **Certificate transparency** - Analyze historical certificate patterns
+
+## Next step
+
+Hardware and software stack verified! Now [verify integrity proof](./verify-signature) to ensure your AI outputs are authentic.
