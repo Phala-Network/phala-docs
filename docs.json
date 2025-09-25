@@ -429,8 +429,8 @@
                       "/overview/pha-token/governance/join-the-council",
                       "/overview/pha-token/governance/voting-for-councillors",
                       "/overview/pha-token/governance/apply-for-project-funding",
-                      "/overview/pha-token/governance/khala-governance",
-                      "/overview/pha-token/governance/khala-treasury",
+                      "/overview/pha-token/governance/phala-governance",
+                      "/overview/pha-token/governance/phala-treasury",
                       "/overview/pha-token/governance/setup-account-identity"
                     ]
                   }
@@ -511,7 +511,7 @@
                   "/network/compute-providers/basic-info/worker-rewards",
                   "/network/compute-providers/basic-info/budget-balancer",
                   "/network/compute-providers/basic-info/staking-mechanism",
-                  "/network/compute-providers/basic-info/requirements-in-phala-khala",
+                  "/network/compute-providers/basic-info/requirements-in-phala",
                   "/network/compute-providers/basic-info/confidence-level-and-sgx-function",
                   "/network/compute-providers/basic-info/rent-hardware",
                   "/network/compute-providers/basic-info/error-summary"
@@ -527,33 +527,6 @@
                   "/network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
                   "/network/compute-providers/run-workers-on-phala/headers-cache-deployment",
                   "/network/compute-providers/run-workers-on-phala/archive-node-deployment"
-                ]
-              },
-              {
-                "group": "Run Workers on Khala - Archived",
-                "pages": [
-                  {
-                    "group": "Solo Scripts Guidance - Archived",
-                    "pages": [
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing",
-                      "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
-                    ]
-                  },
-                  "/network/compute-providers/run-workers-on-khala/prbv3-deployment",
-                  "/network/compute-providers/run-workers-on-khala/using-prbv3-ui",
-                  "/network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3",
-                  "/network/compute-providers/run-workers-on-khala/headers-cache-deployment",
-                  "/network/compute-providers/run-workers-on-khala/archive-node-deployment",
-                  "/network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2",
-                  "/network/compute-providers/run-workers-on-khala/prb-worker-deployment",
-                  "/network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining",
-                  "/network/compute-providers/run-workers-on-khala/khala-worker-rewards",
-                  "/network/compute-providers/run-workers-on-khala/troubleshooting"
                 ]
               },
               {
@@ -700,11 +673,11 @@
       "source": "/compute-providers/gatekeeper/index"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
       "source": "/compute-providers/run-workers-on-khala/index"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools",
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
       "source": "/compute-providers/run-workers-on-khala/solo-scripts-guidance/index"
     },
     {
@@ -1338,6 +1311,86 @@
     {
       "destination": "/phala-cloud/networking/setup-custom-domain",
       "source": "/phala-cloud/networking/setting-up-custom-domain"
+    },
+    {
+      "destination": "/overview/pha-token/governance/phala-governance",
+      "source": "/overview/pha-token/governance/khala-governance"
+    },
+    {
+      "destination": "/overview/pha-token/governance/phala-treasury",
+      "source": "/overview/pha-token/governance/khala-treasury"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/requirements-in-phala",
+      "source": "/network/compute-providers/basic-info/requirements-in-phala-khala"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/prbv3-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/prbv3-deployment"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/using-prbv3-ui",
+      "source": "/network/compute-providers/run-workers-on-khala/using-prbv3-ui"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/prbv3-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/headers-cache-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/headers-cache-deployment"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/archive-node-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/archive-node-deployment"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/prb-worker-deployment"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
+      "source": "/network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining"
+    },
+    {
+      "destination": "/network/compute-providers/basic-info/worker-rewards",
+      "source": "/network/compute-providers/run-workers-on-khala/khala-worker-rewards"
+    },
+    {
+      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "source": "/network/compute-providers/run-workers-on-khala/troubleshooting"
     }
   ],
   "styling": {
