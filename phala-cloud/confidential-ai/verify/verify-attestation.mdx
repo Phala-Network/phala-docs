@@ -1,5 +1,5 @@
 ---
-title: Verify Attestation
+title: Attestation
 description: Learn how to verify cryptographic proof your AI workloads run in genuine TEE hardware with verified software
 ---
 
@@ -71,9 +71,9 @@ This tool decodes Intel's cryptographic proof and shows you exactly what CPU you
 
 ## Verify TEE software stack
 
-Your hardware checks out. Now you need to verify the software running on that hardware is exactly what you expect. Think of it like checking a sealed package - the hardware verification proved the box is genuine, now you're making sure nobody swapped the contents.
+Your hardware checks out. Now you need to verify the software running on that hardware is exactly what you expect.
 
-The software verification catches sneaky attacks. Someone could modify the OS, inject malicious code, or break the security chain between hardware and your application. You'll check each layer to make sure everything is clean.
+The software verification detects supply chain attacks where someone modifies the OS, injects malicious code, or breaks the chain of trust between hardware and application. You'll verify each layer - OS, application code, and cryptographic keys - to ensure the entire stack is authentic.
 
 ### 1. Verify operating system integrity
 

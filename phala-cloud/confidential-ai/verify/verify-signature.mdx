@@ -5,47 +5,61 @@ title: Integrity Proof
 
 ## Why integrity proof matters
 
-Every Confidential AI response includes a cryptographic signature that proves:
+Every Confidential AI response comes with a cryptographic signature. This signature proves the AI output came from verified TEE hardware and nobody tampered with it along the way.
 
-- **Response authenticity** - The AI output came from verified TEE hardware
-- **Data integrity** - No one tampered with your request or the AI's response
-- **Hardware trust** - The signature comes from the TEE's verified `signing_address`
-
-Verifying the signature confirms:
-- The response matches what the TEE generated
-- Data wasn't modified during transmission
-- The response came from genuine TEE hardware
-
-Use this [full signature verification example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py#L221) to verify responses from the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
-
-Here's how the verification process works:
+The signature cryptographically binds the request and response to the TEE's signing key. Any modification to the AI's response or injected fake data will break the signature verification. Without this check, you're trusting the transport layer. With it, you have end-to-end cryptographic proof from the TEE itself.
 
 ## Get the signature
 
-After making a request, parse the `chat_id` from the response and [fetch the signature](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py#L103-L106).
+After you make an AI request, you'll get a `chat_id` in the response. Use it to fetch the cryptographic signature:
 
-The signature response contains:
+```python
+import requests
 
-- `text` - Hashes of your request and the AI's response, separated by `:`
-- `signature` - Cryptographic signature of the `text` field
-- `signing_address` - Public key from the TEE that signed the signature
-- `signing_algo` - Signature algorithm used
+# After getting AI response with chat_id
+chat_id = ai_response["id"]
+model = "phala/deepseek-chat-v3-0324"  # or your model
+
+# Fetch the signature
+sig_response = requests.get(
+    f"https://api.redpill.ai/v1/signature/{chat_id}?model={model}",
+    headers={"Authorization": f"Bearer {api_key}"}
+)
+signature_data = sig_response.json()
+```
+
+The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response, separated by a colon. The `signature` is the cryptographic proof from the TEE. The `signing_address` matches what you verified in the attestation report.
 
 ## Verify signature
 
-[Verify the signature](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py#L81-L89) to confirm it was signed by the TEE's `signing_address`. A valid signature proves:
+Now verify that the signature actually came from the TEE. You're checking that the `signing_address` from the signature matches what you verified in the attestation report, and that the signature is valid:
 
-- The response came from the verified TEE
-- No one tampered with the data
-- The AI output is authentic
+```python
+from eth_account.messages import encode_defunct
+from eth_account import Account
+
+# The signing address from attestation report
+expected_address = report["signing_address"]
+
+# Verify the signature
+message = encode_defunct(text=signature_data["text"])
+recovered_address = Account.recover_message(message, signature=signature_data["signature"])
+
+assert recovered_address.lower() == expected_address.lower()
+```
+
+When this check passes, you know the response came from the verified TEE. For complete verification, you should also confirm that your actual request and response content match the hashes in the signed message - this ensures the data wasn't swapped after signing.
 
 ## Verify using Etherscan (optional)
 
-For visual verification, use the [Etherscan signature tool](https://etherscan.io/verifiedSignatures):
+Want to double-check visually? Use [Etherscan's signature tool](https://etherscan.io/verifiedSignatures). Enter the `signing_address` from your attestation report, paste the `text` field from the signature response, and add the `signature` value. Click verify and Etherscan will confirm everything matches.
 
-1. Enter the `signing_address` from your attestation report
-2. Paste the `text` field from the signature response
-3. Enter the `signature` value
-4. Click verify to confirm the signature
+This gives you an independent third-party verification that the signature is valid.
 
-This provides visual confirmation that all components match correctly.
+## Complete example
+
+For a full implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py).
+
+## What's next
+
+You've now verified both the TEE environment (attestation) and individual AI responses (signatures). Your Confidential AI setup is fully verified and trustworthy.
