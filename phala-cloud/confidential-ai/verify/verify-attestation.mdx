@@ -1,98 +1,139 @@
 ---
 title: Verify Attestation
-description: Learn how to verify  cryptographic proof your AI workloads run in genuine TEE hardware with verified software
+description: Learn how to verify cryptographic proof your AI workloads run in genuine TEE hardware with verified software
 ---
 
 ## Why attestation matters
 
-Attestation proves your AI workloads run on genuine TEE hardware with verified software. It gives you confidence that:
-
-- Hardware comes from trusted vendors (NVIDIA, Intel)
-- The entire software stack is authentic and untampered
-- Your workloads are protected from external attacks
+When you verify attestation, you prove your AI runs on real TEE hardware with authentic software. This gives you cryptographic proof that your hardware comes from NVIDIA or Intel, not some counterfeit supplier. You also confirm the software hasn't been tampered with and your workloads stay protected.
 
 ## Verify TEE hardware stack
 
-Hardware verification confirms your GPUs and CPUs are genuine and secure. This prevents counterfeit hardware from compromising your AI workloads.
+Let's start by verifying your hardware is genuine. You need to check both GPUs and CPUs because TEE protection requires both to work together. If either one fails verification, your entire security model breaks down.
 
-You'll verify:
-- **GPU authenticity** - NVIDIA GPUs are genuine and running in TEE mode
-- **CPU authenticity** - Intel CPUs support TEE protections
-- **Cryptographic security** - Hardware security features are operational
+First, you'll verify NVIDIA GPUs are real and running in TEE mode. Then you'll check Intel CPUs have TEE protections enabled. Finally, you'll confirm the cryptographic features actually work.
 
-Follow this [Python example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py) to verify the full hardware stack.
+Here's a [Python example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py) that walks through the entire verification process.
 
 ### Get the attestation report
 
-Fetch the attestation report with a simple [GET request](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L31-L38). The report contains:
+Start by fetching the attestation report. This report is your starting point - it contains all the cryptographic proofs you need.
 
-- **GPU attestation** - NVIDIA hardware verification data
-- **CPU attestation** - Intel TEE verification data
-- **Signing address** - Public key for signature verification
+```python
+import requests
 
-Start by verifying GPU and CPU attestation.
+# Fetch attestation report from Confidential AI API
+response = requests.get(
+    f"https://api.redpill.ai/v1/attestation/report?model={model}",
+    headers={"Authorization": f"Bearer {api_key}"}
+)
+report = response.json()
+
+# You get three key pieces:
+# - nvidia_payload: GPU verification data
+# - intel_quote: CPU verification data
+# - signing_address: For signature verification
+```
+
+The report gives you NVIDIA's hardware verification data for each GPU, Intel's TEE verification data for the CPU, and a signing address you'll use later to verify signatures. You'll check the GPU and CPU attestation first because they form your hardware foundation.
 
 ### Verify NVIDIA GPU attestation
 
-Verify NVIDIA GPUs by sending the `nvidia_payload` to NVIDIA's attestation service:
+Now let's verify your NVIDIA GPUs are genuine. You'll send the `nvidia_payload` from your report to NVIDIA's own attestation service. Why NVIDIA's service? Because only NVIDIA can confirm their hardware is authentic - they built secret keys into each chip during manufacturing.
 
-1. [Send payload for GPU verification](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L43)
-2. [Decode NVIDIA tokens](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L149-L168) - one token per GPU to validate each device
+```python
+import jwt
+
+# Send to NVIDIA's Remote Attestation Service
+response = requests.post(
+    "https://nras.attestation.nvidia.com/v3/attest/gpu",
+    headers={"Content-Type": "application/json"},
+    data=report["nvidia_payload"]
+)
+
+# Response: [["JWT", "..."], {"GPU-0": "...", "GPU-1": "..."}]
+result = response.json()
+gpu_tokens = result[1]  # Dict of GPU tokens
+
+# Quick check: decode any GPU token to verify success
+for gpu_id, token in gpu_tokens.items():
+    decoded = jwt.decode(token, options={"verify_signature": False})
+    assert decoded.get("measres") == "success"
+```
+
+Each GPU token contains either `"measres": "success"` for verified hardware, or error details if verification failed.
 
 ### Verify Intel TDX CPU attestation
 
-Verify Intel CPUs using the [Intel quote](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L72):
+For Intel CPUs, the process is slightly different. You'll use the [Intel quote](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py#L72) from your attestation report. Copy the `intel_quote` value and paste it into the [TEE Attestation Explorer](https://proof.t16z.com/).
 
-1. Copy the `intel_quote` value
-2. Paste it into the [TEE Attestation Explorer](https://proof.t16z.com/)
-3. Confirm CPU authenticity through the verification tool
+This tool decodes Intel's cryptographic proof and shows you exactly what CPU you're running on. You'll see details about the TDX version, security features, and whether everything checks out.
 
 ## Verify TEE software stack
 
-With hardware verified, confirm the software stack is authentic and untampered. This ensures:
+Your hardware checks out. Now you need to verify the software running on that hardware is exactly what you expect. Think of it like checking a sealed package - the hardware verification proved the box is genuine, now you're making sure nobody swapped the contents.
 
-- No unauthorized modifications to OS or application code
-- The TEE operates in a trusted security state
-- The trust chain from hardware to application remains intact
-
-Verify these software components:
+The software verification catches sneaky attacks. Someone could modify the OS, inject malicious code, or break the security chain between hardware and your application. You'll check each layer to make sure everything is clean.
 
 ### 1. Verify operating system integrity
 
-Confirm the TEE runs the expected, unmodified OS using [this verification process](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/verification/osVerification.ts#L13-L27):
+First, check the OS hasn't been tampered with. The TEE measures every byte of the operating system when it boots, creating a cryptographic fingerprint. You'll compare this fingerprint against known good values.
 
-1. **Measure OS image** - Calculate cryptographic hashes of OS components
-2. **Compare with expected values** - Match against TCB (Trusted Computing Base) values
-3. **Validate registers** - Ensure all system registers are correct
-
+Follow [this verification process](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/verification/osVerification.ts#L13-L27) to measure the OS image and compare it with TCB (Trusted Computing Base) values. The TCB values come from the [dstack-os reproducible build result](https://github.com/Dstack-TEE/meta-dstack?tab=readme-ov-file#reproducible-build-the-guest-image), and represent a clean, unmodified system. If even one byte changes, the fingerprint won't match.
 
 ### 2. Verify source code authenticity
 
-Verify the application code is unmodified by checking Docker Compose configuration hashes:
+Next, verify your application code hasn't been modified. The system takes a SHA256 hash of your entire Docker Compose file content - this proves the exact configuration hasn't changed.
 
-1. [Calculate compose hash](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/dataObjects/baseDataObjectGenerator.ts#L341) - Compute SHA256 of Docker Compose config
-2. [Compare with registry](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/utils/dstackContract.ts#L52) - Check against allowed hashes in blockchain smart contract
-3. [Validate event log](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/dataObjects/baseDataObjectGenerator.ts#L341) - Cross-reference with deployment records
+```python
+import hashlib
+
+# Calculate hash of your Docker Compose file
+with open('docker-compose.yml', 'rb') as f:
+    compose_hash = hashlib.sha256(f.read()).hexdigest()
+
+print(f"Compose hash: {compose_hash}")
+
+# Check if it's registered on-chain (pseudo-code)
+# The actual contract call would use Web3.py
+# is_allowed = contract.allowedComposeHashes(compose_hash)
+```
+
+Why blockchain? The on-chain KMS acts as the decentralized authorization system for TEE applications. Only whitelisted compose hashes can boot in the secure environment. Without blockchain, you'd have to trust a single server to manage this whitelist - if that server gets compromised, attackers could authorize malicious apps. The blockchain provides a transparent, auditable record where multiple parties can verify which applications are authorized, and no single entity can unilaterally change the rules.
 
 ### 3. Verify distributed root-of-trust
 
-The distributed root-of-trust (KMS) manages cryptographic keys and authenticates applications. It validates:
+The KMS is what ties everything together - hardware, OS, and application. It's the distributed system that manages all cryptographic operations and decides which applications can boot.
 
-- Hardware attestation
-- Operating system integrity
-- Source code authenticity
+To verify the KMS is legitimate, check that its public keys match what's registered on-chain. The KMS generates two root keys when it first boots: one for signing TLS certificates and another for deriving application-specific keys. These keys never leave the TEE.
 
-See [KMS Verifier code](https://github.com/Phala-Network/dstack-verifier/blob/95689c415cad165033c700979cd26225c56c8d1c/src/verifiers/kmsVerifier.ts#L27) for implementation details.
+```python
+# Verify KMS keys match on-chain registration (conceptual)
+# kms_ca_key: For TLS certificates
+# kms_k256_key: For deriving app keys
+# Both should match what's registered in the blockchain
+```
 
+The [KMS Verifier code](https://github.com/Phala-Network/dstack-verifier/blob/95689c415cad165033c700979cd26225c56c8d1c/src/verifiers/kmsVerifier.ts#L27) shows the complete verification process. You're checking that the KMS itself runs in a verified TEE and that its keys haven't been tampered with.
 
 ### 4. Verify network end-to-end encryption
 
-Ensure TEE controls all communication with [network verification](https://github.com/Phala-Network/dstack-verifier/blob/7d2f5acc04e498dced91334a1b5424040b44535e/src/verifiers/gatewayVerifier.ts#L40):
+Finally, verify that all network traffic stays encrypted and under TEE control. The TEE generates its own TLS keys internally - they never exist outside the secure enclave. This means even if someone compromises the host system, they can't intercept your traffic.
 
-1. **TEE-controlled keys** - Verify keys are generated and stored in TEE
-2. **Certificate matching** - Ensure TLS certificates match TEE public keys
-3. **DNS CAA records** - Validate Certificate Authority Authorization
-4. **Certificate transparency** - Analyze historical certificate patterns
+The [network verification](https://github.com/Phala-Network/dstack-verifier/blob/7d2f5acc04e498dced91334a1b5424040b44535e/src/verifiers/gatewayVerifier.ts#L40) checks that TLS certificates match the TEE's public keys. It also validates DNS CAA records to prevent rogue certificate authorities from issuing fake certificates for your domain.
+
+Certificate transparency gives you a historical view - you can see every certificate ever issued for your service and spot any suspicious patterns.
+
+## Complete verification example
+
+For a complete Python script that performs all the verifications above, see the [attestation verifier example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/attestation_verifier.py).
+
+This script handles:
+- Fetching the attestation report from Confidential AI API
+- Verifying NVIDIA GPUs through their attestation service
+- Checking Intel TDX quotes
+- Validating signing addresses
+- Complete error handling and reporting
 
 ## Next step
 
