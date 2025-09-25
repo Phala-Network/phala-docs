@@ -120,9 +120,7 @@ The [KMS Verifier code](https://github.com/Phala-Network/dstack-verifier/blob/95
 
 Finally, verify that all network traffic stays encrypted and under TEE control. The TEE generates its own TLS keys internally - they never exist outside the secure enclave. This means even if someone compromises the host system, they can't intercept your traffic.
 
-The [network verification](https://github.com/Phala-Network/dstack-verifier/blob/7d2f5acc04e498dced91334a1b5424040b44535e/src/verifiers/gatewayVerifier.ts#L40) checks that TLS certificates match the TEE's public keys. It also validates DNS CAA records to prevent rogue certificate authorities from issuing fake certificates for your domain.
-
-Certificate transparency gives you a historical view - you can see every certificate ever issued for your service and spot any suspicious patterns.
+For more details, your can check the docs of [Domain Attestation](/phala-cloud/networking/domain-attestation).
 
 ## Complete verification example
 
