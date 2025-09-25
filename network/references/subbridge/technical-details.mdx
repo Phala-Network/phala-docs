@@ -13,7 +13,7 @@ SubBridge is more like a router linking different cross-chain bridges and allows
 
 </Frame>
 
-As shown in the figure below, SubBridge integrates the implementation of multiple bridges, here we use BridgeA, BridgeB, and BridgeC to represent. When SubBridge receives a cross-chain asset transfer, it will choose whether to forward the transaction to another chain according to the destination address. If the transaction is only transferred to an account in the Khala or Phala network, we will deposit the asset directly into the receiving account; in the case of another chain, usually, this needs to ensure:
+As shown in the figure below, SubBridge integrates the implementation of multiple bridges, here we use BridgeA, BridgeB, and BridgeC to represent. When SubBridge receives a cross-chain asset transfer, it will choose whether to forward the transaction to another chain according to the destination address. If the transaction is only transferred to an account in the Phala network, we will deposit the asset directly into the receiving account; in the case of another chain, usually, this needs to ensure:
 
 * The destination is already supported by a certain bridge, that is, the SubBridge will traverse the list of bridges to check whether the bridge supports transfers to the destination address, and if so, use this bridge for forwarding.
 * Make sure that the format of the path conforms to our specification \[see next section] and still has enough assets as a fee to pay the cross-chain fee to the other chain.
@@ -49,7 +49,7 @@ MultiLocation::new(1, X4(Parachain(2035), GeneralKey(bridge), GeneralIndex(chain
 
 > Among them, `bridge` represents a specific bridge, for example, SygmaBridge uses sygma to represent; ChainBridge uses `cb` to represent; `chain` represents the ID of the EVM chain under the EVM Bridge system. Currently, Ethereum is 0 under both SygmaBridge and ChainBridge protocol; `account` represents the ID on the EVM chain. An account, usually a 20-byte hexadecimal string.
 
-Similarly, the assets of any chain also need to be unified. The assets on the parachain are defined by the team of the parachain to define their corresponding MultiAsset; the EVM chain assets based on SubBridge are also defined as the sub-asset of the Khala network like the account address. That is, the usual asset location would be represented as:
+Similarly, the assets of any chain also need to be unified. The assets on the parachain are defined by the team of the parachain to define their corresponding MultiAsset; the EVM chain assets based on SubBridge are also defined as the sub-asset of the Phala network like the account address. That is, the usual asset location would be represented as:
 
 ```
 MultiLocation::new(1, X3(Parachain(2035), GeneralIndex(chain), GeneralKey(token)))
@@ -71,7 +71,7 @@ The steps to do the registration stuff are as follow:
 
     There are several things we need to pay attention to. The first one is that each asset has a bunch of metadata defined in `pallet-assets`, like `name`, `symbol`, etc. We have provided an extrinsic called `forceSetMetadata` in `pallet-registry` which can be used to update the metadata of an asset. Another one is that each asset has some privileged accounts used to manage the asset, like `Issuer`, `Admin`, etc. Different account has different permission. In `asset-registry`, we set all the privileged accounts of each asset to an account derived by `PalletId(b"phala/ar")`. This means no external account has permission to do things beyond authority.
 
-    All registered assets can be found at [here](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/assets). The asset registration informations are stored on-chain, head to [polkadot.js.app](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/chainstate) and choose RPC `assetsRegistry→registryInfoByIds` to see details. Here is a screenshot of KSM registration information:
+    All registered assets can be found at [here](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/assets). The asset registration informations are stored on-chain, head to [polkadot.js.app](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/chainstate) and choose RPC `assetsRegistry→registryInfoByIds` to see details. Here is a screenshot of KSM registration information:
 
     <Frame caption="Registration infomartion of KSM">
         <img src="/images/subbridge-assetinfo.png" alt="" />
@@ -101,7 +101,7 @@ The steps to do the registration stuff are as follow:
     ]
     ```
 
-    Looking at the ChainBridge filed, the `chainId` is 2 means it has enabled crosschain transfer between the Khala network and Moonriver EVM. `ResourceId` is used to bind ZLK on the Khala network and ERC20-ZLK on Moonriver EVM. `reserveAccount` is used to save ZLK temporarily when transferring ZLK from the Khala network to Moonriver EVM, and will transfer back to the recipient account when someone transfer ZLK from Moonriver EVM back to Khala network. `isMintable` is `false` tells the client that should aware of the ZLK balance of reserve account.
+    Looking at the ChainBridge filed, the `chainId` is 2 means it has enabled crosschain transfer between the Phala network and Moonriver EVM. `ResourceId` is used to bind ZLK on the Phala network and ERC20-ZLK on Moonriver EVM. `reserveAccount` is used to save ZLK temporarily when transferring ZLK from the Phala network to Moonriver EVM, and will transfer back to the recipient account when someone transfer ZLK from Moonriver EVM back to Phala network. `isMintable` is `false` tells the client that should aware of the ZLK balance of reserve account.
 
 * Step3\[If Step2 has been done], we also need to config your asset in our ChainBridge [Bridge contract](https://github.com/Phala-Network/chainbridge-solidity/blob/phala-bridge/contracts/Bridge.sol) before finally launching the crosschain transfer through ChainBridge. It including:
   * Binding resource id generated during registration with its ERC20 contract address. This essentially is done by executing method [adminSetResource](https://github.com/Phala-Network/chainbridge-solidity/blob/5eef3073ccc75b48e06ce44eee522c2023da974e/contracts/Bridge.sol#L204) of Bridge contract.

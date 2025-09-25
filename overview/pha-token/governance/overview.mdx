@@ -7,11 +7,11 @@ title: Overview
 
 ## Participate in Democracy <a href="#participate-in-democracy" id="participate-in-democracy"></a>
 
-The public referenda chamber is one of the three bodies of on-chain governance as it’s instantiated in Phala and Khala. The other two bodies are the council and the technical committee.
+The public referenda chamber is one of the three bodies of on-chain governance as it's instantiated in Phala. The other two bodies are the council and the technical committee.
 
 Public referenda can be proposed and voted on by any token holder in the system as long as they provide a bond. After a proposal is made, others can agree with it by seconding it and putting up tokens equal to the original bond. Every launch period, the most seconded proposal will be moved to the public referenda table where it can be voted upon. Voters who are willing to lock up their tokens for a greater duration of time can do so and get their vote amplified. For more details on the governance system please see here.
 
-This guide will instruct token holders how to propose and vote on public referenda using the Democracy module as it’s implemented in Khala.
+This guide will instruct token holders how to propose and vote on public referenda using the Democracy module as it's implemented in Phala.
 
 ### Important Parameters <a href="#important-parameters" id="important-parameters"></a>
 
@@ -87,7 +87,7 @@ Once successful you will see your second appear in the dropdown in the proposal 
 
 At the end of each launch period, the most seconded proposal will move to referendum. During this time you can cast a vote for or against the proposal. You may also lock up your tokens for a greater length of time to weigh your vote more strongly. During the time your tokens are locked, you are unable to transfer them, however they can still be used for further votes. Locks are layered on top of each other, so **7-days lock** will become a total **14-days lock** if you vote again.
 
-To vote on a referendum, navigate to the “Democracy” tab of Khala . Any active referendum will show in the “referenda” column. Click the blue button “Vote” to cast a vote for the referendum.
+To vote on a referendum, navigate to the "Democracy" tab of Phala. Any active referendum will show in the "referenda" column. Click the blue button "Vote" to cast a vote for the referendum.
 
 If you would like to cast your vote for the proposal select the “Aye, I approve” option. If you would like to cast your vote against the proposal in referendum you will select “Nay, I do not approve” option.
 
@@ -103,7 +103,7 @@ When you are comfortable with the decision you have made, click the orange “Vo
 
 Like vesting, the tokens that are locked in democracy are unlocked lazily. This means that you, the user, must explicitly call an unlock extrinsic to make your funds available again after the lock expires. Unbonding is another term you hear a lot in Phala, it means withdrawing your PHA that was used in staking. To know more about it, please see here.
 
-You can do this from the “Accounts” page in [Khala](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpara2-api.phala.network%2Fws%2F#/accounts), unless you use Ledger. First check that your account has a “democracy” lock by opening the details on your balance. In the example below the account has 9 PHA locked in democracy.
+You can do this from the "Accounts" page in [Phala](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/accounts), unless you use Ledger. First check that your account has a “democracy” lock by opening the details on your balance. In the example below the account has 9 PHA locked in democracy.
 
 ![](https://i.imgur.com/Sb8LtlW.png)
 

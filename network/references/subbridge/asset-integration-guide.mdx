@@ -190,9 +190,9 @@ Compare with the registration of parachain assets, registration of EVM assets is
 
 It’s better to integrate SubBridge into your App if you’d like to let your users use it easily. Integrating SubBridge into your app is super easy, the only thing you need to do is follow the `dest` specification we defined previously on your client. The difference between doing crosschain transfer on a parachain and an EVM chain is that in the former case you will need to interact with the XCM implementation pallet on that parachain, while in the latter you will need to interact with the smart contract deployed by Phala.
 
-* Issuing crosschain transfer on other parachains or Khala network
+* Issuing crosschain transfer on other parachains or Phala network
 
-For example, when issuing a crosschain transfer to the Khala network or EVM chains from Karura, you should use the [xtoken»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkarura.polkawallet.io#/extrinsics), while issuing a crosschain transfer to other parachains or EVM chains from Khala, you should use the [xtransfer»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkhala.api.onfinality.io%2Fpublic-ws#/extrinsics). So interfaces may be different between different parachains depends on its implementation.
+For example, when issuing a crosschain transfer to the Phala network or EVM chains from Karura, you should use the [xtoken»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkarura.polkawallet.io#/extrinsics), while issuing a crosschain transfer to other parachains or EVM chains from Phala, you should use the [xtransfer»transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/extrinsics). So interfaces may be different between different parachains depends on its implementation.
 
 * Issuing crosschain transfer on EVM chains with SygmaBridge
 
