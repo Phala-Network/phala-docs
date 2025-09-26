@@ -30,6 +30,22 @@ signature_data = sig_response.json()
 
 The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response, separated by a colon. The `signature` is the cryptographic proof from the TEE. The `signing_address` matches what you verified in the attestation report.
 
+## Verify request and response hashes
+
+Confirm the hashes in the `text` field match your actual request and response. `text` field format is `request_hash:response_hash`. 
+
+```python
+def calculate_request_hash(request_text: str):
+    """Calculate SHA256 hash of request body"""
+    return sha256(request_text.encode("utf-8")).hexdigest()
+
+def calculate_response_hash(response_text: str):
+    """Calculate SHA256 hash of response body"""
+    return sha256(response_text.encode("utf-8")).hexdigest()
+```
+
+Check that your request and response hashes match the ones in the `text` field. This ensures the data wasn't swapped after signing.
+
 ## Verify signature
 
 Now verify that the signature actually came from the TEE. You're checking that the `signing_address` from the signature matches what you verified in the attestation report, and that the signature is valid:
