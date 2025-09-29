@@ -116,7 +116,7 @@ After deployment, you can:
 
 ## Multiple Services with Custom Domains
 
-You can use multiple custom domains in one deployment:
+You can use multiple custom domains in one deployment. Note that you need to explicitly set the listen port for each service.
 
 ```yaml
 services:
@@ -132,6 +132,7 @@ services:
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
+      - PORT=443 # Explicitly set the listen port
     volumes:
       - /var/run/tappd.sock:/var/run/tappd.sock
       - api-cert-data:/etc/letsencrypt
@@ -140,7 +141,7 @@ services:
   web-ingress:
     image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
     ports:
-      - "444:443"  # Different host port
+      - "444:444"  # Different host port
     environment:
       - DOMAIN=app.mycompany.com
       - TARGET_ENDPOINT=http://frontend:3000
@@ -148,6 +149,7 @@ services:
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
+      - PORT=444 # Explicitly set the listen port
     volumes:
       - /var/run/tappd.sock:/var/run/tappd.sock
       - web-cert-data:/etc/letsencrypt
