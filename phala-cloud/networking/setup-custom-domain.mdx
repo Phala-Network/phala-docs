@@ -46,7 +46,7 @@ Update your `docker-compose.yml` to include the dstack-ingress container:
 ```yaml
 services:
   dstack-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
       - "443:443"
     environment:
@@ -122,7 +122,7 @@ You can use multiple custom domains in one deployment. Note that you need to exp
 services:
   # API with custom domain
   api-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
       - "443:443"
     environment:
@@ -139,7 +139,7 @@ services:
 
   # Frontend with custom domain  
   web-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
       - "444:444"  # Different host port
     environment:
