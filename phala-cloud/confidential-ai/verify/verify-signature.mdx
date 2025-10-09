@@ -26,45 +26,113 @@ sig_response = requests.get(
     headers={"Authorization": f"Bearer {api_key}"}
 )
 signature_data = sig_response.json()
+
+# signature_data contains:
+# - text: "request_hash:response_hash"
+# - signature: The ECDSA or Ed25519 signature
+# - signing_address: The address that signed this response
 ```
 
-The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response, separated by a colon. The `signature` is the cryptographic proof from the TEE. The `signing_address` matches what you verified in the attestation report.
+The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response, separated by a colon. The `signature` is the cryptographic proof from the TEE. The `signing_address` identifies which TEE instance signed this response.
 
 ## Verify request and response hashes
 
-Confirm the hashes in the `text` field match your actual request and response. `text` field format is `request_hash:response_hash`. 
+Confirm the hashes in the `text` field match your actual request and response. The `text` field format is `request_hash:response_hash`.
 
 ```python
-def calculate_request_hash(request_text: str):
-    """Calculate SHA256 hash of request body"""
-    return sha256(request_text.encode("utf-8")).hexdigest()
+from hashlib import sha256
 
-def calculate_response_hash(response_text: str):
-    """Calculate SHA256 hash of response body"""
-    return sha256(response_text.encode("utf-8")).hexdigest()
+def sha256_text(text: str):
+    """Calculate SHA256 hash of text"""
+    return sha256(text.encode()).hexdigest()
+
+# Calculate hashes of your original request and response
+request_body_json = '{"model": "...", "messages": [...]}'  # Your request JSON
+response_body = '{"id": "...", "choices": [...], ...}'     # Full response JSON
+
+request_hash = sha256_text(request_body_json)
+response_hash = sha256_text(response_body)
+
+# Parse the signed hashes
+hashed_text = signature_data["text"]
+request_hash_server, response_hash_server = hashed_text.split(":")
+
+# Verify they match
+assert request_hash == request_hash_server
+assert response_hash == response_hash_server
+print("Request and response hashes verified")
 ```
 
-Check that your request and response hashes match the ones in the `text` field. This ensures the data wasn't swapped after signing.
+This ensures the data wasn't modified or swapped after signing. The signature covers these exact hashes.
 
 ## Verify signature
 
-Now verify that the signature actually came from the TEE. You're checking that the `signing_address` from the signature matches what you verified in the attestation report, and that the signature is valid:
+Now verify that the signature actually came from a TEE. You'll recover the signing address from the signature, then fetch and verify the attestation for that specific address.
+
+### Recover signing address from signature
+
+For ECDSA signatures (most common), recover the Ethereum address:
 
 ```python
 from eth_account.messages import encode_defunct
 from eth_account import Account
 
-# The signing address from attestation report
-expected_address = report["signing_address"]
-
-# Verify the signature
+# Recover the address that created this signature
 message = encode_defunct(text=signature_data["text"])
-recovered_address = Account.recover_message(message, signature=signature_data["signature"])
+recovered_address = Account.recover_message(
+    message,
+    signature=signature_data["signature"]
+)
 
-assert recovered_address.lower() == expected_address.lower()
+# Verify it matches the claimed signing address
+signing_address = signature_data["signing_address"]
+assert recovered_address.lower() == signing_address.lower()
+print(f"Signature valid from: {signing_address}")
 ```
 
-When this check passes, you know the response came from the verified TEE. For complete verification, you should also confirm that your actual request and response content match the hashes in the signed message - this ensures the data wasn't swapped after signing.
+For Ed25519 signatures, the verification process differs - check the signing algorithm in your attestation response.
+
+### Fetch attestation for signing address
+
+Now fetch a fresh attestation for this specific signing address. This proves the signing key belongs to verified TEE hardware:
+
+```python
+import secrets
+
+# Generate fresh nonce for attestation
+nonce = secrets.token_hex(32)
+
+# Fetch attestation for this signing address
+attestation_response = requests.get(
+    f"https://api.redpill.ai/v1/attestation/report?model={model}&nonce={nonce}&signing_address={signing_address}",
+    headers={"Authorization": f"Bearer {api_key}"}
+)
+attestation_report = attestation_response.json()
+
+# If using multi-server deployment, filter for matching signing address
+if "all_attestations" in attestation_report:
+    attestation = next(
+        item for item in attestation_report["all_attestations"]
+        if item["signing_address"].lower() == signing_address.lower()
+    )
+else:
+    attestation = attestation_report
+
+print(f"Found attestation for: {attestation['signing_address']}")
+```
+
+In multi-server deployments, the response may include `all_attestations` array containing attestations from multiple backend servers. You filter by `signing_address` to find the one matching your signature.
+
+### Verify the attestation
+
+Finally, verify this attestation using all the checks from [Verify Attestation](./verify-attestation):
+- Verify Intel TDX quote
+- Verify report data binds the signing address and nonce
+- Verify NVIDIA GPU attestation
+- Verify Docker compose manifest and mr_config
+- Verify Sigstore build provenance
+
+When all checks pass, you've proven end-to-end that your AI response came from verified TEE hardware running verified software.
 
 ## Verify using Etherscan (optional)
 
@@ -74,7 +142,15 @@ This gives you an independent third-party verification that the signature is val
 
 ## Complete example
 
-For a full implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/confidential-ai-verifier/blob/f606cf8675b6d920cdec49f46c5624cbcd7f2f16/examples/signature_verifier.py).
+For a full implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/signature_verifier.py).
+
+This script demonstrates the complete flow:
+1. Send chat completion request (streaming or non-streaming)
+2. Fetch signature for the response
+3. Verify request and response hashes match
+4. Recover signing address from ECDSA signature
+5. Fetch fresh attestation for that signing address
+6. Verify full attestation (TDX quote, GPU, report data, compose manifest, Sigstore)
 
 ## What's next
 

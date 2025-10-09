@@ -15,13 +15,13 @@ The verification process follows these steps:
 
 <Steps>
   <Step title="TEE Hardware Stack">
-    Verify the physical hardware stack, including CPU and GPU, is genuine and running in a secure TEE.
+    Verify the physical hardware stack, including CPU and GPU, is genuine and running in a secure TEE. Confirm the signing key is cryptographically bound to the hardware.
   </Step>
   <Step title="TEE Software Stack">
-    Verify that the software stack, including operating system, source code, network end-to-end encryption, and distributed root-of-trust, is secure and trustworthy.
+    Verify that the software stack, including operating system, Docker compose configuration, container build provenance, network end-to-end encryption, and distributed root-of-trust, is secure and trustworthy.
   </Step>
   <Step title="Integrity Proof">
-    Verify the integrity of request and response content.
+    Verify the integrity of request and response content through cryptographic signatures.
   </Step>
 </Steps>
 
@@ -32,11 +32,15 @@ Here's how the verification workflow looks:
 flowchart TD
   subgraph Attestation [Verify Attestation]
     direction TB
-    A0[Get Attestation] ==> A1
-    A1[Verify TEE Hardware Stack] ==> A2[Verify TEE Software Stack]
+    A0[Generate Nonce] ==> A1[Get Attestation]
+    A1 ==> A2[Verify TEE Hardware Stack]
+    A2 ==> A3[Verify Report Data Binding]
+    A3 ==> A4[Verify TEE Software Stack]
   end
   subgraph Signature [Verify Integrity]
-    S1[Get Signature] ==> S2[Verify Signature]
+    S1[Get Signature] ==> S2[Verify Request/Response Hashes]
+    S2 ==> S3[Recover Signing Address]
+    S3 ==> S4[Verify Attestation for Address]
   end
   Request[Secure Request] ==> Attestation
   Request ==> Signature
@@ -44,13 +48,15 @@ flowchart TD
 
 ### How the trust chain works
 
-These three verification steps create a complete security chain:
+These verification steps create a complete security chain:
 
-- **TEE Hardware Stack** establishes the physical foundation - genuine hardware from trusted vendors
-- **TEE Software Stack** extends trust to the software layer - verified OS and application code
-- **Integrity Proof** ensures data authenticity - cryptographic proof that responses came from the TEE
+- **Fresh Nonce** prevents replay attacks - ensures attestations are generated fresh for your request
+- **TEE Hardware Stack** establishes the physical foundation - genuine NVIDIA GPUs and Intel CPUs with TEE enabled
+- **Report Data Binding** proves the signing key belongs to the TEE - signing address and nonce are cryptographically embedded in hardware-signed attestation
+- **TEE Software Stack** extends trust to the software layer - verified OS, exact Docker compose configuration, and container build provenance
+- **Integrity Proof** ensures data authenticity - cryptographic signatures prove responses came from the verified TEE
 
-Together, they guarantee your AI workloads run securely across the entire system.
+Together, they guarantee your AI workloads run securely across the entire system with end-to-end cryptographic proof.
 
 Click the cards below to learn more about details.
 
@@ -61,7 +67,7 @@ Click the cards below to learn more about details.
     title="Verify Attestation"
     arrow="true"
   >
-    Learn how to verify hardware, operating system, source code,network end-to-end encryption, and distributed root-of-trust attestations
+    Learn how to verify hardware authenticity, report data binding, operating system integrity, Docker compose configuration, container build provenance, network end-to-end encryption, and distributed root-of-trust
   </Card>
 
   <Card
