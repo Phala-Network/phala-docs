@@ -1,0 +1,234 @@
+---
+description: Automated verification reports for every Phala Cloud deployment with the Trust Center platform
+title: Trust Center Verification
+---
+
+## What is the Trust Center?
+
+The [Trust Center](https://trust.phala.com/) is an automated verification platform that generates comprehensive security reports for every application deployed on Phala Cloud. It provides cryptographic proof that your application is running in a genuine TEE with the exact code you deployed, giving you and your users confidence in the integrity and security of your deployment.
+
+<Note type="info">
+**Automatic Verification**: Every application deployed to Phala Cloud automatically receives a Trust Center verification report. No additional configuration required.
+</Note>
+
+## Why Trust Center Verification Matters
+
+Traditional cloud platforms require you to trust the provider. With Phala Cloud and Trust Center:
+
+- **Verify Hardware Authenticity**: Cryptographically prove your app runs on genuine Intel TDX and Nvidia CC hardware
+- **Confirm Code Integrity**: Verify the exact Docker compose configuration deployed matches your source code
+- **Validate OS Security**: Ensure the operating system hasn't been tampered with
+- **Prove Zero Trust**: For gateway deployments, verify domain certificates are managed entirely within the TEE
+
+This matters for:
+- **Regulatory Compliance**: Meet GDPR, HIPAA, and other privacy requirements with verifiable evidence
+- **Customer Trust**: Share public verification reports with users to prove data privacy
+- **Security Audits**: Provide auditors with cryptographic proof of deployment integrity
+
+## Accessing Your Verification Report
+
+Every Phala Cloud application receives a unique verification report URL:
+
+```
+https://trust.phala.com/app/{your-app-id}
+```
+
+You can find your app ID in:
+1. The Phala Cloud dashboard
+2. The API response when creating a CVM
+
+**Example Report**: [https://trust.phala.com/app/7e0817205044eb202a590a0d236ccb4d66140197](https://trust.phala.com/app/7e0817205044eb202a590a0d236ccb4d66140197)
+
+## Understanding Your Verification Report
+
+The Trust Center report displays comprehensive verification results across multiple security dimensions. Let's walk through each section:
+
+### Overview Section
+
+The left column of the report shows your application's basic information and overall verification status.
+
+<Frame caption="Trust Center - Application Overview">
+<img src="/images/trust-center-overview.png" alt="Trust Center application overview section" />
+</Frame>
+
+**What you see:**
+- **App Name**: Your application's identifier (e.g., "account-demo")
+- **Verification Status**: Overall pass/fail indicator with green checkmark when all checks succeed
+- **Hardware Verification**: Confirms TEE runs on genuine Intel TDX and Nvidia CC hardware
+- **Source Code Verification**: Validates deployed Docker Compose matches your source code repository
+- **Network Verification**: Checks domain certificates and network infrastructure security
+- **Operating System Verification**: Ensures OS image matches trusted dstack release
+- **Key Management Verification**: Validates cryptographic key derivation
+
+### Hardware Verification
+
+This section proves your application runs on genuine Intel and Nvidia TEE hardware.
+
+<Frame caption="Trust Center - Hardware Verification">
+<img src="/images/trust-center-hardware.png" alt="Hardware attestation verification status" />
+</Frame>
+
+**What's verified:**
+- **Intel TDX Quote**: Cryptographically signed attestation from Intel hardware
+- **(Optional) Nvidia CC Attestation Report**: Cryptographically signed attestation from Nvidia hardware
+- **TCB Status**: Trusted Computing Base security version (checks for known vulnerabilities)
+- **Platform Certificates**: Validates certificate chain back to Intel/Nvidia root CA
+- **Hardware Identity**: Confirms genuine Intel processor with TDX enabled and Nvidia GPU with CC enabled
+
+**Why it matters**: Ensures your application runs on real security hardware, not a simulated environment or compromised system.
+
+### Source Code Verification
+
+This is the critical verification that your deployed application contains exactly the code you intended.
+
+<Frame caption="Trust Center - Source Code Verification">
+<img src="/images/trust-center-source.png" alt="Source code verification showing compose hash match" />
+</Frame>
+
+**What's verified:**
+- **Compose Hash**: SHA256 hash of your configuration file containing the raw Docker compose file and other metadata
+- **RTMR3**: Application-specific measurement register containing:
+  - `app-id`: Application identifier
+  - `compose-hash`: Hash of deployment manifest
+  - `instance-id`: Specific deployment instance
+  - `os-image-hash`: Hash of operating system image
+
+**Why it matters**: This is the core of code integrity. Anyone can recompute the compose hash from your source code and verify it matches the deployed version. No hidden modifications possible.
+
+**How to verify yourself:**
+```bash
+# Compute the compose hash of your compose_file.json
+sha256sum compose_file.json
+
+# Compare with the hash shown in compose-hash Event Logs
+# They must match exactly
+```
+
+### Operating System Integrity
+
+This verification confirms the OS running in your TEE matches a known trusted version.
+
+<Frame caption="Trust Center - OS Integrity Verification">
+<img src="/images/trust-center-os.png" alt="Operating system integrity verification" />
+</Frame>
+
+**What's verified:**
+- **MRTD (Measurement Root of Trust Domain)**: Hash of the initial TD state
+- **RTMR0**: Virtual hardware environment measurement
+- **RTMR1**: Linux kernel measurement
+- **RTMR2**: Kernel command line and initrd measurement
+- **Dstack Version**: Specific OS image version hash
+
+**Why it matters**: Proves the operating system hasn't been modified or backdoored. The OS matches publicly auditable dstack releases.
+
+### Network Verification (Gateway Deployments)
+
+For applications exposed via custom domains with dstack-gateway, this verifies zero-trust HTTPS and secure traffic forwarding.
+
+<Frame caption="Trust Center - Domain Verification">
+<img src="/images/trust-center-network.png" alt="Domain verification for zero-trust HTTPS" />
+</Frame>
+
+**What's verified:**
+- **Gateway TEE Status**: Confirms the dstack-gateway itself runs in a TEE environment
+- **TLS Certificate**: Certificate private key generated entirely within TEE
+- **CAA Records**: DNS Certification Authority Authorization locked to TEE-controlled account
+- **Certificate Transparency**: All certificates logged to public CT logs
+- **Domain Ownership**: Cryptographic proof the domain is controlled by the TEE
+
+**Why it matters**: The gateway runs entirely within a TEE, ensuring it can safely decrypt, inspect, and forward traffic to your application without exposing it to untrusted infrastructure. Traditional HTTPS terminates at cloud load balancers where providers can access your traffic. With Phala's TEE-based gateway, even Phala cannot intercept your TLS traffic—everything stays encrypted until it reaches your application's TEE.
+
+### Key Management Service Verification
+
+This section verifies that cryptographic keys are properly managed and derived through Phala's decentralized key management system.
+
+<Frame caption="Trust Center - Key Management Service Verification">
+<img src="/images/trust-center-kms.png" alt="Key management service verification status" />
+</Frame>
+
+**What's verified:**
+- **Key Provider Address**: The decentralized KMS endpoint used for key derivation
+- **KMS Node TEE Status**: All KMS nodes run in TEE environments with program digests matching the smart contract
+- **App-ID Binding**: Confirms keys are uniquely derived from your application identifier
+- **Key Derivation Protocol**: Validates the cryptographic protocol used to generate encryption keys
+- **No Vendor Lock-in**: Verifies keys can be recreated on any Phala worker or Dstack node with the same app-id
+
+**Why it matters**: Unlike traditional cloud platforms where encryption keys are tied to specific hardware or vendor infrastructure, Phala's decentralized key management ensures your keys are derived from your application identity, not the physical machine. This means you can migrate your application between different compute providers while maintaining access to your encrypted data. The KMS verification proves that your keys are generated securely and consistently, without giving Phala or any single party control over your encryption keys.
+
+## Interpreting Verification Status
+
+### ✅ Passed Verification
+
+When all checks pass:
+- Your app runs on genuine Intel TEE hardware
+- The OS matches a trusted dstack version
+- Your source code hash matches the deployed version
+- (If applicable) Domain certificates are TEE-controlled
+
+**What this means**: You have cryptographic proof your application is running securely and exactly as intended. You can share this report with users, auditors, or compliance officers.
+
+### ⚠️ Partial Verification
+
+Some checks passed, others failed or skipped:
+- Check which specific verifications failed
+- Common causes: outdated TCB version, domain not configured, custom OS modifications
+
+**Action**: Review failed checks. Some failures may be expected (e.g., domain verification for apps without custom domains).
+
+### ❌ Failed Verification
+
+Verification could not complete:
+- Hardware attestation signature invalid
+- Source code hash mismatch
+- OS image not recognized
+
+**Action**: This indicates a potential security issue. Contact Phala support or re-deploy your application.
+
+## Sharing Your Verification Report
+
+Trust Center reports are **publicly accessible** by design. This enables:
+
+1. **Customer Transparency**: Share your report URL in documentation or marketing
+2. **Auditor Access**: Provide reports to security auditors without exposing credentials
+3. **Automated Verification**: Third parties can programmatically verify your deployment
+
+Example uses:
+```markdown
+<!-- In your app documentation -->
+Security: [View our Trust Center report](https://trust.phala.com/app/YOUR_APP_ID)
+```
+
+```html
+<!-- On your website -->
+<a href="https://trust.phala.com/app/YOUR_APP_ID">
+  <img src="verified-badge.png" alt="TEE Verified" />
+</a>
+```
+
+## Programmatic Verification
+
+See [Trust Center Technical Documentation](/dstack/trust-center-technical) for API details and integration examples.
+
+## Trust Center vs Manual Verification
+
+| Feature | Trust Center | Manual Verification |
+|---------|-------------|-------------------|
+| **Ease of Use** | ✅ Automatic, zero config | ❌ Complex, requires tooling |
+| **Public Auditability** | ✅ Shareable URL | ⚠️ Must share raw quote data |
+| **Verification Speed** | ✅ Seconds | ⚠️ Minutes to hours |
+| **Technical Expertise** | ✅ No expertise needed | ❌ Requires cryptography knowledge |
+| **Blockchain Integration** | ✅ Verifies on-chain records | ⚠️ Manual registry lookup |
+
+For most users, Trust Center provides the easiest and most reliable verification. Advanced users can still perform [manual verification](/phala-cloud/attestation/verifying-attestation) for full control.
+
+## Next Steps
+
+- **Learn the Technical Details**: [Trust Center Technical Architecture](/dstack/trust-center-technical)
+- **Understand Attestation**: [Verifying TEE Attestation](/phala-cloud/attestation/verifying-attestation)
+- **Deep Dive on Security**: [Security Architecture](/phala-cloud/security-and-privacy/security-architecture)
+
+## Additional Resources
+
+- **Trust Center Platform**: [https://trust.phala.com](https://trust.phala.com)
+- **GitHub Repository**: [https://github.com/Phala-Network/trust-center](https://github.com/Phala-Network/trust-center)
+- **Example Report**: [account-demo verification](https://trust.phala.com/app/7e0817205044eb202a590a0d236ccb4d66140197)
