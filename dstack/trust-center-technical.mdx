@@ -1,0 +1,514 @@
+---
+description: Technical architecture and API reference for Trust Center verification system
+title: Trust Center Technical Documentation
+icon: code
+---
+
+## Overview
+
+The Trust Center is an open-source verification platform that automates the validation of TEE attestations for dstack-based applications. It performs multi-dimensional verification across hardware, operating system, source code, and domain ownership to provide cryptographic proof of deployment integrity.
+
+**Architecture**: Monorepo with TypeScript verifier library, background worker queue, and web dashboard.
+
+**Repository**: [https://github.com/Phala-Network/trust-center](https://github.com/Phala-Network/trust-center)
+
+## System Architecture
+
+### Components
+
+1. **Verifier Package** (`@phala/dstack-verifier`)
+   - Core TypeScript library for attestation verification
+   - Modular verifier classes with configurable flags
+   - Supports Intel TDX quote validation
+   - Platform-specific verifiers (PhalaCloud, Redpill.ai)
+
+2. **Background Worker**
+   - Built on BullMQ for reliable job processing
+   - PostgreSQL for task persistence
+   - Redis for queue management
+   - Asynchronous verification execution
+
+3. **Web Application**
+   - Next.js dashboard for report visualization
+   - Direct database access for read operations
+   - Real-time verification status updates
+   - Public report URLs for transparency
+
+4. **Storage Layer**
+   - PostgreSQL: Verification tasks and results
+   - Redis: Job queue state
+   - S3-compatible: Raw attestation data and quotes
+
+## Verification Phases
+
+The Trust Center performs verification in four distinct phases:
+
+### Phase 1: Hardware Attestation
+
+Validates the TEE quote to prove execution on genuine Intel hardware.
+
+**What's verified:**
+- **Quote signature**: ECDSA-P256 signature validation using Intel certificates
+- **Certificate chain**: Validates back to Intel root CA
+- **TCB status**: Checks Trusted Computing Base security version
+- **Platform identity**: Confirms genuine Intel TDX processor
+- **Revocation status**: Verifies no certificates or platforms are revoked
+
+**Tools used:**
+- Quote verification with [DCAP-QVL](https://github.com/Phala-Network/dcap-qvl)
+
+**Implementation:**
+```typescript
+// Note: verifyQuote is an internal utility in @phala/dstack-verifier
+// For hardware verification, use VerificationService with hardware flag
+import { VerificationService } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+// For Redpill apps (with GPU models)
+const result = await service.verify({
+  contractAddress: '0x...',
+  model: 'phala/llama-3.1-8b'
+}, {
+  hardware: true,
+  os: false,
+  sourceCode: false
+});
+
+// Or for Phala Cloud apps
+const result2 = await service.verify({
+  contractAddress: '0x...',
+  domain: 'myapp.phala.network'
+}, {
+  hardware: true,
+  os: false,
+  sourceCode: false
+});
+
+console.log('Hardware verified:', result.success);
+```
+
+**Failure modes:**
+- Invalid signature: Quote not signed by genuine TEE
+- Revoked certificates: Platform or attestation key compromised
+- Outdated TCB: Security patches not applied
+
+### Phase 2: Operating System Integrity
+
+Confirms the OS image matches a known trusted dstack version.
+
+**What's verified:**
+- **MRTD**: Measurement Root of Trust Domain (TD initial state)
+- **RTMR0**: Virtual hardware environment
+- **RTMR1**: Linux kernel measurement
+- **RTMR2**: Kernel command line and initrd
+
+**Tools used:**
+- Dstack image verification with [dstack-mr-cli](https://github.com/Dstack-TEE/dstack/tree/master/dstack-mr/cli)
+
+**Measurement calculation:**
+```bash
+# Calculate OS measurements using dstack-mr-cli
+dstack-mr-cli --kernel bzImage --initrd initrd.img --cmdline "console=htyS0"
+
+# Output: MRTD, RTMR0, RTMR1, RTMR2 values
+```
+
+**Verification logic:**
+```typescript
+// OS verification is performed by VerificationService
+// The service automatically downloads trusted dstack images and compares measurements
+import { VerificationService } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+const result = await service.verify({
+  contractAddress: '0x...',
+  model: 'phala/llama-3.1-8b',  // For Redpill
+  // OR domain: 'myapp.phala.network'  // For Phala Cloud
+  metadata: {
+    osSource: {
+      github_repo: 'https://github.com/Dstack-TEE/meta-dstack',
+      git_commit: 'abc123',
+      version: 'v0.5.2'
+    }
+  }
+}, {
+  hardware: false,
+  os: true,  // Enable OS verification
+  sourceCode: false
+});
+
+console.log('OS verified:', result.success);
+```
+
+**Why it matters**: Ensures the OS hasn't been modified, backdoored, or replaced with an untrusted image.
+
+### Phase 3: Source Code Verification
+
+Validates the application code matches the deployed version.
+
+**What's verified:**
+- **compose-hash**: SHA256 hash of `docker-compose.yaml`
+- **app-id**: Application identifier (used for key derivation)
+- **instance-id**: Specific deployment instance
+- **key-provider**: KMS service address
+- **RTMR3**: Application measurement register containing above values
+
+**RTMR3 structure:**
+```typescript
+interface RTMR3Events {
+  'app-id': string;           // Application identifier
+  'compose-hash': string;     // SHA256 of docker-compose.yaml
+  'instance-id': string;      // Deployment instance UUID
+  'key-provider': string;     // KMS endpoint URL
+}
+```
+
+**RTMR3 calculation:**
+```typescript
+// RTMR3 is computed as a hash chain of events
+function computeRTMR3(events: RTMR3Events): string {
+  let rtmr3 = '0'.repeat(96); // Initial value (all zeros)
+
+  for (const [key, value] of Object.entries(events)) {
+    const event = JSON.stringify({ [key]: value });
+    const eventHash = sha384(event);
+    rtmr3 = sha384(rtmr3 + eventHash);
+  }
+
+  return rtmr3;
+}
+```
+
+**Verification against blockchain:**
+```typescript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+  chain: mainnet,
+  transport: http()
+});
+
+// Read compose-hash from blockchain registry
+const onChainHash = await client.readContract({
+  address: '0x...',
+  abi: registryABI,
+  functionName: 'getAppComposeHash',
+  args: [appId]
+});
+
+const match = onChainHash === quote.body.rtmr3.composeHash;
+console.log('Source code verified:', match);
+```
+
+**Tools:**
+- [dstack attestation docs](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md)
+
+### Phase 4: Domain Verification (Gateway Only)
+
+For applications with custom domains, verifies zero-trust HTTPS.
+
+**What's verified:**
+- **TLS certificate**: Private key generated in TEE
+- **CAA records**: DNS locked to TEE-controlled Let's Encrypt account
+- **Certificate Transparency**: All certs logged to public CT logs
+- **Domain control**: Cryptographic proof of domain ownership
+
+**Verification process:**
+1. Extract TLS public key from `reportData` field
+2. Query Certificate Transparency logs (via crt.sh)
+3. Verify all certificates for domain match the TEE public key
+4. Check CAA records point to TEE Let's Encrypt account
+5. Confirm no unauthorized certificates exist
+
+**CAA record format:**
+```
+example.com CAA 0 issue "letsencrypt.org;validationmethods=dns-01;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/XXXXXX"
+```
+
+**CT Log monitoring:**
+```typescript
+// Domain verification (including CT logs) is performed by VerificationService
+// The service checks Certificate Transparency logs when ctLog flag is enabled
+import { VerificationService } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+const result = await service.verify({
+  contractAddress: '0x...',
+  domain: 'example.com'
+}, {
+  hardware: false,
+  os: false,
+  sourceCode: false,
+  teeControlledKey: true,    // Verify TEE controls TLS private key
+  certificateKey: true,      // Verify certificate matches
+  dnsCAA: true,              // Verify DNS CAA records
+  ctLog: true                // Check Certificate Transparency logs (can be slow)
+});
+
+if (!result.success) {
+  console.error('❌ Domain verification failed:', result.errors);
+}
+```
+
+**Why it matters**: Traditional cloud providers can intercept HTTPS traffic because they control certificate private keys. Zero-trust HTTPS proves even the cloud provider cannot decrypt your traffic.
+
+## Using the Verifier Package
+
+### Basic Usage
+
+```typescript
+import { VerificationService } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+// For Redpill AI models
+const result = await service.verify({
+  contractAddress: '0x7e0817205044eb202a590a0d236ccb4d66140197',
+  model: 'phala/llama-3.1-8b',
+  metadata: {
+    osSource: {
+      github_repo: 'https://github.com/Dstack-TEE/meta-dstack',
+      git_commit: 'abc123',
+      version: 'v0.5.2'
+    }
+  }
+}, {
+  hardware: true,      // Verify Intel TDX quote
+  os: true,            // Verify OS integrity
+  sourceCode: true,    // Verify compose-hash
+  teeControlledKey: false,
+  certificateKey: false,
+  dnsCAA: false,
+  ctLog: false
+});
+
+// For Phala Cloud apps with custom domains
+const result2 = await service.verify({
+  contractAddress: '0x...',
+  domain: 'myapp.phala.network'
+}, {
+  hardware: true,
+  os: true,
+  sourceCode: true,
+  teeControlledKey: true,  // Verify TEE controls TLS key
+  certificateKey: true,    // Verify certificate
+  dnsCAA: false,           // Skip DNS CAA check (can be slow)
+  ctLog: false             // Skip CT log check (can be very slow)
+});
+
+console.log('Verification success:', result.success);
+console.log('Verification errors:', result.errors);
+console.log('Data objects:', result.dataObjects);
+```
+
+### Configurable Verification Flags
+
+```typescript
+import type { VerificationFlags } from '@phala/dstack-verifier';
+
+// Available verification flags (all optional, defaults shown)
+const flags: VerificationFlags = {
+  hardware: true,           // Verify Intel TDX quote
+  os: true,                 // Verify OS integrity (MRTD, RTMR0-2)
+  sourceCode: true,         // Verify source code (compose-hash in RTMR3)
+  teeControlledKey: true,   // Verify TEE controls private key
+  certificateKey: true,     // Verify certificate matches attestation
+  dnsCAA: true,             // Verify DNS CAA records (can be slow)
+  ctLog: false              // Verify Certificate Transparency logs (can be very slow)
+};
+
+// Use with VerificationService
+const service = new VerificationService();
+const result = await service.verify(config, flags);
+```
+
+### Platform-Specific Configuration
+
+```typescript
+import { VerificationService } from '@phala/dstack-verifier';
+import type { PhalaCloudConfig, RedpillConfig } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+// Phala Cloud configuration
+const phalaConfig: PhalaCloudConfig = {
+  contractAddress: '0x...',
+  domain: 'myapp.phala.network',
+  metadata: {
+    osSource: {
+      github_repo: 'https://github.com/Dstack-TEE/meta-dstack',
+      git_commit: 'abc123',
+      version: 'v0.5.2'
+    }
+  }
+};
+
+// Redpill.ai configuration
+const redpillConfig: RedpillConfig = {
+  contractAddress: '0x...',
+  model: 'phala/llama-3.1-8b',
+  metadata: {
+    osSource: {
+      github_repo: 'https://github.com/Dstack-TEE/meta-dstack',
+      git_commit: 'def456',
+      version: 'v0.5.3'
+    }
+  }
+};
+
+// Use the same service for both platforms
+const phalaResult = await service.verify(phalaConfig);
+const redpillResult = await service.verify(redpillConfig);
+```
+
+### Error Handling
+
+```typescript
+import { VerificationService } from '@phala/dstack-verifier';
+import type { VerificationError } from '@phala/dstack-verifier';
+
+const service = new VerificationService();
+
+try {
+  const result = await service.verify(config, flags);
+
+  if (!result.success) {
+    console.error('Verification failed');
+
+    // Errors are objects with { message: string }
+    for (const error of result.errors) {
+      console.error('Error:', error.message);
+
+      // Check error messages for specific issues
+      if (error.message.includes('signature')) {
+        console.error('→ Hardware signature invalid - not genuine TEE');
+      } else if (error.message.includes('compose')) {
+        console.error('→ Deployed code does not match source');
+      } else if (error.message.includes('MRTD') || error.message.includes('RTMR')) {
+        console.error('→ OS measurements do not match trusted version');
+      }
+    }
+  } else {
+    console.log('✓ All verification checks passed');
+    console.log('Data objects:', result.dataObjects);
+  }
+} catch (err) {
+  // Handle unexpected errors during verification
+  console.error('Verification process error:', err);
+}
+```
+
+## Self-Hosting Trust Center
+
+Organizations can run their own Trust Center instance for private verification.
+
+### Prerequisites
+
+- Node.js 18+ / Bun
+- PostgreSQL 14+
+- Redis 6+
+- S3-compatible storage (MinIO, AWS S3, etc.)
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/Phala-Network/trust-center.git
+cd trust-center
+
+# Install dependencies
+bun install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your database, redis, and S3 credentials
+
+# Run database migrations
+bun run db:migrate
+
+# Start services
+bun run worker    # Background verification worker
+bun run webapp    # Web dashboard (localhost:3000)
+```
+
+### Configuration
+
+**`.env` file:**
+```bash
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/trust_center
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# S3 Storage
+S3_ENDPOINT=https://s3.amazonaws.com
+S3_BUCKET=trust-center-quotes
+S3_ACCESS_KEY=...
+S3_SECRET_KEY=...
+
+# PCCS (for quote verification)
+PCCS_URL=https://pccs.phala.network/sgx/certification/v4/
+
+# Optional: Blockchain RPC for source code verification
+ETH_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/...
+```
+
+### Docker Deployment
+
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: trust_center
+      POSTGRES_USER: trust_center
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6
+    volumes:
+      - redis_data:/data
+
+  worker:
+    build: .
+    command: bun run worker
+    depends_on:
+      - postgres
+      - redis
+    env_file: .env
+
+  webapp:
+    build: .
+    command: bun run webapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    env_file: .env
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+## Next Steps
+
+- **User Documentation**: [Trust Center Verification Reports](/phala-cloud/attestation/trust-center-verification)
+- **Attestation Basics**: [Understanding TEE Attestation](/phala-cloud/attestation/verifying-attestation)
+- **API Reference**: [Attestation API](/phala-cloud/phala-cloud-api/attestations)
+- **Dstack SDK**: [Getting Started with Dstack](/dstack/getting-started)
+
+## Additional Resources
+
+- **GitHub Repository**: [trust-center](https://github.com/Phala-Network/trust-center)
+- **DeepWiki Analysis**: [Technical Deep Dive](https://deepwiki.com/Phala-Network/trust-center)
+- **Live Platform**: [trust.phala.com](https://trust.phala.com)
+- **Dstack Attestation Docs**: [attestation.md](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md)

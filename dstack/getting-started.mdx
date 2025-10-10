@@ -196,6 +196,8 @@ To get a TDX quote within app containers:
     curl -X POST --unix-socket /var/run/tappd.sock -d '{"report_data": "0x1234deadbeef"}' http://localhost/prpc/Tappd.TdxQuote?json | jq .
     ```
 
+For automated verification of your application's attestation, see the [Trust Center Technical Documentation](/dstack/trust-center-technical) which explains how to use these quotes with the Trust Center verification platform.
+
 ### Container logs
 
 Container logs can be obtained from the CVM's `dashboard` page or by curl:
