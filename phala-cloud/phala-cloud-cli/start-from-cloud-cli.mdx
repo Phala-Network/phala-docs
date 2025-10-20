@@ -199,9 +199,9 @@ print(info.tcb_info.event_log[0].event)  # Access event log entries
 
 # Get a deterministic key with path
 key_result = client.get_key('my-app/encryption/v1')
-print(key_result.key)  # Raw key bytes
+print(key_result.key)  # Hex string
 print(key_result.signature_chain)  # Signature chain
-key_bytes = key_result.decode_key()  # Get key as bytes
+key_bytes = key_result.decode_key()  # Decode to bytes (32 bytes)
 
 # Generate TDX quote (manually hash data if > 64 bytes)
 data = b'some-data'
