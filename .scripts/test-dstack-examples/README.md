@@ -22,6 +22,18 @@ This directory contains test scripts to validate the dstack v0.5 SDK examples in
 
 ## Step 2: Run Tests Locally
 
+### Curl Tests
+
+```bash
+cd .scripts/test-dstack-examples
+
+# Set your endpoint
+export DSTACK_ENDPOINT=https://[app-id]-80.dstack-prod7.phala.network
+
+# Run tests
+./test-curl.sh
+```
+
 ### JavaScript Tests
 
 ```bash
@@ -54,41 +66,51 @@ python test-py.py
 
 ## What the Tests Validate
 
+### Curl (`test-curl.sh`)
+
+- ✅ `GetKey` - Derive deterministic 32-byte key
+- ✅ `GetQuote` - Generate TDX quote with report data
+- ✅ Deterministic key derivation
+
 ### JavaScript (`test-js.mjs`)
 
-- ✅ `DstackClient` initialization with HTTP endpoint
-- ✅ `isReachable()` - Service connectivity check
 - ✅ `info()` - Get TEE information (app_id, tcb_info)
 - ✅ `getKey()` - Derive deterministic 32-byte key
 - ✅ `getQuote()` - Generate TDX quote with manual SHA256 hashing
+- ✅ Deterministic key derivation
 
 ### Python (`test-py.py`)
 
-- ✅ `DstackClient` initialization with HTTP endpoint
 - ✅ `info()` - Get TEE information (app_id, tcb_info)
 - ✅ `get_key()` - Derive deterministic 32-byte key
 - ✅ `get_quote()` - Generate TDX quote with manual SHA256 hashing
+- ✅ Deterministic key derivation
 
 ## Expected Output
 
-### Successful Run
+### Curl Tests
 
 ```text
-🔗 Testing dstack v0.5 JavaScript SDK against: https://abc123-80.dstack-prod7.phala.network
+🔗 Testing: https://abc123-80.dstack-prod7.phala.network
 
-🧪 Running JavaScript Tests
+✅ GetKey
+✅ GetQuote
+✅ GetKey - deterministic
 
-════════════════════════════════════════════════════════════
-✅ isReachable() - Check service availability
-   App ID: abc123...
-✅ info() - Get TEE information
-   Key length: 32 bytes
-✅ getKey() - Derive deterministic key
-   Quote length: 8192 chars
-✅ getQuote() - Generate TDX quote with manual hashing
-════════════════════════════════════════════════════════════
+📊 3 passed, 0 failed
+```
 
-📊 Results: 4 passed, 0 failed
+### JavaScript Tests
+
+```text
+🔗 Testing: https://abc123-80.dstack-prod7.phala.network
+
+✅ info()
+✅ getKey()
+✅ getQuote()
+✅ getKey() - deterministic
+
+📊 4 passed, 0 failed
 ```
 
 ## Troubleshooting
