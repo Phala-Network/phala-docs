@@ -41,8 +41,8 @@ cd dstack/sdk/simulator
 ./dstack-simulator
 
 # The simulator will create the following socket files:
-#   tappd.sock   // Legacy TEE service interface (recommended)
-#   dstack.sock  // New TEE service interface (in development)
+#   dstack.sock  // Current TEE service interface (v0.5+)
+#   tappd.sock   // Legacy TEE service interface (v0.3)
 #   external.sock
 #   guest.sock
 ```
@@ -50,7 +50,7 @@ cd dstack/sdk/simulator
 To use the simulator with any SDK, set the following environment variable with the absolute path:
 
 ```bash
-export DSTACK_SIMULATOR_ENDPOINT=/path/to/tappd.sock
+export DSTACK_SIMULATOR_ENDPOINT=/path/to/dstack.sock
 ```
 
 ### Verifying Simulator Setup
@@ -91,9 +91,9 @@ The Dstack API provides the basic abstraction of the TEE functionalities. In gen
     }
     ```
 
-The `tappd.sock` is the current TEE RPC API. For more detailed documents, check the [README](https://github.com/Dstack-TEE/dstack/blob/master/sdk/curl/api-tappd.mdx) file.
+The `dstack.sock` is the current TEE RPC API (v0.5+). For more detailed documents, check the [SDK documentation](https://github.com/Dstack-TEE/dstack/tree/master/sdk).
 
-> Dstack API is now undergoing an upgrade from the legacy `tappd.sock` to the new `dstack.sock`. `tappd.sock` is still recommended until the full upgrade is done.
+> **Note**: If you're upgrading from dstack v0.3, see the [Migration Guide](/phala-cloud/references/migration-from-dstack-v03) for breaking changes.
 
 ## Programming Language Support
 
@@ -110,28 +110,31 @@ npm install @phala/dstack-sdk
 #### Basic Usage
 
 ```js
-import { TappdClient } from '@phala/dstack-sdk';
+import { DstackClient } from '@phala/dstack-sdk';
+import crypto from 'crypto';
 
-const client = new TappdClient();
+const client = new DstackClient();
 
 // Check if service is reachable (500ms timeout, never throws)
 const isReachable = await client.isReachable();
 if (!isReachable) {
-  console.log('Tappd service is not available');
+  console.log('Dstack service is not available');
   return;
 }
 
 // Get the information of the Base Image.
 await client.info();
 
-// Derive a key with optional path and subject
-const keyResult = await client.deriveKey('<unique-id>');
-console.log(keyResult.key); // X.509 private key in PEM format
-console.log(keyResult.certificate_chain); // Certificate chain
+// Get a deterministic key with path
+const keyResult = await client.getKey('my-app/encryption/v1');
+console.log(keyResult.key); // Raw key bytes
+console.log(keyResult.signature_chain); // Signature chain
 const keyBytes = keyResult.asUint8Array(); // Get key as Uint8Array
 
-// Generate TDX quote
-const quoteResult = await client.tdxQuote('some-data', 'sha256');
+// Generate TDX quote (manually hash data if > 64 bytes)
+const data = 'some-data';
+const hash = crypto.createHash('sha256').update(data).digest();
+const quoteResult = await client.getQuote(hash.slice(0, 32));
 console.log(quoteResult.quote); // TDX quote in hex format
 console.log(quoteResult.event_log); // Event log
 const rtmrs = quoteResult.replayRtmrs(); // Replay RTMRs
@@ -150,31 +153,31 @@ pip install dstack-sdk
 #### Basic Usage
 
 ```python
-from dstack_sdk import TappdClient, AsyncTappdClient
+from dstack_sdk import DstackClient
+import hashlib
 
 # Synchronous client
-client = TappdClient()
+client = DstackClient()
 
 # Caution: You don't need to do this most of the time.
-http_client = TappdClient('http://localhost:8000')
-
-# Asynchronous client
-async_client = AsyncTappdClient()
+http_client = DstackClient('http://localhost:8000')
 
 # Get the information of the Base Image.
-info = client.info()  # or await async_client.info()
+info = client.info()
 print(info.app_id)  # Application ID
 print(info.tcb_info.mrtd)  # Access TCB info directly
 print(info.tcb_info.event_log[0].event)  # Access event log entries
 
-# Derive a key with optional path and subject
-key_result = client.derive_key('<unique-id>')  # or await async_client.derive_key('<unique-id>')
-print(key_result.key)  # X.509 private key in PEM format
-print(key_result.certificate_chain)  # Certificate chain
-key_bytes = key_result.toBytes()  # Get key as bytes
+# Get a deterministic key with path
+key_result = client.get_key('my-app/encryption/v1')
+print(key_result.key)  # Raw key bytes
+print(key_result.signature_chain)  # Signature chain
+key_bytes = key_result.decode_key()  # Get key as bytes
 
-# Generate TDX quote
-quote_result = client.tdx_quote('some-data', 'sha256')  # or await async_client.tdx_quote('some-data', 'sha256')
+# Generate TDX quote (manually hash data if > 64 bytes)
+data = b'some-data'
+hash_value = hashlib.sha256(data).digest()
+quote_result = client.get_quote(hash_value[:32])
 print(quote_result.quote)  # TDX quote in hex format
 print(quote_result.event_log)  # Event log
 rtmrs = quote_result.replay_rtmrs()  # Replay RTMRs

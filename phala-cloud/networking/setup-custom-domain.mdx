@@ -57,7 +57,7 @@ services:
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - cert-data:/etc/letsencrypt
     restart: unless-stopped
 
@@ -134,7 +134,7 @@ services:
       - SET_CAA=true
       - PORT=443 # Explicitly set the listen port
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - api-cert-data:/etc/letsencrypt
 
   # Frontend with custom domain  
@@ -151,7 +151,7 @@ services:
       - SET_CAA=true
       - PORT=444 # Explicitly set the listen port
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - web-cert-data:/etc/letsencrypt
 
   api:

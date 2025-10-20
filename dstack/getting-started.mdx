@@ -175,7 +175,7 @@ ssh root@10.0.3.2
 
 To get a TDX quote within app containers:
 
-1.  Mount `/var/run/tappd.sock` to the target container in `docker-compose.yaml`
+1.  Mount `/var/run/dstack.sock` to the target container in `docker-compose.yaml`
 
     ```yaml
     version: "3"
@@ -183,7 +183,7 @@ To get a TDX quote within app containers:
     nginx:
       image: nginx:latest
       volumes:
-        - /var/run/tappd.sock:/var/run/tappd.sock
+        - /var/run/dstack.sock:/var/run/dstack.sock
       ports:
         - "8080:80"
       restart: always
@@ -191,9 +191,12 @@ To get a TDX quote within app containers:
 2.  Execute the quote request command in the container.
 
     ```bash
-    # The argument report_data accepts binary data encoding in hex string.
-    # The actual report_data passing the to the underlying TDX driver is sha2_256(report_data).
-    curl -X POST --unix-socket /var/run/tappd.sock -d '{"report_data": "0x1234deadbeef"}' http://localhost/prpc/Tappd.TdxQuote?json | jq .
+    # The report_data must be max 64 bytes. For larger data, hash it first.
+    # Example using a hash of the data:
+    curl -X POST --unix-socket /var/run/dstack.sock \
+      -H 'Content-Type: application/json' \
+      -d '{"reportData": "0x1234deadbeef00000000000000000000000000000000000000000000000000"}' \
+      http://dstack/GetQuote | jq .
     ```
 
 For automated verification of your application's attestation, see the [Trust Center Technical Documentation](/dstack/trust-center-technical) which explains how to use these quotes with the Trust Center verification platform.
