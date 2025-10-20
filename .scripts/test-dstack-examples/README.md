@@ -91,13 +91,6 @@ python test-py.py
 📊 Results: 4 passed, 0 failed
 ```
 
-### Failed Test
-
-```text
-❌ getKey() - Derive deterministic key
-   Error: Missing signature_chain
-```
-
 ## Troubleshooting
 
 **Error: Service not reachable**
