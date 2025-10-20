@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+
+configs:
+  nginx_config:
+    content: |
+      user nginx;
+      worker_processes auto;
+      error_log /var/log/nginx/error.log warn;
+      pid /var/run/nginx.pid;
+
+      events {
+          worker_connections 1024;
+      }
+
+      http {
+          include /etc/nginx/mime.types;
+          default_type application/octet-stream;
+
+          log_format main "[$$remote_addr] $$request $$status";
+          access_log /var/log/nginx/access.log main;
+
+          sendfile on;
+          keepalive_timeout 65;
+
+          upstream dstack {
+              server unix:/var/run/dstack.sock;
+          }
+
+          server {
+              listen 80;
+              server_name _;
+
+              location / {
+                  proxy_pass http://dstack;
+                  proxy_http_version 1.1;
+                  proxy_set_header Host $$http_host;
+                  proxy_set_header Connection "";
+                  proxy_buffering off;
+                  client_max_body_size 0;
+              }
+          }
+      }

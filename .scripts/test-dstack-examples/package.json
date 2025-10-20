@@ -1,0 +1,12 @@
+{
+  "name": "dstack-examples-test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Test scripts for dstack v0.5 SDK examples",
+  "scripts": {
+    "test": "node test-js.mjs"
+  },
+  "dependencies": {
+    "@phala/dstack-sdk": "latest"
+  }
+}

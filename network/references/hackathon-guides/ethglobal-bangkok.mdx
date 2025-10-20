@@ -33,41 +33,49 @@ Welcome to the Hackathon guide for Phala's TEE Docker SDK. If you are a Docker e
 <Tabs>
 <Tab title="JS SDK">
 ```typescript
-// Tappd Client
-const client = new TappdClient(endpoint)
-// Remote Attestation
-const getRemoteAttestation = await client.tdxQuote('dataString')
+import crypto from 'crypto';
+
+// Dstack Client
+const client = new DstackClient(endpoint)
+// Remote Attestation (manually hash data if > 64 bytes)
+const data = 'dataString';
+const hash = crypto.createHash('sha256').update(data).digest();
+const getRemoteAttestation = await client.getQuote(hash.slice(0, 32))
 ```
 </Tab>
 
 <Tab title="Python SDK">
 ```python
-# Tappd Client
-client = AsyncTappdClient(endpoint)
-# Remote Attestation
-result = await client.tdx_quote('dataString')
+import hashlib
+
+# Dstack Client
+client = DstackClient(endpoint)
+# Remote Attestation (manually hash data if > 64 bytes)
+data = b'dataString'
+hash_value = hashlib.sha256(data).digest()
+result = await client.get_quote(hash_value[:32])
 ```
 </Tab>
 </Tabs>
 
-* **Derive Key Account**
+* **Get Deterministic Key**
 
 <Tabs>
 <Tab title="JS SDK">
 ```typescript
-// Tappd Client
-const client = new TappdClient(endpoint)
-// Derive Key Account
-const randomDeriveKey = await client.deriveKey('/', 'dataString')
+// Dstack Client
+const client = new DstackClient(endpoint)
+// Get deterministic key
+const keyResult = await client.getKey('my-app/key/v1')
 ```
 </Tab>
 
 <Tab title="Python SDK">
 ```python
-# Tappd Client
-client = AsyncTappdClient(endpoint)
-# Derive Key Account
-result = await client.derive_key('/', 'dataString')
+# Dstack Client
+client = DstackClient(endpoint)
+# Get deterministic key
+result = await client.get_key('my-app/key/v1')
 ```
 </Tab>
 </Tabs>

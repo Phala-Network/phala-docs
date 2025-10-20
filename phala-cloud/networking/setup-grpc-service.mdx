@@ -80,7 +80,7 @@ services:
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - cert-data:/etc/letsencrypt
 
   grpc-server:

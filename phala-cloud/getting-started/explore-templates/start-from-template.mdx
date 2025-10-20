@@ -67,10 +67,10 @@ By default, the Next.js development server will listen on port 3000. Open http:/
 
 This repo also includes code snippets for the following common use cases:
 
-* `/api/tdx_quote`: The `reportdata` is `test` and generates the quote for attestation report via `tdxQuote` API.
+* `/api/tdx_quote`: The `reportdata` is `test` and generates the quote for attestation report via `getQuote` API.
 * `/api/tdx_quote_raw`: The `reportdata` is `Hello DStack!` and generates the quote for attestation report. The difference from `/api/dx_quote` is that you can see the raw text `Hello DStack!` in [Attestation Explorer](https://proof.t16z.com/).
-* `/api/eth_account/address`: Using the `deriveKey` API to generate a deterministic wallet for Ethereum, a.k.a. a wallet held by the TEE instance.
-* `/api/solana_account/address`: Using the `deriveKey` API to generate a deterministic wallet for Solana, a.k.a. a wallet held by the TEE instance.
+* `/api/eth_account/address`: Using the `getKey` API to generate a deterministic wallet for Ethereum, a.k.a. a wallet held by the TEE instance.
+* `/api/solana_account/address`: Using the `getKey` API to generate a deterministic wallet for Solana, a.k.a. a wallet held by the TEE instance.
 
 </Tab>
 </Tabs>
@@ -122,7 +122,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
 ```
 
 <Frame caption="Docker Compose Example">
@@ -243,7 +243,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
 ```
 
 <Frame>

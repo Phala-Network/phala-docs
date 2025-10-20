@@ -30,7 +30,7 @@ Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cl
         ports:
           - 8080:8888
         volumes:
-          - /var/run/tappd.sock:/var/run/tappd.sock
+          - /var/run/dstack.sock:/var/run/dstack.sock
         environment:
           - GRANT_SUDO=yes
         user: root
