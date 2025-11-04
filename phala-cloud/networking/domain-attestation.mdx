@@ -3,46 +3,177 @@ title: Domain Attestation
 description: How to verify your data privacy when connecting to TEE applications
 ---
 
-## Verify Your Connection Is 100% Private in Under 3 Minutes
+This guide shows how to verify that TLS certificates are controlled by a TEE using cryptographic attestation.
 
-Your TEE connection is end-to-end encrypted. Here's how to prove it yourself with simple commands that anyone can run.
+For application code verification, see your app's attestation documentation. For security concepts, see [Security Architecture](/phala-cloud/networking/security).
 
-This guide covers network privacy verification. For application code verification, check your app's attestation docs. For security concepts, see [Network Security Architecture](/phala-cloud/networking/security).
+## Which Verification Guide to Follow?
 
-## Choose Your Verification Path
+The verification method depends on what the application deployer chose:
 
-| Domain Type | Verification Time | Trust Model |
-|-------------|------------------|-------------|
-| **Phala Cloud** (`*.phala.network`) | 30 seconds | Trust Phala's TEE infrastructure |
-| **Custom Domain** | 3 minutes | Zero-trust cryptographic proof |
+| Domain Type | When to Use | Operator |
+|-------------|-------------|----------|
+| **Gateway Domains** (`*.phala.network`) | Your app uses Phala's gateway domain | Phala Cloud |
+| **Custom Domain** | Your app uses a custom domain with dstack-ingress | Developer |
 
-## Phala Cloud Domains - 30 Second Verification
+Both provide cryptographic proof of TEE control over TLS certificates. The difference is who operates the certificate infrastructure.
 
-Phala Cloud domains use TEE-protected gateways. Run these three commands to verify your security.
+## Gateway Domains
 
-### Step 1: Check Certificate Authority
+Gateway domains expose attestation endpoints that prove TEE control over TLS certificate private keys.
+
+### What You'll Verify
+
+The gateway TEE publishes cryptographic evidence at `https://GATEWAY/.dstack/` endpoints that proves:
+
+1. The TLS certificate private keys are generated and controlled by the gateway TEE
+2. TEE hardware backs all certificate operations
+3. Only the TEE-controlled Let's Encrypt account can issue certificates for gateway domains
+4. All historical certificates are accounted for via TEE remote attestation
+
+### 3-Step Verification
+
+**Example**: We'll use `gateway.dstack-pha-prod7.phala.network` - replace with your gateway domain.
+
+#### Step 1: Get Gateway Evidence
+
+The gateway publishes evidence through three endpoints:
+
 ```bash
-curl -s "https://crt.sh/?q=%.dstack-prod5.phala.network&output=json" | jq -r '.[].issuer_name' | sort -u
-```
-**Expected**: Only "Let's Encrypt" appears. Any other CA means potential compromise.
+# Get ACME certificate information
+curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/acme-info" | jq > acme-info.json
 
-### Step 2: Verify Domain Protection
+# Get gateway application information
+curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/app-info" | jq > app-info.json
+```
+
+**Expected output from acme-info.json**:
+```json
+{
+  "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/2584877296",
+  "account_quote": "<tdx-quote-hex>",
+  "hist_keys": ["<base64-pubkey-1>"],
+  "quoted_hist_keys": [
+    {"pubkey": "<base64>", "quote": "<tdx-quote-hex>"},
+    {"pubkey": "<base64>", "quote": "<tdx-quote-hex>"}
+  ],
+  "active_cert": "-----BEGIN CERTIFICATE-----\n...",
+  "base_domain": "dstack-pha-prod7.phala.network"
+}
+```
+
+**What this means**: The gateway provides its Let's Encrypt account, all certificate public keys (current and historical), and TDX quotes proving the TEE generated these keys.
+
+#### Step 2: Verify Certificate Matches TDX Quotes
+
+Check that the served certificate matches the TEE-quoted keys:
+
 ```bash
-dig +short CAA phala.network | grep -c "letsencrypt.org"
-```
-**Expected**: Returns `1` or higher. Zero means CAA protection is missing.
+# Get the public key from the served certificate
+openssl s_client -connect gateway.dstack-pha-prod7.phala.network:443 </dev/null 2>/dev/null | \
+  openssl x509 -pubkey -noout > served-pubkey.pem
 
-### Step 3: Confirm Your Certificate
+# Get the public key from the evidence certificate
+cat acme-info.json | jq -r '.active_cert' | \
+  openssl x509 -pubkey -noout > evidence-pubkey.pem
+
+# Compare the public keys
+diff served-pubkey.pem evidence-pubkey.pem
+```
+
+**Expected**: No output (files are identical).
+
+Now verify the TEE hardware signed the certificate public key:
+
 ```bash
-echo | openssl s_client -connect YOUR-APP-ID.dstack-prod5.phala.network:443 2>/dev/null | openssl x509 -issuer -noout
+# Step 1: Prepare the public key for hashing
+cat acme-info.json | jq -r '.quoted_hist_keys[0].public_key' | xxd -r -p > pubkey.bin
+(echo -n "zt-cert:" && cat pubkey.bin) | sha512sum
+# Output: 68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8  -
+
+# Step 2: Search for this hash in the TDX quote's report_data
+jq -r '.quoted_hist_keys[0].quote | fromjson | .report_data' acme-info.json | \
+  grep -o "68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8"
+# Output: 68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8
 ```
-**Expected**: `issuer=CN=R3, O=Let's Encrypt, C=US` or similar Let's Encrypt issuer.
 
-**What you're trusting**: Phala's gateway TEEs are genuine and monitoring works. For zero-trust verification, use custom domains.
+**What this means**: If you see the same hash in both outputs, Intel TDX hardware has cryptographically signed this public key. Copy the hash from step 1 and search for it in step 2 - they must match exactly.
 
-## Custom Domains - Zero-Trust Verification
+#### Step 3: Check Domain Protection and Certificate History
 
-Custom domains provide cryptographic proof that only your TEE controls the certificate. No middlemen, no trust required.
+Verify only this TEE can issue certificates:
+
+```bash
+# Check ALL certificates ever issued for the gateway domain
+curl -s "https://crt.sh/?q=%.dstack-pha-prod7.phala.network&output=json" | \
+  jq -r '.[] | "\(.not_before) to \(.not_after): \(.issuer_name)"' | head -10
+
+# Get the TEE's ACME account
+cat acme-info.json | jq -r '.account_uri'
+# Output: https://acme-v02.api.letsencrypt.org/acme/acct/2584877296
+
+# Check DNS CAA records for the base domain
+dig +short CAA dstack-pha-prod7.phala.network
+```
+
+**Example output**:
+```
+# Certificate history
+2025-01-15T08:23:45 to 2025-04-15T08:23:44: C=US, O=Let's Encrypt, CN=E5
+2024-12-01T10:15:22 to 2025-03-01T10:15:21: C=US, O=Let's Encrypt, CN=R3
+
+# ACME account
+https://acme-v02.api.letsencrypt.org/acme/acct/2584877296
+
+# CAA record
+0 issue "letsencrypt.org;validationmethods=dns-01;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/2584877296"
+```
+
+Verify the following:
+
+- All certificates are from Let's Encrypt (no other CAs)
+- CAA record matches the account_uri from the TEE
+- Historical keys in `hist_keys` correspond to certificates in CT logs
+
+### Gateway Evidence Endpoints Reference
+
+| Endpoint | Contains | Proves |
+|----------|----------|--------|
+| `/.dstack/index` | List of available endpoints | Gateway discovery |
+| `/.dstack/app-info` | App ID, instance ID, device ID, TCB info | TEE application identity |
+| `/.dstack/acme-info` | ACME account, certificate keys, TDX quotes | Certificate control and history |
+
+The `acme-info` response structure:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `account_uri` | String | Let's Encrypt account URI |
+| `account_quote` | String | TDX quote proving TEE controls the ACME account |
+| `hist_keys` | Array | All certificate public keys (current + historical) |
+| `quoted_hist_keys` | Array | Public keys with TDX quotes proving TEE generated them |
+| `active_cert` | String | Currently active certificate (PEM format) |
+| `base_domain` | String | Base domain for gateway (e.g., dstack-pha-prod7.phala.network) |
+
+### Troubleshooting
+
+**"Connection refused to /.dstack/ endpoints"**: These endpoints are only accessible via the gateway subdomain: `gateway.dstack-pha-prod7.phala.network`
+
+**"Certificate doesn't match quoted keys"**: The gateway may have recently renewed certificates. Re-fetch the evidence with a fresh `acme-info` request.
+
+**"Multiple ACME accounts in history"**: Gateway upgrades or migrations may result in new ACME accounts. Check that the CAA record matches the current account_uri, and verify old certificates have expired.
+
+### What You've Verified
+
+When all checks pass, you've cryptographically proven:
+- **Zero-trust TLS**: The gateway TEE controls certificate private keys, verifiable via TDX attestation
+- **Phala-operated infrastructure**: Phala Network operates the gateway TEE and maintains CAA records
+- **Certificate transparency**: All certificates are publicly auditable via CT logs
+
+**Key difference from custom domains**: With gateway domains, Phala operates the certificate infrastructure. With custom domains, the application deployer operates it. Both provide cryptographic proof of TEE control.
+
+## Custom Domains
+
+Custom domains use dstack-ingress running in your application's TEE to manage certificates. The application deployer operates the certificate infrastructure.
 
 ### What You'll Verify
 
@@ -212,10 +343,21 @@ Learn more: [Application Attestation Documentation](/phala-cloud/attestation)
 For detailed application verification: [Attestation Guide](/phala-cloud/attestation)
 </Note>
 
-### Next Steps
+## Next Steps
 
-**For monitoring**: Set up alerts on [crt.sh](https://crt.sh) to detect any unexpected certificate issuance.
+### Monitoring
 
-**For developers**: Enable CAA records with `SET_CAA=true` in your deployment configuration.
+Set up alerts on [crt.sh](https://crt.sh) to detect unexpected certificate issuance:
+- Gateway domains: `%.dstack-pha-prod7.phala.network`
+- Custom domains: `your-domain.com`
 
-**For security teams**: Audit the [dstack-ingress source code](https://github.com/Dstack-TEE/dstack-examples) to verify key handling.
+### Development
+
+- **Gateway verification**: Integrate attestation checks into your security monitoring workflow
+- **Custom domains**: Enable CAA records with `SET_CAA=true` in your deployment configuration
+
+### Security Auditing
+
+Review the source code to understand certificate management:
+- [Gateway implementation](https://github.com/Dstack-TEE/dstack/tree/master/gateway)
+- [Custom domain ingress](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress)
