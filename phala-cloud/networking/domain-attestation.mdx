@@ -24,7 +24,7 @@ Gateway domains expose attestation endpoints that prove TEE control over TLS cer
 
 ### What You'll Verify
 
-The gateway TEE publishes cryptographic evidence at `https://GATEWAY/.dstack/` endpoints that proves:
+The gateway TEE publishes cryptographic evidence at `https://GATEWAY-DOMAIN/.dstack/` endpoints that proves:
 
 1. The TLS certificate private keys are generated and controlled by the gateway TEE
 2. TEE hardware backs all certificate operations
@@ -51,11 +51,11 @@ curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/app-info" | jq >
 ```json
 {
   "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/2584877296",
-  "account_quote": "<tdx-quote-hex>",
+  "account_quote": { tdx-quote-with-eventlogs },
   "hist_keys": ["<base64-pubkey-1>"],
   "quoted_hist_keys": [
-    {"pubkey": "<base64>", "quote": "<tdx-quote-hex>"},
-    {"pubkey": "<base64>", "quote": "<tdx-quote-hex>"}
+    {"public_key": "<base64>", "quote": { tdx-quote-with-eventlogs } },
+    {"public_key": "<base64>", "quote": { tdx-quote-with-eventlogs } }
   ],
   "active_cert": "-----BEGIN CERTIFICATE-----\n...",
   "base_domain": "dstack-pha-prod7.phala.network"
@@ -99,6 +99,8 @@ jq -r '.quoted_hist_keys[0].quote | fromjson | .report_data' acme-info.json | \
 
 **What this means**: If you see the same hash in both outputs, Intel TDX hardware has cryptographically signed this public key. Copy the hash from step 1 and search for it in step 2 - they must match exactly.
 
+Please follow the [Attestation Verification tutorial](/phala-cloud/attestation/verifying-attestation) to further verify the remote attestation of the gateway. It ensures the implementation and the execution environment of the gateway is secure.
+
 #### Step 3: Check Domain Protection and Certificate History
 
 Verify only this TEE can issue certificates:
@@ -132,7 +134,7 @@ https://acme-v02.api.letsencrypt.org/acme/acct/2584877296
 Verify the following:
 
 - All certificates are from Let's Encrypt (no other CAs)
-- CAA record matches the account_uri from the TEE
+- All the CAA record matches the account_uri from the TEE
 - Historical keys in `hist_keys` correspond to certificates in CT logs
 
 ### Gateway Evidence Endpoints Reference
