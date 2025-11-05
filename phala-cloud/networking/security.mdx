@@ -1,99 +1,116 @@
 ---
-title: Network Security Architecture
-description: How Phala Cloud keeps your data private even from the cloud provider
+title: Network Security
+description: How Phala Cloud keeps your network traffic private even from the cloud provider
 ---
 
-## Complete Network Privacy Through Hardware
+## Network Privacy Through Hardware
 
-Phala Cloud runs your applications in hardware-encrypted memory where even the cloud provider can't see your data. Every network connection uses multiple layers of encryption, and you can verify it all cryptographically.
+Run your application on Phala Cloud without trusting us to keep your data private—the hardware guarantees it. Intel TDX encrypts your application's memory with keys that never leave the CPU. The host OS cannot decrypt your data because the hardware prevents it.
 
-## Security Architecture
+When clients connect to your application, traffic passes through multiple layers of encryption. Each layer protects against different attacks. You can verify all of this through cryptographic attestation.
 
-### Defense in Depth
+## How It Works: The Big Picture
 
-Phala Cloud implements multiple independent security layers. Each layer assumes others might fail, creating resilient protection:
+Your application runs inside a Confidential VM (CVM). When clients connect, their requests flow through a gateway that's also hardware-protected:
 
-**Hardware encryption**. Intel TDX encrypts memory with unique per-VM keys. The hypervisor and host OS cannot access these keys—the hardware prevents it.
+```mermaid
+graph LR
+    Client["Client<br/>(Browser)"]
+    Gateway["Gateway TEE<br/>- TLS termination<br/>- Certificate mgmt<br/>- Verifiable code"]
+    CVM["Your CVM (TEE)<br/>- Your application<br/>- Your data<br/>- Verifiable code"]
 
-**Network isolation**. Every packet travels through encrypted tunnels. TLS 1.3 protects client connections, then WireGuard isolates CVM traffic from the host network.
-
-**Certificate security**. TEEs generate ACME accounts inside encrypted memory. Private keys exist nowhere else—they're mathematically bound to the TEE instance.
-
-### Application Responsibility
-
-**Your code, your security**. We protect the infrastructure layer. Application vulnerabilities like SQL injection or authentication bugs remain your responsibility. Think of us as an armored truck: we secure the transport, not what you put inside.
-
-## Network Architecture
-
-### Hardware Isolation
-
-Your application runs in a Confidential VM (CVM) protected by Intel TDX. Here's the architecture:
-
-```
-Physical Server
-├── Intel TDX (hardware root of trust)
-├── Your CVM (encrypted with unique key)
-│   ├── WireGuard tunnel (your keypair only)
-│   ├── Docker network (172.x.x.x)
-│   └── Your containers
-└── Someone else's CVM (different encryption key)
-    └── Can't see your traffic or memory
+    Client -->|TLS| Gateway
+    Gateway -->|WireGuard| CVM
+    Gateway <-.->|Mutual Attestation| CVM
 ```
 
-The key point: each CVM gets its own encryption key from the hardware. The host OS literally cannot decrypt your memory—it doesn't have the key.
+Both the gateway and your CVM run inside Intel TDX Trusted Execution Environments. The infrastructure operator cannot access their memory or keys because the hardware prevents it. Before any connection is established, the gateway and your CVM verify each other through cryptographic attestation. This ensures you're always connecting to genuine TEE instances, not imposters.
 
-### Traffic Flow
+TLS certificate private keys are generated inside the TEE and never leave. The keys get sealed to specific hardware measurements, so only verified TEE instances can use them. DNS security records lock your domain to the TEE's certificate account, preventing unauthorized certificate issuance.
 
-**Standard HTTPS traffic** follows this path:
-```
-Browser → TLS 1.3 → Gateway → WireGuard → Your CVM → HTTP → Container
-```
+For network topology and routing details, see [Architecture](/phala-cloud/networking/architecture).
 
-The gateway (also in a TEE) strips TLS and immediately re-encrypts with WireGuard. Your data is never in plaintext on the host.
+## Security Model
 
-**TLS passthrough mode** preserves end-to-end encryption:
-```
-Client → TLS → Gateway → WireGuard[TLS] → Your CVM → TLS → Container
-```
+### What We Protect Against
 
-Add an `s` suffix to your domain (like `app-443s.phala.network`) and the gateway routes without decryption. Your application handles TLS termination directly.
+**Compromised host OS**: Hardware encrypts your CVM's memory with keys the host cannot access. Even with root access, attackers cannot read your application's memory or network traffic.
 
-### WireGuard with Mutual Attestation
+**Malicious infrastructure operator**: The gateway runs in its own TEE. Even with full infrastructure access, the operator cannot access the gateway's memory, keys, or decrypt your traffic. Both gateway and CVM verify each other before establishing connections.
 
-WireGuard tunnels between the gateway and your CVM are only established after mutual attestation:
+**Certificate compromise**: Certificate private keys are generated inside TEEs and cryptographically bound to hardware measurements. DNS security records prevent unauthorized certificate issuance. Even a compromised certificate authority cannot issue valid certificates without TEE control.
+
+**Certificate misissuance**: Public certificate transparency logs track all certificate issuance. Combined with DNS security records, this provides detection and prevention of unauthorized certificates.
+
+### What You Need to Trust
+
+The security model shifts trust from people and organizations to hardware and verifiable code.
+
+**You don't need to trust the infrastructure.** The gateway operator can't access gateway memory, keys, or traffic because the gateway runs in its own TEE. Other CVMs on the same host can't reach your data due to hardware-enforced isolation. Even the host operating system can't inspect your memory because TEE protection prevents it. Infrastructure providers have no access that can compromise TEEs.
+
+**You still need to trust three things.** First, your own application code—application vulnerabilities are your responsibility. Second, the TDX hardware security itself, as Intel's hardware implementation forms the root of trust. Third, the certificate authorities like Let's Encrypt must be trustworthy, though this risk is mitigated by CAA records and CT monitoring.
+
+### Out of Scope
+
+**Application security**: Network security doesn't protect against application vulnerabilities. Your code must handle input validation, authentication, and authorization correctly.
+
+**Availability attacks**: DDoS protection and high availability are not guaranteed. Design your applications with redundancy and rate limiting as needed.
+
+**Side-channel attacks**: Advanced timing attacks or speculative execution vulnerabilities may leak information. Follow secure coding practices and keep software updated.
+
+## Gateway Security Architecture
+
+The gateway routes traffic between clients and your CVM while maintaining zero-trust security. Understanding how the gateway works helps explain why even infrastructure operators can't compromise your connections.
+
+### Gateway TEE Protection
+
+The gateway itself runs inside an Intel TDX Confidential VM:
+- Operator cannot access TLS keys or decrypt traffic
+- Gateway code is verifiable through attestation
+- All certificate operations happen inside the TEE
+
+This means the infrastructure operator has no access to certificate private keys, TLS session keys, or plaintext traffic, even though they control the physical servers.
+
+For network routing and load balancing details, see [Architecture: How Routing Works](/phala-cloud/networking/architecture#how-routing-works).
+
+### Mutual Attestation Protocol
+
+Before any traffic flows, the gateway and your CVM verify each other. This prevents man-in-the-middle attacks and ensures both sides are genuine TEE instances running verified code:
 
 1. **Attestation First**: Both the gateway TEE and your CVM generate TDX attestation quotes
 2. **Mutual Verification**: Each side verifies the other's attestation before proceeding
-3. **Key Exchange**: Only after successful attestation do they exchange WireGuard public keys
-4. **Tunnel Creation**: WireGuard establishes the encrypted tunnel using ChaCha20-Poly1305
+3. **Key Exchange**: Only after successful attestation do they exchange tunnel keys
+4. **Tunnel Creation**: An encrypted tunnel is established using ChaCha20-Poly1305
 5. **Continuous Encryption**: All traffic flows through this attested tunnel, invisible to the host
 
 This attestation requirement ensures you're always connecting to genuine TEE instances, not imposters. Even after TLS termination at the gateway, your data remains encrypted until it reaches your container.
 
 ## Zero-Trust HTTPS (zt-https)
 
+TLS certificate private keys are generated inside TEEs and never leave. The keys stay sealed to hardware measurements. Only verified TEE instances can use them. This means certificate private keys remain under TEE control at all times.
+
 ### How TEEs Control Certificates
 
-Both Phala Cloud domains (via gateway) and custom domains (via dstack-ingress) implement Zero-Trust HTTPS. TEEs generate and control their own ACME accounts:
+Both Phala Cloud gateway domains (via gateway) and custom domains (via dstack-ingress) implement Zero-Trust HTTPS:
 
-1. **TEE generates ECDSA keypair**: The private key is created inside TDX-encrypted memory
-2. **Registers with Let's Encrypt**: The TEE establishes its own ACME account
-3. **Seals credentials to hardware**: Keys are stored on encrypted disk, bound to TEE measurements
-4. **Requests certificates**: Only this specific TEE instance can use these credentials
+1. **TEE generates ECDSA keypair**: The private key is created inside TDX-encrypted memory and never leaves the TEE
+2. **Registers with Let's Encrypt**: The TEE establishes its own certificate account using the key
+3. **Seals credentials to hardware**: Keys are bound to specific TEE measurements, so only this exact TEE configuration can use them
+4. **Requests certificates**: Certificate operations happen entirely inside the TEE
 
-The private keys are stored on an encrypted disk that only the TEE can decrypt. Even with full host access, attackers can't extract these credentials—the hardware prevents it.
+The private keys never exist outside the TEE. They're stored on encrypted disk that only the TEE can decrypt, sealed to hardware measurements. Even with full host access, attackers can't extract or use these keys because the hardware cryptographically binds them to the TEE instance.
 
-### Zero-Trust Certificate Architecture
+### Certificate Architecture
 
-We implement Zero-Trust HTTPS through three essential mechanisms:
+Zero-Trust HTTPS uses three mechanisms to prevent unauthorized certificate issuance:
 
 **CAA DNS Records**: Lock your domain to a specific ACME account
 ```
 your-domain.com CAA 0 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/YOUR_TEE"
 ```
-This prevents anyone else—even with domain control—from getting valid certificates.
+This prevents anyone else from getting valid certificates, even with domain control. The certificate authority checks this DNS record before issuing certificates.
 
-**Certificate Transparency Monitoring**: Every certificate issuance gets logged publicly. Monitor these logs to detect any unauthorized certificates immediately.
+**Certificate Transparency Monitoring**: Every certificate issuance gets logged publicly. Monitor these logs to detect any unauthorized certificates immediately. Certificate Transparency logs are append-only and publicly auditable.
 
 **Cryptographic Evidence**: Custom domains publish proof at `/evidences/` containing:
 - TDX attestation quote proving hardware backing
@@ -110,29 +127,19 @@ CAA records only protect future certificate issuance. Existing certificates rema
 2. **Verify expiration**: Ensure pre-deployment certificates have expired
 3. **Revoke if necessary**: Contact the CA to revoke any unexpired legacy certificates
 
-This prevents attackers from using certificates obtained before your TEE deployment.
+This prevents attackers from using certificates obtained before your TEE deployment. Check Certificate Transparency logs for your domain to see all historical issuance.
 
+### Verification Procedures
 
-## Compliance and Standards
+For step-by-step instructions on verifying certificate control and attestation:
+- **Gateway domains** (`*.phala.network`): See [Domain Attestation: Gateway Domains](/phala-cloud/networking/domain-attestation#gateway-domains)
+- **Custom domains**: See [Domain Attestation: Custom Domains](/phala-cloud/networking/domain-attestation#custom-domains)
 
-Phala Cloud's architecture aligns with major regulatory requirements through hardware-enforced security. The platform provides GDPR Article 32 compliance with state-of-the-art encryption (TLS 1.3, WireGuard, TDX), pseudonymization through CVM isolation, and continuous confidentiality.
+These guides provide complete verification procedures including TDX quote validation, Certificate Transparency monitoring, and CAA record auditing.
 
-For HIPAA, we deliver hardware-enforced access controls, attestation-based audit trails, and mandatory end-to-end encryption. PCI DSS requirements are met through hardware network segmentation, FIPS-approved cryptography, and hardware-sealed key management.
+## Advanced Privacy with Tor
 
-Remember: infrastructure security doesn't replace application security. You remain responsible for secure coding practices, authentication, and application-layer compliance requirements.
-
-## Advanced Deployment Patterns
-
-### Cross-Region Architecture
-
-Running globally distributed CVMs? Traffic flows like this:
-```
-CVM_US → WireGuard → Gateway_US → Internet → Gateway_EU → WireGuard → CVM_EU
-```
-
-Expect ~100ms latency per ocean crossing. Data transfer costs apply. Consider regulatory requirements for data movement.
-
-### Maximum Privacy with Tor
+Tor adds an additional layer of network-level anonymity on top of TEE protection.
 
 Need network-layer anonymity? Deploy Tor inside your CVM:
 
@@ -146,36 +153,24 @@ services:
     network_mode: "service:tor"
 ```
 
-Users connect via .onion addresses. Traffic correlation becomes nearly impossible. TEE attestation still works.
+Users connect via .onion addresses. Traffic correlation becomes nearly impossible. TEE attestation still works, so you can cryptographically verify your Tor node runs in a genuine TEE. This combines TEE hardware protection with Tor's network-layer anonymity for maximum privacy.
 
-### TLS Passthrough Applications
+## Compliance and Standards
 
-For services requiring unmodified TLS:
-```javascript
-{
-  host: 'app-443s.phala.network',  // Note the 's' suffix
-  port: 443
-}
-```
+Hardware-enforced security helps meet regulatory requirements. TEE isolation, encryption at rest and in transit, and cryptographic attestation provide technical controls for GDPR Article 32, HIPAA technical safeguards, and PCI DSS network segmentation.
 
-The `s` suffix enables passthrough mode. Common uses include gRPC services, custom protocols, and applications with client certificate authentication.
+The infrastructure provides several compliance-relevant protections:
+- Memory encryption (TLS 1.3, WireGuard, TDX)
+- Hardware isolation between tenants
+- Cryptographic audit trails via attestation
+- FIPS-approved cryptography
 
-## Security Boundaries
+However, infrastructure security alone doesn't guarantee compliance. You still need to handle application-level requirements:
+- Secure coding practices
+- Authentication and authorization logic
+- Data retention and deletion policies
 
-### What TEE Hardware Guarantees
-
-**Memory encryption**. Each CVM's memory is encrypted with a unique key from the CPU. The host OS doesn't have this key.
-
-**Attestation**. You can cryptographically verify what code is running. The hardware signs the measurements.
-
-**Isolation**. CVMs can't access each other's memory or networks. Hardware enforces these boundaries.
-
-### Scope Boundaries
-
-**Application layer**. Your code's security remains your responsibility. We secure the platform, not the application logic.
-
-**Availability**. We focus on confidentiality and integrity. Plan redundancy for high availability requirements.
-
+Your application design and implementation ultimately determine whether you meet regulatory requirements.
 
 ## Technical References
 
