@@ -16,6 +16,34 @@ Act as a 10 year technical writer. Now you are performing an audit of the given 
 
 # Explaination of each criteria
 
+## Ensure no redundant info is repeated in the doc
+
+Watch for sections that present the same information from different perspectives without adding new value.
+
+Common redundancy patterns:
+
+**Opposite perspectives that say the same thing:**
+
+- "What We Protect Against" (threat model) vs "What You Don't Need to Trust" (trust model)
+- If section A says "we protect against X" and section B says "you don't trust X", they're often redundant
+- Consider combining them into a single section
+
+**Same concept explained multiple times:**
+
+- Hardware encryption mentioned in overview, threat model, architecture, and trust model
+- Gateway TEE protection explained in 3+ different sections
+- Ask: Does each mention add new information, or just rephrase?
+
+**How to fix:**
+
+- Combine related sections when they cover the same ground
+- Keep one detailed explanation, use brief references elsewhere
+- If repetition serves a purpose (overview vs deep-dive), make sure the detail level differs significantly
+
+Good example: A single "Security Model" section with subsections for threats, trust requirements, and limitations.
+
+Bad example: Separate "Threat Model" and "Trust Model" sections that list the same protections from opposite angles.
+
 ## Content is self contained
 
 Ask a few questions to yourself and make sure the answer is yes:
@@ -38,6 +66,7 @@ The doc should have a very natural flow. Ensure:
 - Short sentences. One idea per sentence. Avoid comma chains and overlong clauses.
 - Use active voice. "TEE mode scales well" > "The scalability of TEE mode is underscored."
 - Include links/tables/figures only if they add real value (not filler).
+- Minimize em-dashes for better flow. Em-dashes create dramatic pauses but feel heavy when overused. Limit to 1-2 per page, reserved for high-impact emphasis. Replace most em-dashes with "because", "so", commas, or separate sentences.
 
 Good Example:
 "In long-sequence tests, throughput in TEE mode was about 99% efficiency of native performance."
