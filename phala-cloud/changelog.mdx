@@ -6,6 +6,63 @@ noindex: true
 icon: "clock"
 ---
 
+<Update label="November 3-13, 2025" tags={["GPU Rental", "SSH Keys", "Infrastructure"]} rss={{ title: "GPU Rental System & SSH Key Management", description: "Complete GPU rental marketplace, SSH key management, and advanced resource allocation" }}>
+
+  ## GPU Rental Marketplace
+
+  - **GPU Rental System**: Full GPU rental workflow with SKU management, pricing tiers, and order processing
+  - **GPU Rental UI**: Complete user interface for browsing GPU catalog and placing rental orders
+  - **Rental Orders Admin**: Comprehensive admin interface for managing GPU rental orders and allocations
+  - **Automated Billing**: Hourly billing periods with automated order completion and notifications
+  - **Email Notifications**: Order confirmation, provisioning, and completion email templates
+
+  ## SSH & Security
+
+  - **SSH Key Management**: Store and manage SSH public keys for secure CVM access
+  - **SSH Key Injection**: Automatically inject SSH keys into CVMs at creation time
+  - **GitHub SSH Sync**: Import SSH keys directly from GitHub accounts
+  - **Key Validation**: Comprehensive SSH key format validation and fingerprint tracking
+
+  ## Resource Management
+
+  - **Auto Resource Allocation**: Intelligent automatic resource matching for CVM deployment
+  - **GPU Reallocation v2**: Enhanced GPU reallocation on CVM start with better availability checks
+  - **Inventory Refactor**: Refactored inventory SQL queries for improved performance
+  - **Sortable Instance Types**: Reorderable instance types with display_order field
+
+  ## User Profiles & Workspaces
+
+  - **Custom Profiles**: Entity profile system for users, workspaces, and apps with avatar uploads
+  - **Profile Management**: Profile editing UI for workspace and app customization
+  - **Workspace Admin**: Enhanced workspace administration interface
+
+  ## Infrastructure & Developer Experience
+
+  - **Update Environment API**: New API for updating CVM environment variables without full redeployment
+  - **Update OS Image**: Support for upgrading CVM OS images in-place
+  - **Immutable Compose**: Immutable docker-compose hash generation for consistency
+  - **Trust Center**: Trust report existence detection for attestation verification
+  - **Structured Errors**: Comprehensive structured error handling system
+  - **Claude Skills**: Added Python backend and TypeScript frontend skills for development
+
+  ## Billing & Invoices
+
+  - **Invoice Refactor**: Refactored invoice service with better Stripe integration
+  - **Invoice Admin**: Enhanced invoice administration with filtering and status management
+  - **Billing Handler**: Automated billing handlers for charge failures and CVM shutdown
+  - **Payment Methods**: Customer payment method validation and tracking
+
+  ## Bug Fixes & Improvements
+
+  - Fixed KMS nonce race conditions with obtain_app_id improvements
+  - Improved CVM admin UI with better filtering and compose file drawers
+  - Enhanced error messages across the platform
+  - Fixed workspace setup and repository configuration issues
+  - Updated Next.js to 15.4.7 for security and performance
+  - UI theme updates with new color system
+
+</Update>
+
 <Update label="October 27 - November 2, 2025" tags={["Workspaces", "CLI", "API"]} rss={{ title: "Workspace Invitations & CLI Auth", description: "Team member invitations, CLI device authentication, and API versioning" }}>
 
   ## Workspace Collaboration
