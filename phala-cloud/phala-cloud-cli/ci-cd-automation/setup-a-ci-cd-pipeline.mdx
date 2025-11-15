@@ -25,7 +25,7 @@ This is a starter template for building a Phala Cloud TEE application easily wit
 | `APP_NAME`                 | Deployment name (e.g., `my-tee-app`)                    | Choose name without special characters except `-`                                           |
 | `DOCKER_IMAGE`             | Full image path (e.g., `docker.io/username/image-name`) | Follow registry naming conventions                                                          |
 
-The above secrets are required for the deployment workflow to work. And you can add more secrets to the repository as needed. These secrets will be used in the deployment workflow to build the docker image and deploy to Phala TEE Cloud. Once the secrets are added, you can trigger the deployment workflow anytime.
+The above secrets are required for the deployment workflow to work. And you can add more secrets to the repository as needed. These secrets will be used in the deployment workflow to build the docker image and deploy to Phala Cloud. Once the secrets are added, you can trigger the deployment workflow anytime.
 
 ### 🚀 Step 2: Deployment Workflow
 
@@ -34,7 +34,7 @@ The GitHub Action will automatically:
 1. Build Docker image from Dockerfile, `api-server/Dockerfile` in this example.
 2. Push built docker image to your container registry
 3. Update the docker compose file with the new image
-4. Deploy to Phala TEE Cloud using `phala` CLI with the name you set in `APP_NAME` with the updated docker compose file.
+4. Deploy to Phala Cloud using `phala` CLI with the name you set in `APP_NAME` with the updated docker compose file.
 
 #### Trigger Conditions:
 
@@ -48,7 +48,7 @@ on:
   workflow_dispatch:  # Manual trigger available
 ```
 
-If you want to deploy to Phala TEE Cloud manually, you can trigger the workflow manually from the GitHub Actions page.
+If you want to deploy to Phala Cloud manually, you can trigger the workflow manually from the GitHub Actions page.
 
 #### Docker Image Build and Publish:
 
