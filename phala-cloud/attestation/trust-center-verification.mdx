@@ -117,7 +117,7 @@ This verification confirms the OS running in your TEE matches a known trusted ve
 - **RTMR0**: Virtual hardware environment measurement
 - **RTMR1**: Linux kernel measurement
 - **RTMR2**: Kernel command line and initrd measurement
-- **Dstack Version**: Specific OS image version hash
+- **dstack Version**: Specific OS image version hash
 
 **Why it matters**: Proves the operating system hasn't been modified or backdoored. The OS matches publicly auditable dstack releases.
 
@@ -151,7 +151,7 @@ This section verifies that cryptographic keys are properly managed and derived t
 - **KMS Node TEE Status**: All KMS nodes run in TEE environments with program digests matching the smart contract
 - **App-ID Binding**: Confirms keys are uniquely derived from your application identifier
 - **Key Derivation Protocol**: Validates the cryptographic protocol used to generate encryption keys
-- **No Vendor Lock-in**: Verifies keys can be recreated on any Phala worker or Dstack node with the same app-id
+- **No Vendor Lock-in**: Verifies keys can be recreated on any Phala worker or dstack node with the same app-id
 
 **Why it matters**: Unlike traditional cloud platforms where encryption keys are tied to specific hardware or vendor infrastructure, Phala's decentralized key management ensures your keys are derived from your application identity, not the physical machine. This means you can migrate your application between different compute providers while maintaining access to your encrypted data. The KMS verification proves that your keys are generated securely and consistently, without giving Phala or any single party control over your encryption keys.
 
@@ -217,7 +217,7 @@ See [Trust Center Technical Documentation](/dstack/trust-center-technical) for A
 | **Public Auditability** | ✅ Shareable URL | ⚠️ Must share raw quote data |
 | **Verification Speed** | ✅ Seconds | ⚠️ Minutes to hours |
 | **Technical Expertise** | ✅ No expertise needed | ❌ Requires cryptography knowledge |
-| **Blockchain Integration** | ✅ Verifies on-chain records | ⚠️ Manual registry lookup |
+| **Blockchain Integration** | ✅ Verifies onchain records | ⚠️ Manual registry lookup |
 
 For most users, Trust Center provides the easiest and most reliable verification. Advanced users can still perform [manual verification](/phala-cloud/attestation/verifying-attestation) for full control.
 

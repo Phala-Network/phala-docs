@@ -33,18 +33,18 @@ DeRoT is designed to enhance the functionalities of the current hardware-kept se
 
 ## Unique Challenge: Stealthy Deployer Attack <a href="#p-8432-unique-challenge-stealthy-deployer-attack-3" id="p-8432-unique-challenge-stealthy-deployer-attack-3"></a>
 
-Unlike in smart contracts that every operation is observable on-chain, the introduce of DeRoT enables a blockchain-TEE hybrid system where the interactions can happen both on-chain and invisibly off-chain. Also, the support for upgradable application code will introduce more risks since the benign code may be changed to dump the encrypted data in an unconscious way.
+Unlike in smart contracts that every operation is observable onchain, the introduce of DeRoT enables a blockchain-TEE hybrid system where the interactions can happen both onchain and invisibly off-chain. Also, the support for upgradable application code will introduce more risks since the benign code may be changed to dump the encrypted data in an unconscious way.
 
 Considering the following attack from a malicious application deployer:
 
 1. An open-source benign application is deployed to TEE and trusted by its users to process the privacy data;
 2. The deployer asks the DeRoT to upgrade the application code. It seems no reason to reject it since he is the owner;
-3. The deployer injects malicious logic to dump all the privacy data in the new code, but doesn’t announce this to the public. Since this upgrade is between the TEE and DeRoT, it is not observable from the on-chain perspective;
+3. The deployer injects malicious logic to dump all the privacy data in the new code, but doesn't announce this to the public. Since this upgrade is between the TEE and DeRoT, it is not observable from the onchain perspective;
 4. The deployer can make another upgrade to remove the malicious logic to erase the evidence.
 
 Actually, similar attacks on the upgradable smart contracts happened before, but the difference is that such attack will not be naturally perceived when the application and the DeRoT are running off-chain. It’s worth noting that adding more access control on the application upgrade operation (e.g. enforce a multi-sig smart contract) cannot mitigate this risk.
 
-This attack motivates an important principle in our design: _every operation involving key authorization changes must be initiated on-chain to ensure observability_. This will ensure the security equivalence to existing smart contracts.
+This attack motivates an important principle in our design: _every operation involving key authorization changes must be initiated onchain to ensure observability_. This will ensure the security equivalence to existing smart contracts.
 
 ## Design <a href="#p-8432-design-4" id="p-8432-design-4"></a>
 
@@ -58,8 +58,8 @@ To enable the verification on the DeRoT program integrity and correctness, its m
 
 1. The DeRoT code is open-source for anyone to do code and security review to ensure the correctness of key management logic and no backdoors;
 2. The executable must be produced with reproducible build so the verifier can know it matches the source code;
-3. The digest of valid executable is published through on-chain governance;
-4. Multiple DeRoT instances run inside TEE. Here we only rely on TEE to provide the measurement over the executable, and ensure it matches the digest on chain.
+3. The digest of valid executable is published through onchain governance;
+4. Multiple DeRoT instances run inside TEE. Here we only rely on TEE to provide the measurement over the executable, and ensure it matches the digest onchain.
 
 Apart from RA report verification, the core logic of key management in DeRoT is quite compact. It just involves two operations:
 
@@ -68,7 +68,7 @@ Apart from RA report verification, the core logic of key management in DeRoT is 
 
 Because of the simple logic, it can use MPC/FHE-based threshold key generation and derivation with no concern about the performance overhead.
 
-The public key of RootKey must be published on-chain to enable any party to verify the validity of application keys with it. We will show that such root-key-derivation pattern is important to enable an efficient key rotation in the following section.
+The public key of RootKey must be published onchain to enable any party to verify the validity of application keys with it. We will show that such root-key-derivation pattern is important to enable an efficient key rotation in the following section.
 
 ### Key Derivation <a href="#p-8432-key-derivation-6" id="p-8432-key-derivation-6"></a>
 

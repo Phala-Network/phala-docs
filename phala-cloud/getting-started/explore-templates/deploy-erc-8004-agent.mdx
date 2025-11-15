@@ -5,10 +5,10 @@ description: "Deploy a verifiable ERC-8004 Trustless Agent using Phala Cloud's V
 
 ## TL;DR
 
-- **ERC-8004** gives us on-chain primitives to register and discover *trustless agents*.
+- **ERC-8004** gives us onchain primitives to register and discover *trustless agents*.
 - To make those registrations meaningful, you want verifiable runtime evidence, not just a signature.
 - **Confidential VMs (CVMs)** running **dstack** to deliver **deterministic key derivation** + **remote attestation** so your agent can prove *where* it executed.
-- **Phala Cloud** wraps this in a bow: VibeVM templates, an on-chain KMS/registry workflow, and (optionally) confidential inference (GPU TEE) support.
+- **Phala Cloud** wraps this in a bow: VibeVM templates, an onchain KMS/registry workflow, and (optionally) confidential inference (GPU TEE) support.
 - This post walks the whole flow: deploy a CVM → produce attestation → register identity on Sepolia → verify via **TEERegistry**.
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/OP99InL0cU8" title="Deploy ERC-8004 Agent Overview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -19,7 +19,7 @@ description: "Deploy a verifiable ERC-8004 Trustless Agent using Phala Cloud's V
 
 Distributed systems increasingly outsource work to off-chain agents—indexers, oracles, model inference, payment relays. When an agent signs a statement or moves value, a bare signature only proves **key possession**, not execution context. The missing link is provenance: *did this response come from the runtime I expect?*
 
-**ERC-8004** gives us a compact on-chain model for agent identity and discovery. Pair it with TEE-backed CVMs and you get the runtime receipts you've been wishing for: **attested execution**. Explore more [confidential AI agent use cases](https://phala.com/solutions/ai-agents) and implementations.
+**ERC-8004** gives us a compact onchain model for agent identity and discovery. Pair it with TEE-backed CVMs and you get the runtime receipts you've been wishing for: **attested execution**. Explore more [confidential AI agent use cases](https://phala.com/solutions/ai-agents) and implementations.
 
 ---
 
@@ -30,9 +30,9 @@ Distributed systems increasingly outsource work to off-chain agents—indexers, 
 - What agents actually need:
     1. **Deterministic key material** derived inside the runtime.
     2. **Remote attestation** that binds keys + code measurements to a platform identity.
-    3. **On-chain discovery** so other contracts/clients can programmatically verify them.
+    3. **Onchain discovery** so other contracts/clients can programmatically verify them.
 
-ERC-8004 covers the on-chain identity/registry. **TEEs + CVMs** supply runtime evidence. **Phala Cloud** ties it all together with templates, SDKs, and an on-chain governance/KMS model.
+ERC-8004 covers the onchain identity/registry. **TEEs + CVMs** supply runtime evidence. **Phala Cloud** ties it all together with templates, SDKs, and an onchain governance/KMS model.
 
 ---
 
@@ -135,7 +135,7 @@ https://<dstack-app-id>-8000.<dstack-gateway-domain>
 
 ### 9) Talk to the agent
 
-- Hit the Agent API. You should get signed responses whose key matches what you registered, and whose runtime is backed by the TEE attestation on-chain.
+- Hit the Agent API. You should get signed responses whose key matches what you registered, and whose runtime is backed by the TEE attestation onchain.
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/f4Ii_sb7KMg" title="Interact with Agent" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
@@ -158,7 +158,7 @@ flowchart LR
 
 ## Conclusion
 
-ERC-8004 + TEE on **Phala Cloud** give you a practical path to trustless agents: deterministic keys, remote attestations, and on-chain identity—wrapped in a dev flow that feels like spinning up a regular VM, just with superpowers.
+ERC-8004 + TEE on **Phala Cloud** give you a practical path to trustless agents: deterministic keys, remote attestations, and onchain identity—wrapped in a dev flow that feels like spinning up a regular VM, just with superpowers.
 
 ## Resources
 
