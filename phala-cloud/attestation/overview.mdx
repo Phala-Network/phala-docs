@@ -5,23 +5,15 @@ title: Overview
 
 ## Why Attestation Matters
 
-Attestation (also called Remote Attestation) is a critical security mechanism in TEE environments. It allows a remote verifier to confirm that a CVM is running inside a genuine, secure TEE with the expected configuration and code.
+Attestation proves your CVM runs in genuine TEE hardware with the exact software you expect. No one can fake it.
 
-With attestation, you get cryptographic proof that:
-
-- **TEE hardware stack is authentic** - Your CVM runs on genuine Intel hardware with TEE protections enabled
-- **TEE software stack is untampered** - The entire software stack from OS to application code is verified
-- **Environment is secure** - Your workloads run in a protected TEE environment
+It gives you cryptographic proof covering three layers: Intel TDX hardware, your OS and application code, and the runtime environment. Anyone can independently verify this proof to confirm your CVM's security.
 
 ## How Attestation Works
 
-Attestation creates a cryptographic proof that binds together:
+Your CVM generates a cryptographic quote that includes measurements of the Intel TDX CPU, your OS and application images, and optional custom data like public keys or challenge responses.
 
-1. **TEE hardware stack** - Intel TDX CPU measurements and security features
-2. **TEE software stack** - OS image, application code, and runtime environment
-3. **Custom data** - Optional user-provided data for application-specific verification
-
-This proof can be independently verified by anyone to confirm the security and authenticity of your CVM.
+The quote is signed by Intel hardware. Verifiers check this signature against Intel's root certificates to confirm authenticity.
 
 ## Quick Start
 
@@ -56,4 +48,4 @@ This proof can be independently verified by anyone to confirm the security and a
 
 ## Next Steps
 
-Ready to get started? Begin with [Getting Attestation](/phala-cloud/attestation/get-attestation) to learn how to retrieve attestation reports from your CVM.
+Start with [Get Attestation](/phala-cloud/attestation/get-attestation) to retrieve your first attestation report.

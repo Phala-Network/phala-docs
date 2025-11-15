@@ -3,26 +3,19 @@ description: Learn how to get CVM attestation on Phala Cloud using dashboard or 
 title: Get Attestation
 ---
 
-## Introduction
+You can get attestation reports two ways: check the dashboard for your CVM's default report, or use the dstack SDK to generate fresh quotes programmatically.
 
-There are two ways to retrieve the attestation report of your CVM on Phala Cloud:
-
-1. **Dashboard** - View the default attestation report on the dashboard
-2. **dstack SDK** - Generate a new attestation report programmatically within your application
-
-Choose the method that best fits your workflow. The dashboard is great for quick verification, while the SDK enables dynamic attestation generation in your applications.
+Use the dashboard for quick checks. Use the SDK when you need to bind custom data (like public keys or nonces) to your attestation.
 
 ## View Attestation Report on Dashboard
 
-You can view the attestation report on the dashboard under the **Attestation** tab and verify it by clicking the **Check Attestation** button.
+Open the **Attestation** tab in your CVM dashboard. Click **Check Attestation** to verify the default report generated during bootstrap.
 
 ## Generate Attestation Programmatically
 
 ### Prerequisites: Configure Docker Compose
 
-To use the dstack SDK within your CVM, you need to mount the dstack socket into your container. This socket connection allows your application to communicate with the dstack service for attestation, key generation, and other TEE operations.
-
-Add the socket volume to your `docker-compose.yml`:
+Your application needs access to the dstack service to generate attestation quotes. Mount the dstack socket into your container:
 
 ```yaml
 version: '3'
@@ -38,9 +31,13 @@ services:
 
 ### Using dstack SDK
 
-In your CVM application, you can generate attestation reports programmatically using the [dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme), which supports Python, JavaScript, and Go.
+The dstack SDK connects to `/var/run/dstack.sock` automatically. Install for your language:
 
-The SDK automatically connects to `/var/run/dstack.sock` and allows you to attach custom data to the attestation report. Custom data can be any application-specific information you want to bind to the attestation (up to 64 bytes, or larger if you hash it yourself).
+- **JavaScript/TypeScript:** [@phala/dstack-sdk](https://www.npmjs.com/package/@phala/dstack-sdk)
+- **Python:** [dstack-sdk](https://pypi.org/project/dstack-sdk/)
+- **Go:** [github.com/Dstack-TEE/dstack](https://github.com/Dstack-TEE/dstack/tree/master/sdk/go)
+
+You can attach custom data to your attestation quote—up to 64 bytes directly, or unlimited if you hash it first. Use this to bind public keys, nonces, or challenge responses.
 
 <CodeGroup>
 ```javascript TypeScript
@@ -112,11 +109,11 @@ print('RTMR0-3:', rtmrs)
 ```
 </CodeGroup>
 
-You can implement this code in your application as a public API that anyone can call to generate new attestation reports on demand.
+Expose this as an API endpoint so clients can request fresh attestation quotes anytime they need proof of your CVM's security.
 
 ## Next Steps
 
-Once you have your attestation quote generated, you can:
+Now verify your quote:
 
 <CardGroup cols={2}>
   <Card

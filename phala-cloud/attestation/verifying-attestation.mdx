@@ -5,17 +5,13 @@ title: Verifying Attestation
 
 ## Why Verify Attestation
 
-Verifying attestation ensures your CVM runs in genuine TEE hardware with authentic software. This gives you cryptographic proof that:
-
-- **TEE hardware stack is authentic** - Intel CPUs have TEE protections enabled
-- **TEE software stack is untampered** - The entire software stack from OS to application code is verified
-- **Environment is secure** - Your workloads run in a protected TEE environment
+Verification proves your CVM runs in genuine Intel TEE hardware with the exact software you expect. The cryptographic proof covers hardware authenticity, software integrity, and environment security.
 
 ## Verification Methods
 
 ### Method 1: Cloud API (Recommended)
 
-The easiest way to verify attestation is using Phala Cloud's API:
+Send your quote to Phala Cloud's verification API:
 
 ```bash
 curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
@@ -23,7 +19,7 @@ curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
   -d '{"hex": "0x040002000..."}'
 ```
 
-This returns a verification result and a shareable proof URL:
+You get back verification status and a unique checksum:
 
 ```json
 {
@@ -36,19 +32,14 @@ This returns a verification result and a shareable proof URL:
 }
 ```
 
-**Share verification proof:**
+Share the proof URL with anyone who needs to verify your CVM:
 ```
 https://proof.t16z.com/reports/9aa049fb9049d4f582ca316206f7cf34ee185c2b5b63370a518921432385b81a
 ```
 
 ### Method 2: Manual verification
 
-For advanced users who want to verify attestation manually:
-
-1. **Extract Intel TDX quote** from your attestation report
-2. **Verify quote signature** using Intel's root certificates
-3. **Check TCB status** to ensure no security vulnerabilities
-4. **Validate measurements** against expected values
+Advanced users can verify quotes locally using Intel DCAP libraries. Extract the TDX quote, verify the signature against Intel's root certificates, check TCB status, and validate measurements.
 
 ```python
 # Example using Intel DCAP libraries
@@ -67,37 +58,25 @@ else:
 
 ## What Gets Verified
 
-When you verify attestation, these key components are checked:
+Verification checks three layers:
 
-### TEE hardware stack verification
-- **Intel TDX CPU** - Genuine Intel hardware with TEE enabled
-- **Security features** - All TEE protections are active
-- **Firmware integrity** - No tampering with system firmware
+**Hardware:** Intel TDX CPU authenticity, security features enabled, firmware integrity.
 
-### TEE software stack verification
-- **Operating system** - Verified OS image with known measurements
-- **Application code** - Hash of your deployed application
-- **Runtime environment** - Secure boot chain and trusted execution
+**Software:** OS image hash, application code hash, secure boot chain.
 
-### Security verification
-- **No vulnerabilities** - TCB status shows no known security issues
-- **Freshness** - Quote was generated recently
-- **Authenticity** - Cryptographic proof from Intel's root of trust
+**Security:** No known vulnerabilities (TCB status), quote freshness, Intel's cryptographic signature.
 
 ## Verification Workflow
 
 <Steps>
-  <Step title="Get Attestation Report">
-    Generate or retrieve an attestation quote from your CVM using the dashboard or dstack SDK.
+  <Step title="Get quote">
+    Generate a quote using the dashboard or dstack SDK.
   </Step>
-  <Step title="Submit for Verification">
-    Upload your quote to Phala Cloud's verification API or verify manually using Intel tools.
+  <Step title="Verify">
+    Submit to Phala Cloud's API or verify locally with Intel tools.
   </Step>
-  <Step title="Review Results">
-    Check the verification status, TCB information, and get a shareable proof URL.
-  </Step>
-  <Step title="Share Proof">
-    Use the verification proof URL to demonstrate your CVM's security to third parties.
+  <Step title="Share proof">
+    Use the checksum URL to prove your CVM's security to anyone.
   </Step>
 </Steps>
 
