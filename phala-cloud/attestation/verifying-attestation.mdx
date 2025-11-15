@@ -4,6 +4,10 @@ description: Security features and remote attestation capabilities of Phala Clou
 title: Verifying
 ---
 
+## Prerequisites
+
+- Basic understanding of cryptographic signatures and hash functions
+- TEE attestation quote to verify
 
 ## Introduction
 
@@ -16,7 +20,7 @@ Let’s get into it!
 An attestation report (or "quote") is a cryptographically signed document containing evidence about the TEE environment, including hardware measurements, runtime measurements, and application-specific data. The Attestation Key sealed by the manufactory in the Quoting Enclave will be used to sign the quote when received request from Challenger. When the remote Challenger receives this report, it can validate that the environment meets expected security properties before trusting it with sensitive data or operations.
 
 <Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-8025-945f-ce263a7b96e3.jpg" alt="" />
+    <img src="https://img0.phala.world/files/1cf0317e-04a1-8025-945f-ce263a7b96e3.jpg" alt="Intel SGX remote attestation architecture showing challenger, service provider, Intel Attestation Service, and quoting enclave workflow" />
 </Frame>
 
 Source: [https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/attestation-services.html](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/attestation-services.html)
@@ -48,7 +52,7 @@ Here is an example report generated on Phala Cloud:
 You can check those information at the **CVM Dashboard→Attestation** page.
 
 <Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-80f6-822d-ddfca969efb5.jpg" alt="" />
+    <img src="https://img0.phala.world/files/1cf0317e-04a1-80f6-822d-ddfca969efb5.jpg" alt="Example TDX attestation report showing key fields including MRTD, runtime measurements, and report data" />
 </Frame>
 
 Now, let’s dive into each field and learn what it represents.
@@ -153,7 +157,7 @@ RTMR3_new = SHA384(RTMR3_old || SHA384(event))
 When you deployed your application on Phala Cloud, you can verify the RTMR3 with the data shown in dashboard attestation page. You can do it with a community tool called [rtmr3-calculator](https://rtmr3-calculator.vercel.app/).
 
 <Frame>
-    <img src="https://img0.phala.world/files/1cf0317e-04a1-802e-9b07-eca33e760a18.jpg" alt="" />
+    <img src="https://img0.phala.world/files/1cf0317e-04a1-802e-9b07-eca33e760a18.jpg" alt="TEE attestation verification flow showing quote generation, signature validation, and measurement comparison steps" />
 </Frame>
 
 _The source code of the rtmr3-calculator:_ [_https://github.com/propeller-heads/rtmr3-calculator_](https://github.com/propeller-heads/rtmr3-calculator)
