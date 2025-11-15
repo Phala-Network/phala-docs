@@ -12,20 +12,41 @@ There are two ways to retrieve the attestation report of your CVM on Phala Cloud
 
 Choose the method that best fits your workflow. The dashboard is great for quick verification, while the SDK enables dynamic attestation generation in your applications.
 
-## View attestation report on dashboard
+## View Attestation Report on Dashboard
 
 You can view the attestation report on the dashboard under the **Attestation** tab and verify it by clicking the **Check Attestation** button.
 
-## Generate attestation programmatically
+## Generate Attestation Programmatically
+
+### Prerequisites: Configure Docker Compose
+
+To use the dstack SDK within your CVM, you need to mount the dstack socket into your container. This socket connection allows your application to communicate with the dstack service for attestation, key generation, and other TEE operations.
+
+Add the socket volume to your `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+  app:
+    image: your-app-image
+    ports:
+      - 8080:8080
+    volumes:
+      # Mount dstack socket for TEE operations
+      - /var/run/dstack.sock:/var/run/dstack.sock
+```
 
 ### Using dstack SDK
 
-In your CVM application, you can generate attestation reports programmatically using the [dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme), which supports Python, JavaScript, and Go. The `user-data` argument allows you to attach custom data to the attestation report.
+In your CVM application, you can generate attestation reports programmatically using the [dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme), which supports Python, JavaScript, and Go.
+
+The SDK automatically connects to `/var/run/dstack.sock` and allows you to attach custom data to the attestation report. Custom data can be any application-specific information you want to bind to the attestation (up to 64 bytes, or larger if you hash it yourself).
 
 <CodeGroup>
 ```javascript TypeScript
 import { DstackClient } from '@phala/dstack-sdk';
 
+// Client automatically connects to /var/run/dstack.sock
 const client = new DstackClient();
 
 // Get TEE instance information
@@ -35,18 +56,22 @@ console.log('Instance ID:', info.instance_id);
 console.log('App Name:', info.app_name);
 console.log('TCB Info:', info.tcb_info);
 
-// Generate remote attestation quote with custom data
+// Prepare custom data to bind to the attestation
+// This can be any application-specific data (e.g., public key, nonce, challenge)
 const applicationData = JSON.stringify({
   version: '1.0.0',
   timestamp: Date.now(),
   user_id: 'alice'
 });
 
+// Generate remote attestation quote
+// SDK handles hashing if data exceeds 64 bytes
 const quote = await client.getQuote(applicationData);
 console.log('TDX Quote:', quote.quote);
 console.log('Event Log:', quote.event_log);
 
-// Verify measurement registers
+// Replay and verify Runtime Measurement Registers (RTMRs)
+// These values prove what software is running in the TEE
 const rtmrs = quote.replayRtmrs();
 console.log('RTMR0-3:', rtmrs);
 ```
@@ -56,7 +81,7 @@ import json
 import time
 from dstack_sdk import DstackClient
 
-# Create synchronous client - automatically connects to /var/run/dstack.sock
+# Client automatically connects to /var/run/dstack.sock
 client = DstackClient()
 
 # Get TEE instance information
@@ -66,18 +91,22 @@ print('Instance ID:', info.instance_id)
 print('App Name:', info.app_name)
 print('TCB Info:', info.tcb_info)
 
-# Generate remote attestation quote
+# Prepare custom data to bind to the attestation
+# This can be any application-specific data (e.g., public key, nonce, challenge)
 application_data = json.dumps({
     "version": "1.0.0",
     "timestamp": time.time(),
     "user_id": "alice"
 })
 
+# Generate remote attestation quote
+# SDK handles hashing if data exceeds 64 bytes
 quote = client.get_quote(application_data.encode())
 print('TDX Quote:', quote.quote)
 print('Event Log:', quote.event_log)
 
-# Verify measurement registers
+# Replay and verify Runtime Measurement Registers (RTMRs)
+# These values prove what software is running in the TEE
 rtmrs = quote.replay_rtmrs()
 print('RTMR0-3:', rtmrs)
 ```
@@ -85,7 +114,7 @@ print('RTMR0-3:', rtmrs)
 
 You can implement this code in your application as a public API that anyone can call to generate new attestation reports on demand.
 
-## Next steps
+## Next Steps
 
 Once you have your attestation quote generated, you can:
 

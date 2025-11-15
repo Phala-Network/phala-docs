@@ -3,7 +3,7 @@ description: Learn how to verify remote attestation of CVM on Phala Cloud TEE.
 title: Verifying Attestation
 ---
 
-## Why verify attestation
+## Why Verify Attestation
 
 Verifying attestation ensures your CVM runs in genuine TEE hardware with authentic software. This gives you cryptographic proof that:
 
@@ -11,7 +11,7 @@ Verifying attestation ensures your CVM runs in genuine TEE hardware with authent
 - **TEE software stack is untampered** - The entire software stack from OS to application code is verified
 - **Environment is secure** - Your workloads run in a protected TEE environment
 
-## Verification methods
+## Verification Methods
 
 ### Method 1: Cloud API (Recommended)
 
@@ -65,7 +65,7 @@ else:
     print(f"Verification failed: {result.error_message}")
 ```
 
-## What gets verified
+## What Gets Verified
 
 When you verify attestation, these key components are checked:
 
@@ -84,7 +84,7 @@ When you verify attestation, these key components are checked:
 - **Freshness** - Quote was generated recently
 - **Authenticity** - Cryptographic proof from Intel's root of trust
 
-## Verification workflow
+## Verification Workflow
 
 <Steps>
   <Step title="Get Attestation Report">
@@ -101,7 +101,7 @@ When you verify attestation, these key components are checked:
   </Step>
 </Steps>
 
-## Next steps
+## Next Steps
 
 - **[Get Attestation](/phala-cloud/attestation/get-attestation)** - Learn how to generate attestation quotes
 - **[API Quickstart](/phala-cloud/attestation/api-quickstart)** - Use Phala Cloud's verification API
