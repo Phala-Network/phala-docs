@@ -262,7 +262,8 @@
                   "/phala-cloud/attestation/overview",
                   "/phala-cloud/attestation/get-attestation",
                   "/phala-cloud/attestation/verifying-attestation",
-                  "/phala-cloud/attestation/api-quickstart"
+                  "/phala-cloud/attestation/chain-of-trust",
+                  "/phala-cloud/attestation/attestation-fields"
                 ]
               },
               {
@@ -544,6 +545,10 @@
     ]
   },
   "redirects": [
+    {
+      "destination": "/phala-cloud/attestation/verifying-attestation",
+      "source": "/phala-cloud/attestation/api-quickstart"
+    },
     {
       "destination": "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
       "source": "/phala-cloud/be-production-ready/ci-cd-automation/ci-cd-integration-best-practices"

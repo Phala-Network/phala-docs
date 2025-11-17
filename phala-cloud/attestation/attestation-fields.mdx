@@ -1,0 +1,145 @@
+---
+description: Reference guide for Intel TDX attestation quote fields and their meanings.
+title: Attestation Fields Reference
+---
+
+This reference explains each field in an Intel TDX attestation quote. Use this when you need to understand or verify specific measurements.
+
+## Example Quote
+
+Here's a typical attestation quote from Phala Cloud:
+
+```json
+{
+  "tee_tcb_svn": "06010300000000000000000000000000",
+  "mr_seam": "5b38e33a6487958b72c3c12a938eaa5e3fd4510c51aeeab58c7d5ecee41d7c436489d6c8e4f92f160b7cad34207b00c1",
+  "mr_signer_seam": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "seam_attributes": "0000000000000000",
+  "td_attributes": "0000001000000000",
+  "xfam": "e702060000000000",
+  "mr_td": "c68518a0ebb42136c12b2275164f8c72f25fa9a34392228687ed6e9caeb9c0f1dbd895e9cf475121c029dc47e70e91fd",
+  "mr_config_id": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "mr_owner": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "mr_owner_config": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "rt_mr0": "85e0855a6384fa1c8a6ab36d0dcbfaa11a5753e5a070c08218ae5fe872fcb86967fd2449c29e22e59dc9fec998cb6547",
+  "rt_mr1": "9b43f9f34a64bc7191352585be0da1774a1499e698ba77cbf6184547d53d1770d6524c1cfa00b86352f273fc272a8cfe",
+  "rt_mr2": "7cc2dadd5849bad220ab122c4fbf25a74dc91cc12702447d3b5cac0f49b2b139994f5cd936b293e5f0f14dea4262d668",
+  "rt_mr3": "2c482b5b34f6902293bc203696f407241bfa319d2410a04c604d1021888d6028bf4bd280ff859ee270a0429aac5f0d82",
+  "report_data": "afab9790acb13c4c651c1933a22b5f0663ef22927120dd08cc8291d7e0912d8b1c36eb75cf661a64735042f8e81bbe42cb9ab310ca95bf8d36c44cb8835c901f"
+}
+```
+
+## Hardware Fields
+
+### tee_tcb_svn
+**Trusted Computing Base Security Version Number**
+
+Security patch level for TEE hardware components. Verify this matches the latest version to ensure no known vulnerabilities.
+
+### mr_seam (MRSEAM)
+**Measurement of TDX-Module**
+
+Cryptographic hash of the SEAM (Secure Arbitration Mode) firmware. Confirms the TDX firmware hasn't been tampered with.
+
+### mr_td (MRTD)
+**Measurement Register for Trust Domain**
+
+Hash of the initial Trust Domain memory and configuration. Proves the TD was initialized with expected contents.
+
+### seam_attributes
+**SEAM Firmware Attributes**
+
+Configuration flags for SEAM firmware. Always zeros for Intel TDX.
+
+### td_attributes
+**Trust Domain Attributes**
+
+Configuration flags for the TD. Verifies the TD has expected security settings.
+
+### xfam
+**eXtended Feature Activation Mask**
+
+Controls which CPU extended features are accessible to the TD. Ensures proper security boundaries.
+
+## Runtime Measurement Registers (RTMRs)
+
+These registers contain hash chains of boot components.
+
+### RTMR0
+**Virtual Hardware Measurement**
+
+Measures the virtual hardware environment provided to the CVM.
+
+### RTMR1
+**Linux Kernel Measurement**
+
+Hash of the Linux kernel loaded during boot.
+
+### RTMR2
+**Kernel Parameters Measurement**
+
+Measurement of kernel command line and initrd.
+
+### RTMR3
+**Application Measurement**
+
+dstack-specific measurements including:
+- **app-id**: Relevant for KMS key derivation
+- **compose-hash**: Hash of your Docker Compose configuration
+- **instance-id**: Unique CVM instance identifier
+- **key-provider**: Who distributed the root filesystem encryption keys
+
+## RTMR3 Hash Chain
+
+RTMR3 uses a hash chain mechanism:
+
+```
+RTMR3_new = SHA384(RTMR3_old || SHA384(event))
+```
+
+Each application component (compose-hash, instance-id, key-provider) is hashed individually, then chained together. Verify the final RTMR3 value using the [rtmr3-calculator](https://rtmr3-calculator.vercel.app/) tool.
+
+## Application-Specific Fields
+
+### report_data (reportData)
+**User-Provided Data (64 bytes)**
+
+Custom data you attach to the quote. Common uses:
+- **Public keys**: Bind a public key to prove you control the private key
+- **Nonces**: Challenge-response protocols
+- **Application state**: Hash of configuration or state
+
+### mr_config_id, mr_owner, mr_owner_config
+**Configuration and Ownership**
+
+Usually all zeros for dstack deployments. Reserved for advanced attestation scenarios.
+
+## Verification Checklist
+
+When verifying a quote, check:
+
+**Hardware Integrity:**
+- `tee_tcb_svn` - Latest security patches
+- `mr_seam` - Known, trusted TDX firmware
+
+**System Integrity:**
+- `mr_td` - Expected initial TD state
+- `RTMR0-2` - Expected boot chain
+
+**Application Integrity:**
+- `RTMR3` - Your application's hash matches
+
+**Identity:**
+- `report_data` - Contains expected challenge response or public key
+
+## Resources
+
+- **[dstack Attestation Guide](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md)** - How dstack implements attestation
+- **[Intel TDX Specification](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html)** - Official Intel documentation
+- **[RTMR3 Calculator](https://rtmr3-calculator.vercel.app/)** - Verify RTMR3 values
+- **[Verification Script](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)** - Example verification code
+
+## Next Steps
+
+- **[Get Attestation](/phala-cloud/attestation/get-attestation)** - Generate quotes with custom data
+- **[Verifying Attestation](/phala-cloud/attestation/verifying-attestation)** - Verify quotes with Phala Cloud API

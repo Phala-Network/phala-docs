@@ -37,83 +37,79 @@ The dstack SDK connects to `/var/run/dstack.sock` automatically. Install for you
 - **Python:** [dstack-sdk](https://pypi.org/project/dstack-sdk/)
 - **Go:** [github.com/Dstack-TEE/dstack](https://github.com/Dstack-TEE/dstack/tree/master/sdk/go)
 
-You can attach custom data to your attestation quote—up to 64 bytes directly, or unlimited if you hash it first. Use this to bind public keys, nonces, or challenge responses.
+### Attaching Custom Data (reportData)
+
+The attestation quote includes a 64-byte `reportData` field for your custom data. **Important:** The SDK throws an error if you exceed 64 bytes—it does not auto-hash.
+
+**Two patterns:**
+
+1. **Short data (≤64 bytes)**: Nonces, small challenges, or hashes—pass directly
+2. **Long data (>64 bytes)**: Any arbitrary data—hash it first with SHA256 (produces 32 bytes)
 
 <CodeGroup>
 ```javascript TypeScript
 import { DstackClient } from '@phala/dstack-sdk';
+import crypto from 'crypto';
 
-// Client automatically connects to /var/run/dstack.sock
 const client = new DstackClient();
 
-// Get TEE instance information
-const info = await client.info();
-console.log('App ID:', info.app_id);
-console.log('Instance ID:', info.instance_id);
-console.log('App Name:', info.app_name);
-console.log('TCB Info:', info.tcb_info);
+// Pattern 1: Short data (≤64 bytes) - pass directly
+// Example: 32-byte nonce for challenge-response
+const nonce = crypto.randomBytes(32);
+const quote1 = await client.getQuote(nonce);
 
-// Prepare custom data to bind to the attestation
-// This can be any application-specific data (e.g., public key, nonce, challenge)
-const applicationData = JSON.stringify({
+// Pattern 2: Long data (>64 bytes) - hash it first
+// Example: JSON with arbitrary data
+const userData = JSON.stringify({
   version: '1.0.0',
   timestamp: Date.now(),
-  user_id: 'alice'
+  user_id: 'alice',
+  public_key: '0x1234...'
 });
 
-// Generate remote attestation quote
-// SDK handles hashing if data exceeds 64 bytes
-const quote = await client.getQuote(applicationData);
-console.log('TDX Quote:', quote.quote);
-console.log('Event Log:', quote.event_log);
+// Hash to fit in 64 bytes (SHA256 produces 32 bytes)
+const hash = crypto.createHash('sha256').update(userData).digest();
+const quote2 = await client.getQuote(hash);
 
-// Replay and verify Runtime Measurement Registers (RTMRs)
-// These values prove what software is running in the TEE
-const rtmrs = quote.replayRtmrs();
-console.log('RTMR0-3:', rtmrs);
+console.log('Quote:', quote2.quote);
+console.log('Event Log:', quote2.event_log);
 ```
 
 ```python Python
 import json
 import time
+import hashlib
+import secrets
 from dstack_sdk import DstackClient
 
-# Client automatically connects to /var/run/dstack.sock
 client = DstackClient()
 
-# Get TEE instance information
-info = client.info()
-print('App ID:', info.app_id)
-print('Instance ID:', info.instance_id)
-print('App Name:', info.app_name)
-print('TCB Info:', info.tcb_info)
+# Pattern 1: Short data (≤64 bytes) - pass directly
+# Example: 32-byte nonce for challenge-response
+nonce = secrets.token_bytes(32)
+quote1 = client.get_quote(nonce)
 
-# Prepare custom data to bind to the attestation
-# This can be any application-specific data (e.g., public key, nonce, challenge)
-application_data = json.dumps({
+# Pattern 2: Long data (>64 bytes) - hash it first
+# Example: JSON with arbitrary data
+user_data = json.dumps({
     "version": "1.0.0",
     "timestamp": time.time(),
-    "user_id": "alice"
+    "user_id": "alice",
+    "public_key": "0x1234..."
 })
 
-# Generate remote attestation quote
-# SDK handles hashing if data exceeds 64 bytes
-quote = client.get_quote(application_data.encode())
-print('TDX Quote:', quote.quote)
-print('Event Log:', quote.event_log)
+# Hash to fit in 64 bytes (SHA256 produces 32 bytes)
+data_hash = hashlib.sha256(user_data.encode()).digest()
+quote2 = client.get_quote(data_hash)
 
-# Replay and verify Runtime Measurement Registers (RTMRs)
-# These values prove what software is running in the TEE
-rtmrs = quote.replay_rtmrs()
-print('RTMR0-3:', rtmrs)
+print('Quote:', quote2.quote)
+print('Event Log:', quote2.event_log)
 ```
 </CodeGroup>
 
 Expose this as an API endpoint so clients can request fresh attestation quotes anytime they need proof of your CVM's security.
 
 ## Next Steps
-
-Now verify your quote:
 
 <CardGroup cols={2}>
   <Card
@@ -122,15 +118,15 @@ Now verify your quote:
     title="Verify Attestation"
     arrow="true"
   >
-    Learn how to verify your attestation quote using Phala Cloud's API
+    Verify your quote using Phala Cloud's API
   </Card>
 
   <Card
-    icon="api"
-    href="/phala-cloud/attestation/api-quickstart"
-    title="API Quickstart"
+    icon="book"
+    href="/phala-cloud/attestation/attestation-fields"
+    title="Field Reference"
     arrow="true"
   >
-    Get started with Phala Cloud's attestation verification API
+    Understand what each field in the quote means
   </Card>
 </CardGroup>

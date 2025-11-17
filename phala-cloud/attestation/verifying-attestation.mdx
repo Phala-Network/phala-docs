@@ -3,23 +3,33 @@ description: Learn how to verify remote attestation of CVM on Phala Cloud TEE.
 title: Verifying Attestation
 ---
 
-## Why Verify Attestation
-
 Verification proves your CVM runs in genuine Intel TEE hardware with the exact software you expect. The cryptographic proof covers hardware authenticity, software integrity, and environment security.
 
-## Verification Methods
+## Cloud API Verification (Recommended)
 
-### Method 1: Cloud API (Recommended)
+Send your attestation quote to Phala Cloud's API for verification. You'll need either a binary quote file or hex string.
 
-Send your quote to Phala Cloud's verification API:
+Don't have a quote yet? See [Get Attestation](/phala-cloud/attestation/get-attestation) first.
 
+### Choose your method
+
+**Method 1: Binary File Upload**
+```bash
+curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@quote.bin"
+```
+
+**Method 2: Hex String**
 ```bash
 curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
   -H "Content-Type: application/json" \
   -d '{"hex": "0x040002000..."}'
 ```
 
-You get back verification status and a unique checksum:
+### Check the response
+
+Both methods return identical results:
 
 ```json
 {
@@ -32,12 +42,27 @@ You get back verification status and a unique checksum:
 }
 ```
 
-Share the proof URL with anyone who needs to verify your CVM:
+The `checksum` is your quote's unique ID. Use it to share proof or retrieve details:
+
+**Share proof:**
 ```
 https://proof.t16z.com/reports/9aa049fb9049d4f582ca316206f7cf34ee185c2b5b63370a518921432385b81a
 ```
 
-### Method 2: Manual verification
+**Get details:**
+```bash
+curl "https://cloud-api.phala.network/api/v1/attestations/view/9aa049fb9049d4f582ca316206f7cf34ee185c2b5b63370a518921432385b81a"
+```
+
+### Troubleshooting
+
+- **File not found** → Check your file path
+- **Invalid hex** → Remove spaces, use valid hex characters
+- **Verification failed** → Development platforms lack Intel certificates
+
+For detailed error handling, see the [API reference](/phala-cloud/phala-cloud-api/attestations).
+
+## Manual Verification (Advanced)
 
 Advanced users can verify quotes locally using Intel DCAP libraries. Extract the TDX quote, verify the signature against Intel's root certificates, check TCB status, and validate measurements.
 
@@ -56,15 +81,43 @@ else:
     print(f"Verification failed: {result.error_message}")
 ```
 
-## What Gets Verified
+## What Gets Verified (And What You Must Check)
 
-Verification checks three layers:
+API verification proves the quote is cryptographically valid and from genuine Intel hardware. But **this alone doesn't prove the CVM runs your specific code**. You must also compare the measurements against your expected values.
 
-**Hardware:** Intel TDX CPU authenticity, security features enabled, firmware integrity.
+### What the API verifies automatically
 
-**Software:** OS image hash, application code hash, secure boot chain.
+**Hardware authenticity:** Intel TDX CPU is genuine, firmware is signed by Intel, no tampering.
 
-**Security:** No known vulnerabilities (TCB status), quote freshness, Intel's cryptographic signature.
+**Security status:** No known vulnerabilities (TCB status), quote is fresh, cryptographic signature is valid.
+
+### What YOU must verify manually
+
+After the API confirms the quote is valid, check these measurements match your expectations:
+
+**MRTD (mr_td):** Proves the initial TD configuration. Verify this matches your base image.
+
+**RTMR0-2:** Proves the boot sequence (firmware, kernel, initrd). Verify these match your OS image.
+
+**RTMR3:** Proves your application code. **Critical:** Verify this matches your Docker Compose hash. If RTMR3 doesn't match, someone could be running different code in the TEE.
+
+**reportData:** Verify this contains the expected challenge response or public key you requested.
+
+Without checking these measurements, you only know it's a valid TEE—not that it's running YOUR code.
+
+### How to get reference measurements and verify the full chain of trust
+
+Verifying measurements is just the beginning. For complete security, you must verify the **entire chain of trust** from source code to running CVM.
+
+See **[Chain of Trust](/phala-cloud/attestation/chain-of-trust)** for the complete guide covering:
+- How to verify the OS came from audited source code
+- How to link Docker images back to your source code
+- How to verify encryption keys and governance
+
+**Quick reference for measurements:**
+- **MRTD, RTMR0-2:** CVM dashboard shows these for your OS version
+- **RTMR3:** Use SDK's `getComposeHash()` + [rtmr3-calculator](https://rtmr3-calculator.vercel.app/)
+- **reportData:** Verify it matches what you passed to `getQuote()`
 
 ## Verification Workflow
 
@@ -72,16 +125,19 @@ Verification checks three layers:
   <Step title="Get quote">
     Generate a quote using the dashboard or dstack SDK.
   </Step>
-  <Step title="Verify">
-    Submit to Phala Cloud's API or verify locally with Intel tools.
+  <Step title="Verify signature">
+    Submit to Phala Cloud's API to verify cryptographic validity.
+  </Step>
+  <Step title="Check measurements">
+    Compare MRTD, RTMR0-3, and reportData against your expected values. See [Attestation Fields](/phala-cloud/attestation/attestation-fields) for details.
   </Step>
   <Step title="Share proof">
-    Use the checksum URL to prove your CVM's security to anyone.
+    Once measurements match, use the checksum URL to prove your CVM's security.
   </Step>
 </Steps>
 
 ## Next Steps
 
 - **[Get Attestation](/phala-cloud/attestation/get-attestation)** - Learn how to generate attestation quotes
-- **[API Quickstart](/phala-cloud/attestation/api-quickstart)** - Use Phala Cloud's verification API
+- **[Attestation Fields](/phala-cloud/attestation/attestation-fields)** - Understand what each field in the quote means
 - **[API Reference](/phala-cloud/phala-cloud-api/attestations)** - Complete verification service documentation
