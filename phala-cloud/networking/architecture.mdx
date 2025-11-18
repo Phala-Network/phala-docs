@@ -3,9 +3,13 @@ title: Architecture
 description: Understanding how Phala Cloud routes and secures your network traffic
 ---
 
+Phala Cloud's networking architecture is built around a zero-trust model. The gateway runs in its own TEE and mutually attests with your CVM before routing any traffic. This creates multiple layers of encryption that keep your data private even from the infrastructure operator.
+
+Understanding this architecture explains how routing works, why isolation is hardware-enforced, and where performance characteristics come from. For the security details behind this design, see [Network Security](/phala-cloud/networking/security).
+
 ## Request Journey
 
-When a client connects to `appid-8080.dstack-prod5.phala.network`, the request follows a specific path that affects both security and performance.
+Here's how requests flow through the gateway and why each step matters for your application.
 
 ### The Complete Path
 
@@ -19,7 +23,7 @@ Each step serves a purpose:
 
 **SNI Routing (\<1ms)**: Gateway extracts the hostname from the TLS handshake to determine which CVM and port to route to. No decryption of request data happens yet.
 
-**WireGuard Tunnel (\<1ms)**: Traffic gets re-encrypted with WireGuard before forwarding to your CVM. This creates defense-in-depth - even if the gateway is compromised, traffic to your CVM remains encrypted.
+**WireGuard Tunnel (\<1ms)**: Traffic gets re-encrypted with WireGuard before forwarding to your CVM. Even after TLS termination at the gateway, your data stays encrypted until it reaches your container.
 
 **Container Processing**: Inside the CVM's trusted environment, traffic is decrypted and forwarded to your container on the specified port.
 
@@ -39,10 +43,7 @@ deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network  → TLS passt
 deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network → HTTP/2 enabled → gRPC to container
 ```
 
-The suffixes change the behavior:
-- No suffix: Standard HTTP/HTTPS with TLS termination
-- `s` suffix: TLS passthrough for end-to-end encryption
-- `g` suffix: HTTP/2 with ALPN negotiation for gRPC
+The suffix changes behavior. No suffix means standard HTTP/HTTPS with TLS termination. Add `s` for TLS passthrough when you need end-to-end encryption. Add `g` to enable HTTP/2 with ALPN negotiation for gRPC. For TLS passthrough use cases and security considerations, see [TLS Passthrough](/phala-cloud/networking/tls-passthrough).
 
 ### Load Balancing
 
@@ -72,6 +73,8 @@ Your CVM operates in its own network segment with:
 - No access to the host's network services
 
 You cannot ping another CVM, connect to the host's localhost, or even discover what other CVMs exist. This isolation happens at the kernel level using network namespaces.
+
+For security implications and hardware-level isolation details, see [Network Security](/phala-cloud/networking/security#hardware-isolation).
 
 ### Container Networking Inside CVM
 
@@ -128,33 +131,11 @@ Scale vertically when you need:
 - Lowest possible latency
 - Stateful services that can't be distributed
 
-## Security Considerations
-
-The network architecture provides multiple security boundaries.
-
-### What's Encrypted Where
-
-Different encryption applies at each layer:
-- **Client to Gateway**: Standard TLS 1.3 encryption
-- **Gateway to CVM**: WireGuard with perfect forward secrecy
-- **Inside CVM**: Unencrypted between containers (but in encrypted memory)
-- **CVM Memory**: Hardware-encrypted via Intel TDX
-
-### Trust Boundaries
-
-You don't need to trust:
-- The gateway operator (can't see WireGuard-encrypted traffic)
-- Other CVMs on the same host (complete isolation)
-- The host operating system (TEE protection)
-
-You do need to trust:
-- Your own application code
-- The TDX hardware security
-- DNS resolution (use DNSSEC where possible)
+For security implications of these scaling strategies, including encryption overhead and trust boundaries, see [Network Security](/phala-cloud/networking/security).
 
 ## Common Architectural Patterns
 
-Patterns that work well with this network architecture.
+These patterns take advantage of Phala's sub-millisecond internal networking and hardware isolation.
 
 ### Microservices in Single CVM
 

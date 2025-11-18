@@ -6,23 +6,1035 @@ noindex: true
 icon: "clock"
 ---
 
-<Update label="August 5 - August 11" tags={["Features", "Models"]} rss={{ title: "Phala Updates", description: "GPU TEE enhancements, CLI improvements, and security updates" }}>
+<Update label="November 3-13, 2025" tags={["GPU Rental", "SSH Keys", "Infrastructure"]} rss={{ title: "GPU Rental System & SSH Key Management", description: "Complete GPU rental marketplace, SSH key management, and advanced resource allocation" }}>
+
+  ## GPU Rental Marketplace
+
+  - **GPU Rental System**: Full GPU rental workflow with SKU management, pricing tiers, and order processing
+  - **GPU Rental UI**: Complete user interface for browsing GPU catalog and placing rental orders
+  - **Rental Orders Admin**: Comprehensive admin interface for managing GPU rental orders and allocations
+  - **Automated Billing**: Hourly billing periods with automated order completion and notifications
+  - **Email Notifications**: Order confirmation, provisioning, and completion email templates
+
+  ## SSH & Security
+
+  - **SSH Key Management**: Store and manage SSH public keys for secure CVM access
+  - **SSH Key Injection**: Automatically inject SSH keys into CVMs at creation time
+  - **GitHub SSH Sync**: Import SSH keys directly from GitHub accounts
+  - **Key Validation**: Comprehensive SSH key format validation and fingerprint tracking
+
+  ## Resource Management
+
+  - **Auto Resource Allocation**: Intelligent automatic resource matching for CVM deployment
+  - **GPU Reallocation v2**: Enhanced GPU reallocation on CVM start with better availability checks
+  - **Inventory Refactor**: Refactored inventory SQL queries for improved performance
+  - **Sortable Instance Types**: Reorderable instance types with display_order field
+
+  ## User Profiles & Workspaces
+
+  - **Custom Profiles**: Entity profile system for users, workspaces, and apps with avatar uploads
+  - **Profile Management**: Profile editing UI for workspace and app customization
+  - **Workspace Admin**: Enhanced workspace administration interface
+
+  ## Infrastructure & Developer Experience
+
+  - **Update Environment API**: New API for updating CVM environment variables without full redeployment
+  - **Update OS Image**: Support for upgrading CVM OS images in-place
+  - **Immutable Compose**: Immutable docker-compose hash generation for consistency
+  - **Trust Center**: Trust report existence detection for attestation verification
+  - **Structured Errors**: Comprehensive structured error handling system
+  - **Claude Skills**: Added Python backend and TypeScript frontend skills for development
+
+  ## Billing & Invoices
+
+  - **Invoice Refactor**: Refactored invoice service with better Stripe integration
+  - **Invoice Admin**: Enhanced invoice administration with filtering and status management
+  - **Billing Handler**: Automated billing handlers for charge failures and CVM shutdown
+  - **Payment Methods**: Customer payment method validation and tracking
+
+  ## Bug Fixes & Improvements
+
+  - Fixed KMS nonce race conditions with obtain_app_id improvements
+  - Improved CVM admin UI with better filtering and compose file drawers
+  - Enhanced error messages across the platform
+  - Fixed workspace setup and repository configuration issues
+  - Updated Next.js to 15.4.7 for security and performance
+  - UI theme updates with new color system
+
+</Update>
+
+<Update label="October 27 - November 2, 2025" tags={["Workspaces", "CLI", "API"]} rss={{ title: "Workspace Invitations & CLI Auth", description: "Team member invitations, CLI device authentication, and API versioning" }}>
+
+  ## Workspace Collaboration
+
+  - **Member Invitations**: Full workspace invitation system with email-based invites and role management
+  - **Invitation UI**: New invitation management interface for workspace administrators
+  - **Member Management**: Comprehensive member list and permissions interface
+
+  ## CLI & Authentication
+
+  - **CLI Device Auth**: New device authentication flow for CLI users with secure token management
+  - **CLI Login**: Streamlined CLI login experience with browser-based OAuth flow
+  - **CLI Monitoring**: Node monitoring capabilities for cron-based infrastructure tasks
+
+  ## Infrastructure
+
+  - **API Versioning**: Implemented comprehensive API versioning system for backward compatibility
+  - **GPU Rental**: New GPU rental workflow and allocation improvements
+  - **Error Handling**: Enhanced error handling and logging across the platform
+  - **Trust Center**: Added proof-of-cloud verification for trust center integration
+
+</Update>
+
+<Update label="October 20-26, 2025" tags={["Workspaces", "GPU", "CVM"]} rss={{ title: "Workspace Context & Reserved GPUs", description: "Workspace-based API context, reserved GPU allocations, and improved CVM operations" }}>
+
+  ## Workspace Architecture
+
+  - **Workspace Context**: Complete workspace context system for scoped API operations
+  - **Scoped APIs**: All CVM and resource APIs now workspace-aware with proper isolation
+  - **Team Launch Pages**: New team-based launch and deploy pages with workspace context
+  - **dStack Apps**: Enhanced dStack app management with per-workspace app lists and detailed views
+
+  ## GPU Management
+
+  - **Reserved GPUs**: Teams can now reserve specific GPUs for dedicated access
+  - **GPU Team Allocation**: Allowed teams configuration for GPU access control
+  - **GPU Admin Polish**: Enhanced GPU administration interface with better allocation visibility
+
+  ## CVM Operations
+
+  - **Improved Status Management**: Comprehensive CVM status tracking with batch operations
+  - **Operation Refactor**: Refactored CVM operations (start/stop/restart/resize) for better reliability
+  - **State Transactions**: Enhanced state transaction control for atomic CVM operations
+  - **Queue Monitoring**: Improved task queue monitoring and worker management
+
+  ## Bug Fixes
+
+  - Fixed OAuth login issues with GitHub and Google providers
+  - Resolved CVM visibility state synchronization
+  - Fixed domain configuration for dStack apps
+  - Improved compose file consistency and validation
+
+</Update>
+
+<Update label="October 13-19, 2025" tags={["Features", "Infrastructure"]} rss={{ title: "Custom Domain Support", description: "Custom domain configuration with CNAME management and diagnostic tools" }}>
 
   ## Cloud Platform
 
-  - Social login from Google and Github
+  - **Custom Domain Support**: Full support for custom domains with CNAME configuration, backfill scripts, and domain target management
+  - **Domain Diagnostics**: New diagnostic tools to troubleshoot domain configuration issues
+  - **API Key Management**: Enhanced API key creation dialog with security warnings
 
-  ## Confidential VM
+</Update>
 
-  - Set up redundant nodes for Ethereum KMS `prod7-eth`
+<Update label="October 6-12, 2025" tags={["Admin", "Infrastructure"]} rss={{ title: "Workspace Admin & System Improvements", description: "Comprehensive workspace management and platform stability enhancements" }}>
 
-  ## Confidential AI
+  ## Workspace Administration
 
-  - GPU instances now will auto-shutdown when the balance reaches zero, instead of accumulating more bills
-  - New confidential model launched: [`phala/gpt-oss-120b`](https://redpill.ai/models/phala/gpt-oss-120b)
-  - Increase the throughputs of [`phala/deepseek-chat-v3-0324`](https://redpill.ai/models/phala/deepseek-chat-v3-0324)
+  - **Complete Workspace Admin**: New comprehensive workspace management interface with team transfer capabilities
+  - **Telegram Integration**: Added Telegram bot integration with debug admin UI for better monitoring
+  - **Bulk Communication**: Implemented bulk email system with comprehensive reporting
 
-  ## CLI and API updates
+  ## Infrastructure & Performance
 
-  - Better CLI outputs and improved commands
+  - **API Rate Limiting**: Implemented comprehensive rate limiting system for platform stability
+  - **Session Management**: Enhanced session pattern validation with new checks
+  - **Database Optimization**: Updated PostgreSQL connection pool settings and session management patterns
+  - **Navigation**: New single-search-selector component and improved admin navigation
+
+  ## Bug Fixes
+
+  - Fixed multiple session-related issues and API key creation errors
+  - Resolved authentication service context problems
+  - Improved error handling for asyncio operations
+
+</Update>
+
+<Update label="September 29 - October 5, 2025" tags={["UI", "Performance"]} rss={{ title: "Resource Management Redesign", description: "Enhanced resource selection and team administration tools" }}>
+
+  ## UI/UX Improvements
+
+  - **Resource Section Redesign**: Split resource section into multi-piece components for better organization
+  - **Storage Management**: New storage filesystem selector component
+  - **Team Admin Prototype**: Initial implementation of team administration interface
+  - **Filter Enhancements**: Server-side filter options with remote search capability
+
+  ## Infrastructure
+
+  - **SDK Integration**: Switched to using SDKs to reduce maintenance overhead
+  - **Timeout Support**: Added timeout configuration to BaseClient for better reliability
+  - **Field Tracking**: Improved tracking system for consistent compose hash generation
+
+  ## Bug Fixes
+
+  - Prevented potential row deadlocks with improved transaction commits
+  - Fixed multiple Sentry-reported production issues
+  - Resolved storage initialization and node filtering problems
+
+</Update>
+
+<Update label="September 22-28, 2025" tags={["GPU", "Task Queue"]} rss={{ title: "GPU Allocation & Task Queue System", description: "Major backend infrastructure improvements for GPU management" }}>
+
+  ## GPU Management
+
+  - **GPU Allocation System**: New CvmGpuAllocation model with dynamic allocation and release mechanisms
+  - **Resource Separation**: Split CPU and GPU in resource section for clearer management
+  - **Reallocation Support**: Added GPU reallocation for CVM start operations
+
+  ## Task Queue System
+
+  - **Celery Integration**: Implemented Celery-based task queue for async operations
+  - **Queue Monitoring**: Added task queue state monitoring in admin dashboard
+  - **Worker Management**: Split queue workers by workload type with control commands
+  - **Task Cancellation**: Ability to cancel in-progress tasks for stop/remove operations
+
+  ## Security
+
+  - Added signature support for public TCB info and secure time
+  - CustomerIO integration for user tracking and analytics
+
+</Update>
+
+<Update label="September 15-21, 2025" tags={["KMS", "Infrastructure"]} rss={{ title: "KMS System & Inventory Management", description: "Enhanced KMS integration and new inventory-based allocation" }}>
+
+  ## KMS Integration
+
+  - **KMS Contracts**: New kms_contracts table and kms_type support
+  - **KMS Admin**: Enhanced admin interface for KMS and contract management
+  - **Version Compatibility**: Added v03x_only flag for API compatibility checks
+  - **Upgrade Callbacks**: KMS upgrade callback URL detection for version management
+
+  ## Infrastructure
+
+  - **Inventory System**: Proof of concept for new inventory-based allocation
+  - **Node Management**: Added deleted_at to nodes with soft deletion support
+  - **Infrastructure Actions**: New VMM connection capabilities
+  - **Announcement Scoping**: Scoped announcements with CTA button support
+
+</Update>
+
+<Update label="September 8-14, 2025" tags={["Workspace", "GPU"]} rss={{ title: "Workspace Launch & Instance Management", description: "New workspace features and instance type management" }}>
+
+  ## Workspace & Teams
+
+  - **Workspace Introduction**: New workspace system with improved team management
+  - **GPU Admin**: Comprehensive GPU administration interface
+  - **Instance Types**: Database-driven instance type management replacing hardcoded rates
+  - **Model Workload**: Support for creating and deploying model workloads
+
+  ## Infrastructure
+
+  - **Build Improvements**: Migration from Black to Ruff for code formatting
+  - **Python 3.13**: Upgraded to Python 3.13 with better type safety
+  - **GPU Allocation**: Improved GPU allocation and reallocation mechanisms
+  - **Resource Computation**: Node-based available resource computation
+
+</Update>
+
+<Update label="September 1-7, 2025" tags={["Billing", "Infrastructure"]} rss={{ title: "Billing System Refactor", description: "Major billing system improvements and inventory tables" }}>
+
+  ## Billing System
+
+  - **Metered Usage**: Renamed billing_records to metered_usages for clarity
+  - **Idle Disk Usage**: Enabled aggregate idle disk usage tracking
+  - **Instance Types Admin**: New admin interface for instance type management
+
+  ## Infrastructure
+
+  - **Inventory Tables**: Created nodes table and associated inventory structures
+  - **Node Migration**: Added node_id to associate tables for better resource tracking
+  - **Authorization**: New AuthGuard implementation with announcement banner
+
+  ## Bug Fixes
+
+  - Fixed KMS authentication API for upgrade scenarios
+  - Resolved audit logging and update environment variable issues
+  - Improved compatibility checks across the platform
+
+</Update>
+
+<Update label="August 25-31, 2025" tags={["UI", "Billing"]} rss={{ title: "Trust Center & Billing Separation", description: "Public GPU TEE page and improved billing granularity" }}>
+
+  ## Features
+
+  - **Trust Center Integration**: Added app attestation API for trust center functionality
+  - **Separate Billing**: Computing resource and storage now billed separately
+  - **Public GPU TEE Page**: New public-facing page showcasing GPU TEE capabilities
+  - **API Proxy**: Enhanced HTTP header handling in API proxy routes
+
+  ## Performance
+
+  - **Backoff Configuration**: Configurable timeout for exponential backoff
+  - **Network Management**: Improved network service resource management and error handling
+
+</Update>
+
+<Update label="August 18-24, 2025" tags={["KMS", "Security"]} rss={{ title: "Multi-KMS Support", description: "Enhanced KMS integration and project identification" }}>
+
+  ## KMS Integration
+
+  - **Project Slugs**: Added unique project slugs within teams
+  - **Gateway Slugs**: New gateway slug system for better identification
+  - **Multi-KMS Support**: Fixed environment encryption for multi-KMS nodes
+  - **KMS Display**: Show KMS name in CVM cards for better visibility
+
+  ## Features
+
+  - **API Token Teams**: Added team_id to api_tokens for team-based access
+  - **Mava Widget**: Integrated Mava widget for user support
+
+</Update>
+
+<Update label="August 11-17, 2025" tags={["Security", "2FA"]} rss={{ title: "Two-Factor Authentication", description: "Enhanced security with 2FA and session management" }}>
+
+  ## Security Features
+
+  - **Two-Factor Authentication**: Complete 2FA implementation with backup codes
+  - **Session Management**: Session versioning and password history tracking
+  - **OAuth Tracking**: Track OAuth login device and IP information
+  - **Security Headers**: Added CSP and X-Frame-Options headers
+
+  ## KMS Updates
+
+  - **Quote Collateral V3**: Added PKC CRL and root CA CRL support
+  - **Health Checks**: Decoupled KMS and gateway health checks from VMM
+
+  ## UI/UX
+
+  - **Password Management**: New password update form with show/hide functionality
+  - **Admin Session Tools**: Session management interface for administrators
+
+</Update>
+
+<Update label="August 4-10, 2025" tags={["KMS", "Multi-KMS"]} rss={{ title: "Multi-KMS Architecture", description: "Users can now choose which KMS to use for their deployments" }}>
+
+  ## KMS Flexibility
+
+  - **User KMS Selection**: Users can now decide which KMS to use for their CVMs
+  - **Gateway Integration**: Added gateway_url and gateway_admin_rpc_url to KMS
+  - **KMS Relationships**: Created relationship table between teepods and KMS with soft deletion
+  - **App ID Management**: New obtain_app_id functionality
+
+  ## Infrastructure
+
+  - **API Token Versioning**: Added default_version for ApiToken
+  - **Build System**: Fixed Node.js polyfills and build configurations
+  - **Wallet Security**: Separated encryption keys for wallet management
+
+</Update>
+
+<Update label="July 28 - August 3, 2025" tags={["Teams", "Billing"]} rss={{ title: "Reserved Nodes & Billing Audit", description: "Team-based reserved nodes and comprehensive billing audit" }}>
+
+  ## Workspace & Teams
+
+  - **Reserved Nodes**: Teams can now have reserved nodes for dedicated resources
+  - **Team Migrations**: Comprehensive migration system for team members and node associations
+  - **Billing Audit**: New billing audit system for transaction tracking
+
+  ## Features
+
+  - **Password Setup**: Users can set up passwords and update usernames
+  - **Startup Program**: New startup program page for eligible teams
+  - **CalForm Integration**: Integrated calendar form for scheduling
+
+</Update>
+
+<Update label="July 21-27, 2025" tags={["OAuth", "KMS"]} rss={{ title: "OAuth Integration", description: "Social login with GitHub and Google" }}>
+
+  ## Authentication
+
+  - **OAuth Support**: Added OAuth integration with GitHub and Google
+  - **Account Linking**: Users can link and unlink OAuth accounts
+  - **Near Protocol**: Added Near protocol registration and login API
+
+  ## KMS Features
+
+  - **KMS Pagination**: Pagination info in KMS list API with detail endpoints
+  - **Maintenance Mode**: UI support for maintenance mode
+  - **Unit Input Component**: New unit input component for better UX
+
+  ## Bug Fixes
+
+  - Fixed Gateway Admin RPC incompatibility
+  - Resolved node maintenance restrictions for resize operations
+  - Improved soft ban handling for CVMs
+
+</Update>
+
+<Update label="July 14-20, 2025" tags={["API", "Limits"]} rss={{ title: "Boot Auth & Tier Limits", description: "New boot authentication API and updated tier limits" }}>
+
+  ## API Development
+
+  - **Boot Auth API**: New boot authentication API for secure VM initialization
+  - **KMS List API**: List available KMS with slug support
+  - **Available Resources**: API now returns remaining available resources and tier thresholds
+
+  ## Features
+
+  - **Node Maintenance**: Maintenance mode switch for node management
+  - **Tier Limits**: Updated resource limits for each tier (free, pro, enterprise)
+  - **KMS Slugs**: Support for using KMS slugs in API calls and admin CRUD
+  - **Docker Compose Checker**: Script to validate docker-compose patterns
+
+  ## UI/UX
+
+  - **CalCom Integration**: Added CalCom meeting form for support scheduling
+  - **KMS Slug Display**: Show KMS slugs in APIs and UI pages
+
+</Update>
+
+<Update label="July 7-13, 2025" tags={["GPU", "Workloads"]} rss={{ title: "GPU Instance Validation", description: "Model validation and workload filtering" }}>
+
+  ## GPU Management
+
+  - **Model Validation**: Added model_id validation for GPU instance creation
+  - **Workload Filtering**: Filter workloads by various criteria
+  - **Proxy Log URL**: Support for proxy log URL via environment variable
+
+  ## UI/UX
+
+  - **Chat & Verify**: Added chat and verify buttons in CVM detail pages
+  - **URL Checker**: New useUrlChecker hook for validation
+  - **Delete Callbacks**: Custom navigation callbacks for delete dialogs
+
+</Update>
+
+<Update label="June 30 - July 6, 2025" tags={["Billing", "Admin"]} rss={{ title: "Team-Based Billing Migration", description: "Transition from user-based to team-based billing" }}>
+
+  ## Billing System Evolution
+
+  - **Team Billing Fields**: Prepared fields for moving from user-based to team-based billing
+  - **Stripe Integration**: Added stripe_customer_id and payment method tracking to credits
+  - **Team Tiers**: Added more TeamTier values for flexible pricing
+
+  ## Admin Tools
+
+  - **Search Query Builder**: New component for building complex search queries
+  - **Enhanced Admin Panels**: Search-query-builder integration for CVMs, users, and instance events
+  - **Invoice Admin**: AI-generated order administration interface
+
+  ## UI/UX
+
+  - **Logs & Containers**: Merged logs and containers view for better UX
+  - **Compose File Editing**: Edit and reset functionality in CVM create form
+
+</Update>
+
+<Update label="June 23-29, 2025" tags={["CVM", "Monitoring"]} rss={{ title: "Scheduled Deletion & Monitoring", description: "CVM lifecycle management and enhanced monitoring" }}>
+
+  ## CVM Operations
+
+  - **Scheduled Deletion**: Added scheduled delete time functionality for automatic CVM cleanup
+  - **Patch API**: New patch-style API alongside legacy CVM upgrade API
+  - **Context Logging**: Task context logging with contextvars for better debugging
+
+  ## Monitoring
+
+  - **Sentry Alerts**: Enhanced Sentry alert integration
+  - **CustomerIO Sync**: Sync all users to CustomerIO for analytics
+
+  ## UI/UX
+
+  - **Eliza Auto-fill**: Auto-fill RedPill API keys in Eliza builder
+  - **GPU Feature Flag**: Admin-controlled GPU CVM creation feature flag
+
+</Update>
+
+<Update label="June 16-22, 2025" tags={["CVM", "Replica"]} rss={{ title: "CVM Replica", description: "Clone and replicate confidential VMs" }}>
+
+  ## Major Features
+
+  - **CVM Replica**: New replica functionality to clone CVMs with same configuration
+  - **H200 Shared Instances**: Special handling for h200.shared instances preventing stop/restart
+  - **Region Identifiers**: Show region identifier in node select list and APIs
+  - **Instance Type Billing**: Added instance_type with updated billing rate calculations
+
+  ## API Enhancements
+
+  - **Replica API**: New API endpoints for CVM replication
+  - **Latest Status**: Support for latest Teepod status API
+  - **CVM Lists**: API for listing CVMs under an app and their replicas
+
+  ## Admin Tools
+
+  - **Gateway Admin Client**: New GatewayAdminClient with transitional solution
+
+</Update>
+
+<Update label="June 9-15, 2025" tags={["GPU", "Events"]} rss={{ title: "GPU CVM Creation", description: "Create GPU-powered confidential VMs" }}>
+
+  ## GPU Features
+
+  - **GPU CVM API**: New API to create GPU-powered CVMs
+  - **GPU Stats**: Added GpuSpecs type and GPU system info support
+  - **Region Editing**: Edit region identifiers for nodes
+
+  ## Event Tracking
+
+  - **CustomerIO Integration**: Track major events with CustomerIO
+  - **Event Emission**: Both create and start operations emit cvm_running event
+
+  ## Features
+
+  - **Project Encryption**: Set app_id_salt, encrypted_env_pubkey, and kms_id to projects
+  - **Dev Image Support**: Support for setting passwords in dev images and expose DSTACK_APP_ID
+  - **Hashid Support**: Added hashid support for senseless identifiers
+
+  ## Admin Tools
+
+  - **Node Management**: Comprehensive node management APIs and admin interface
+
+</Update>
+
+<Update label="June 2-8, 2025" tags={["GPU", "Templates"]} rss={{ title: "GPU Deployment UI", description: "User interface for GPU instance deployment" }}>
+
+  ## GPU Infrastructure
+
+  - **GPU Project Provisioning**: Server-side GPU project provisioning support
+  - **GPU CVM Card**: Enhanced GPU CVM card and stats display
+  - **GPU Deployment UI**: Complete UI components for GPU deployment
+  - **GpuBasicStats**: New GPU statistics tracking
+
+  ## Features
+
+  - **Template Section**: Added template section for quick deployments
+  - **Ollama Hub Service**: Integration with Ollama Hub
+  - **ClickHouse**: Database initialization script for analytics
+  - **Env Keys Tracking**: Metadata tracking for environment keys in deployment APIs
+
+  ## Infrastructure
+
+  - **PDM**: Switched to PDM for dependency management
+  - **CustomerIO SDK**: Added CustomerIO SDK for marketing integration
+
+</Update>
+
+<Update label="May 26 - June 1, 2025" tags={["KMS", "Security"]} rss={{ title: "Onchain KMS Integration", description: "KMS integration for CVM launches and updates" }}>
+
+  ## KMS Features
+
+  - **KMS on Launch**: Onchain KMS integration when launching CVMs
+  - **KMS Compose Updates**: KMS integration for compose file updates
+  - **KMS App Config**: New KMS app configuration drawer
+  - **KMS List**: Returns KMS list in available nodes query
+  - **Proxied API**: Proxied get_app_env_encrypt_pubkey API through KMS
+
+  ## Refactoring
+
+  - **KMS Hooks**: Refactored KMS hooks with type safety utilities
+  - **Network Hooks**: Simplified to use chainId instead of networkConfig
+  - **Blockchain Operations**: Renamed useBlockchainOperations to useTx
+
+  ## Bug Fixes
+
+  - Fixed salt synchronization issues
+  - Resolved dstack-gateway settings in AppCompose migration
+  - Fixed OS image duplication checks
+
+</Update>
+
+<Update label="May 19-25, 2025" tags={["API", "Validation"]} rss={{ title: "Compose Validation & New APIs", description: "Docker-compose validation and structured error handling" }}>
+
+  ## API Development
+
+  - **Compose Validation**: Docker-compose validation on compose endpoints
+  - **New Provision API**: Raw dstack vmconfiguration provision API
+  - **App-Compose Update**: New API for CVM app-compose updates
+  - **Collateral API**: Enhanced collateral API with compatibility helpers
+
+  ## Features
+
+  - **OS Image Tracking**: Save os_image_id when creating CVMs
+  - **KMS Configuration**: Added kms_urls and gateway_urls to VmConfiguration
+  - **Post-Paid Flag**: Added is_post_paid flag to credits
+  - **Image Hash**: Renamed mr_image to os_image_hash for clarity
+
+  ## Infrastructure
+
+  - **Test Coverage**: Added test-coverage report in pull requests
+  - **Modular CVMs API**: Cut CVMs API into manageable chunks
+
+</Update>
+
+<Update label="May 12-18, 2025" tags={["Admin", "KMS"]} rss={{ title: "KMS & OS Image Admin", description: "CRUD interfaces for KMS and OS image management" }}>
+
+  ## Admin Tools
+
+  - **KMS CRUD**: Complete CRUD API and admin view for KMS management
+  - **OS Image CRUD**: Complete CRUD API and admin view for OS images
+  - **Order Processing**: Manual order status handling in admin
+
+  ## Database
+
+  - **KMS Table**: New table for KMS with fmspc and device_id
+  - **OS Image Table**: New OSImage and NodeOsImage tables
+  - **Scheduled Tasks**: sync_stripe_order_status and auto_fix_cvm_status
+
+  ## Infrastructure
+
+  - **Python 3.13**: Updated required Python version to 3.13+
+  - **Preflight Refactor**: Moved CVM launch and resize checks to preflight
+
+</Update>
+
+<Update label="May 5-11, 2025" tags={["Security", "Eliza"]} rss={{ title: "Email Verification & Eliza Updates", description: "Mandatory email verification and Eliza version support" }}>
+
+  ## Security Features
+
+  - **Email Verification**: New users must verify email before continuing
+  - **Turnstile CAPTCHA**: Cloudflare Turnstile integration for registration
+  - **Registration Limits**: API registration restrictions with frontend-only flow
+  - **IP Audit Logs**: Save IP and user agent upon successful registration
+
+  ## Eliza Integration
+
+  - **Version Support**: Added Eliza v0.1.9-patch.2 and v0.25.9
+  - **Mira Provider**: Added Mira as model provider in Eliza builder
+
+  ## Fraud Prevention
+
+  - **Telegram Bot**: Alert system for possible fraud order detection
+  - **Email Reachability**: Track email reachability in registration logs
+
+</Update>
+
+<Update label="April 28 - May 4, 2025" tags={["Billing", "Attestation"]} rss={{ title: "Stripe Webhooks & DCAP", description: "Enhanced payment processing and attestation support" }}>
+
+  ## Billing System
+
+  - **Stripe Webhooks**: Save Stripe webhook logs to ClickHouse for audit
+  - **Order Sync**: Added sync_purchased_orders functionality
+  - **Stripe Service**: Handle charge refunds through StripeService
+  - **Rate Limiting**: Registration rate limit of 2 accounts per hour
+
+  ## Security
+
+  - **DCAP Attestation**: Added DCAP attestation upload and verify API
+  - **Proof API**: Compatible API for proof.t16z.com integration
+
+  ## Infrastructure
+
+  - **Redis Management**: Improved Redis connection management with aclose
+  - **Type Annotations**: Enhanced type notations for SQLAlchemy models
+
+</Update>
+
+<Update label="April 21-27, 2025" tags={["Billing", "MCP"]} rss={{ title: "Coinbase Commerce", description: "Cryptocurrency payment support via Coinbase" }}>
+
+  ## Billing Features
+
+  - **Coinbase Commerce**: Setup billing flow for Coinbase callback
+  - **Email Templates**: Jinja2 mailing template solution with staging tests
+  - **Payment Dialog**: Dialog for Coinbase billing facts
+
+  ## UI/UX
+
+  - **MCP Hosting**: Sub-pages and TypeForm integration for MCP hosting
+  - **Command Copy**: Copy button for CommandLine component in LaunchTab
+
+  ## Technical
+
+  - **Quote Parser**: SGX extension parser for quote validation
+  - **Viber Coding**: KMS controller and app controller viber implementation
+  - **Compose Hash**: Fixed compose hash algorithm for Rust compatibility
+
+</Update>
+
+<Update label="April 14-20, 2025" tags={["UI", "Billing"]} rss={{ title: "Launch Page Redesign", description: "Improved launch experience with step-by-step guide" }}>
+
+  ## UI/UX
+
+  - **GPU TEE Dashboard**: Updated GPU TEE dashboard page with new navigation
+  - **Step Guide**: Step-by-step guide in launch page
+  - **Deposit Button**: Added deposit button in launch view with amount selection
+  - **Auto-fill Username**: Automatically fill username after registration
+
+  ## Features
+
+  - **Coinbase Terms**: Accept terms before deposit with Coinbase
+  - **Version Check**: Check selected base image version before launch
+  - **MCP Server Schema**: Added logo and provider to MCPServer schema
+
+  ## Bug Fixes
+
+  - Added disk size validation checks
+  - Updated documentation and privacy policy links
+  - Improved GPU TEE dashboard layout spacing
+
+</Update>
+
+<Update label="April 7-13, 2025" tags={["Admin", "History"]} rss={{ title: "Transaction History", description: "Complete transaction history and admin enhancements" }}>
+
+  ## Features
+
+  - **Transaction History**: View complete transaction history for account
+  - **SEO**: Setup sitemap and robots.txt
+  - **LLMs.txt**: Added markdown as llms.txt for AI crawlers
+  - **Eliza Patched**: Use patched Eliza version, removed original 1.x images
+
+  ## Admin Tools
+
+  - **User Transactions**: Admin panel for user transaction list
+  - **Instance Events**: Added instance events to admin interface
+  - **Credit Indexing**: Added indexing for credit_transactions for performance
+
+  ## UI/UX
+
+  - **MCP Landing**: New MCP-hosting landing page
+  - **Navigation**: Added "About" to main navigation
+
+</Update>
+
+<Update label="March 31 - April 6, 2025" tags={["Admin", "Limits"]} rss={{ title: "Account Limits & Admin", description: "Usage limits and comprehensive admin panels" }}>
+
+  ## Admin Tools
+
+  - **CVM Admin**: Complete admin CVM list with pagination
+  - **User Info**: Enhanced UserInfo component for admin view
+  - **Verified Filter**: Added verified status filter for admin user list
+  - **Billing Summary**: Billing summary in user overview
+
+  ## Features
+
+  - **Usage Limits**: Account-level usage limits for free tier
+  - **Privacy & Terms**: Added privacy policy and terms of service
+  - **CalCom Integration**: Contact form with CalCom scheduling
+
+  ## Infrastructure
+
+  - **Sentry**: Added Sentry for error capture
+  - **SQLAlchemy Utils**: Added sqlalchemy-utils dependency
+
+</Update>
+
+<Update label="March 24-30, 2025" tags={["Teams", "Billing"]} rss={{ title: "Team-Based Architecture", description: "Shift to team-based billing and dedicated nodes" }}>
+
+  ## Architecture Changes
+
+  - **Team Billing**: Shifted from tier-based to CVM billing_period based charges
+  - **Dedicated Nodes**: Added dedicated_for_team_id to teepods for team reservations
+  - **Team Slugs**: Generate slug when creating teams
+  - **Billing Rates**: Set billing price and compute unit at launch and resize
+
+  ## API Changes
+
+  - **Tier Compatibility**: Removed tier from business logic, kept API compatible
+  - **Stripe Setup**: API for account verification with Stripe Setup Intent
+
+  ## Infrastructure
+
+  - **Python Slugify**: Added python-slugify dependency
+  - **Money Type**: Direct comparison with int/float for Money type
+
+</Update>
+
+<Update label="March 17-23, 2025" tags={["UI", "Billing"]} rss={{ title: "Debt Settlement & MDX", description: "Debt settlement flow and policy pages" }}>
+
+  ## UI/UX
+
+  - **Log Viewer**: New log viewer component
+  - **Debt Settlement**: Complete debt-settlement page and API
+  - **Verification Form**: New VerificationForm component
+  - **MDX Plugin**: Setup MDX plugin with policy and terms pages
+  - **Submenu**: New submenu structure for usage and AI pages
+
+  ## Features
+
+  - **Free Quota**: Logic for free instance quota management
+  - **RedPill Atom**: Added isRedpillEnabledAtom for feature control
+  - **Pricing Calculator**: Compute resource pricing calculator
+
+  ## Bug Fixes
+
+  - Fixed attestation explorer functionality
+  - Resolved scroll transition issues after build
+  - Fixed sidebar default state
+
+</Update>
+
+<Update label="March 10-16, 2025" tags={["Notifications", "Orders"]} rss={{ title: "Notification System", description: "Comprehensive notification and order system" }}>
+
+  ## Features
+
+  - **Notifications**: New notification system with overdue alerts
+  - **Payment History**: Complete payment order history
+  - **Feature Flags**: Feature flags atom for client integration
+  - **Money Type**: Using Money type in charging logic with granted_balance handling
+
+  ## API Development
+
+  - **Feature Flags API**: Server-side feature flags API
+  - **Granted Credits**: Returns granted-credits in /me API
+
+  ## UI/UX
+
+  - **Launch Page**: Use launch page by default
+  - **Attestation Guide**: Improved RTMR3 reproduce documentation
+
+</Update>
+
+<Update label="March 3-9, 2025" tags={["Billing", "Payment"]} rss={{ title: "Payment Gateway Integration", description: "Multiple payment gateway support" }}>
+
+  ## Payment Integration
+
+  - **Coinbase Commerce**: Complete Coinbase charge and top-up API workflow
+  - **Square API**: Square API integration (testing phase)
+  - **Orders Table**: Added orders table, removed billing_items
+  - **HashedId**: New HashedId type for secure identifiers
+
+  ## Infrastructure
+
+  - **Money Type**: Added Money type for financial calculations
+  - **CI Feedback**: Added feedback to PR if CI fails
+  - **Staging Environment**: Added staging environment configuration
+
+</Update>
+
+<Update label="February 24 - March 2, 2025" tags={["Billing", "UI"]} rss={{ title: "Credits & Billing", description: "Credit-based billing system implementation" }}>
+
+  ## Billing System
+
+  - **Credit Billing**: Complete billing from credits system
+  - **Overdue Handling**: Create overdue transactions and shutdown CVMs when due
+  - **Team Transactions**: Added team_id and has_paid to CreditTransaction
+  - **Billing Navigation**: New billing navigation structure
+
+  ## UI/UX
+
+  - **Billing Page**: New billing page with transaction history
+  - **Container Query**: Using container-query for responsive design
+  - **Registry Form**: Private container registry form
+  - **Pre-launch Script**: Built-in pre-launch script attached by default
+
+</Update>
+
+<Update label="February 17-23, 2025" tags={["Tiers", "Events"]} rss={{ title: "Team Tiers & Event Logs", description: "Tiered team system with usage tracking" }}>
+
+  ## Team Features
+
+  - **Team Tiers**: Added team tier (free, pro, enterprise) with trial periods
+  - **Capacity Limits**: Enable capacity limits for free tier users
+  - **Usage Logs**: Enable usage and instance event logs for all users
+
+  ## Admin Tools
+
+  - **Tier Update**: Team tier update form and API
+  - **User Filters**: Support filters in admin user list
+  - **Event Tracking**: Events display in admin CVM view
+
+  ## UI/UX
+
+  - **Billing Details**: Details item table for billing records
+  - **Resource API**: Use new resource API in compute panel
+  - **Eliza Input**: CommaSeparatedInput for Twitter config
+
+</Update>
+
+<Update label="February 10-16, 2025" tags={["Eliza", "Billing"]} rss={{ title: "Eliza Builder & Rate Limiting", description: "Enhanced Eliza configuration and anti-abuse measures" }}>
+
+  ## Eliza Features
+
+  - **Eliza Versions**: Support for setting and updating Eliza versions
+  - **Local Storage**: Save Eliza environment variables in local storage
+  - **Config Form**: Eliza configuration edit form with all settings
+  - **Project API**: New API for project list and details
+
+  ## Security
+
+  - **Rate Limiting**: IP + UA + language header based registration rate limiting
+  - **Gmail Protection**: Prevent multiple registrations with same Gmail using + trick
+
+  ## UI/UX
+
+  - **Landing Page**: LLM-generated landing page
+  - **Pricing Page**: LLM-generated pricing page with copy
+  - **Billing UI**: Complete billing page components and layout
+
+</Update>
+
+<Update label="February 3-9, 2025" tags={["Stability"]} rss={{ title: "Stability Improvements", description: "Bug fixes and reliability enhancements" }}>
+
+  ## Bug Fixes
+
+  - Fixed docker-compose generation issues
+  - Updated Eliza characters repository location
+  - Resolved dev image detection problems
+  - Fixed docker-compose depends_on dictionary format
+
+  ## Improvements
+
+  - Allow HTTP endpoints in Teepod connect form
+  - Check image existence before CVM creation
+  - Added ensure_cvm_stopped utility function
+  - Set Twitter 2FA secret as required field
+
+</Update>
+
+<Update label="January 27 - February 2, 2025" tags={["Eliza", "Teams"]} rss={{ title: "Eliza Provisioning & Teams", description: "Eliza hosting infrastructure and team system" }}>
+
+  ## Eliza Hosting
+
+  - **Character Loader**: Remote characterfile loader
+  - **Provision API**: API to provision CVM for Eliza
+  - **Eliza Apps Table**: hosted_eliza_apps table for tracking
+  - **Web UI**: Complete web UI integration for Eliza provisioning
+
+  ## Team System
+
+  - **Teams Table**: New teams table with relationships
+  - **Revisions**: Create revision tracking on CVM create and update
+  - **Auto Team**: Automatically create team when creating user
+
+  ## Security
+
+  - **E2E Encryption**: Secrets E2E encrypted, not stored in characterfile
+  - **Same-Site Only**: Only allow return to same-site on login/register
+
+</Update>
+
+<Update label="January 20-26, 2025" tags={["Eliza", "Auth"]} rss={{ title: "Eliza Builder UI", description: "Multi-step Eliza configuration interface" }}>
+
+  ## Eliza Builder
+
+  - **Multi-Step Form**: Complete multi-step form for Eliza characterfile editing
+  - **Client Config**: Configuration input for all known Eliza clients
+  - **Environment Input**: Enhanced environment variable input components
+  - **Model Config**: Model provider configuration options
+
+  ## Features
+
+  - **Usage Check**: User usage and role checks for available Teepod allocation
+  - **Image Parsing**: Parse list_images response from Teepod RPC
+  - **Stats API**: Standalone authorization token for stats API
+
+</Update>
+
+<Update label="January 13-19, 2025" tags={["Ownership", "Lifecycle"]} rss={{ title: "CVM Ownership & Lifecycle", description: "Transfer ownership and improved shutdown" }}>
+
+  ## CVM Management
+
+  - **Ownership Transfer**: Transfer CVM ownership between users
+  - **Public State**: Change public state from CVM settings
+  - **Graceful Shutdown**: Implemented graceful shutdown before upgrades
+  - **Graceful Restart**: Restart CVM with graceful shutdown
+
+  ## Bug Fixes
+
+  - Fixed validation rules for Docker Compose restart field
+  - Resolved credits calculation and CVM counts
+  - Fixed compose manifest panel display issues
+
+</Update>
+
+<Update label="January 6-12, 2025" tags={["Promo", "Admin"]} rss={{ title: "Promotion Codes", description: "Invite and promotion code system" }}>
+
+  ## Features
+
+  - **Promotion Codes**: Use promotion codes as invite codes
+  - **MailerLite**: Save mailerlite_user_id for marketing
+  - **User Management**: Added disabled flag and email field to users table
+
+  ## Bug Fixes
+
+  - Fixed API key authentication issues
+  - Resolved CVM attestation retrieval problems
+  - Fixed Teepod admin list filters
+  - Improved status and progress detection
+
+  ## Improvements
+
+  - Auto-refetch CVM info on mount
+  - Hide port 443 in public endpoints for cleaner URLs
+  - Unified cookie management
+
+</Update>
+
+<Update label="December 30 - January 5, 2025" tags={["Docker"]} rss={{ title: "Docker Compose Fixes", description: "Docker configuration improvements" }}>
+
+  ## Bug Fixes
+
+  - Fixed docker_config schema validation
+  - Resolved docker-compose.yml user existence checks
+
+</Update>
+
+<Update label="December 23-29, 2024" tags={["Monitoring"]} rss={{ title: "Teepod Monitoring", description: "Enhanced Teepod status tracking" }}>
+
+  ## Features
+
+  - **Status Checking**: Scheduled task to check Teepod status
+  - **App-Compose V2**: Adjusted for app-compose v2 schema
+  - **Metadata Sync**: sync_teepod_metadata and ping API
+
+  ## UI/UX
+
+  - **Reversed Order**: Show CVMs in reversed order (most recent first)
+  - **Creating Status**: More accurate creating status display
+  - **Search**: Enhanced search functionality
+
+</Update>
+
+<Update label="December 16-22, 2024" tags={["Billing", "Events"]} rss={{ title: "Event Emission", description: "Instance and resize event tracking" }}>
+
+  ## Features
+
+  - **Event Emission**: Emit instance and resize events for tracking
+  - **Encrypted Environment**: Update encrypted environment variables
+
+  ## Bug Fixes
+
+  - Fixed billing for CVMs not charged for full hour
+  - Resolved foreign key issues
+  - Fixed asyncio and async SQLAlchemy compatibility
+
+</Update>
+
+<Update label="December 9-15, 2024" tags={["Upgrades"]} rss={{ title: "CVM Upgrades", description: "Upgrade infrastructure and registry" }}>
+
+  ## Features
+
+  - **CVM Upgrade**: Minimal implementation for CVM upgrades
+  - **Upgrade Registry**: Simple upgrade registry system
+  - **Redis Job Store**: Setup Redis as job store for scheduling
+  - **URL Arguments**: Support URL argument identifiers
+
+  ## UI/UX
+
+  - **Compose Editor**: Improved compose edit form
+  - **Health Check**: Enhanced CVM health checking
+  - **Error Handling**: Better error handling for ofetch and QueryClient
+
+</Update>
+
+<Update label="December 2-8, 2024" tags={["Infrastructure"]} rss={{ title: "Infrastructure Work", description: "Backend infrastructure improvements" }}>
+
+  ## Infrastructure
+
+  - Various backend optimizations and improvements
+  - Code refactoring and cleanup
+  - Performance enhancements
+
+</Update>
+
+<Update label="November 25 - December 1, 2024" tags={["Foundation"]} rss={{ title: "Platform Foundation", description: "Core platform features and admin tools" }}>
+
+  ## Features
+
+  - **VM Status**: Added "starting" status for better state tracking
+  - **Pod Lifecycle**: Wait for pod alive after creation
+  - **API Tokens**: Token list, generate, and revoke functionality
+
+  ## Admin Tools
+
+  - **Admin Panel**: Comprehensive admin for users, credits, and promotion codes
+
+  ## UI/UX
+
+  - **Consistent Flow**: Built consistent request flow for different CVM create workflows
+  - **VM List UI**: New UI for VM list presentation
+
+  ## API Development
+
+  - **K8s-like API**: Kubernetes-like spec-based pod create API
+
 </Update>

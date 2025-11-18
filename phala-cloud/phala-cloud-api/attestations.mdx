@@ -530,13 +530,18 @@ echo "Verification report: https://proof.t16z.com/reports/$checksum"
 
 **Hex Data from DStack SDK:**
 ```javascript
+import crypto from 'crypto';
+
 // 1. Generate and upload quote
-const client = new TappdClient(endpoint);
-const quote = await client.tdxQuote('challenge');
+const client = new DstackClient(endpoint);
+// Manually hash data if > 64 bytes
+const data = 'challenge';
+const hash = crypto.createHash('sha256').update(data).digest();
+const quoteResult = await client.getQuote(hash.slice(0, 32));
 const response = await fetch('$API_BASE/verify', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ hex: quote })
+  body: JSON.stringify({ hex: quoteResult.quote })
 });
 const { checksum, quote: result } = await response.json();
 

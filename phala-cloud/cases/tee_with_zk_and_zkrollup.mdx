@@ -1,42 +1,71 @@
 ---
-description: Integrate Zero-Knowledge proofs with TEE for verifiable private computing.
-title: Multi-Proof ZK and TEE
+description: Private Proving - Running ZK provers inside TEE to protect sensitive data during proof generation.
+title: Private Proving with TEE
 ---
 
-## Introduction
+## What is Private Proving?
+
+**Private Proving** is a method of generating cryptographic proofs inside a Trusted Execution Environment (TEE) that ensures input data (the witness) remains completely confidential during proof generation. This means neither the verifier nor the prover can see an application's input data.
 
 <Frame>
-  <img src="/images/Intro-Multi-Proof.png" />
+  <img src="/images/succinct-private-proving-overview.jpeg" alt="Private Proving Overview - Source: Succinct Labs" />
 </Frame>
 
-In the blockchain space, our vision is to bring privacy, security, and verifiability to users. Our ultimate goal is to design a system that can simultaneously fulfill these attributes. However, relying on a single proof system to achieve this is impractical for several reasons:
+### The Problem: Witness Data Exposure in Traditional ZK Proving
 
-- No single cryptographic system can be guaranteed to be 100% secure. For instance, zero-knowledge proofs (zk) can have soundness bugs that are difficult to detect, while Multi-Party Computation (MPC) is susceptible to collusion risks between nodes.
-- Privacy in zkRollups cannot be fully guaranteed because sequencers can extract user transaction data during proof generation.
-- Verifiability in Fully Homomorphic Encryption (FHE) computations is challenging because the FHE server may not perform computations correctly, and without knowing the correct result, we cannot verify its accuracy.
+Traditional zero-knowledge proving systems verify computation correctness, but the witness data (private inputs) is exposed to the prover operator during proof generation:
 
-## The Need for Multi-Proof Systems
+- **Privacy-focused rollups**: Prover operators can see user transaction amounts, recipients, and trading strategies
+- **Private DeFi protocols**: Witness data includes sensitive positions, balances, and trading logic
+- **Confidential identity systems**: User credentials and personal data are exposed to prover infrastructure
+- **Private payments**: Transaction amounts and sender/receiver information visible to prover
 
-In the blockchain space, our vision is to bring privacy, security, and verifiability to users. Our ultimate goal is to design a system that can simultaneously fulfill these attributes. However, relying on a single proof system to achieve this is impractical for several reasons:
+**The core issue**: Zero-knowledge proofs hide data from the verifier, but they don't protect data from the prover. The prover sees all witness data during proof generation.
 
-- No single cryptographic system can be guaranteed to be 100% secure. For instance, zero-knowledge proofs (zk) can have soundness bugs that are difficult to detect, while Multi-Party Computation (MPC) is susceptible to collusion risks between nodes.
-- Privacy in zkRollups cannot be fully guaranteed because sequencers can extract user transaction data during proof generation.
-- Verifiability in Fully Homomorphic Encryption (FHE) computations is challenging because the FHE server may not perform computations correctly, and without knowing the correct result, we cannot verify its accuracy.
+### The Solution: Run ZK Provers Inside TEE
 
-There are several benefits we can gain by introducing TEE:
+Private proving runs the proof generation process inside hardware-isolated environments, ensuring witness data never leaves the secure enclave:
 
-1. **Hardware-grade safety:** The privacy, confidentiality, and data integrity is guaranteed by hardware TEE.
-2. **No computation overhead:** Applications run TEE have nearly same speed compare with running in normal CPU env
-3. **Low verification cost:** The Gas consumption to verify TEE proof is minimal, requiring just an ECDSA verification.
-4. **No Privacy Leak:** The execution of ZK Prover running in TEE can be verified that it generates proofs without leaking any user data.
+```
+Witness Data (Private) → TEE [zkVM Prover] → ZK Proof (Public)
+```
 
-We can not guarantee any single cryptography system is 100% secure. At the same time, the current Zero-Knowledge (ZK) solution is secure theoretically but still does not guarantee system-wide bug-free operation, especially from an engineering perspective, which remains challenging due to the complexity of ZK implementation. Here's where multi-proof systems come into play, to hedge the bugs in ZK implementation, a hardware solution, Trusted Execution Environment (TEE), can be used as a 2-factor verifier to offer double security to ZK projects like zk-Rollups. Inspired by Vitalik Buterin's [presentation](https://hackmd.io/@vbuterin/zk_slides_20221010#/) and a recent [post](https://ethresear.ch/t/2fa-zk-Rollups-using-sgx/14462) by Justin Drake.
+**How it works**:
+- Witness data enters the TEE and remains hardware-encrypted throughout proving
+- The zkVM (like SP1) executes inside the TEE to generate the proof
+- Only the final proof leaves the TEE - witness data stays protected
+- TEE attestation proves the proving environment was secure
 
-<Frame>
-  <img src="/images/Why-Multi-Proof.png" />
-</Frame>
+**Key benefits**:
+1. **Complete Witness Privacy**: No one, including the prover operator, can see witness data
+2. **Hardware-Level Security**: Data encrypted at the silicon level (Intel TDX, AMD SEV, AWS Nitro)
+3. **Developer-Friendly**: Write private applications in Rust using familiar zkVM frameworks
+4. **Performance**: GPU TEE (H200) provides hardware acceleration for fast proof generation
+5. **Verifiable Security**: Remote attestation cryptographically proves the secure execution environment
 
-## Case Studies
+**Impact**: Private proving transforms privacy from a specialized technical challenge into a standard feature. As Succinct states: "With Succinct, privacy will be a standard rather than an exception."
+
+<Note type="info">
+Learn more about Private Proving from Succinct Labs' [Private Proving announcement](https://blog.succinct.xyz/private-proving/).
+</Note>
+
+## Benefits vs Traditional ZK
+
+| Feature | Traditional ZK | Private Proving (ZK in TEE) |
+|---------|---------------|----------------------------|
+| **Proof Correctness** | ✅ Cryptographic | ✅ Cryptographic |
+| **Witness Privacy** | ❌ Exposed to prover | ✅ Hardware encrypted |
+| **Verifiable Execution** | ❌ No guarantees | ✅ TEE attestation |
+| **Developer Experience** | Circuit development | ✅ No code changes (Rust/zkVM) |
+| **Performance** | Fast | Minimal overhead with GPU TEE |
+| **GPU Acceleration** | ✅ Yes | ✅ Yes (H100/H200) |
+| **Trust Assumptions** | Cryptography only | Cryptography + hardware |
+
+## Private Proving in Production
+
+### Phala Cloud: Hardware-Accelerated Private Proving
+
+Phala Cloud provides production-ready infrastructure for private proving with GPU TEE:
 
 <table data-card-size="large" data-view="cards">
   <thead>
@@ -60,7 +89,7 @@ We can not guarantee any single cryptography system is 100% secure. At the same 
         </a>
       </td>
       <td>
-        <a href="https://phala.network/posts/introducing-phala-sgxprover-a-twofactor-authentication-solution-for-zkrollups">
+        <a href="https://phala.com/posts/introducing-phala-sgxprover-a-twofactor-authentication-solution-for-zkrollups">
           Phala SGXProver
         </a>
       </td>
@@ -94,10 +123,47 @@ We can not guarantee any single cryptography system is 100% secure. At the same 
         </a>
       </td>
       <td>
-        <a href="https://phala.network/posts/performance-benchmark-running-sp1-zkvm-in-tee-h200-with-low-overhead">
+        <a href="https://phala.com/posts/performance-benchmark-running-sp1-zkvm-in-tee-h200-with-low-overhead">
           SP1 zkVM in TEE
         </a>
       </td>
     </tr>
   </tbody>
 </table>
+
+## Multi-Proof Systems: Defense-in-Depth (SP1-2FA)
+
+While private proving protects data privacy, some applications require maximum security through defense-in-depth. **Multi-proof systems** like [Succinct's SP1-2FA](https://blog.succinct.xyz/sp1-2fa/) generate both ZK and TEE proofs in parallel:
+
+<Frame>
+  <img src="/images/succinct-sp1-2fa-architecture.jpg" alt="SP1-2FA Multi-Proof Architecture - Source: Succinct Labs" />
+</Frame>
+
+**How it differs from private proving**:
+- **Private Proving**: ZK prover runs *inside* TEE (focus: data privacy)
+- **SP1-2FA**: ZK and TEE run in *parallel* (focus: maximum security)
+
+**When to use SP1-2FA**:
+- Critical infrastructure (blockchain consensus, bridges)
+- High-value DeFi protocols (significant TVL at risk)
+- Defense against undiscovered ZK circuit bugs
+- Regulatory requirements for multiple independent proofs
+
+**Trade-off**: SP1-2FA provides stronger security guarantees but doesn't specifically protect data privacy during ZK proving. For most applications requiring data privacy, private proving is the right choice.
+
+<Note type="info">
+Learn more about SP1-2FA from [Succinct's blog post](https://blog.succinct.xyz/sp1-2fa/).
+</Note>
+
+**Resources**:
+- [Getting Started Guide](/phala-cloud/getting-started/overview)
+- [Performance Benchmarks](/phala-cloud/references/performance-report)
+- [TEE Attestation](/phala-cloud/attestation/overview)
+- [Deploy with Docker](/phala-cloud/cvm/overview)
+
+## References and Further Reading
+
+- **Succinct Labs**: [Private Proving Blog Post](https://blog.succinct.xyz/private-proving/) | [SP1-2FA Technical Details](https://blog.succinct.xyz/sp1-2fa/)
+- **Vitalik Buterin**: [Multi-Proof Systems Presentation](https://hackmd.io/@vbuterin/zk_slides_20221010#/)
+- **Justin Drake**: [2FA ZK-Rollups with SGX](https://ethresear.ch/t/2fa-zk-Rollups-using-sgx/14462)
+- **Phala Network**: [SP1 zkVM Performance Benchmark](https://phala.com/posts/performance-benchmark-running-sp1-zkvm-in-tee-h200-with-low-overhead)

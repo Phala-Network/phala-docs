@@ -256,6 +256,13 @@
                 ]
               },
               {
+                "group": "Trust Center",
+                "icon": "shield-check",
+                "pages": [
+                  "/phala-cloud/attestation/trust-center-verification"
+                ]
+              },
+              {
                 "group": "Attestation",
                 "icon": "shield",
                 "pages": [
@@ -308,7 +315,6 @@
                 "pages": [
                   "/phala-cloud/security-and-privacy/security-audit",
                   "/phala-cloud/security-and-privacy/security-architecture",
-                  "/phala-cloud/security-and-privacy/set-secure-environment-variables",
                   "/phala-cloud/security-and-privacy/privacy"
                 ]
               },
@@ -382,6 +388,7 @@
           "/dstack/overview",
           "/dstack/getting-started",
           "/dstack/security-audit",
+          "/dstack/trust-center-technical",
           "/dstack/local-development",
           "/dstack/hardware-requirements",
           {

@@ -46,7 +46,7 @@ Update your `docker-compose.yml` to include the dstack-ingress container:
 ```yaml
 services:
   dstack-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
       - "443:443"
     environment:
@@ -57,7 +57,7 @@ services:
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - cert-data:/etc/letsencrypt
     restart: unless-stopped
 
@@ -116,13 +116,13 @@ After deployment, you can:
 
 ## Multiple Services with Custom Domains
 
-You can use multiple custom domains in one deployment:
+You can use multiple custom domains in one deployment. Note that you need to explicitly set the listen port for each service.
 
 ```yaml
 services:
   # API with custom domain
   api-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
       - "443:443"
     environment:
@@ -132,15 +132,16 @@ services:
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
+      - PORT=443 # Explicitly set the listen port
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - api-cert-data:/etc/letsencrypt
 
   # Frontend with custom domain  
   web-ingress:
-    image: kvin/dstack-ingress@sha256:2cc3bc50d71faa4d313084237b0f5d1d25963024f2484c7a6414aed075883cdd
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
     ports:
-      - "444:443"  # Different host port
+      - "444:444"  # Different host port
     environment:
       - DOMAIN=app.mycompany.com
       - TARGET_ENDPOINT=http://frontend:3000
@@ -148,8 +149,9 @@ services:
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
+      - PORT=444 # Explicitly set the listen port
     volumes:
-      - /var/run/tappd.sock:/var/run/tappd.sock
+      - /var/run/dstack.sock:/var/run/dstack.sock
       - web-cert-data:/etc/letsencrypt
 
   api:

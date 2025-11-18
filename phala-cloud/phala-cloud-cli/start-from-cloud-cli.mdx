@@ -46,7 +46,7 @@ npx phala free
 This will open a browser to the Phala Cloud sign-up page. Get your free account then get started on generating your Phala Cloud API Key.
 
 <Frame caption="Signup Page">
-    <img src="/images/image (12).png" alt="" />
+    <img src="/images/image (12).png" alt="Phala Cloud registration page with sign up form" />
 
 </Frame>
 
@@ -57,19 +57,19 @@ This will open a browser to the Phala Cloud sign-up page. Get your free account 
 Log into your dashboard and select the logo in the top left corner.
 
 <Frame>
-    <img src="/images/Screenshot 2025-02-27 at 11.42.32.png" />
+    <img src="/images/Screenshot 2025-02-27 at 11.42.32.png" alt="Phala Cloud dashboard with logo highlighted in top left corner" />
 </Frame>
 
 Click your username and select "**API Tokens**".
 
 <Frame>
-    <img src="/images/Screenshot 2025-02-27 at 11.45.13.png" />
+    <img src="/images/Screenshot 2025-02-27 at 11.45.13.png" alt="User dropdown menu with API Tokens option highlighted" />
 </Frame>
 
 Click Create Token and then copy your newly generated API Key.
 
 <Frame>
-    <img src="/images/image (2) (1) (1) (1).png" />
+    <img src="/images/image (2) (1) (1) (1).png" alt="API token creation interface with newly generated token displayed" />
 </Frame>
 
 With your API Key in hand, authenticate your CLI:
@@ -154,19 +154,19 @@ phala cvms get app_ecc21474f89b47a8e33ecd4e53a0ed744fff4eb2
 Congratulations! Your Jupyter Notebook is deployed! Let’s checkout the deployment and use the Jupyter Token to access our notebook. Go to the “Network” Tab:
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-8008-9767-fe58091b1b69.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-8008-9767-fe58091b1b69.jpg" alt="CVM Network tab showing public endpoint URL for Jupyter notebook access" />
 </Frame>
 
 Open in New Tab and enter the Jupyter Token generated for your Jupyter Notebook.
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80ef-89cd-fd41a11f63fa.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80ef-89cd-fd41a11f63fa.jpg" alt="Jupyter notebook login page requesting authentication token" />
 </Frame>
 
 We are now inside the Jupyter Notebook!
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80da-bbbf-c3db53200b7f.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80da-bbbf-c3db53200b7f.jpg" alt="Jupyter notebook interface running inside Phala Cloud CVM" />
 </Frame>
 
 ### Call TEE Native Functions
@@ -176,37 +176,37 @@ Let’s try a couple function to test with the [dstack python SDK](https://githu
 * **Remote Attestation**
 * **Key Derive with Key Management Service**
 
-#### Install Dstack SDK
+#### Install dstack SDK
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80a1-91e9-fe32a4f39af9.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80a1-91e9-fe32a4f39af9.jpg" alt="Installing dstack SDK in Jupyter notebook with pip install command" />
 </Frame>
 
 Now, we can use some sample code from the SDK README below to test out.
 
 ```python
-from dstack_sdk import TappdClient, AsyncTappdClient
+from dstack_sdk import DstackClient
+import hashlib
 
 # Synchronous client
-client = TappdClient()
-
-# Asynchronous client
-async_client = AsyncTappdClient()
+client = DstackClient()
 
 # Get the information of the Base Image.
-info = client.info()  # or await async_client.info()
+info = client.info()
 print(info.app_id)  # Application ID
 print(info.tcb_info.mrtd)  # Access TCB info directly
 print(info.tcb_info.event_log[0].event)  # Access event log entries
 
-# Derive a key with optional path and subject
-key_result = client.derive_key('<unique-id>')  # or await async_client.derive_key('<unique-id>')
-print(key_result.key)  # X.509 private key in PEM format
-print(key_result.certificate_chain)  # Certificate chain
-key_bytes = key_result.toBytes()  # Get key as bytes
+# Get a deterministic key with path
+key_result = client.get_key('my-app/encryption/v1')
+print(key_result.key)  # Hex string
+print(key_result.signature_chain)  # Signature chain
+key_bytes = key_result.decode_key()  # Decode to bytes (32 bytes)
 
-# Generate TDX quote
-quote_result = client.tdx_quote('some-data', 'sha256')  # or await async_client.tdx_quote('some-data', 'sha256')
+# Generate TDX quote (manually hash data if > 64 bytes)
+data = b'some-data'
+hash_value = hashlib.sha256(data).digest()
+quote_result = client.get_quote(hash_value[:32])
 print(quote_result.quote)  # TDX quote in hex format
 print(quote_result.event_log)  # Event log
 rtmrs = quote_result.replay_rtmrs()  # Replay RTMRs
@@ -215,7 +215,7 @@ rtmrs = quote_result.replay_rtmrs()  # Replay RTMRs
 We get the following result:
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80a4-b543-fe32e846cffb.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80a4-b543-fe32e846cffb.jpg" alt="Dstack SDK output showing app ID, TCB info, and TEE quote generation results" />
 </Frame>
 
 #### Generate a Wallet on Ethereum and Solana
@@ -228,19 +228,17 @@ This is a great start, but let’s try something more specific like generating:
 First, run `pip install "dstack-sdk[all]"` to get the right dependencies.
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80ae-907d-fe3f7dd15a3d.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80ae-907d-fe3f7dd15a3d.jpg" alt="Installing dstack SDK with all dependencies for wallet generation" />
 </Frame>
 
-Let’s write some code to get an ETH and SOL account.
+Let's write some code to get an ETH and SOL account.
 
 <Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80c5-ab56-eb68133d0dfd.jpg" />
+    <img src="https://img0.phala.world/files/1c20317e-04a1-80c5-ab56-eb68133d0dfd.jpg" alt="Jupyter notebook code generating Ethereum and Solana wallet addresses using TEE-derived keys" />
 </Frame>
 
-This is great! We have now shown we can interact with the TEE special functions for deriving keys through the key management service and generate remote attestations. We will have another blogpost to dive deeper into this information later, but to get a head start check out [Key Management Service Docs](https://docs.phala.network/dstack/design-documents/key-management-protocol) and the [Attestation Guide for Dstack](https://github.com/Dstack-TEE/dstack/blob/master/attestation.mdx).
+This is great! We have now shown we can interact with the TEE special functions for deriving keys through the key management service and generate remote attestations. We will have another blogpost to dive deeper into this information later, but to get a head start check out [Key Management Service Docs](https://phala.com/dstack/design-documents/key-management-protocol) and the [Attestation Guide for Dstack](https://github.com/Dstack-TEE/dstack/blob/master/attestation.mdx).
 
 ## Conclusion
 
 Congratulations! You have deployed your first CVM into the Phala Cloud. Let's dive into some of the templates we have.
-
-```

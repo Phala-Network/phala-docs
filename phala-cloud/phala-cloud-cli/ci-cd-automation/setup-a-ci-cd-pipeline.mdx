@@ -25,7 +25,7 @@ This is a starter template for building a Phala Cloud TEE application easily wit
 | `APP_NAME`                 | Deployment name (e.g., `my-tee-app`)                    | Choose name without special characters except `-`                                           |
 | `DOCKER_IMAGE`             | Full image path (e.g., `docker.io/username/image-name`) | Follow registry naming conventions                                                          |
 
-The above secrets are required for the deployment workflow to work. And you can add more secrets to the repository as needed. These secrets will be used in the deployment workflow to build the docker image and deploy to Phala TEE Cloud. Once the secrets are added, you can trigger the deployment workflow anytime.
+The above secrets are required for the deployment workflow to work. And you can add more secrets to the repository as needed. These secrets will be used in the deployment workflow to build the docker image and deploy to Phala Cloud. Once the secrets are added, you can trigger the deployment workflow anytime.
 
 ### 🚀 Step 2: Deployment Workflow
 
@@ -34,7 +34,7 @@ The GitHub Action will automatically:
 1. Build Docker image from Dockerfile, `api-server/Dockerfile` in this example.
 2. Push built docker image to your container registry
 3. Update the docker compose file with the new image
-4. Deploy to Phala TEE Cloud using `phala` CLI with the name you set in `APP_NAME` with the updated docker compose file.
+4. Deploy to Phala Cloud using `phala` CLI with the name you set in `APP_NAME` with the updated docker compose file.
 
 #### Trigger Conditions:
 
@@ -48,7 +48,7 @@ on:
   workflow_dispatch:  # Manual trigger available
 ```
 
-If you want to deploy to Phala TEE Cloud manually, you can trigger the workflow manually from the GitHub Actions page.
+If you want to deploy to Phala Cloud manually, you can trigger the workflow manually from the GitHub Actions page.
 
 #### Docker Image Build and Publish:
 
@@ -82,7 +82,7 @@ Next, you will see where the `PHALA_CLOUD_API_KEY` and the `APP_NAME` will be us
 
 ```yaml
 - name: Deploy to Phala Cloud
-  uses: Leechael/phala-deploy-action@v2
+  uses: Leechael/phala-deploy-action@v3
   with:
     # Required parameters
     phala-api-key: ${{ secrets.PHALA_CLOUD_API_KEY }}
@@ -109,7 +109,7 @@ Lastly, the Phala deploy action will launch the CVM based on the configuration. 
 After successful workflow run once the workflow is triggered and the deployment is successful, you can verify the deployment on [Phala Cloud Dashboard](https://cloud.phala.network/dashboard).
 
 <Frame>
-    <img src="/images/image (22).png" />
+    <img src="/images/image (22).png" alt="Phala Cloud Virtual Machines dashboard displaying running cloud-tee-starter-template CVM with status and app ID" />
 </Frame>
 
 And then you can see the deployment details on the dashboard and visit the endpoint to test the application.
@@ -120,4 +120,4 @@ Common issues:
 
 1. **Authentication Errors**: Verify all secrets are correctly set
 2. **Docker Build Failures**: Check `api-server/Dockerfile` syntax
-3. **Debug Github Actions Locally**: You can debug the Github Actions locally by running `act` command. The `act` can be installed from https://github.com/nektos/act. The secerts you need to set are the same as the ones in the repository secrets to local `.env` file in the root of the repository.
+3. **Debug Github Actions Locally**: You can debug the Github Actions locally by running `act` command. The `act` can be installed from https://github.com/nektos/act. The secrets you need to set are the same as the ones in the repository secrets to local `.env` file in the root of the repository.

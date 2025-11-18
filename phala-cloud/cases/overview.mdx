@@ -6,6 +6,14 @@ title: Overview
 
 TEE provide hardware-based isolation for sensitive computations, ensuring data confidentiality and integrity. This document explores various use cases where TEEs can be combined with other technologies to create powerful, secure solutions.
 
+## Industry Success Stories
+
+Explore real-world implementations across different sectors:
+- [Financial Services](https://phala.com/success-stories/financial-services) - Confidential AI for banking and trading
+- [Healthcare & Research](https://phala.com/success-stories/healthcare-research) - HIPAA-compliant AI and medical data privacy
+- [B2B SaaS Platforms](https://phala.com/success-stories/ai-saas-platform) - Enterprise AI privacy and multi-tenant security
+- [Decentralized AI](https://phala.com/success-stories/decentralized-ai) - Web3 and blockchain AI applications
+
 ## TEE + AI
 
 TEEs can protect AI model training and inference, preserving both model privacy and data confidentiality. This combination enables secure machine learning on sensitive data while preventing unauthorized access to proprietary models.
@@ -20,8 +28,10 @@ TEEs can complement Fully Homomorphic Encryption (FHE) and Multi-Party Computati
 
 Check out [TEE with FHE and MPC](/phala-cloud/cases/tee_with_fhe_and_mpc)
 
-## TEE + ZK/ZKrollup
+## Private Proving with TEE
 
-When combined with Zero-Knowledge Proofs (ZK) and ZK-Rollups, TEEs can enable efficient verification of computations while maintaining privacy. This approach is particularly valuable for blockchain applications requiring both scalability and confidentiality.
+**Private Proving** runs zero-knowledge provers inside TEE to protect sensitive data during proof generation. While ZK proofs verify computation correctness, they don't prevent the prover from accessing your private data. Running ZK provers in TEE solves this critical problem - your transaction data, API keys, AI models, and business logic stay hardware-encrypted even during proving.
 
-Check out [TEE with ZK and ZKrollup](/phala-cloud/cases/tee_with_zk_and_zkrollup)
+Phala Cloud provides production-ready infrastructure for private proving with GPU TEE (H100/H200), enabling developers to generate ZK proofs at hardware speed while keeping sensitive inputs encrypted at the silicon level.
+
+Check out [Private Proving with TEE](/phala-cloud/cases/tee_with_zk_and_zkrollup)

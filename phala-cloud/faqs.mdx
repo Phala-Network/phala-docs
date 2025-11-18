@@ -6,9 +6,9 @@ title: FAQ
 
 ## ❓ FAQs
 
-### What is Phala TEE Cloud?
+### What is Phala Cloud?
 
-Phala TEE Cloud is a platform that provides TEE virtual machines. These VMs offer hardware-level isolation through Intel TDX technology, allowing for secure and private computation.
+Phala Cloud is a platform that provides TEE virtual machines. These VMs offer hardware-level isolation through Intel TDX technology, allowing for secure and private computation.
 
 ### How are the VMs provisioned?
 
@@ -45,7 +45,7 @@ Yes, the data you write to the filesystem inside Docker will persist on the disk
 
 Yes. Please check our Cloud API docs here: https://cloud-api.phala.network/docs\
 API examples: https://github.com/Leechael/phala-cloud-api-example/tree/main/js\
-Or set CI/CD pipline for you instance: https://docs.phala.network/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline
+Or set CI/CD pipeline for you instance: https://phala.com/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline
 
 ### Does the “update” feature sync the latest Docker image?
 
@@ -71,7 +71,7 @@ Under the hood, the TEE wraps the tcp ports you have exposed in docker with TLS.
 
 ### Is there a simulator or free tier available for testing?
 
-We have built a Phala cloud cli so you don’t need to touch the raw docker command. The doc is available here: https://docs.phala.network/phala-cloud/references/tee-cloud-cli/phala/simulator.
+We have built a Phala cloud cli so you don't need to touch the raw docker command. The doc is available here: https://phala.com/phala-cloud/references/tee-cloud-cli/phala/simulator.
 
 ### Is Phala Cloud based on serverless functions or traditional VMs? What are the startup and shutdown times?
 
@@ -131,11 +131,11 @@ Phala Cloud CVM uses a hardware root key unique to the TEE platform, from which 
 ### How can others verify that my application is running inside a TEE?
 
 Once the application is successfully launched, you can prove this by providing the RA Report, which can be exported through an endpoint by your Docker application. check [this\
-article](https://phala.network/posts/how-to-generate-attestation-repport-and-prove-your-application-runs-in-tee) for more details.
+article](https://phala.com/posts/how-to-generate-attestation-repport-and-prove-your-application-runs-in-tee) for more details.
 
 ### What’s the best approach to verify Phala Cloud Attestation Report in a smart contract?
 
-You can verify the Attestation Report with [Automata's on-chain DCAP verifier](https://github.com/automata-network/automata-dcap-attestation) written in Solidity and deployed on multiple blockchains.
+You can verify the Attestation Report with [Automata's onchain DCAP verifier](https://github.com/automata-network/automata-dcap-attestation) written in Solidity and deployed on multiple blockchains.
 
 To verify the report, user can get the report hex data from Phala Cloud dashboard “Attestation” tab, and call the smart contract method verifyAndAttestOnChain, check the example [here](https://github.com/Leechael/ra-quote-explorer/blob/37a86a96f0f5059359b33fdb61b1f507fd1ca291/src/components/onchain_attestation.tsx#L152).
 

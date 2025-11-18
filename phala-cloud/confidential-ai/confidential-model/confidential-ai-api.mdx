@@ -5,7 +5,7 @@ title: Use API
 
 ## Overview
 
-Confidential AI API provides a secure, OpenAI-compatible interface for running AI models in TEE on GPU hardware. This enables developers to integrate AI applications with hardware-level privacy protection, ensuring user data remain confidential during inference.
+Confidential AI API provides a secure, OpenAI-compatible interface for running AI models in TEE on GPU hardware. This enables developers to integrate AI applications with hardware-level privacy protection, ensuring user data remain confidential during inference. Browse [available confidential AI models](https://phala.com/confidential-ai-models) for your application.
 
 
 ## Prerequisites
@@ -30,7 +30,7 @@ Replace `<API_KEY>` with your actual API key in the examples below. We use DeepS
 
 from openai import OpenAI
 
-client = OpenAI(api_key="<API_KEY>", base_url="https://api.redpill.ai/api/v1")
+client = OpenAI(api_key="<API_KEY>", base_url="https://api.redpill.ai/v1")
 
 response = client.chat.completions.create(
     model="phala/deepseek-chat-v3-0324",
@@ -47,7 +47,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-    baseURL: 'https://api.redpill.ai/api/v1',
+    baseURL: 'https://api.redpill.ai/v1',
     apiKey: '<API_KEY>',
   },
 });

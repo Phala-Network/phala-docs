@@ -73,3 +73,5 @@ tech-specs/blockchain/index
 phala-cloud/networking/expose-service-port
 phala-cloud/networking/protect-cvm-endpoint
 phala-cloud/networking/setting-up-custom-domain
+phala-cloud/attestation/trust-center-verification
+dstack/trust-center-technical
