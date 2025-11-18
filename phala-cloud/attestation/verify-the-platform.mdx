@@ -1,0 +1,346 @@
+---
+description: Verify Phala's infrastructure integrity end-to-end.
+title: Verify the Platform
+---
+
+Verify Phala's infrastructure integrity end-to-end. This proves the OS, key management system, network certificates, and governance are all secure.
+
+## Do You Need This?
+
+Prove platform integrity to your end users. Verify both your application and the infrastructure it runs on.
+
+Application verification proves your code runs in a TEE. But users still have to trust the OS, key management, network certificates, and governance. Any of these could be compromised.
+
+Verify the platform too, and you get end-to-end security with zero trust assumptions. The only thing left to trust is the TEE hardware itself.
+
+## What is TCB (Trusted Computing Base)?
+
+The Trusted Computing Base (TCB) represents all components critical for security. In dstack, the TCB consists of cryptographic measurements that prove integrity across three layers.
+
+A **measurement** is a cryptographic hash (like a fingerprint) of a component. TEE hardware records these measurements in the remote attestation report during boot. Once recorded in the cryptographically signed quote, measurements cannot be modified.
+
+This makes them unforgeable proof of what code is running. Change even one byte in any component, and the measurements won't match your expected values.
+
+**Hardware & Firmware** use MRTD for virtual firmware and RTMR0 for hardware configuration like CPU count and memory size.
+
+**Operating System** uses RTMR1 for the Linux kernel and RTMR2 for kernel parameters and initrd.
+
+**Application** uses RTMR3 for your compose hash and runtime info.
+
+All RTMRs (0-3) use the same hash chain structure. Each starts at zero and is "extended" by hashing in events during boot (RTMR = SHA384(RTMR || event)).
+
+For verification, only RTMR3 event logs matter. RTMR0-2 event logs contain low-level hardware/firmware details you can ignore. Just use dstack-mr to reproduce the final RTMR0-2 values directly.
+
+## Prerequisites
+
+Your application must expose an `/attestation` endpoint that returns the quote, event log, and VM configuration. This endpoint is what dstack-verifier calls to get the data it needs.
+
+See [Get Attestation](/phala-cloud/attestation/get-attestation) for how to set this up inside your CVM.
+
+## Using dstack-verifier
+
+The dstack-verifier tool automates complete platform verification. It validates hardware, firmware, OS, key management, and event log integrity in one operation.
+
+Run it as an HTTP service:
+
+```bash
+# Via Docker
+docker run -p 8080:8080 dstacktee/dstack-verifier:latest
+
+# Or via cargo
+cargo run --bin dstack-verifier
+```
+
+Verify a quote:
+
+```bash
+# Get quote from your app
+curl https://your-app.example.com/attestation -o quote.json
+
+# Verify it
+curl -d @quote.json localhost:8080/verify | jq
+```
+
+The verifier checks:
+- **Hardware & firmware**: MRTD, RTMR0, TCB status, debug mode disabled
+- **Operating system**: RTMR1, RTMR2, OS image hash matches known build
+- **Key management**: KeyProviderInfo extracted from RTMR3 events
+- **Event log integrity**: Replays events to verify RTMR values match quote
+
+Response shows `is_valid: true` when all checks pass. See [dstack-verifier README](https://github.com/Dstack-TEE/dstack/tree/master/verifier) for API details and configuration.
+
+### What the Verifier Checks Automatically
+
+dstack-verifier automates cryptographic verification by fetching reference values and comparing them against your quote.
+
+**Automatically fetched and verified**:
+- OS images downloaded from dstack releases (if not cached locally)
+- Expected MRTD and RTMR0-2 calculated using dstack-mr from the OS image + VM config
+- Quote signature validated using Intel root certificates via dcap-qvl
+- RTMR3 recalculated by replaying the event log
+- TCB status checked for security patches and debug mode disabled
+
+**You provide** (from your app's `/attestation` endpoint):
+- TDX quote (hex string)
+- Event log (hex-encoded JSON)
+- VM configuration (JSON with CPU, memory, os_image_hash)
+
+**You verify separately**:
+- Governance policies via smart contracts - see [5. Governance Verification](#5-governance-verification)
+- KMS instance attestation - see [3. Key Management Verification](#3-key-management-verification)
+- Network certificate binding - see [4. Network Security Verification](#4-network-security-verification)
+
+The verifier handles all cryptographic verification. You handle policy and governance verification.
+
+## 1. Hardware & Firmware Verification
+
+### Attack Vector
+
+Modified firmware can compromise the entire boot sequence. An attacker who controls the virtual firmware (OVMF) can load a malicious OS that appears legitimate to your application. The firmware is the trust anchor - if it's compromised, everything that follows is suspect.
+
+### How It's Secured
+
+**MRTD** measures the virtual firmware (OVMF). This is the first code executed after CVM startup and serves as your trust anchor.
+
+**RTMR0** measures the virtual hardware configuration - CPU count, memory size, and device setup. This ensures the CVM runs with expected hardware resources.
+
+**mr_seam** must be all zeros for TDX TD 1.0. This verifies the SEAM firmware signature is correct.
+
+**Debug mode** must be disabled. The TCB validation checks this to prevent debugging interfaces from exposing secrets.
+
+Intel signs the quote containing these measurements with their hardware root of trust.
+
+### How to Verify
+
+Use dstack-verifier to verify hardware and firmware automatically. It validates the quote signature, checks TCB status, and ensures debug mode is disabled.
+
+**Implementation details**: See [`verify_quote` function](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for the complete TCB validation logic.
+
+## 2. Operating System Verification
+
+### Attack Vector
+
+Anyone in the cloud compute supply chain (cloud provider, network operator, data center staff, or compromised infrastructure) could substitute the dstack OS image with a modified version containing backdoors or data exfiltration code.
+
+### How It's Secured
+
+The dstack OS is built from the [meta-dstack](https://github.com/Dstack-TEE/meta-dstack) repository using Yocto. This means you can reproduce it from any specific git commit. The OS produces four measurements (MRTD, RTMR0-2) that cryptographically prove firmware, hardware config, kernel, and boot parameters.
+
+Only OS images with approved hashes can boot, enforced by the `DstackKms.allowedOsImages` smart contract.
+
+### How to Verify
+
+Use dstack-verifier to verify OS integrity automatically. It downloads the OS image, calculates MRTD and RTMR0-2 using the VM configuration, and compares them against the quote.
+
+For reproducible builds, you can independently build the OS from [meta-dstack](https://github.com/Dstack-TEE/meta-dstack) source and verify it produces identical measurements.
+
+**Implementation details**: See [`verify_os_image_hash` function](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for the OS verification logic.
+
+## 3. Key Management Verification
+
+### Attack Vector
+
+A malicious KMS could leak all keys used by your application: disk encryption keys, TLS private keys, and signing keys. This would compromise your application even if everything else was verified.
+
+### How It's Secured
+
+Your application uses multiple keys: disk encryption, TLS certificates, and signing keys. All of these derive from two KMS root key pairs using deterministic Key Derivation Functions (KDFs). The Root CA Key (P256) derives your TLS certificates and disk encryption keys. The Root K256 Key (secp256k1) derives Ethereum-compatible signing keys.
+
+Each derived key combines your app's unique ID with a purpose string for cryptographic separation. Verify the KMS is trustworthy, and you've automatically verified all derived keys too.
+
+The KMS root CA public key is recorded in RTMR3 as the `key-provider` event. This binds your app to a specific KMS instance. You can't silently swap to a different KMS without changing the attestation.
+
+### How to Verify
+
+Use dstack-verifier to extract the key provider information from RTMR3 events automatically. The verifier returns the KMS ID and name in the verification response.
+
+**Important**: dstack-verifier only extracts which KMS instance your app uses. It does not verify the KMS itself. The KMS is a separate TEE instance that requires its own complete verification:
+
+1. **Hardware verification**: Validate the KMS's TDX quote against Intel root CAs
+2. **OS integrity verification**: Verify the KMS's MRTD and RTMR0-2 match expected values for the dstack OS version
+3. **Source code verification**: Verify the KMS's compose hash matches known trustworthy KMS configurations
+4. **Governance verification**: Check the KMS's aggregated MR is whitelisted in the `DstackKms.kmsAllowedAggregatedMrs` smart contract
+
+For production deployments, use [trust-center](https://github.com/Phala-Network/trust-center) which automates complete KMS verification including all reference value comparisons.
+
+**Implementation details**: See [`decode_app_info` method](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for key provider extraction logic.
+
+## 4. Network Security Verification
+
+### Attack Vector
+
+Anyone could issue a valid TLS certificate for your domain and impersonate your TEE. This includes the domain owner, cloud provider, or a compromised Certificate Authority.
+
+Without verification, users can't tell the legitimate TEE-controlled certificate from a fraudulent one used for man-in-the-middle attacks.
+
+### How It's Secured
+
+Your TLS certificates are generated and controlled entirely within the TEE. For custom domains, the TEE creates its own ACME account and TLS private keys inside encrypted memory. The private keys never leave the TEE.
+
+Evidence files published at `/evidences/` prove the TEE controls the certificate through cryptographic binding. The TEE puts a hash of the certificate evidence into the TDX quote's `report_data` field. This proves the TEE created both the quote and the certificate evidence at the same time.
+
+CAA (Certification Authority Authorization) DNS records add another layer of protection. They restrict which Certificate Authorities can issue certificates for your domain, preventing unauthorized issuance even if DNS is compromised.
+
+### How to Verify
+
+The verification process differs based on your domain type.
+
+#### For custom domains
+
+Verify the evidence files:
+
+1. Download evidence files from `https://your-domain.com/evidences/`
+2. Verify the certificate fingerprint matches what's being served
+3. Check that the TDX quote contains the hash of the evidence files
+4. Confirm CAA records restrict certificate issuance to the TEE's ACME account
+
+See **[Domain Attestation](/phala-cloud/networking/domain-attestation)** for complete step-by-step verification.
+
+#### For Phala Cloud domains
+
+`*.phala.network` domains use the gateway TEE for TLS termination. The gateway performs mutual attestation with your CVM to establish a secure tunnel.
+
+You don't need to verify TLS certificates for these domains. The gateway's attestation is verified separately.
+
+## 5. Governance Verification
+
+### Attack Vector
+
+Without governance verification, a malicious developer could update the application at any time to introduce backdoors. This could happen even if the previous version was fully attested, verified, and trusted by users.
+
+### How It's Secured
+
+The `DstackApp` and `DstackKms` contracts define which compose hashes (application versions), OS images (system versions), and KMS instances are allowed. Code updates pushed to Phala Cloud must pass contract authorization. The new compose-hash must be whitelisted on-chain before deployment.
+
+### How to Verify
+
+#### Application governance
+
+Check which application versions are authorized:
+
+```bash
+# Check if your app's compose-hash is whitelisted
+cast call <DstackApp_ADDRESS> "allowedComposeHashes(bytes32)" <COMPOSE_HASH>
+
+# Monitor for new authorized versions
+cast logs <DstackApp_ADDRESS> --event "ComposeHashAdded(bytes32,address)"
+```
+
+#### Platform governance
+
+The `DstackKms` contract controls platform-level security:
+
+```bash
+# Check allowed OS images
+cast call <DstackKms_ADDRESS> "allowedOsImages(bytes32)" <OS_IMAGE_HASH>
+
+# Check allowed KMS instances
+cast call <DstackKms_ADDRESS> "kmsAllowedAggregatedMrs(bytes32)" <AGGREGATED_MR_HASH>
+
+# Monitor governance changes
+cast logs <DstackKms_ADDRESS>
+```
+
+Understanding who controls these contracts and how they're governed is critical for assessing platform trustworthiness.
+
+## Complete Platform Verification Checklist
+
+Verify the full platform integrity by checking each component:
+
+**Hardware & Firmware:**
+- [ ] TDX quote signature is valid (Intel's root certificates)
+- [ ] `tee_tcb_svn` matches latest security patches
+- [ ] `mr_seam` matches known TDX firmware
+
+**Operating System:**
+- [ ] OS version from `appInfo.tcb_info.os_version` is known
+- [ ] MRTD and RTMR0-2 match calculated values
+- [ ] VM config (CPU, memory, GPU) matches `appInfo.vm_config`
+- [ ] OS image hash is whitelisted in `DstackKms.allowedOsImages`
+- [ ] (Optional) OS built reproducibly from source
+
+**Key Management:**
+- [ ] KMS ID from RTMR3 `key-provider` event is known
+- [ ] KMS's own attestation quote is valid
+- [ ] KMS aggregated MR is whitelisted in `DstackKms.kmsAllowedAggregatedMrs`
+
+**Network Security:**
+- [ ] TLS certificate fingerprint matches served certificate
+- [ ] Evidence files at `/evidences/` are cryptographically bound to quote
+- [ ] CAA DNS records restrict certificate issuance
+
+**Governance:**
+- [ ] Smart contract addresses are verified
+- [ ] Contract permissions match security policy
+- [ ] Contract ownership and upgrade mechanisms are understood
+
+## Attack Scenarios Prevented
+
+**Compromised OS:** OS measurements in RTMR0-2 and on-chain whitelist prevent unauthorized OS versions from booting.
+
+**Malicious KMS:** KMS binding in RTMR3 and on-chain governance prevent unauthorized KMS instances from providing keys.
+
+**Certificate impersonation:** Evidence files and CAA records prevent unauthorized TLS certificates from being issued.
+
+**Supply chain attacks:** Reproducible OS builds and governance contracts prevent compromised build infrastructure from injecting malicious code.
+
+**Unauthorized updates:** On-chain governance ensures only authorized OS versions, KMS instances, and application updates can run.
+
+## Tools and Resources
+
+- **[dstack-verifier](https://github.com/Dstack-TEE/dstack/tree/main/verifier)** - Automated platform verification tool
+- **[meta-dstack](https://github.com/Dstack-TEE/meta-dstack)** - Reproducible OS builds
+- **[dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk)** - Application info and quote retrieval
+- **[Smart Contracts](https://github.com/Dstack-TEE/dstack/tree/master/kms/auth-eth/contracts)** - DstackKms and DstackApp source
+- **[trust-center](https://github.com/Phala-Network/trust-center)** - Complete reference implementation
+
+## Real-World Example: Confidential AI
+
+For a complete implementation of platform verification, see how Confidential AI verifies:
+- Hardware stack (NVIDIA GPUs + Intel TDX)
+- OS integrity from reproducible builds
+- Application code via compose-hash
+- KMS trust for key derivation
+- Request/response integrity signatures
+
+Learn more: **[Confidential AI Verification](/phala-cloud/confidential-ai/verify/overview)**
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
+    arrow="true"
+  >
+    Verify your application code and Docker images
+  </Card>
+
+  <Card
+    icon="list-check"
+    href="/phala-cloud/attestation/chain-of-trust"
+    title="Complete Security Checklist"
+    arrow="true"
+  >
+    Security audit checklist for 100% verification
+  </Card>
+
+  <Card
+    icon="book"
+    href="/phala-cloud/attestation/attestation-fields"
+    title="Field Reference"
+    arrow="true"
+  >
+    Understand all quote fields and measurements
+  </Card>
+
+  <Card
+    icon="shield"
+    href="/phala-cloud/networking/domain-attestation"
+    title="Domain Attestation"
+    arrow="true"
+  >
+    Verify TLS certificate binding for custom domains
+  </Card>
+</CardGroup>

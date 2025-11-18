@@ -1,72 +1,209 @@
 ---
-description: Generate Intel SGX and TDX attestation quotes using dstack SDK and Phala Cloud platform
-title: Generate Attestation
+description: Learn how to get CVM attestation on Phala Cloud using dashboard or dstack SDK.
+title: Get Attestation
 ---
 
-The cloud will generate a default RA report for your application when it is bootstrapped. You can view this report on the dashboard under the **Attestation** tab and verify it by clicking the **Check** **Attestation** button.
+Get attestation reports from your CVM to prove it's running in genuine TEE hardware. You can check the dashboard for quick verification, or use the dstack SDK to generate quotes programmatically with custom data.
 
-<Frame>
-    <img src="/images/cloud-cert-chain.png" alt="cert-chain" />
-</Frame>
+## View Attestation Report on Dashboard
 
-There are two steps needed to generate a new RA report, rather than using the default one, which allows you to prove the execution of your code.
+Open the **Attestation** tab in your CVM dashboard. Click **Check Attestation** to verify the default report generated during bootstrap.
 
-### Config docker compose file
+## Generate Attestation Programmatically
 
-This Docker Compose file spins up a Jupyter Notebook environment, and importantly, it's configured the `volumes` to connect to the Dstack API by mounting its socket file (`/var/run/dstack.sock`) into the container. This allows the Jupyter Notebook running inside the TEE to interact with the Dstack service like generate a remote attestation, get a TLS key, or generate a key for chains like ETH (`ECDSA, K256 curve`) or SOL (`ed25519`).
+### Prerequisites: Configure Docker Compose
 
-For development convenience, this setup grants sudo privileges inside the container (`environment`), runs the Jupyter server with root user permissions (`user`), and starts the notebook with token-based authentication using the `TOKEN` environment variable (`command`).
+Your application needs access to the dstack service to generate attestation quotes. Mount the dstack socket into your container:
 
 ```yaml
 version: '3'
 services:
-  jupyter:
-    image: quay.io/jupyter/base-notebook
+  app:
+    image: your-app-image
     ports:
-      - 8080:8888
+      - 8080:8080
     volumes:
+      # Mount dstack socket for TEE operations
       - /var/run/dstack.sock:/var/run/dstack.sock
-    environment:
-      - GRANT_SUDO=yes
-    user: root
-    command: "start-notebook.sh --NotebookApp.token=${TOKEN}"
 ```
 
-### Generate RA report inside your application code
+### Using dstack SDK
 
-In your application, you can generate the RA report using the [Dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk?activeTab=readme), which supports Python, JS, and Go. The `user-data` argument allows you to attach your own data to the RA report.
+The dstack SDK connects to `/var/run/dstack.sock` automatically. Install for your language:
 
-```javascript
+- **JavaScript/TypeScript:** [@phala/dstack-sdk](https://www.npmjs.com/package/@phala/dstack-sdk)
+- **Python:** [dstack-sdk](https://pypi.org/project/dstack-sdk/)
+- **Go:** [github.com/Dstack-TEE/dstack](https://github.com/Dstack-TEE/dstack/tree/master/sdk/go)
+
+### Attaching Custom Data (reportData)
+
+The attestation quote includes a 64-byte `reportData` field for your custom data. **Important:** The SDK throws an error if you exceed 64 bytes—it does not auto-hash.
+
+**Two patterns:**
+
+1. **Short data (≤64 bytes)**: Nonces, small challenges, or hashes—pass directly
+2. **Long data (>64 bytes)**: Any arbitrary data—hash it first with SHA256 (produces 32 bytes)
+
+<CodeGroup>
+```javascript TypeScript
 import { DstackClient } from '@phala/dstack-sdk';
 import crypto from 'crypto';
 
 const client = new DstackClient();
 
-// Show the information of the Base Image.
-await client.info();
+// Pattern 1: Short data (≤64 bytes) - pass directly
+// Example: 32-byte nonce for challenge-response
+const nonce = crypto.randomBytes(32);
+const quote1 = await client.getQuote(nonce);
 
-// Get a TDX quote for the given custom data (manually hash if data > 64 bytes)
-const userData = 'user-data';
+// Pattern 2: Long data (>64 bytes) - hash it first
+// Example: JSON with arbitrary data
+const userData = JSON.stringify({
+  version: '1.0.0',
+  timestamp: Date.now(),
+  user_id: 'alice',
+  public_key: '0x1234...'
+});
+
+// Hash to fit in 64 bytes (SHA256 produces 32 bytes)
 const hash = crypto.createHash('sha256').update(userData).digest();
-const quoteResult = await client.getQuote(hash.slice(0, 32));
-console.log(quoteResult.quote); // TDX quote in hex format
-console.log(quoteResult.event_log); // Event log
-const rtmrs = quoteResult.replayRtmrs(); // Replay RTMRs
+const quote2 = await client.getQuote(hash);
+
+console.log('Quote:', quote2.quote);
+console.log('Event Log:', quote2.event_log);
 ```
 
-You can implement the above code in your application as an public API that anyone can call to generate a new RA report.
+```python Python
+import json
+import time
+import hashlib
+import secrets
+from dstack_sdk import DstackClient
 
-### Next Steps
+client = DstackClient()
 
-Once you have your quote generated, you can:
+# Pattern 1: Short data (≤64 bytes) - pass directly
+# Example: 32-byte nonce for challenge-response
+nonce = secrets.token_bytes(32)
+quote1 = client.get_quote(nonce)
 
-1. **[Verify with API](/phala-cloud/attestation/api-quickstart)** - Upload your quote to Phala Cloud for verification
-2. **[Understand the Data](/phala-cloud/attestation/overview)** - Learn what each field in your quote means
-3. **[API Reference](/phala-cloud/phala-cloud-api/attestations)** - Complete verification service documentation
+# Pattern 2: Long data (>64 bytes) - hash it first
+# Example: JSON with arbitrary data
+user_data = json.dumps({
+    "version": "1.0.0",
+    "timestamp": time.time(),
+    "user_id": "alice",
+    "public_key": "0x1234..."
+})
 
-### Use Cases
+# Hash to fit in 64 bytes (SHA256 produces 32 bytes)
+data_hash = hashlib.sha256(user_data.encode()).digest()
+quote2 = client.get_quote(data_hash)
 
-The `user-data` field enables powerful applications:
-- **Key Binding**: Set a public key as user-data, then sign messages with the private key
-- **Identity Proof**: Include application identifiers or certificates  
-- **Challenge Response**: Respond to verification challenges from remote parties
+print('Quote:', quote2.quote)
+print('Event Log:', quote2.event_log)
+```
+</CodeGroup>
+
+<Note>
+**reportData Parameter Required**
+
+The `getQuote()` method requires a reportData parameter. If you don't need custom data, pass an empty value: `''` in TypeScript or `b''` in Python. Calling `getQuote()` without any parameter will fail.
+</Note>
+
+### Exposing Attestation via API
+
+Expose attestation endpoints so external verifiers can validate your CVM. The `/attestation` endpoint provides the quote for hardware verification, while `/info` provides the application configuration for code verification:
+
+<CodeGroup>
+```javascript TypeScript
+import express from 'express';
+import { DstackClient } from '@phala/dstack-sdk';
+
+const app = express();
+const client = new DstackClient();
+
+app.get('/attestation', async (req, res) => {
+  const result = await client.getQuote('');
+  res.json({
+    quote: result.quote,
+    event_log: result.event_log,
+    vm_config: result.vm_config  // Required by dstack-verifier
+  });
+});
+
+app.get('/info', async (req, res) => {
+  const info = await client.info();
+  res.json(info);
+});
+
+app.listen(8080);
+```
+
+```python Python
+from flask import Flask, jsonify
+from dstack_sdk import DstackClient
+
+app = Flask(__name__)
+client = DstackClient()
+
+@app.route('/attestation')
+def get_attestation():
+    result = client.get_quote(b'')
+    return jsonify({
+        'quote': result.quote,
+        'event_log': result.event_log,
+        'vm_config': result.vm_config  # Required by dstack-verifier
+    })
+
+@app.route('/info')
+def get_info():
+    info = client.info()
+    return jsonify(info)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
+```
+</CodeGroup>
+
+These endpoints allow external verifiers to fetch attestation data and verify your CVM. See [Verify Your Application](/phala-cloud/attestation/verify-your-application) for how verifiers use these endpoints.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
+    arrow="true"
+  >
+    Prove your exact code is running
+  </Card>
+
+  <Card
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure
+  </Card>
+
+  <Card
+    icon="book"
+    href="/phala-cloud/attestation/attestation-fields"
+    title="Field Reference"
+    arrow="true"
+  >
+    Understand what each field in the quote means
+  </Card>
+
+  <Card
+    icon="list-check"
+    href="/phala-cloud/attestation/chain-of-trust"
+    title="Complete Security Checklist"
+    arrow="true"
+  >
+    Complete verification with no trust assumptions
+  </Card>
+</CardGroup>
