@@ -1,0 +1,358 @@
+---
+description: Prove your exact Docker containers run unmodified in the TEE.
+title: Verify Your Application
+---
+
+Prove your exact Docker containers run unmodified in the TEE. Verify no one substituted different code.
+
+## What Should You Verify?
+
+**Basic verification:** Confirm your application code (reportData and compose-hash) runs in genuine TEE hardware. Suitable for most use cases.
+
+**Advanced verification:** Everything from Basic, plus RTMR3 event log replay, on-chain governance checks, and source code provenance. Required for high-assurance applications (DeFi, confidential AI, sensitive data).
+
+## Basic Verification
+
+Verify your application code runs in genuine TEE hardware. This verification confirms:
+- Your specific data (reportData) is present in the quote
+- Your application configuration (compose-hash) matches what's deployed
+- The quote comes from genuine Intel TDX hardware
+
+<Note>
+This code runs on the **verifier side** (end users or auditors checking your CVM), not inside the CVM itself.
+</Note>
+
+### Prerequisites
+
+Your application must expose attestation endpoints. See [Get Attestation](/phala-cloud/attestation/get-attestation) for how to set this up inside your CVM.
+
+Fetch all required data from your CVM:
+
+<CodeGroup>
+```javascript TypeScript
+// Fetch attestation quote
+const attestResponse = await fetch('https://your-app.example.com/attestation');
+const attestData = await attestResponse.json();
+
+const quote = attestData.quote;
+const eventLog = attestData.event_log;
+const reportData = attestData.report_data;
+
+// Fetch application configuration
+const infoResponse = await fetch('https://your-app.example.com/info');
+const appInfo = await infoResponse.json();
+const appComposeConfig = appInfo.tcb_info.app_compose;
+```
+
+```python Python
+import requests
+
+# Fetch attestation quote
+attest_response = requests.get('https://your-app.example.com/attestation')
+attest_data = attest_response.json()
+
+quote = attest_data['quote']
+event_log = attest_data['event_log']
+report_data = attest_data['report_data']
+
+# Fetch application configuration
+info_response = requests.get('https://your-app.example.com/info')
+app_info = info_response.json()
+app_compose_config = app_info['tcb_info']['app_compose']
+```
+</CodeGroup>
+
+### Step 1: Verify reportData
+
+Check that reportData contains the expected challenge or public key:
+
+<CodeGroup>
+```javascript TypeScript
+import assert from 'assert';
+
+const expectedChallenge = 'your-expected-challenge-hex';
+assert(reportData.startsWith(expectedChallenge), 'reportData mismatch');
+```
+
+```python Python
+expected_challenge = 'your-expected-challenge-hex'
+assert report_data.startswith(expected_challenge), 'reportData mismatch'
+```
+</CodeGroup>
+
+### Step 2: Verify compose-hash
+
+The compose-hash is a SHA256 hash of your app-compose.json configuration file (which includes your docker-compose.yaml plus metadata). This hash proves which exact Docker images are running.
+
+Verify the configuration you fetch from the CVM matches what's attested in RTMR3:
+
+<CodeGroup>
+```javascript TypeScript
+import assert from 'assert';
+import { createHash } from 'crypto';
+
+// Calculate SHA-256 hash of app-compose
+const calculatedHash = createHash('sha256')
+  .update(appComposeConfig)
+  .digest('hex');
+
+// Extract attested hash from RTMR3 event log
+const events = JSON.parse(eventLog);
+const composeEvent = events.find(e => e.event === 'compose-hash');
+const attestedHash = composeEvent.event_payload;
+
+// Verify hashes match
+assert.strictEqual(calculatedHash, attestedHash, 'compose-hash mismatch');
+```
+
+```python Python
+import hashlib
+import json
+
+# Calculate SHA-256 hash of app-compose
+calculated_hash = hashlib.sha256(app_compose_config.encode()).hexdigest()
+
+# Extract attested hash from RTMR3 event log
+events = json.loads(event_log)
+compose_event = next(e for e in events if e['event'] == 'compose-hash')
+attested_hash = compose_event['event_payload']
+
+# Verify hashes match
+assert calculated_hash == attested_hash, 'compose-hash mismatch'
+```
+</CodeGroup>
+
+### Step 3: Verify quote signature
+
+Verify the TDX quote was signed by genuine Intel hardware. This uses Phala Cloud's verification API (alternatively, you can use [dcap-qvl](https://github.com/Phala-Network/trust-center) locally for trustless verification):
+
+<CodeGroup>
+```javascript TypeScript
+import assert from 'assert';
+
+const verifyResponse = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ hex: quote })
+});
+
+const result = await verifyResponse.json();
+assert(result.quote.verified, 'Hardware verification failed');
+```
+
+```python Python
+import requests
+
+verify_response = requests.post(
+    'https://cloud-api.phala.network/api/v1/attestations/verify',
+    json={'hex': quote}
+)
+
+result = verify_response.json()
+assert result['quote']['verified'], 'Hardware verification failed'
+```
+</CodeGroup>
+
+You've verified your application code runs in genuine TEE hardware.
+
+## Advanced Verification
+
+For high-assurance applications, verify additional security properties beyond Basic Verification:
+- **RTMR3 event log replay**: Cryptographically prove the boot sequence
+- **Docker image digests**: Ensure images are pinned to specific versions
+- **On-chain governance**: Verify only authorized configs can run
+- **Source code provenance**: Link images back to audited source code
+
+<Note>
+All verification steps **must run outside the CVM**. Only verification that happens outside the TEE provides security guarantees.
+</Note>
+
+### Prerequisites
+
+Complete [Basic Verification](#basic-verification) first. You'll need the same data (quote, event_log, app_compose, calculated hash).
+
+### Step 1: Verify RTMR3 event log replay
+
+RTMR3 uses a hash chain where each event extends the previous value. The event log records three events during boot:
+1. `compose-hash` - Your application configuration
+2. `instance-id` - Unique CVM instance identifier
+3. `key-provider` - KMS that distributed encryption keys
+
+The hash chain mechanism ensures no one can modify the event log without breaking the chain. Each new value is computed as: `RTMR3_new = SHA384(RTMR3_old || SHA384(event))`.
+
+To verify this:
+
+1. Parse the event log and extract all RTMR3 events (where `imr === 3`)
+2. Start with initial RTMR3 value (48 zero bytes)
+3. For each event digest in order:
+   - Pad digest to 48 bytes if needed
+   - Compute: `RTMR3 = SHA384(RTMR3 || digest)`
+4. Compare final replayed RTMR3 with the `rtmr3` value from the quote
+
+<Note>
+**TODO**: The dstack SDK does not currently export a `replayRtmrs()` utility function for external verifiers. For production use, refer to the [Rust verification implementation](https://github.com/Dstack-TEE/dstack/blob/d3275d1e0a0f4e2191273f0d9df62986f3d6acca/verifier/src/verification.rs#L26-L149) or use [trust-center](https://github.com/Phala-Network/trust-center) for complete RTMR3 replay verification.
+</Note>
+
+### Step 2: Verify Docker image digests
+
+Docker images must be pinned by SHA256 digest, not mutable tags. Tags like `nginx:latest` can point to different images over time, breaking verification.
+
+Verify all images in your app-compose use immutable digests:
+
+<CodeGroup>
+```javascript TypeScript
+import assert from 'assert';
+
+// Parse app-compose and extract docker-compose
+const appCompose = JSON.parse(appComposeConfig);
+const dockerComposeYaml = appCompose.docker_compose_file;
+
+// Check all image lines use @sha256 digests
+const imageLines = dockerComposeYaml.split('\n').filter(line =>
+  line.trim().startsWith('image:')
+);
+
+for (const line of imageLines) {
+  assert(
+    line.includes('@sha256:'),
+    `Image not pinned by digest: ${line.trim()}`
+  );
+}
+```
+
+```python Python
+import json
+import yaml
+
+# Parse app-compose and extract docker-compose
+app_compose = json.loads(app_compose_config)
+docker_compose = yaml.safe_load(app_compose['docker_compose_file'])
+
+# Check all services use @sha256 digests
+for service_name, service in docker_compose.get('services', {}).items():
+    image = service.get('image', '')
+    assert '@sha256:' in image, f'Image not pinned by digest: {service_name}'
+```
+</CodeGroup>
+
+Example of proper image pinning:
+
+```yaml
+services:
+  app:
+    # BAD: Mutable tag
+    image: nginx:latest
+
+    # GOOD: Immutable digest
+    image: nginx@sha256:eee5eae48e79b2e75178328c7c585b89d676eaae616f03f9a1813aaed820745a
+```
+
+Get the digest for any image:
+
+```bash
+docker pull nginx:latest
+docker inspect nginx:latest | grep -A 1 RepoDigests
+```
+
+### Step 3: Verify on-chain governance (optional)
+
+If your application uses on-chain governance, verify the compose-hash is whitelisted. This ensures only authorized application versions can boot:
+
+```bash
+# Check if compose-hash is authorized in DstackApp contract
+cast call <DstackApp_ADDRESS> "allowedComposeHashes(bytes32)" <COMPOSE_HASH>
+# Returns true if whitelisted, false otherwise
+
+# Monitor for new authorized versions
+cast logs <DstackApp_ADDRESS> --event "ComposeHashAdded(bytes32,address)"
+```
+
+### Step 4: Verify source code provenance
+
+Link Docker image digests back to audited source code using cryptographic build provenance.
+
+**Recommended: Sigstore for GitHub builds**
+
+Sigstore cryptographically links container images to specific GitHub commits and workflows. When you build images via GitHub Actions, Sigstore automatically signs the build with GitHub's identity, creating unforgeable proof.
+
+Platform components use Sigstore:
+- [dstack-gateway releases](https://github.com/Dstack-TEE/dstack/releases?q=%22dstack-gateway%22&expanded=true)
+- [dstack-kms releases](https://github.com/Dstack-TEE/dstack/releases?q=%22dstack-kms%22&expanded=true)
+- [dstack-verifier releases](https://github.com/Dstack-TEE/dstack/releases?q=%22dstack-verifier%22&expanded=true)
+
+Set up Sigstore signing in your GitHub Actions workflow to provide the same cryptographic build provenance for your applications.
+
+**Alternative: Reproducible builds**
+
+For maximum verifiability, use reproducible builds where anyone can rebuild from source and get identical digests. Publish your Dockerfile and build instructions.
+
+This requires careful environment control but removes the need to trust any build service.
+
+## Attack Scenarios Prevented
+
+**Compromised Docker registry:** The TEE verifies image digests against compose-hash before pulling. Even if the registry serves malicious images, digest verification fails.
+
+**Code substitution:** The compose-hash in RTMR3 is recorded by TEE hardware during boot. No one can modify it without invalidating the attestation quote signature.
+
+**Unauthorized updates:** On-chain governance (if enabled) ensures only whitelisted compose hashes can boot. Malicious developers cannot deploy unapproved versions.
+
+**Event log tampering:** RTMR3 event log replay cryptographically proves the events are authentic. Modification causes replay to produce different RTMR3 that won't match the quote.
+
+## Verification Checklist
+
+Complete application verification requires checking:
+
+- [ ] All Docker images use SHA256 digests (not tags)
+- [ ] Calculated compose-hash matches expected value
+- [ ] RTMR3 event log replays to quoted RTMR3 value
+- [ ] Attested compose-hash matches calculated hash
+- [ ] compose-hash is whitelisted on-chain (if using governance)
+- [ ] reportData contains expected challenge/public key
+- [ ] Image digests link to audited source code (Sigstore or reproducible builds)
+
+## Tools and Resources
+
+- **[dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk)** - `getComposeHash()` and `replayRtmrs()` methods
+- **[RTMR3 Calculator](https://rtmr3-calculator.vercel.app/)** - Web tool for compose-hash calculation
+- **[Verification Script](https://github.com/Dstack-TEE/dstack-examples/blob/main/attestation/rtmr3-based/verify.py)** - Complete Python example
+- **[trust-center](https://github.com/Phala-Network/trust-center)** - Reference implementation
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure security
+  </Card>
+
+  <Card
+    icon="list-check"
+    href="/phala-cloud/attestation/chain-of-trust"
+    title="Complete Security Checklist"
+    arrow="true"
+  >
+    Security audit checklist for 100% verification
+  </Card>
+
+  <Card
+    icon="book"
+    href="/phala-cloud/attestation/attestation-fields"
+    title="Field Reference"
+    arrow="true"
+  >
+    Understand all quote fields and measurements
+  </Card>
+
+  <Card
+    icon="code"
+    href="/phala-cloud/phala-cloud-api/attestations"
+    title="API Reference"
+    arrow="true"
+  >
+    Complete verification service documentation
+  </Card>
+</CardGroup>

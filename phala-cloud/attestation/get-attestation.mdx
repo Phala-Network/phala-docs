@@ -3,9 +3,7 @@ description: Learn how to get CVM attestation on Phala Cloud using dashboard or 
 title: Get Attestation
 ---
 
-You can get attestation reports two ways: check the dashboard for your CVM's default report, or use the dstack SDK to generate fresh quotes programmatically.
-
-Use the dashboard for quick checks. Use the SDK when you need to bind custom data (like public keys or nonces) to your attestation.
+Get attestation reports from your CVM to prove it's running in genuine TEE hardware. You can check the dashboard for quick verification, or use the dstack SDK to generate quotes programmatically with custom data.
 
 ## View Attestation Report on Dashboard
 
@@ -107,18 +105,88 @@ print('Event Log:', quote2.event_log)
 ```
 </CodeGroup>
 
-Expose this as an API endpoint so clients can request fresh attestation quotes anytime they need proof of your CVM's security.
+<Note>
+**reportData Parameter Required**
+
+The `getQuote()` method requires a reportData parameter. If you don't need custom data, pass an empty value: `''` in TypeScript or `b''` in Python. Calling `getQuote()` without any parameter will fail.
+</Note>
+
+### Exposing Attestation via API
+
+Expose attestation endpoints so external verifiers can validate your CVM. The `/attestation` endpoint provides the quote for hardware verification, while `/info` provides the application configuration for code verification:
+
+<CodeGroup>
+```javascript TypeScript
+import express from 'express';
+import { DstackClient } from '@phala/dstack-sdk';
+
+const app = express();
+const client = new DstackClient();
+
+app.get('/attestation', async (req, res) => {
+  const result = await client.getQuote('');
+  res.json({
+    quote: result.quote,
+    event_log: result.event_log,
+    vm_config: result.vm_config  // Required by dstack-verifier
+  });
+});
+
+app.get('/info', async (req, res) => {
+  const info = await client.info();
+  res.json(info);
+});
+
+app.listen(8080);
+```
+
+```python Python
+from flask import Flask, jsonify
+from dstack_sdk import DstackClient
+
+app = Flask(__name__)
+client = DstackClient()
+
+@app.route('/attestation')
+def get_attestation():
+    result = client.get_quote(b'')
+    return jsonify({
+        'quote': result.quote,
+        'event_log': result.event_log,
+        'vm_config': result.vm_config  # Required by dstack-verifier
+    })
+
+@app.route('/info')
+def get_info():
+    info = client.info()
+    return jsonify(info)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
+```
+</CodeGroup>
+
+These endpoints allow external verifiers to fetch attestation data and verify your CVM. See [Verify Your Application](/phala-cloud/attestation/verify-your-application) for how verifiers use these endpoints.
 
 ## Next Steps
 
 <CardGroup cols={2}>
   <Card
-    icon="shield-check"
-    href="/phala-cloud/attestation/verifying-attestation"
-    title="Verify Attestation"
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
     arrow="true"
   >
-    Verify your quote using Phala Cloud's API
+    Prove your exact code is running
+  </Card>
+
+  <Card
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure
   </Card>
 
   <Card
@@ -128,5 +196,14 @@ Expose this as an API endpoint so clients can request fresh attestation quotes a
     arrow="true"
   >
     Understand what each field in the quote means
+  </Card>
+
+  <Card
+    icon="list-check"
+    href="/phala-cloud/attestation/chain-of-trust"
+    title="Complete Security Checklist"
+    arrow="true"
+  >
+    Complete verification with no trust assumptions
   </Card>
 </CardGroup>

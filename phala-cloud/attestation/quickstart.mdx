@@ -1,0 +1,77 @@
+---
+description: Get your first attestation proof using the dashboard.
+title: Quickstart
+---
+
+Get your first attestation proof using just the dashboard. No code required.
+
+## Step 1: Open Attestation Tab
+
+Open your CVM in the [Phala Cloud dashboard](https://cloud.phala.network). Click **View Details** on your CVM card.
+
+Navigate to the **Attestations** tab. You'll see the default attestation quote that was generated during CVM bootstrap.
+
+## Step 2: Check Attestation
+
+Click the **Check Attestation** button in the certificate chain section.
+
+This automatically opens the [TEE Proof Explorer](https://proof.t16z.com/) in a new tab with your quote already loaded and verified.
+
+You'll see verification results showing:
+- ✓ Hardware signature is valid (genuine Intel TDX)
+- ✓ Quote measurements (MRTD, RTMR0-3)
+- ✓ Security status (TCB level, no known vulnerabilities)
+
+## You're Done!
+
+You just verified your CVM runs in genuine TEE hardware. The cryptographic proof shows Intel TDX signed your quote, making it impossible to fake.
+
+You can share the proof URL with anyone who needs to verify your CVM's security.
+
+## What You Verified
+
+**Hardware authenticity**: Intel's signature proves genuine TDX hardware generated this quote.
+
+**Measurement integrity**: The quote includes cryptographic hashes (measurements) of your OS, application, and hardware configuration. Change one byte anywhere, and the measurements won't match.
+
+**Unforgeable proof**: The signature binds all measurements together. No one can modify the quote without invalidating Intel's signature.
+
+## What's Next?
+
+Now that you understand attestation, choose your path:
+
+### Want Programmatic Attestation?
+
+**Generate quotes from code** instead of the dashboard. Useful for APIs, services, or automated verification.
+
+See [Get Attestation](/phala-cloud/attestation/get-attestation) for SDK examples.
+
+### Want to Bind Custom Data?
+
+**Attach challenges, public keys, or nonces** to your quotes. This proves freshness and prevents replay attacks.
+
+See [Get Attestation: Attaching Custom Data](/phala-cloud/attestation/get-attestation#attaching-custom-data-reportdata) for reportData patterns.
+
+### Want to Verify Your Application Code?
+
+**Prove your exact Docker images are running** unmodified. This verifies no one substituted your code.
+
+See [Verify Your Application](/phala-cloud/attestation/verify-your-application) for compose-hash verification.
+
+### Want to Verify Platform Security?
+
+**Verify the OS, KMS, and infrastructure** end-to-end. This proves Phala's platform integrity without trust assumptions.
+
+See [Verify the Platform](/phala-cloud/attestation/verify-the-platform) for complete platform verification.
+
+### Want Complete Security Audit?
+
+**Verify everything with no trust assumptions.** Security researchers and auditors need the complete checklist.
+
+See [Complete Chain of Trust](/phala-cloud/attestation/chain-of-trust) for necessary and sufficient verification.
+
+### Want to Understand Quote Fields?
+
+**Learn what each measurement means** (MRTD, RTMR0-3, reportData, etc.).
+
+See [Attestation Fields Reference](/phala-cloud/attestation/attestation-fields) for field-by-field explanation.

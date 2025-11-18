@@ -1,5 +1,5 @@
 ---
-description: Learn about attestation and how to get and verify your CVM attestation on Phala Cloud.
+description: Learn how attestation proves your CVM runs unmodified code in genuine TEE hardware.
 title: Overview
 ---
 
@@ -7,42 +7,70 @@ title: Overview
 
 Attestation proves your CVM runs in genuine TEE hardware with the exact software you expect. No one can fake it.
 
-It gives you cryptographic proof covering three layers: Intel TDX hardware, your OS and application code, and the runtime environment. Anyone can independently verify this proof to confirm your CVM's security.
+It gives you cryptographic proof covering three layers: Intel TDX hardware, the operating system, and your application code. Anyone can independently verify this proof to confirm your CVM's security.
+
+You can verify what you control (your application code) or verify everything (including Phala's infrastructure). The choice depends on your security requirements.
 
 ## How Attestation Works
 
-Your CVM generates a cryptographic quote that includes measurements of the Intel TDX CPU, your OS and application images, and optional custom data like public keys or challenge responses.
+Your CVM generates a cryptographic quote that includes measurements of the Intel TDX CPU, OS images, your application configuration, and optional custom data like public keys or challenge responses.
 
 The quote is signed by Intel hardware. Verifiers check this signature against Intel's root certificates to confirm authenticity.
 
-## Quick Start
+## What You Can Verify
+
+**Your Application**: Prove your specific Docker containers and configuration run unmodified. This verifies no one substituted your code.
+
+**The Platform**: Prove the OS, key management system, and network infrastructure are secure. This verifies Phala's infrastructure integrity.
+
+**Complete Chain**: Verify everything end-to-end with no trust assumptions. This provides complete trustless execution.
+
+## Get Started
 
 <CardGroup cols={2}>
+  <Card
+    icon="rocket"
+    href="/phala-cloud/attestation/quickstart"
+    title="Quickstart"
+    arrow="true"
+  >
+    Generate your first quote and verify it works
+  </Card>
+
   <Card
     icon="download"
     href="/phala-cloud/attestation/get-attestation"
     title="Get Attestation"
     arrow="true"
   >
-    Generate attestation quotes using dashboard or dstack SDK
+    Generate quotes using dashboard or SDK
   </Card>
 
   <Card
-    icon="shield-check"
-    href="/phala-cloud/attestation/verifying-attestation"
-    title="Verify Attestation"
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
     arrow="true"
   >
-    Verify quotes using Phala Cloud's API or manual methods
+    Prove your exact code is running
   </Card>
 
   <Card
-    icon="link"
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure
+  </Card>
+
+  <Card
+    icon="list-check"
     href="/phala-cloud/attestation/chain-of-trust"
-    title="Chain of Trust"
+    title="Complete Security Checklist"
     arrow="true"
   >
-    Complete security from source code to running CVM
+    Complete verification with no trust assumptions
   </Card>
 
   <Card
@@ -57,4 +85,4 @@ The quote is signed by Intel hardware. Verifiers check this signature against In
 
 ## Next Steps
 
-Start with [Get Attestation](/phala-cloud/attestation/get-attestation) to retrieve your first attestation report.
+New to attestation? Start with the [Quickstart](/phala-cloud/attestation/quickstart) to generate and verify your first quote.

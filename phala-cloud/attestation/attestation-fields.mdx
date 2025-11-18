@@ -114,23 +114,39 @@ Custom data you attach to the quote. Common uses:
 
 Usually all zeros for dstack deployments. Reserved for advanced attestation scenarios.
 
-## Verification Checklist
+## Which Fields Should I Verify?
 
-When verifying a quote, check:
+Different verification levels require checking different fields:
 
-**Hardware Integrity:**
-- `tee_tcb_svn` - Latest security patches
-- `mr_seam` - Known, trusted TDX firmware
+**Quick Verification:**
+- `report_data` - Your challenge or public key
+- Use Cloud API for hardware verification
 
-**System Integrity:**
-- `mr_td` - Expected initial TD state
-- `RTMR0-2` - Expected boot chain
+See [Quickstart](/phala-cloud/attestation/quickstart) for step-by-step guide.
 
-**Application Integrity:**
-- `RTMR3` - Your application's hash matches
+**Application Verification:**
+- `rt_mr3` (RTMR3) - Your compose-hash
+- `report_data` - Custom data binding
+- Use Cloud API for hardware and OS
 
-**Identity:**
-- `report_data` - Contains expected challenge response or public key
+See [Verify Your Application](/phala-cloud/attestation/verify-your-application) for complete guide.
+
+**Complete Platform Verification:**
+- `mr_td` (MRTD) - OS initial state
+- `rt_mr0` through `rt_mr2` - OS boot chain
+- `rt_mr3` (RTMR3) - Application and KMS binding
+- `tee_tcb_svn` - Security patch level
+- `mr_seam` - TDX firmware measurement
+
+See [Verify the Platform](/phala-cloud/attestation/verify-the-platform) for complete guide.
+
+**Security Audit:**
+- All measurements above
+- On-chain governance verification
+- Reproducible OS builds
+- KMS attestation
+
+See [Complete Chain of Trust](/phala-cloud/attestation/chain-of-trust) for checklist.
 
 ## Resources
 
@@ -141,5 +157,40 @@ When verifying a quote, check:
 
 ## Next Steps
 
-- **[Get Attestation](/phala-cloud/attestation/get-attestation)** - Generate quotes with custom data
-- **[Verifying Attestation](/phala-cloud/attestation/verifying-attestation)** - Verify quotes with Phala Cloud API
+<CardGroup cols={2}>
+  <Card
+    icon="rocket"
+    href="/phala-cloud/attestation/quickstart"
+    title="Quickstart"
+    arrow="true"
+  >
+    Verify your first quote
+  </Card>
+
+  <Card
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
+    arrow="true"
+  >
+    Prove your exact code is running
+  </Card>
+
+  <Card
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure
+  </Card>
+
+  <Card
+    icon="list-check"
+    href="/phala-cloud/attestation/chain-of-trust"
+    title="Complete Security Checklist"
+    arrow="true"
+  >
+    Complete verification with no trust assumptions
+  </Card>
+</CardGroup>
