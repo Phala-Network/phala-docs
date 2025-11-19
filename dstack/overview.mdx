@@ -27,7 +27,7 @@ The container uses `dstack` to communicate with the underlying `tappd`. `dstack`
 `tappd` communicates with a decentralized Key Management Service (KMS), that derives deterministic encryption keys for the application. The keys will be utilized to encrypt storage specific to the application and to protect the its data integrity. With KMS operating independently from any specific TEE instance, your applications avoid vendor lock-in and can be securely migrated between different hardware environments without any data loss.
 
 <Frame>
-    <img src="/images/dstack-cvm-arch.png" />
+    <img src="/images/dstack-cvm-arch.png" alt="dstack CVM architecture diagram showing the relationship between docker containers, dstack, tappd, and decentralized KMS" />
 </Frame>
 
 ## Verify If An Application is Running Inside a TEE

@@ -10,7 +10,8 @@
       "copy",
       "view",
       "chatgpt",
-      "claude"
+      "claude",
+      "mcp"
     ]
   },
   "errors": {
@@ -143,6 +144,9 @@
   "integrations": {
     "ga4": {
       "measurementId": "G-RHRW9RL5LG"
+    },
+    "gtm": {
+      "tagId": "GTM-TX3VQZP"
     }
   },
   "logo": {
@@ -1411,6 +1415,24 @@
       "source": "/network/compute-providers/run-workers-on-khala/troubleshooting"
     }
   ],
+  "seo": {
+    "indexing": "all",
+    "metatags": {
+      "author": "Phala Cloud",
+      "canonical": "https://docs.phala.com",
+      "category": "Technology",
+      "distribution": "global",
+      "keywords": "Phala Cloud, TEE, Trusted Execution Environment, Confidential Computing, Confidential AI, GPU TEE, Intel TDX, dstack, blockchain, privacy-preserving computing, secure cloud, attestation",
+      "language": "en",
+      "og:image": "https://docs.phala.com/images/phala-docs (1).jpg",
+      "og:site_name": "Phala Docs",
+      "og:type": "website",
+      "robots": "index, follow",
+      "twitter:card": "summary_large_image",
+      "twitter:creator": "@PhalaNetwork",
+      "twitter:site": "@PhalaNetwork"
+    }
+  },
   "styling": {
     "codeblocks": "system"
   },
