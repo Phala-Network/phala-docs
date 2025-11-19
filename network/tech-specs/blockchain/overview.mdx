@@ -14,7 +14,7 @@ Phala is a trustless cloud computing solution for the next generation’s intern
 Phala tackles the privacy and performance issues of legacy blockchain solutions operated in a cloud environment by decoupling the computation from the chain to off-chain secure workers: the blockchain is only used as the canonical (encrypted) message queue, and the attested secure workers fetch requests (i.e., transactions) from the chain, verify and execute them, and then write the computation results back.
 
 <Frame>
-    <img src="/images/phala-design (1).png" />
+    <img src="/images/phala-design (1).png" alt="Phala blockchain architecture overview" />
 </Frame>
 
 Our secure workers utilize specific [Secure Enclave](https://en.wikipedia.org/wiki/Trusted\_execution\_environment) hardware that ensures confidentiality, security, and performance of blockchain computation. Furthermore, our code is all open-source.
@@ -28,7 +28,7 @@ In general, Phala Network consists of the Phala blockchain and the off-chain run
 * `pherry`: The Substrate-Enclave bridge relayer. Connects the blockchain and `pRuntime`;
 
 <Frame>
-    <img src="/images/node-detail.png" />
+    <img src="/images/node-detail.png" alt="Phala node architecture details showing worker and gatekeeper components" />
 </Frame>
 
 ### Transaction Security <a href="#transaction-security" id="transaction-security"></a>
