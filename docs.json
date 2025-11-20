@@ -154,6 +154,9 @@
     "light": "/images/phala-light.png"
   },
   "name": "Phala",
+  "thumbnails": {
+    "background": "/images/phala-docs-og.png"
+  },
   "navbar": {
     "primary": {
       "href": "https://cloud.phala.network",
