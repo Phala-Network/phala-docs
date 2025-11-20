@@ -86,7 +86,7 @@ On your first visit, create an admin account with your name, email, and password
 
 After account creation, click **Okay, Let's Go!** to access the chat interface.
 
-## Step 3: Use the chat interface
+## Step 3: Interact with your model
 
 Open WebUI provides a standard chat interface. Type your questions in the prompt box, manage conversation history in the left sidebar, and use the tools menu (+) for advanced features like file uploads. The interface is intuitive and works like other chat applications you may be familiar with.
 
@@ -96,34 +96,17 @@ Open WebUI provides a standard chat interface. Type your questions in the prompt
 
 ## Step 4: Access via API
 
-Beyond the WebUI, you can access your dedicated model programmatically through a REST API. This lets you integrate the model into applications and workflows while preserving confidentiality.
+Beyond the WebUI, you can access your dedicated model programmatically through a REST API.
 
-### Find your API details
+Navigate to the **Overview** page for your running instance. In the **Inference API** section, click **Quickstart** to see example commands and integration code.
 
-Navigate to the **Overview** page for your running instance. In the **Inference API** section, you'll see:
-- **API Base URL**: Your unique domain endpoint
-- **Quickstart**: Example commands and integration guide
-- **API Docs**: Complete API reference
-
-Click **Quickstart** to open a modal with detailed instructions and example code.
-
-### Generate an API key
-
-To authenticate API requests, you need an API key from Open WebUI.
-
-Open the WebUI and navigate to **Settings** → **Account** → **API keys**. Create a new key and copy it. Use this key as a Bearer token in all API requests.
+To make API calls, you'll need an API key from Open WebUI. Open the WebUI, navigate to **Settings** → **Account** → **API keys**, and create a new key. Use this key as a Bearer token in your requests.
 
 <Warning>
 Protect your API key like a password. Anyone with the key can access your model.
 </Warning>
 
-### Make API requests
-
-All API calls use your instance's base URL (e.g., `https://<app-id>.dstack-prod5.phala.network`). Include your API key in the Authorization header.
-
-#### Chat completions
-
-Send chat completion requests to interact with your model:
+Here's a quick example for chat completions:
 
 ```bash
 curl -H "Content-Type: application/json" \
@@ -131,38 +114,25 @@ curl -H "Content-Type: application/json" \
   -d '{
     "model": "qwen/qwen-2.5-7b-instruct",
     "messages": [
-      {"role": "system", "content": "You are a helpful assistant."},
       {"role": "user", "content": "Hello! Can you tell me a fun fact about space?"}
     ]
   }' \
   https://<base_url>/v1/chat/completions
 ```
 
-The endpoint accepts OpenAI-compatible request bodies with a `model` field and `messages` array.
-
-#### Verify TEE attestation
-
-For enhanced security, fetch attestation reports and cryptographic signatures to verify your requests were processed inside a TEE.
-
-**Get attestation report** for a specific model:
+For TEE verification, your instance exposes attestation endpoints:
 
 ```bash
+# Get attestation report
 curl -H "Authorization: Bearer sk-your-api-key" \
   "https://<base_url>/v1/attestation/report?model=MODEL_NAME"
-```
 
-**Get signature** for a chat completion:
-
-```bash
+# Get signature for a chat completion
 curl -H "Authorization: Bearer sk-your-api-key" \
   "https://<base_url>/v1/signature/{chat_completion_id}?model=MODEL_NAME&signing_algo=ecdsa"
 ```
 
-These endpoints help you confirm the integrity and provenance of your inference results. See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation) and [Verify Signature](/phala-cloud/confidential-ai/verify/verify-signature) for detailed verification guides.
-
-<Note>
-API requests incur the same hourly compute charges as WebUI usage. Monitor your usage to control costs.
-</Note>
+See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation) and [Verify Signature](/phala-cloud/confidential-ai/verify/verify-signature) for how to use these endpoints to confirm your requests were processed inside a TEE.
 
 ## Managing your instance
 
@@ -175,44 +145,6 @@ Return to the Confidential AI Models page anytime to monitor your model:
 <Note>
 Billing continues while the instance is running. Stop or schedule destruction when you no longer need the model to avoid ongoing charges.
 </Note>
-
-## Next steps
-
-You've deployed a dedicated model and accessed it through Open WebUI! Now you can:
-
-<CardGroup cols={2}>
-  <Card
-    icon="shield-check"
-    title="Verify attestation"
-    href="/phala-cloud/confidential-ai/verify/verify-attestation"
-  >
-    Confirm your model runs in genuine TEE hardware
-  </Card>
-
-  <Card
-    icon="code"
-    title="API access"
-    href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api"
-  >
-    Use the Confidential AI API for programmatic access
-  </Card>
-
-  <Card
-    icon="microchip"
-    title="GPU TEE"
-    href="/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
-  >
-    Deploy custom models with full infrastructure control
-  </Card>
-
-  <Card
-    icon="chart-line"
-    title="Benchmark"
-    href="/phala-cloud/confidential-ai/benchmark"
-  >
-    Review performance metrics for TEE mode
-  </Card>
-</CardGroup>
 
 ## Troubleshooting
 
@@ -228,8 +160,24 @@ Verify your model status is **Running** in the Active Workloads section. Check t
 
 We can't reset your admin password because the model is running in a confidential environment that even the cloud provider doesn't have access to. You will lose all the chat history if you forget your password.
 
-## Related documentation
+## Next steps
 
-- [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) - Use pre-deployed models with pay-per-request pricing
-- [Verify signature](/phala-cloud/confidential-ai/verify/verify-signature) - Verify request/response integrity
-- [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) - Deploy custom workloads on dedicated GPU infrastructure
+You've deployed a dedicated model and accessed it through Open WebUI! Now you can:
+
+<CardGroup cols={2}>
+  <Card
+    icon="shield-check"
+    title="Verify attestation"
+    href="/phala-cloud/confidential-ai/verify/verify-attestation"
+  >
+    Confirm your model runs in genuine TEE hardware
+  </Card>
+
+  <Card
+    icon="microchip"
+    title="GPU TEE"
+    href="/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
+  >
+    Deploy custom models with full infrastructure control
+  </Card>
+</CardGroup>

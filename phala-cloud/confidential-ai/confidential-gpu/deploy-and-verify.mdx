@@ -3,11 +3,11 @@ title: Deploy and Verify GPU TEE
 description: Deploy or fine-tune AI models with hardware-level security using TEE-protected GPUs and verify they run in genuine TEE hardware
 ---
 
-This tutorial shows you how to deploy a dedicated GPU instance with TEE protection and verify it runs on genuine hardware. You'll provision an H100, H200, or B200 GPU, access it through JupyterLab, and use NVIDIA's verification tools to confirm hardware authenticity.
+GPU TEE gives you dedicated H100, H200, or B200 GPUs running inside trusted execution environments for custom AI workloads. You get full control over your environment with Docker container support, and you can verify hardware authenticity using NVIDIA's local verification tools.
 
-When you need full control over your GPU environment, GPU TEE gives you dedicated servers for custom model deployment, inference, or fine-tuning. The [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) and [Model Template](/phala-cloud/confidential-ai/confidential-gpu/model-template) work well for standard use cases, but GPU TEE is built for custom workloads on proprietary datasets.
+This option works when you need to train, fine-tune, or run inference on proprietary datasets with custom code. For standard LLM inference, the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) or [Model Template](/phala-cloud/confidential-ai/confidential-gpu/model-template) are simpler alternatives.
 
-Each instance comes with NVIDIA Driver `570.133.20` and CUDA `12.8` pre-installed. You can scale from 1 to 8 GPUs depending on your compute needs.
+Each instance includes NVIDIA Driver `570.133.20` and CUDA `12.8`. You can scale from 1 to 8 GPUs per instance.
 
 ## Prerequisites
 
@@ -17,17 +17,13 @@ Each instance comes with NVIDIA Driver `570.133.20` and CUDA `12.8` pre-installe
 
 ## Step 1: Deploy GPU TEE instance
 
-### Sign in to Phala Cloud
+### Launch the deployment wizard
 
-Navigate to [cloud.phala.network](https://cloud.phala.network) and sign in with GitHub, Google, or email. After logging in, you'll see your dashboard with tabs for **Overview**, **GPU TEE**, **Confidential AI API**, **Confidential AI Models**, and **Billing**.
+Sign in to [cloud.phala.network](https://cloud.phala.network), click **GPU TEE** in the navigation bar, then click **Start Building** to open the Launch GPU Instance wizard.
 
 <Note>
 Check your credit balance in the upper right corner. GPU instances incur hourly charges, so confirm your balance before launching.
 </Note>
-
-### Launch the GPU TEE wizard
-
-Click **GPU TEE** in the navigation bar, then click **Start Building** to open the Launch GPU Instance wizard.
 
 ### Choose GPU hardware
 
@@ -63,6 +59,10 @@ Choose the number of GPUs for your instance. You can scale from **1 to 8 GPUs** 
 Give your deployment a name or use the auto-generated name like `gpu-tee-1p1qp`. For the template, choose **Jupyter Notebook (PyTorch)** to get a GPU-accelerated JupyterLab environment with PyTorch and CUDA pre-installed. This template works well for running verification scripts and custom experiments.
 
 You can also choose vLLM for an inference server or Custom Configuration to provide your own Docker Compose file. For this tutorial, we'll use Jupyter Notebook because it gives us terminal access to run verification commands.
+
+<Tip>
+You can always deploy different containers later. Your initial template choice isn't permanent.
+</Tip>
 
 ### Select pricing plan
 
@@ -147,21 +147,15 @@ Run the verifier to get cryptographic proof of hardware authenticity:
 python -m verifier.cc_admin
 ```
 
-The verifier confirms your GPUs are genuine NVIDIA devices, checks confidential compute mode is enabled, verifies driver and firmware versions, and generates cryptographic evidence of your TEE status.
-
-<Note>
-Placeholder: Add expected output example and interpretation guidance. The output should show verification success with GPU details and attestation evidence.
-</Note>
-
-Successful verification confirms your GPU hardware is authentic, confidential compute mode is active, and the driver version matches the expected TEE-enabled version.
+The verifier confirms your GPUs are genuine NVIDIA devices, checks confidential compute mode is enabled, verifies driver and firmware versions, and generates cryptographic evidence of your TEE status. Successful verification means your GPU hardware is authentic, confidential compute mode is active, and the driver version matches the expected TEE-enabled version.
 
 <Warning>
 If verification fails, do not use the instance for confidential workloads. Contact [Phala Support](/phala-cloud/support) with the error details.
 </Warning>
 
-## Step 4: Test with PyTorch
+## Step 4: Confirm GPU functionality
 
-You can verify GPU functionality with PyTorch. Open a new notebook in JupyterLab (**File** → **New** → **Notebook**) and run:
+Verify GPU functionality with PyTorch. Open a new notebook in JupyterLab (**File** → **New** → **Notebook**) and run:
 
 ```python
 import torch
@@ -201,15 +195,3 @@ You've deployed and verified a GPU TEE instance! Now you can:
     Make your GPU TEE workloads accessible over HTTPS
   </Card>
 </CardGroup>
-
-## Key takeaways
-
-GPU TEE gives you dedicated GPUs for custom training, inference, or fine-tuning on proprietary data. You can choose H200 (US & India) or B200 (US) hardware and scale from 1 to 8 GPUs per instance.
-
-Pricing is flexible with on-demand or 1/6-month commitments. Local verification using NVIDIA's tools confirms hardware authenticity. The Jupyter template provides easy access for running verification and development workflows.
-
-## Related documentation
-
-- [Model Template](/phala-cloud/confidential-ai/confidential-gpu/model-template) - Deploy pre-built AI models on GPU TEE
-- [Attestation verification](/phala-cloud/confidential-ai/verify/verify-attestation) - Deep dive into attestation concepts
-- [Verify signature](/phala-cloud/confidential-ai/verify/verify-signature) - Verify request/response integrity
