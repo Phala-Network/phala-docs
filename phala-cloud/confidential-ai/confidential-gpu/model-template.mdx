@@ -1,43 +1,235 @@
 ---
-description: This guide will help you deploy and manage AI models in a secure, confidential computing environment
-title: Model Template
+description: Deploy dedicated GPU resources for AI models with hourly pricing. Same models as the API but with dedicated performance.
+title: Dedicated Models
 ---
 
-## Why use model templates?
+Dedicated Models let you host large language models on dedicated GPU hardware inside trusted execution environments (TEEs). You get the same pre-deployed models as the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api), but with dedicated resources and hourly pricing instead of per-request billing.
 
-If your preferred model isn't available in the Confidential AI API, you can deploy and manage custom AI models using our model template on GPU TEE. Ideal for [private model training](https://phala.com/solutions/confidential-training) on proprietary datasets and [custom fine-tuned models](https://phala.com/solutions/fine-tuned-models) deployment.
+Choose this option when you need predictable performance or cost efficiency for high-volume inference workloads. For custom workloads beyond pre-deployed models, see [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify).
 
-## Deploy your model
+## Prerequisites
 
-Navigate to the **Confidential AI Models** tab in your Phala Cloud dashboard. You'll see available model templates ready for deployment.
+- Phala Cloud account with sufficient credits
+- Basic familiarity with LLM deployment
 
-<Frame>
-    <img src="/images/confidential-ai/confidential-model/confidential-ai-models-01.png" alt="Confidential AI Models" />
-</Frame>
+## Step 1: Deploy your model
 
-<Note>
-Don't see your preferred model? We can add custom models—just reach out through [Support](/phala-cloud/support).
-</Note>
+### Access the deployment page
 
-Pick your model and hit **Deploy** to get started.
-
-## Configure your deployment
-
-You'll need to fill in a few details to customize your setup:
-
-1. **Service Name**: Give your deployment a memorable name (e.g., "qwen3-8b-d7a7s")
-2. **Model Template**: Select your preferred model (e.g., "qwen3")
-3. **Node & Image**: Keep the default settings unless you have specific requirements
-4. **Resource Plan**: Choose the instance type that matches your workload needs
-5. **Scheduled Destroy**: Set an auto-destruction date if needed, or leave empty for manual control
-6. **Review**: Check your configuration in the deployment summary
+Sign in to your Phala Cloud account and select **Confidential AI Models** from the top navigation bar.
 
 <Frame>
-    <img src="/images/confidential-ai/confidential-model/confidential-ai-models-02.png" alt="Deploy LLM Model" />
+  <img src="/images/confidential-ai/confidential-model/confidential-ai-models-01.png" alt="Confidential AI Models" />
 </Frame>
 
-Review your settings and click **Deploy** to launch.
+### Choose a model
+
+Locate the model you want to deploy (e.g., `qwen-2.5-7b-instruct`) and click **Deploy** to open the deployment wizard. Review the model description to understand its capabilities. For example, Qwen 2.5 models are instruction-tuned language models optimized for chat and task completion.
 
 <Note>
-Our team will contact you directly to complete the rest of the configuration and guide you through the final steps.
+Don't see your preferred model? We can add custom models—reach out through [Support](/phala-cloud/support).
 </Note>
+
+### Configure deployment
+
+Fill out the deployment form with these details:
+
+**Service Name**: Give your deployment a memorable name (e.g., `qwen-2-5-7b-instruct`). Use the auto-generated name or create your own.
+
+**Node & Image**: Select your preferred deployment location and image version. Available options depend on current capacity (e.g., `gpu1 us-west-1` with `dstack-nvidia-0.5.0`).
+
+**Resource Plan**: Review the hardware allocation for your chosen model. For example, `qwen-2.5-7b-instruct` typically includes:
+- H200 GPU with 141 GB VRAM
+- 24 vCPUs
+- 256 GB RAM
+- 40 GB disk
+- $3.20 per hour pricing
+
+**Scheduled Destroy**: Set an auto-destruction date to avoid ongoing charges, or leave empty for manual control.
+
+### Launch the deployment
+
+Review your configuration and click **Deploy** to launch. Provisioning takes a few minutes.
+
+<Frame>
+  <img src="/images/confidential-ai/confidential-model/confidential-ai-models-02.png" alt="Deploy LLM Model" />
+</Frame>
+
+Monitor the status in the Active Workloads section on the Confidential AI Models page. Your model will progress through these states:
+- **Preparing**: Allocating resources
+- **Starting**: Launching the model
+- **Running**: Ready to use
+
+<Warning>
+Billing starts when the model enters Running status. Remember to stop or schedule destruction when you no longer need the instance.
+</Warning>
+
+## Step 2: Access Open WebUI
+
+Once your model reaches Running status, you can access it through Open WebUI, a browser-based chat interface.
+
+### Open the interface
+
+When the workload shows **RUNNING** status, a **Connect UI** button appears under the model card. The button initially reads "Initializing..." while the interface loads. Click it when active to open a new tab.
+
+<Frame>
+  <img src="/images/confidential-ai/confidential-model/confidential-ai-models-03.png" alt="Model Details Page" />
+</Frame>
+
+### Create admin account
+
+On your first visit, create an admin account with your name, email, and password. Click **Create Admin Account** to continue.
+
+<Warning>
+**Critical**: Choose a strong password and store it securely. Because your model runs in a confidential environment, even we (the cloud provider) cannot access or reset your password. If you forget it, you'll lose access to all chat history permanently.
+</Warning>
+
+After account creation, click **Okay, Let's Go!** to access the chat interface.
+
+## Step 3: Use the chat interface
+
+Open WebUI provides a standard chat interface. Type your questions in the prompt box, manage conversation history in the left sidebar, and use the tools menu (+) for advanced features like file uploads. The interface is intuitive and works like other chat applications you may be familiar with.
+
+<Frame>
+  <img src="/images/confidential-ai/confidential-model/confidential-ai-models-04.png" alt="Open WebUI Chat Interface" />
+</Frame>
+
+## Step 4: Access via API
+
+Beyond the WebUI, you can access your dedicated model programmatically through a REST API. This lets you integrate the model into applications and workflows while preserving confidentiality.
+
+### Find your API details
+
+Navigate to the **Overview** page for your running instance. In the **Inference API** section, you'll see:
+- **API Base URL**: Your unique domain endpoint
+- **Quickstart**: Example commands and integration guide
+- **API Docs**: Complete API reference
+
+Click **Quickstart** to open a modal with detailed instructions and example code.
+
+### Generate an API key
+
+To authenticate API requests, you need an API key from Open WebUI.
+
+Open the WebUI and navigate to **Settings** → **Account** → **API keys**. Create a new key and copy it. Use this key as a Bearer token in all API requests.
+
+<Warning>
+Protect your API key like a password. Anyone with the key can access your model.
+</Warning>
+
+### Make API requests
+
+All API calls use your instance's base URL (e.g., `https://<app-id>.dstack-prod5.phala.network`). Include your API key in the Authorization header.
+
+#### Chat completions
+
+Send chat completion requests to interact with your model:
+
+```bash
+curl -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-your-api-key" \
+  -d '{
+    "model": "qwen/qwen-2.5-7b-instruct",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Hello! Can you tell me a fun fact about space?"}
+    ]
+  }' \
+  https://<base_url>/v1/chat/completions
+```
+
+The endpoint accepts OpenAI-compatible request bodies with a `model` field and `messages` array.
+
+#### Verify TEE attestation
+
+For enhanced security, fetch attestation reports and cryptographic signatures to verify your requests were processed inside a TEE.
+
+**Get attestation report** for a specific model:
+
+```bash
+curl -H "Authorization: Bearer sk-your-api-key" \
+  "https://<base_url>/v1/attestation/report?model=MODEL_NAME"
+```
+
+**Get signature** for a chat completion:
+
+```bash
+curl -H "Authorization: Bearer sk-your-api-key" \
+  "https://<base_url>/v1/signature/{chat_completion_id}?model=MODEL_NAME&signing_algo=ecdsa"
+```
+
+These endpoints help you confirm the integrity and provenance of your inference results. See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation) and [Verify Signature](/phala-cloud/confidential-ai/verify/verify-signature) for detailed verification guides.
+
+<Note>
+API requests incur the same hourly compute charges as WebUI usage. Monitor your usage to control costs.
+</Note>
+
+## Managing your instance
+
+Return to the Confidential AI Models page anytime to monitor your model:
+
+**Overview button**: Opens a dashboard with resource metrics, logs, and attestation data.
+
+**Connect UI button**: Always launches the Open WebUI for your model.
+
+<Note>
+Billing continues while the instance is running. Stop or schedule destruction when you no longer need the model to avoid ongoing charges.
+</Note>
+
+## Next steps
+
+You've deployed a dedicated model and accessed it through Open WebUI! Now you can:
+
+<CardGroup cols={2}>
+  <Card
+    icon="shield-check"
+    title="Verify attestation"
+    href="/phala-cloud/confidential-ai/verify/verify-attestation"
+  >
+    Confirm your model runs in genuine TEE hardware
+  </Card>
+
+  <Card
+    icon="code"
+    title="API access"
+    href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api"
+  >
+    Use the Confidential AI API for programmatic access
+  </Card>
+
+  <Card
+    icon="microchip"
+    title="GPU TEE"
+    href="/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
+  >
+    Deploy custom models with full infrastructure control
+  </Card>
+
+  <Card
+    icon="chart-line"
+    title="Benchmark"
+    href="/phala-cloud/confidential-ai/benchmark"
+  >
+    Review performance metrics for TEE mode
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+### Connect UI button stuck on "Initializing..."
+
+Wait 2-3 minutes after the model reaches Running status. The interface needs time to fully start. Refresh the Confidential AI Models page if the button doesn't activate.
+
+### Cannot access Open WebUI
+
+Verify your model status is **Running** in the Active Workloads section. Check that you're using the correct URL (should end in `dstack-prod5.phala.network`).
+
+### Forgot admin password
+
+We can't reset your admin password because the model is running in a confidential environment that even the cloud provider doesn't have access to. You will lose all the chat history if you forget your password.
+
+## Related documentation
+
+- [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) - Use pre-deployed models with pay-per-request pricing
+- [Verify signature](/phala-cloud/confidential-ai/verify/verify-signature) - Verify request/response integrity
+- [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) - Deploy custom workloads on dedicated GPU infrastructure
