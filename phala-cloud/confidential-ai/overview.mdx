@@ -12,56 +12,56 @@ title: Overview
 
 Traditional cloud AI deployments expose your models and data to the cloud provider. Confidential AI addresses this by running everything inside hardware-protected TEE. Your models stay private, your data stays secure, and you get cryptographic proof that execution happened in a trusted environment.
 
-Confidential AI has these essential features of inferencing pre-deployed LLMs, deploying custom models, or using entire GPU infrastructures with TEE to protect your models and data. Explore our [Confidential AI Models](https://phala.com/confidential-ai-models) to see available pre-trained models, use cases, and deployment options.
+Phala Cloud offers two ways to run confidential AI workloads: pre-deployed **Models** (API or Dedicated) for quick integration, or **GPU TEE** for custom infrastructure. Explore our [Confidential AI Models](https://phala.com/confidential-ai-models) to see available pre-trained models, use cases, and deployment options.
 
 <Columns cols={2}>
   <Card
     icon="webhook"
-    href="https://cloud.phala.network/dashboard/confidential-ai-api"
-    title="Confidential AI API"
+    href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api"
+    title="API Access"
     arrow="true"
   >
-    **Try LLM inference API now**
+    **Pre-deployed models, pay per request**
 
-    Pre-deployed LLM inference API with OpenAI-compatible interface
+    OpenAI-compatible API with no infrastructure management
   </Card>
 
   <Card
     icon="workflow"
-    href="https://cloud.phala.network/dashboard/confidential-ai-models"
-    title="Confidential AI Models"
+    href="/phala-cloud/confidential-ai/confidential-gpu/model-template"
+    title="Dedicated Models"
     arrow="true"
   >
-    **Try inference your own AI models**
-    <i class="fa-solid fa-hexagon-nodes"></i>
-    Deploy and manage AI models in a secure, confidential computing environment
+    **Same models, dedicated performance**
+
+    Hourly pricing with predictable performance for high-volume workloads
   </Card>
 
   <Card
     icon="microchip"
-    title="Confidential GPU"
-    href="https://cloud.phala.network/dashboard/gpu-tee"
+    title="GPU TEE"
+    href="/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
     arrow="true"
   >
-    **Try to deploy your own models on GPU TEE**
+    **Custom infrastructure, full control**
 
-    Rent dedicated GPU TEE servers for custom model deployment
+    Rent dedicated GPU TEE servers for any workload
   </Card>
 </Columns>
 
 ## Quick Tour of Confidential AI
 
-### API and Models
+### Models: API and Dedicated
 
-[Use API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) introduces pre-deployed LLMs with OpenAI-compatible APIs for quick integration.
+**API Access** provides pre-deployed LLMs with OpenAI-compatible APIs for quick integration. Pay per request with no infrastructure to manage. Start with [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
-For advanced use cases, [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) enables LLMs to interact with external tools and APIs securely within TEE.
+For advanced API features, explore [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) to enable LLMs to interact with external tools and APIs securely within TEE.
 
-### Confidential GPU
+**Dedicated Models** give you the same pre-deployed models but with dedicated GPU resources and hourly pricing. Choose this for predictable performance or high-volume workloads. See [Dedicated Models](/phala-cloud/confidential-ai/confidential-gpu/model-template).
 
-[Model Template](/phala-cloud/confidential-ai/confidential-gpu/model-template) lets you deploy and manage custom AI models in GPU TEE if current models in API do not meet your needs.
+### GPU TEE: Custom Infrastructure
 
-For complete infrastructure control, you can use [Confidential GPU](/phala-cloud/confidential-ai/confidential-gpu/gpu-tee) to deploy custom models for inference or training/fine-tuning. Configure GPU, CPU, RAM, and storage to match your exact workload needs.
+For complete infrastructure control beyond pre-deployed models, use [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) to rent dedicated GPU servers. Run any workload including custom models for inference, training, or fine-tuning. Configure GPU, CPU, RAM, and storage to match your exact needs.
 
 
 ### Verify Attestation and Signature
@@ -81,7 +81,7 @@ Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions a
 
 - **Seamless integration**: Drop-in OpenAI API compatibility with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
 - **Verifiable security**: Hardware-enforced privacy with cryptographic attestation proving execution in genuine TEE environments
-- **Flexible deployment**: Choose from pre-deployed APIs, custom model hosting, or dedicated GPU infrastructure with full configuration control
+- **Flexible deployment**: Choose from API access (pay per request), dedicated models (hourly dedicated GPU), or GPU TEE (full infrastructure control)
 
 ## Open Source Foundation
 

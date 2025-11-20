@@ -220,9 +220,10 @@
                 "pages": [
                   "/phala-cloud/confidential-ai/overview",
                   {
-                    "group": "API and Models",
+                    "group": "Models",
                     "pages": [
                       "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
+                      "/phala-cloud/confidential-ai/confidential-gpu/model-template",
                       "/phala-cloud/confidential-ai/confidential-model/tool-calling",
                       "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
                       "/phala-cloud/confidential-ai/confidential-model/structured-output",
@@ -231,10 +232,9 @@
                     ]
                   },
                   {
-                    "group": "GPU",
+                    "group": "GPU TEE",
                     "pages": [
-                      "/phala-cloud/confidential-ai/confidential-gpu/model-template",
-                      "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee"
+                      "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
                     ]
                   },
                   {
@@ -1315,8 +1315,12 @@
       "source": "/phala-cloud/confidential-ai/confidential-gpu/confidential-ai-models"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee",
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
       "source": "/phala-cloud/confidential-ai/confidential-gpu/overview"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/gpu-tee"
     },
     {
       "destination": "/phala-cloud/key-management/get-a-key",
