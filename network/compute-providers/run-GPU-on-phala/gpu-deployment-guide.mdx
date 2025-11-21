@@ -1,0 +1,244 @@
+---
+description: Deploy and manage worker nodes to provide computing power on Phala Network.
+title: Phala GPU Mining Deployment Guide (H100 / H200 / B200)
+---
+
+This document is a step-by-step guide for community members to deploy **Phala GPU Mining** on their own servers.
+
+Currently supported GPU models:
+
+- **NVIDIA H100**
+- **NVIDIA H200**
+- **NVIDIA B200**
+
+Deployment is divided into **two major stages**:
+
+1. **Enable TDX in BIOS, configure the system environment, and install Dstack (with GPU stack enabled)**
+2. **Run the Phala GPU Mining service inside the server via Docker and connect to Phala Cloud**
+
+## 1. Enable TDX & Install Dstack
+
+### 1.1 Enable TDX in BIOS
+
+Before installing or booting the OS, enter the server BIOS and enable:
+
+- Intel TDX
+- Intel VT-x / VT-d
+- SR-IOV (if available)
+- Any required CPU virtualization / security features (names may vary by vendor)
+
+> Different hardware vendors may use different BIOS names. Please refer to your server’s manual.
+
+### 1.2 Configure TDX System Environment
+
+Follow Intel’s / Dstack’s official instructions to configure the TDX system environment:
+
+- Dstack repo & basic setup:  
+  **https://github.com/Dstack-TEE/dstack**
+
+If you encounter errors related to **Intel modules** (for example, TDX module installation failures), refer to Intel’s enabling guide:
+
+- Intel TDX hardware setup guide:  
+  **https://cc-enabling.trustedservices.intel.com/intel-tdx-enabling-guide/04/hardware_setup/**
+
+Make sure all required kernel modules and firmware settings for TDX are correctly configured before continuing.
+
+### 1.3 Upgrade NVIDIA Driver to Latest Version
+
+Phala GPU Mining relies on NVIDIA Confidential Computing–capable GPUs and drivers.  
+Please upgrade your NVIDIA driver to the latest supported version and verify compatibility:
+
+- NVIDIA Confidential Computing compatibility matrix:  
+  **https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/**
+
+After installation, verify that the GPU is correctly recognized:
+
+```bash
+nvidia-smi
+```
+
+### 1.4 Install and Run Dstack
+
+The base deployment of Dstack follows the official documentation:
+
+- Dstack repo:  
+  **https://github.com/Dstack-TEE/dstack**
+
+> By default, the Dstack GitHub documentation focuses on **Confidential CPU** only.  
+> To run **Phala GPU Mining**, you must additionally enable and configure the **GPU Stack**.
+
+#### 1.4.1 Update `vmm.toml` for GPU Stack
+
+Locate your `vmm.toml` configuration file and update (or add) the following fields.
+
+**Global paths & KMS configuration:**
+
+```toml
+image_path = "<your own image path>"
+run_path = "<your own vm path>"
+kms_url = "<your own kms installation path>"
+
+[cvm]
+kms_urls = ["<your own kms installation path>"]
+gateway_urls = ["<your own gateway url>"]
+cid_start = 672000
+cid_pool_size = 1000
+max_disk_size = 2000
+qemu_single_pass_add_pages = false
+qemu_pic = false
+qemu_pci_hole64_size = 1125899906842624
+qemu_hotplug_off = true
+```
+
+**GPU configuration:**
+
+```toml
+[cvm.gpu]
+enabled = true
+# To expose all available GPU devices to the dashboard and VMs:
+include = []
+# Alternatively, you can explicitly list GPU PCI IDs, e.g.:
+# include = ["0000:17:00.0"]
+```
+
+**Supervisor configuration:**
+
+```toml
+[supervisor]
+detached = true
+auto_start = false
+```
+
+**Notes:**
+
+- `cvm.gpu.include`  
+  - `[]` = use **all** available GPUs  
+  - Or specify specific GPU device IDs as needed.
+- `kms_url` / `kms_urls`  
+  - Replace with your actual KMS installation address or domain.
+- `gateway_urls`  
+  - Replace with your actual Dstack gateway URL(s).
+- `qemu_path`  
+  - In some environments, `qemu` is **not** located at `/opt/qemu-xxx`.  
+    Check the actual QEMU location and ensure your Dstack configuration points to the correct path.
+- `image_path` / `run_path`  
+  - Use paths where your VM images and runtime files will be stored.
+
+#### 1.4.2 Start Dstack Services
+
+Once configuration is complete, start the core Dstack components in the following order:
+
+1. **Start KMS**
+
+```bash
+./dstack-kms -c kms.toml
+```
+
+2. **Start Gateway**
+
+```bash
+sudo ./dstack-gateway -c gateway.toml
+```
+
+3. **Start VMM**
+
+```bash
+./dstack-vmm -c vmm.toml
+```
+
+#### 1.4.3 Verify Dstack Setup
+
+Dstack is considered correctly deployed if:
+
+- All three processes (**KMS**, **Gateway**, **VMM**) run without critical errors.
+- You can access the Dstack web UI via its URL (dashboard loads successfully).
+- GPU devices are visible/usable through Dstack after enabling `[cvm.gpu]`.
+
+If these are met, your **Confidential CPU + GPU Stack environment is ready**.
+
+## 2. Run the Phala GPU Mining Service
+
+After Dstack and the GPU stack are running correctly, you can start deploying the Phala GPU Mining service.
+
+The mining backend is a Docker-based service that:
+
+- Connects to your local Dstack instance
+- Registers the node with **Phala Cloud**
+- Exposes your GPU resources for Phala GPU mining
+
+> It is recommended to run the backend as **root** (or with equivalent privileges).
+
+### 2.1 Use the Official Mining Backend Docker Setup
+
+Phala provides an official Docker Compose configuration:
+
+- Docker Compose file:  
+  **https://github.com/Phala-Network/dstack-mining-backend/blob/main/docker-compose.yaml**
+
+- Full backend repo:  
+  **https://github.com/Phala-Network/dstack-mining-backend**
+
+### 2.2 Clone the Repository and Configure
+
+```bash
+git clone https://github.com/Phala-Network/dstack-mining-backend.git
+cd dstack-mining-backend
+```
+
+Edit `docker-compose.yaml` and update necessary fields:
+
+- Dstack gateway and KMS endpoints  
+- Phala Cloud API credentials  
+- Optional: volume mounts, logging, etc.  
+
+### 2.3 Start the Mining Backend
+
+```bash
+docker compose up -d
+```
+
+This will:
+
+- Launch the backend container
+- Connect it to your local Dstack instance
+- Register your GPU node with Phala Cloud
+
+### 2.4 Confirm Mining Is Active
+
+Check Docker containers:
+
+```bash
+docker ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f
+```
+
+Your setup is successful when:
+
+- Backend connects to Dstack gateway & KMS  
+- GPUs (H100 / H200 / B200) are detected  
+- Your node registers on Phala Cloud  
+- Mining jobs begin to run  
+
+## 3. Troubleshooting
+
+Common issues:
+
+- **Intel TDX module errors**  
+  → Re-check BIOS and Intel’s TDX guide.
+
+- **GPU not detected**  
+  → Ensure `cvm.gpu.enabled = true` and correct NVIDIA drivers.
+
+- **QEMU path issue**  
+  → Verify QEMU location on your OS.
+
+- **Backend cannot reach Dstack**  
+  → Confirm gateway/KMS URLs and firewall settings.
+
+- **Docker device permission issues**  
+  → Use root or ensure access to `/dev/nvidia*`.
