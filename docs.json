@@ -962,6 +962,10 @@
       "source": "/en-us/maintain/gatekeeper"
     },
     {
+      "destination": "/network/compute-providers/introduction",
+      "source": "/network/compute-providers/gatekeeper"
+    },
+    {
       "destination": "/network/index",
       "source": "/legacy"
     },
