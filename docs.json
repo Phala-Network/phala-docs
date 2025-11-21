@@ -425,45 +425,7 @@
               "/network/overview/block-explorers",
               "/network/overview/phala-staking",
               "/network/overview/phala-treasury",
-              "/network/overview/phala-governance",
-              {
-                "group": "Legacy Parachain Documentation",
-                "pages": [
-                  "/overview/phala-network",
-                  {
-                    "group": "Phala Token",
-                    "pages": [
-                      "/overview/pha-token/introduction",
-                      {
-                        "group": "Delegation",
-                        "pages": [
-                          "/overview/pha-token/delegation/overview",
-                          "/overview/pha-token/delegation/delegate-to-stakepool",
-                          "/overview/pha-token/delegation/whats-vault",
-                          "/overview/pha-token/delegation/whats-share",
-                          "/overview/pha-token/delegation/wrappedbalances-and-w-pha",
-                          "/overview/pha-token/delegation/examples-of-delegation",
-                          "/overview/pha-token/delegation/use-phala-app-to-delegate",
-                          "/overview/pha-token/delegation/estimate-your-reward"
-                        ]
-                      },
-                      {
-                        "group": "Governance",
-                        "pages": [
-                          "/overview/pha-token/governance/overview",
-                          "/overview/pha-token/governance/governance-mechanism",
-                          "/overview/pha-token/governance/join-the-council",
-                          "/overview/pha-token/governance/voting-for-councillors",
-                          "/overview/pha-token/governance/apply-for-project-funding",
-                          "/overview/pha-token/governance/phala-governance",
-                          "/overview/pha-token/governance/phala-treasury",
-                          "/overview/pha-token/governance/setup-account-identity"
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
+              "/network/overview/phala-governance"
             ]
           },
           {
@@ -638,20 +600,24 @@
       "source": "/dstack/design-documents/index"
     },
     {
-      "destination": "/overview/pha-token/delegation/overview",
+      "destination": "/network/overview/phala-staking",
       "source": "/overview/pha-token/delegation/index"
     },
     {
-      "destination": "/overview/pha-token/governance/overview",
+      "destination": "/network/overview/phala-governance",
       "source": "/overview/pha-token/governance/index"
     },
     {
-      "destination": "/overview/pha-token/introduction",
+      "destination": "/network/overview/phala-staking",
       "source": "/overview/pha-token/index"
     },
     {
-      "destination": "/overview/pha-token/introduction",
+      "destination": "/network/overview/phala-staking",
       "source": "/overview/pha-token"
+    },
+    {
+      "destination": "/network/overview/phala-network",
+      "source": "/overview/phala-network"
     },
     {
       "destination": "/phala-cloud/phala-cloud-cli/overview",
@@ -1050,11 +1016,11 @@
       "source": "/tech-specs/ai-agent-contract/:slug*"
     },
     {
-      "destination": "/overview/pha-token",
+      "destination": "/network/overview/phala-staking",
       "source": "/tech-specs/pha-token"
     },
     {
-      "destination": "/overview/pha-token",
+      "destination": "/network/overview/phala-staking",
       "source": "/tech-specs/pha-token/:slug*"
     },
     {
@@ -1142,7 +1108,7 @@
       "source": "/phala-cloud/use-cases/tee_with_fhe_and_mpc"
     },
     {
-      "destination": "/overview/pha-token/introduction",
+      "destination": "/network/overview/phala-staking",
       "source": "/developers/phat-contract/pay-for-cloud-service"
     },
     {
@@ -1270,12 +1236,32 @@
       "source": "/phala-cloud/networking/setting-up-custom-domain"
     },
     {
-      "destination": "/overview/pha-token/governance/phala-governance",
+      "destination": "/network/overview/phala-governance",
       "source": "/overview/pha-token/governance/khala-governance"
     },
     {
-      "destination": "/overview/pha-token/governance/phala-treasury",
+      "destination": "/network/overview/phala-treasury",
       "source": "/overview/pha-token/governance/khala-treasury"
+    },
+    {
+      "destination": "/network/overview/phala-governance",
+      "source": "/overview/pha-token/governance/phala-governance"
+    },
+    {
+      "destination": "/network/overview/phala-treasury",
+      "source": "/overview/pha-token/governance/phala-treasury"
+    },
+    {
+      "destination": "/network/overview/phala-governance",
+      "source": "/overview/pha-token/governance/overview"
+    },
+    {
+      "destination": "/network/overview/phala-staking",
+      "source": "/overview/pha-token/delegation/overview"
+    },
+    {
+      "destination": "/network/overview/phala-staking",
+      "source": "/overview/pha-token/introduction"
     },
     {
       "destination": "/network/compute-providers/introduction",
