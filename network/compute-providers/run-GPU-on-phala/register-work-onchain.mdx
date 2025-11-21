@@ -1,0 +1,141 @@
+---
+description: 'How to Register Your GPU Worker On-Chain and Start Earning Rewards:'
+title: Register Your GPU Worker On-Chain and Start Earning Rewards
+---
+
+After successfully deploying Dstack, enabling TDX + GPU stack support, your GPU worker is technically online — but **not yet registered on-chain**.  
+To actually start earning GPU mining rewards, each GPU must:
+
+1. Pass environment verification  
+2. Receive an official **GPU NFT**  
+3. Create a **stakepool**  
+4. Lock the GPU NFT into the stakepool  
+5. Deposit required **vPHA collateral**  
+6. Activate mining  
+
+This guide walks you through each step.
+
+## 1. Manual Environment Verification (Required Before On-Chain Registration)
+
+Because the automated GPU verification pipeline is still under development, GPU miners must currently undergo **manual verification**.
+
+After your machine:
+
+- appears online in Phala Cloud  
+- shows healthy TDX + GPU stack operation  
+- completes all configuration steps  
+
+Please contact the Phala Delegation Team: delegation@phala.network
+
+Include the following:
+
+- Your GPU hardware model (H100 / H200 / B200)  
+- Your wallet address (for receiving the NFT)  
+- Any logs or additional information if requested  
+
+The Phala team will manually verify:
+
+- TDX environment readiness  
+- GPU compatibility and stability  
+- Proper Dstack configuration  
+- Worker reliability  
+
+Once approved, you may proceed to on-chain registration.
+
+## 2. Receive Your GPU NFT
+
+After the manual verification is completed, the Phala team will help mint a **GPU Worker NFT** for your device.
+
+This NFT:
+
+- Represents your GPU on-chain  
+- Stores metadata such as GPU model & reward weight  
+- Is mandatory for earning mining rewards  
+- Must be locked into your stakepool  
+
+Without the NFT, your GPU **cannot** receive vPHA mining rewards, even if it is online.
+
+## 3. Create Your StakePool
+
+A **stakepool** is a container that:
+
+- Holds your GPU NFTs  
+- Stores your required vPHA collateral  
+- Tracks your mining activity and earnings  
+- Acts as your mining identity on-chain  
+
+Each miner typically only needs **one stakepool**, unless managing GPUs under different ownership structures.
+
+Using your wallet interface (e.g., MetaMask):
+
+1. Click **Create StakePool**  
+2. Sign the transaction  
+3. Wait for on-chain confirmation  
+
+Your stakepool is now ready.
+
+## 4. Lock Your GPU NFT Into the StakePool
+
+Once your stakepool is created:
+
+1. Open the stakepool interface  
+2. Choose **“Lock NFT”**  
+3. Select the GPU Worker NFT you just received  
+4. Confirm the transaction  
+
+Your GPU is now officially registered on-chain.
+
+## 5. Deposit Required vPHA Collateral
+
+Each GPU requires a certain amount of **vPHA collateral** to ensure network security.
+
+| GPU Model | Required vPHA |
+|----------|----------------|
+| **H100** | 1250 vPHA      |
+| **H100x8** | 10000 vPHA   |
+| **H200** | 1875 vPHA      |
+| **H200x8** | 15000 vPHA   |
+| **B200** | 2250 vPHA      |
+| **B200x8** | 18000 vPHA   |
+
+To deposit collateral:
+
+1. Convert PHA → vPHA through the staking contract if needed  
+2. Bridge the vPHA to L2 network via "bridge.phala.network"
+2. Open your stakepool  
+3. Choose **Deposit Collateral**  
+4. Deposit the required amount (based on GPU type)  
+
+This collateral:
+
+- Does **not** earn rewards  
+- Is used purely as a **security guarantee**  
+- Is fully withdrawable when you retire your GPU and exit properly  
+
+## 6. Start Mining and Earn vPHA Rewards
+
+After completing:
+
+- NFT lock  
+- vPHA collateral deposit  
+- Worker online status in Phala Cloud  
+
+Your GPU will automatically start the mining process.
+
+### Reward Distribution Details
+
+- Rewards are paid in **vPHA**  
+- Rewards are calculated hourly and **Payout happens every hour** at the **end of each hour**  
+
+### Reward Weights by GPU Type
+
+| GPU Model | Weight |
+|-----------|---------|
+| H100      | 1.0     |
+| H200      | 1.5     |
+| B200      | 1.8     |
+
+You can monitor these metrics on app.phala.network
+- Worker status
+- On-chain status (stakepool interface)  
+- Earnings flow (vPHA rewards updated hourly)  

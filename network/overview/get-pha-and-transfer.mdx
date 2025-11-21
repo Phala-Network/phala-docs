@@ -3,7 +3,61 @@ description: Reference documentation and resources for Phala Network development
 title: Acquiring PHA
 ---
 
-PHA token is the native token of Phala Network. Its uses include paying gas fees on the blockchain, performing governance, and staking. To learn more about PHA's uses and utility, head to the [PHA Token](/overview/pha-token) section of the docs.
+Phala tokens exist in multiple environments, and it is important for community members to correctly recognize and verify the token contracts they interact with.  
+
+## PHA as an ERC-20 Token
+**PHA** is an ERC-20 token and can be displayed, transferred, and managed in any **EVM-compatible wallet**, including:
+
+- MetaMask  
+- Rabby  
+- Safe (Gnosis Safe)  
+- WalletConnect-compatible wallets  
+
+This means PHA can be used across the broader Ethereum ecosystem without special configuration.
+
+## What Is vPHA?
+
+**vPHA** is the token generated from the **Phala staking contract** on Ethereum.  
+Users stake PHA → receive vPHA.
+
+vPHA serves several important roles:
+
+- **Community governance**  
+- **Staking on Phala L2**  
+- **Required collateral for GPU mining**  
+- **Utility token for future Phala L2 applications**
+
+Unlike PHA, vPHA is generally not used for transfers or payments — it represents staked value and governance power.
+
+## How to Add Phala L2 Network to Your Wallet
+
+You can add **Phala L2** to any EVM wallet (such as MetaMask or Rabby) by manually entering the official network details. 
+Simply open “Add Network,” fill in: RPC `https://rpc.phala.network`, Chain ID `2035`, Symbol `ETH`, and Explorer `https://explorer.phala.network`, then save. 
+After adding the network, you may also import PHA and vPHA tokens using the correct contract addresses if needed. Once done, your wallet is ready to interact with Phala L2.
+
+## Always Verify Token Contract Addresses
+
+For security reasons, community members must always ensure they are interacting with the **correct token contracts**.  
+Below are the *official and only valid* contract addresses:
+
+### **ERC-20 Contracts (Ethereum Mainnet)**
+
+| Token | Contract Address |
+|-------|------------------|
+| **PHA (ERC20)** | `0x6c5bA91642F10282b576d91922Ae6448C9d52f4E` |
+| **vPHA (ERC20)** | `0x21d6eC8fc14CaAcc55aFA23cBa66798DAB3a0ec0` |
+
+### **Phala L2 Contracts**
+
+| Token | Contract Address |
+|-------|------------------|
+| **PHA (Phala L2)** | `0xd63dD43678124DEb6bF38b0d7f8cf0674e85c46E` |
+| **vPHA (Phala L2)** | `0xFdCEBD2E111D64Fc8a682703Eac62918093ec856` |
+
+
+## Transfer PHA/vPHA between Ethereum and Phala L2 <a href="#Transfer-PHA/vPHA-between-Ethereum-and-Phala-L2" id="Transfer-PHA/vPHA-between-Ethereum-and-Phala-L2"></a>
+
+For now, you can transfer your PHA between Ethereum and Phala L2, with [Superbridge](bridge.phala.network).
 
 ## Get your Phala Tokens (PHA) <a href="#get-your-phala-tokens-pha" id="get-your-phala-tokens-pha"></a>
 
@@ -56,7 +110,3 @@ If you do not hold any PHA, you can purchase PHA from any of the following excha
 <Note type="info">
 Not all brokers may be available in your jurisdiction. Note that some brokers require you to have an account with them for a certain period before you can transfer your funds to another wallet, such as the [Phala Wallet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/accounts).
 </Note>
-
-## Transfer PHA to and from Other Chains <a href="#transfer-pha-fromto-other-chains" id="transfer-pha-fromto-other-chains"></a>
-
-For now, you can transfer your PHA between Ethereum and Phala, as well as several other Parachains with [SubBridge](/network/references/subbridge). Refer to the introduction and our tutorial for more details.

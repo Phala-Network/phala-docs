@@ -1,0 +1,140 @@
+---
+description: Essential information for becoming a compute provider on Phala Network(ETH L2).
+title: Introduction
+---
+
+After [Sunsetting Phala Parachain and Migrating to Ethereum L2](https://phala.subsquare.io/democracy/referenda/77), and upgrading the network infrastructure to Intel TDX and GPU Confidential Computing, computing power providers will migrate from the parachain-based environment to the new Ethereum L2 ecosystem. But Phala’s core tokenomics and incentive structure remain largely consistent and predictable.
+
+## 1. Total Supply & High-Level Distribution
+
+Phala maintains a fixed total token supply of:
+
+- **1,000,000,000 PHA (1 billion PHA)**
+
+Out of the total supply, **70% is allocated to mining rewards**. This portion is designed to:
+
+- Incentivize long-term network participation  
+- Reward resource providers (especially GPU miners)  
+- Support staking-based security and governance  
+- Fund ecosystem growth via the treasury  
+
+The **70% mining reward pool** is further split into three parts:
+
+| Allocation Target             | Share of Mining Rewards | Description                                                |
+|------------------------------|--------------------------|------------------------------------------------------------|
+| **Treasury**                 | 20%                      | Ecosystem, development, and long-term strategic funding    |
+| **Ethereum Staking Rewards** | 40%                      | Rewards for PHA staked into the Ethereum staking contract  |
+| **GPU Miners**               | 40%                      | Rewards for contributing TDX-secured GPU compute           |
+
+
+## 2. PHA → vPHA: The L2 Native & Governance Token
+
+After the migration to Ethereum and an L2-based architecture, Phala introduced a **staking contract on Ethereum** that allows users to convert: PHA → vPHA
+
+### 2.1 What is vPHA?
+
+**vPHA** is the core token for the **Phala L2 Network**, and is designed to be the primary token used within the L2 ecosystem.
+
+Key roles of **vPHA** include:
+
+- **Governance**  
+  Used to participate in community governance and protocol decision-making.
+
+- **GPU Worker Staking**  
+  Used as stake/collateral for GPU workers to participate in the mining set.
+
+- **L2 Application Token Use Cases**  
+  Intended to be the core token for future GPU-related L2 applications and usage scenarios.
+
+### 2.2 Why Stake PHA into vPHA?
+
+By staking PHA into the Ethereum staking contract and receiving vPHA, users:
+
+- Help secure and govern the Phala L2 ecosystem  
+- Gain access to **staking rewards** (from the 40% mining reward share allocated to Ethereum staking)  
+- Obtain the core utility token for future L2 GPU-related use cases  
+
+Therefore, the community is **encouraged to convert PHA into vPHA**, and the protocol offers **corresponding PHA staking rewards** to incentivize this behavior.
+
+## 3. GPU Miners: Core of the TDX-Backed GPU Compute Network
+
+**GPU miners** are the backbone of Phala’s future **TDX-secured GPU computing network**.
+
+By contributing GPU resources to the network, miners receive a portion of the mining rewards based primarily on:
+
+- **GPU type** (hardware class and performance)  
+- **Online time** (availability and stability)  
+
+Rewards are essentially a function of **hardware weight × uptime**.
+
+### 3.1 Reward Weights by GPU Type
+
+Different GPU models receive different reward weights to reflect their relative performance and compute value.
+
+Currently supported GPU models and their reward weights:
+
+| GPU Model | Reward Weight |
+|----------|----------------|
+| **H100** | 1.0            |
+| **H200** | 1.5            |
+| **B200** | 1.8            |
+
+A higher weight implies a higher share of GPU mining rewards, assuming comparable uptime and reliability.
+
+
+### 3.2 GPU Reward Distribution Mechanism
+
+GPU mining rewards are distributed in the form of **vPHA**.
+
+- Rewards are calculated continuously based on validated GPU uptime and hardware weight.  
+- **Payouts occur every hour**, with rewards sent at the **end of each hour**.  
+
+## 4. vPHA Collateral Requirements for GPU Miners
+
+To ensure the **security and reliability** of GPU compute in the network, Phala requires GPU miners to provide additional **vPHA collateral** for each GPU they operate.
+
+> This collateral is **not** the same as staking into the Ethereum staking contract.  
+> It is **non-yield-bearing** and exists purely as a **security guarantee** for GPU compute.
+
+### 4.1 Required vPHA per GPU
+
+The collateral requirements per GPU are:
+
+| GPU Model | Required vPHA Stake per GPU |
+|----------|-----------------------------|
+| **H100** | 1250 vPHA                   |
+| **H200** | 1875 vPHA                   |
+| **B200** | 2250 vPHA                   |
+
+Characteristics of this collateral:
+
+- It does **not** accrue staking rewards or interest.  
+- It is used strictly as a security mechanism.  
+- It links the operator’s economic interest to the quality and honesty of the GPU service they provide.  
+
+This design improves:
+
+- **Sybil resistance** – prevents low-cost spam or malicious GPU registration  
+- **Reliability** – encourages miners to maintain high-quality nodes and configurations  
+- **Accountability** – provides economic basis for punitive or exclusion mechanisms if needed  
+
+## 5. Quality Control & Governance Over GPU Capacity
+
+To uphold network reliability, the Phala team will **periodically verify the quality of GPU compute** available in the network.
+
+These verifications may include:
+
+- Performance and benchmark validation  
+- TDX integrity and security checks  
+- Uptime and stability metrics  
+- Other trust and safety standards defined by the protocol and community  
+
+If a GPU is found to be **non-compliant** (e.g., underperforming, misconfigured, or malicious), the process is:
+
+1. The issue is documented and shared with the community.  
+2. Upon announced, the corresponding GPU(s) can be **removed from the mining set**, and associated rewards can be stopped.  
+
+This ensures the GPU mining ecosystem remains:
+- **Secure**  
+- **Reliable**  
+- **Aligned with community standards**  
