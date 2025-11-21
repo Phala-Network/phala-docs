@@ -421,11 +421,11 @@
             "group": "Overview",
             "pages": [
               "/network/overview/phala-network",
-              "/network/overview/phala-staking",
-              "/network/overview/phala-governance",
-              "/network/overview/phala-treasury",
               "/network/overview/get-pha-and-transfer",
               "/network/overview/block-explorers",
+              "/network/overview/phala-staking",
+              "/network/overview/phala-treasury",
+              "/network/overview/phala-governance",
               {
                 "group": "Legacy Parachain Documentation",
                 "pages": [
