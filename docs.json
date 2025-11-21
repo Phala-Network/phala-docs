@@ -117,15 +117,19 @@
         "header": "Network",
         "items": [
           {
-            "href": "https://docs.phala.network/network/tech-specs",
-            "label": "Tech Specs"
+            "href": "https://docs.phala.network/network/index",
+            "label": "Overview"
           },
           {
-            "href": "https://docs.phala.network/network/references",
-            "label": "References"
+            "href": "https://docs.phala.network/network/overview/phala-network",
+            "label": "Phala Network"
           },
           {
-            "href": "https://docs.phala.network/network/compute-providers",
+            "href": "https://docs.phala.network/network/overview/phala-staking",
+            "label": "Staking"
+          },
+          {
+            "href": "https://docs.phala.network/network/compute-providers/introduction",
             "label": "Compute Providers"
           }
         ]
@@ -1534,6 +1538,18 @@
     {
       "destination": "/network/index",
       "source": "/network/references/faq"
+    },
+    {
+      "destination": "/network/index",
+      "source": "/network/tech-specs"
+    },
+    {
+      "destination": "/network/index",
+      "source": "/network/references"
+    },
+    {
+      "destination": "/network/compute-providers/introduction",
+      "source": "/network/compute-providers"
     }
   ],
   "seo": {
