@@ -154,9 +154,6 @@
     "light": "/images/phala-light.png"
   },
   "name": "Phala",
-  "thumbnails": {
-    "background": "/images/phala-docs-og.png"
-  },
   "navbar": {
     "primary": {
       "href": "https://cloud.phala.network",
@@ -1545,7 +1542,7 @@
       "distribution": "global",
       "keywords": "Phala Cloud, TEE, Trusted Execution Environment, Confidential Computing, Confidential AI, GPU TEE, Intel TDX, dstack, blockchain, privacy-preserving computing, secure cloud, attestation",
       "language": "en",
-      "og:image": "https://docs.phala.com/images/phala-docs (1).jpg",
+      "og:image": "/images/phala-docs-og.png",
       "og:site_name": "Phala Docs",
       "og:type": "website",
       "robots": "index, follow",
@@ -1557,5 +1554,8 @@
   "styling": {
     "codeblocks": "system"
   },
-  "theme": "maple"
+  "theme": "maple",
+  "thumbnails": {
+    "background": "/images/phala-docs-og.png"
+  }
 }
