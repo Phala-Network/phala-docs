@@ -1264,6 +1264,26 @@
       "source": "/overview/pha-token/introduction"
     },
     {
+      "destination": "/network/overview/phala-network",
+      "source": "/overview"
+    },
+    {
+      "destination": "/network/overview/phala-staking",
+      "source": "/overview/pha-token/delegation/delegate-to-stakepool"
+    },
+    {
+      "destination": "/network/overview/phala-staking",
+      "source": "/overview/pha-token/delegation/use-phala-app-to-delegate"
+    },
+    {
+      "destination": "/network/overview/phala-staking",
+      "source": "/overview/pha-token/delegation/whats-vault"
+    },
+    {
+      "destination": "/network/overview/phala-treasury",
+      "source": "/overview/pha-token/governance/apply-for-project-funding"
+    },
+    {
       "destination": "/network/compute-providers/introduction",
       "source": "/network/compute-providers/basic-info/requirements-in-phala-khala"
     },
