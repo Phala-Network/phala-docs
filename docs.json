@@ -610,27 +610,27 @@
       "source": "/cloud/use-cases/use-cases"
     },
     {
-      "destination": "/network/compute-providers/gatekeeper/overview",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/gatekeeper/gatekeeper"
     },
     {
-      "destination": "/network/compute-providers/basic-info/introduction",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/basic-info/index"
     },
     {
-      "destination": "/network/compute-providers/gatekeeper/overview",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/gatekeeper/index"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/compute-providers/run-workers-on-khala/index"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/compute-providers/run-workers-on-khala/solo-scripts-guidance/index"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/compute-providers/run-workers-on-phala/index"
     },
     {
@@ -706,27 +706,27 @@
       "source": "/phala-cloud/tees-attestation-and-zero-trust-security/index"
     },
     {
-      "destination": "/network/references/advanced-topics/cross-chain-solutions",
+      "destination": "/network/index",
       "source": "/references/advanced-topics/index"
     },
     {
-      "destination": "/network/references/basic-guidance/overview",
+      "destination": "/network/overview/get-pha-and-transfer",
       "source": "/references/basic-guidance/index"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides/index"
     },
     {
-      "destination": "/network/references/subbridge/overview",
+      "destination": "/network/index",
       "source": "/references/subbridge/index"
     },
     {
-      "destination": "/network/references/support/overview",
+      "destination": "/network/index",
       "source": "/references/support/index"
     },
     {
-      "destination": "/network/tech-specs/blockchain/overview",
+      "destination": "/network/index",
       "source": "/tech-specs/blockchain/index"
     },
     {
@@ -806,67 +806,67 @@
       "source": "/phala-cloud/migration/generate-ra-report"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/agent-wars-legacy"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/agent-wars-legacy/:slug*"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/agent-wars"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/agent-wars/:slug*"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/product-agent-wars"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/ai-agent-contract-legacy"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/ai-agent-contract-legacy/:slug*"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/ai-agent-contract"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/ai-agent-contract/:slug*"
     },
     {
-      "destination": "/network/compute-providers/basic-info/introduction",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/basic-info"
     },
     {
-      "destination": "/network/compute-providers/basic-info/introduction",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/basic-info/:slug*"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/compute-providers/run-workers-on-phala"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/compute-providers/run-workers-on-phala/:slug*"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy/builders-program"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/references/builders-program"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy/phala-sdk"
     },
     {
@@ -890,43 +890,43 @@
       "source": "/phala-cloud/tee-cloud-cli"
     },
     {
-      "destination": "/network/references/advanced-topics/run-local-testnet",
+      "destination": "/network/index",
       "source": "/references/advanced-topics/run-local-testnet"
     },
     {
-      "destination": "/network/references/basic-guidance/overview",
+      "destination": "/network/overview/get-pha-and-transfer",
       "source": "/references/basic-guidance"
     },
     {
-      "destination": "/network/references/basic-guidance/get-pha-and-transfer",
+      "destination": "/network/overview/get-pha-and-transfer",
       "source": "/references/basic-guidance/get-pha-and-transfer"
     },
     {
-      "destination": "/network/references/subbridge/overview",
+      "destination": "/network/index",
       "source": "/references/subbridge"
     },
     {
-      "destination": "/network/references/subbridge/cross-chain-transfer",
+      "destination": "/network/index",
       "source": "/references/subbridge/cross-chain-transfer"
     },
     {
-      "destination": "/network/references/support/endpoints",
+      "destination": "/network/index",
       "source": "/references/support/endpoints"
     },
     {
-      "destination": "/network/tech-specs/blockchain/blockchain-entities",
+      "destination": "/network/index",
       "source": "/tech-specs/blockchain/blockchain-entities"
     },
     {
-      "destination": "/network/tech-specs/blockchain/secret-key-hierarchy",
+      "destination": "/network/index",
       "source": "/tech-specs/blockchain/secret-key-hierarchy"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/v1/developers/phat-contract/features"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy/framehub"
     },
     {
@@ -946,27 +946,27 @@
       "source": "/tech-specs/multi-proof-and-verifiable-compute/trusted-execution-environments-tee-and-compute-verifiability"
     },
     {
-      "destination": "/network/compute-providers",
+      "destination": "/network/compute-providers/introduction",
       "source": "/en-us/mine/:slug*"
     },
     {
-      "destination": "/network/compute-providers",
+      "destination": "/network/compute-providers/introduction",
       "source": "/en-us/mine"
     },
     {
-      "destination": "/network/compute-providers/gatekeeper",
+      "destination": "/network/compute-providers/introduction",
       "source": "/en-us/maintain/gatekeeper/:slug*"
     },
     {
-      "destination": "/network/compute-providers/gatekeeper",
+      "destination": "/network/compute-providers/introduction",
       "source": "/en-us/maintain/gatekeeper"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy"
     },
     {
-      "destination": "/network/compute-providers/basic-info/budget-balancer",
+      "destination": "/network/compute-providers/introduction",
       "source": "/v1/compute-providers/basic-info/budget-balancer"
     },
     {
@@ -986,23 +986,23 @@
       "source": "/cloud/use-cases/tee_with_zk_and_zkrollup"
     },
     {
-      "destination": "/network/references/subbridge/overview",
+      "destination": "/network/index",
       "source": "/en-us/general/subbridge/:slug*"
     },
     {
-      "destination": "/network/references/subbridge/overview",
+      "destination": "/network/index",
       "source": "/other-products/subbridge/:slug*"
     },
     {
-      "destination": "/network/references/subbridge/overview",
+      "destination": "/network/index",
       "source": "/other-products/subbridge"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/product-agent-wars/:slug*"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/references/phala-sdk"
     },
     {
@@ -1038,11 +1038,11 @@
       "source": "/overview/scale-blockchains-with-ai-coprocessor"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/tech-specs/ai-agent-contract"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/tech-specs/ai-agent-contract/:slug*"
     },
     {
@@ -1058,23 +1058,23 @@
       "source": "/compute-providers"
     },
     {
-      "destination": "/network/references/basic-guidance/overview",
+      "destination": "/network/overview/get-pha-and-transfer",
       "source": "/introduction/basic-guidance"
     },
     {
-      "destination": "/network/references/basic-guidance/get-pha-and-transfer",
+      "destination": "/network/overview/get-pha-and-transfer",
       "source": "/introduction/basic-guidance/get-pha-and-transfer"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-bangkok",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides/ethglobal-hackathon-guide"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-san-francisco",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides/ethglobal-sf-hackathon-guide"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides/ethglobal-sg-hackathon-guide"
     },
     {
@@ -1126,7 +1126,7 @@
       "source": "/references/support"
     },
     {
-      "destination": "/network/references/support/compatibility-matrix",
+      "destination": "/network/index",
       "source": "/references/support/compatibility-matrix"
     },
     {
@@ -1154,23 +1154,23 @@
       "source": "/llm-in-gpu-tee/benchmark"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy/information"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/legacy/ai-agent-contract/phala-agent-gateway"
     },
     {
-      "destination": "/network/references/subbridge/technical-details",
+      "destination": "/network/index",
       "source": "/references/subbridge/technical-details"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-bangkok",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides"
     },
     {
-      "destination": "/network/references/hackathon-guides/ethglobal-singapore",
+      "destination": "/network/index",
       "source": "/references/hackathon-guides/ethglobal-singapore"
     },
     {
@@ -1182,7 +1182,7 @@
       "source": "/dstack/tee-cloud-cli"
     },
     {
-      "destination": "/network/references/advanced-topics/run-local-testnet",
+      "destination": "/network/index",
       "source": "/references/advanced-topics/scripts/run/pruntime.sh"
     },
     {
@@ -1206,7 +1206,7 @@
       "source": "/phala-cloud/cvm/performance-report"
     },
     {
-      "destination": "/network/references/support/faucet",
+      "destination": "/network/index",
       "source": "/references/support/faucet"
     },
     {
@@ -1226,11 +1226,11 @@
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/set-secure-environment-variables"
     },
     {
-      "destination": "/network/compute-providers/basic-info/introduction",
+      "destination": "/network/compute-providers/introduction",
       "source": "/compute-providers/basic-info/introduction"
     },
     {
-      "destination": "/network/references/archived-projects",
+      "destination": "/network/index",
       "source": "/agent-wars-legacy/getting-started/create-and-play-with-social-agents"
     },
     {
@@ -1274,75 +1274,75 @@
       "source": "/overview/pha-token/governance/khala-treasury"
     },
     {
-      "destination": "/network/compute-providers/basic-info/requirements-in-phala",
+      "destination": "/network/compute-providers/introduction",
       "source": "/network/compute-providers/basic-info/requirements-in-phala-khala"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/installing-phala-mining-tools"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/worker-confidence-level"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/configure-the-worker"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/deploy-the-worker"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/monitor-workers-status"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/accelerate-khala-syncing"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/solo-scripts-guidance/update-your-workers-node"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/prbv3-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/prbv3-deployment"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/using-prbv3-ui",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/using-prbv3-ui"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/prbv3-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/migration-from-prbv2-to-v3"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/headers-cache-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/headers-cache-deployment"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/archive-node-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/archive-node-deployment"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/deployment-guide-for-prbv2"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/prb-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/prb-worker-deployment"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/switch-workers-from-solo-to-prb-mode",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/how-to-switch-from-solo-mining-to-prb-mining"
     },
     {
-      "destination": "/network/compute-providers/basic-info/worker-rewards",
+      "destination": "/network/compute-providers/introduction",
       "source": "/network/compute-providers/run-workers-on-khala/khala-worker-rewards"
     },
     {
-      "destination": "/network/compute-providers/run-workers-on-phala/solo-worker-deployment",
+      "destination": "/network/compute-providers/run-GPU-on-phala/gpu-deployment-guide",
       "source": "/network/compute-providers/run-workers-on-khala/troubleshooting"
     },
     {
