@@ -6,6 +6,72 @@ noindex: true
 icon: "clock"
 ---
 
+<Update label="November 14-28, 2025" tags={["GPU TEE Models", "CVM Naming", "Security"]} rss={{ title: "GPU TEE AI Models & CVM Name Identifiers", description: "New GPU TEE AI models from multiple providers, CVM name-based identification, and supply chain security improvements" }}>
+
+  ## GPU TEE AI Models
+
+  New confidential AI models available through the Redpill API, running in GPU TEEs with hardware attestation:
+
+  ### Phala Provider
+  - **DeepSeek V3 0324** (685B MoE) - 163K context, $0.28/$1.14 per 1M tokens
+  - **Qwen2.5 VL 72B Instruct** - Vision-language model, 65K context
+  - **Google Gemma 3 27B** - Multimodal with vision, 53K context
+  - **OpenAI GPT OSS 120B/20B** - 131K context, open-source GPT variants
+  - **Qwen2.5 7B Instruct** - 32K context, improved coding/math
+  - **Sentence Transformers all-MiniLM-L6-v2** - 384-dim embeddings
+
+  ### NearAI Provider
+  - **DeepSeek V3.1** - Hybrid reasoning with thinking modes, 163K context
+  - **Qwen3 30B A3B Instruct** - Ultra-long 262K context, 3.3B active params
+  - **Z.AI GLM 4.6** - Agentic-focused model, 202K context
+
+  ### Tinfoil Provider
+  - **DeepSeek R1 0528** - OpenAI o1 performance with open reasoning
+  - **Qwen3 Coder 480B A35B** - Coding-optimized, 262K context
+  - **Qwen3 VL 30B A3B** - Video understanding, 262K context
+  - **Meta Llama 3.3 70B Instruct** - Multilingual dialogue, 131K context
+
+  ## CVM Name Identifiers
+
+  - **Name-Based Identification**: CVMs can now be identified by name instead of UUID
+  - **Flexible Routing**: API endpoints accept both CVM name and UUID as identifiers
+  - **Hostname Generation**: Automatic hostname generation from CVM names
+  - **Name Validation**: Comprehensive CVM name validation with format rules
+
+  ## CLI & Authentication
+
+  - **CLI Login Improvements**: Enhanced CLI login flow with better device authentication
+  - **Device Auth API Fixes**: Fixed device authentication API issues
+  - **App Auth Rename**: Refactored app authentication module for clarity
+
+  ## Workspace & Usage
+
+  - **Usage API**: New unified usage API for tracking workspace resource consumption
+  - **Workspace Limits**: Enhanced workspace limit checking with tier-based controls
+  - **Usage Repository**: New repository for tracking and querying usage data
+
+  ## Event Logging
+
+  - **Event Logs Phase 1**: Initial implementation of structured event logging
+  - **Split Patch APIs**: Separated patch APIs for better granularity
+
+  ## Security & Infrastructure
+
+  - **Supply Chain Security**: Added lifecycle scripts baseline and verification to prevent supply chain attacks
+  - **CI Improvements**: Configurable GitHub Actions runners for PR checks
+  - **On-Chain KMS Fixes**: Fixed on-chain KMS integration issues
+  - **TProxy Fixes**: Resolved transparent proxy configuration issues
+
+  ## Bug Fixes & Improvements
+
+  - Fixed GPU rental and payment processing issues
+  - Improved GPU compose configuration updates
+  - Enhanced VPC app ID and hostname settings
+  - Cleaned up deprecated code and refactored modules
+  - Fixed CVM operation clearing and status sync issues
+
+</Update>
+
 <Update label="November 3-13, 2025" tags={["GPU Rental", "SSH Keys", "Infrastructure"]} rss={{ title: "GPU Rental System & SSH Key Management", description: "Complete GPU rental marketplace, SSH key management, and advanced resource allocation" }}>
 
   ## GPU Rental Marketplace
