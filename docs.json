@@ -238,7 +238,8 @@
                   {
                     "group": "GPU TEE",
                     "pages": [
-                      "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
+                      "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
+                      "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting"
                     ]
                   },
                   {

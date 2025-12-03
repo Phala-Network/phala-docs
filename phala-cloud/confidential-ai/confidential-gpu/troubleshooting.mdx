@@ -1,0 +1,24 @@
+---
+title: Troubleshooting
+description: Common issues and warnings when running GPU TEE workloads
+---
+
+## Serial Output Warnings
+
+These warnings appear in serial output but are safe to ignore.
+
+### NVIDIA Fabric Manager Service Failed
+
+```
+[FAILED] Failed to start NVIDIA fabric manager service.
+```
+
+Safe to ignore for single-GPU instances. The fabric manager service is only needed for multi-GPU NVLink configurations.
+
+### NVRM Assertion Error
+
+```
+NVRM: nvAssertFailed: Assertion failed: 0 @ g_kern_gmmu_nvoc.h:2256
+```
+
+Safe to ignore. This is a known warning that doesn't affect GPU functionality.
