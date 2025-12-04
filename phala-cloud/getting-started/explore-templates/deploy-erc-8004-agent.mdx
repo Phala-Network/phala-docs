@@ -76,14 +76,14 @@ ERC-8004 covers the onchain identity/registry. **TEEs + CVMs** supply runtime ev
 - Click **Deploy** and let provisioning finish.
 - Open **View details → Networks** and click the URL with port **8080** to open the frontend.
 
-![Network Details](./images/erc-8004-agent/Screenshot_2025-10-17_at_9.44.17_PM_1.jpg)
+![Network Details](./images/erc-8004-agent/network-details.jpg)
 
 ### 4) Sign into the VibeVM frontend
 
 - Use the credentials you set.
 - You'll land in a VSCode server with the repo already cloned.
 
-![VibeVM Login](./images/erc-8004-agent/Screenshot_2025-10-17_at_9.46.22_PM.jpg)
+![VibeVM Login](./images/erc-8004-agent/vibevm-login.jpg)
 
 ### 5) Prep the agent
 
@@ -97,7 +97,7 @@ cp .env.example .env
 # REDPILL_API_KEY=<your-key>  # generate in Phala dashboard: /dashboard/confidential-ai-api
 ```
 
-![Environment Configuration](./images/erc-8004-agent/Screenshot_2025-10-17_at_8.51.10_PM_4.jpg)
+![Environment Configuration](./images/erc-8004-agent/env-configuration.jpg)
 
 ### 6) Build & run
 
@@ -112,7 +112,7 @@ Service should come up at:
 https://<dstack-app-id>-8000.<dstack-gateway-domain>
 ```
 
-![Agent Running](./images/erc-8004-agent/Screenshot_2025-10-17_at_9.49.44_PM.jpg)
+![Agent Running](./images/erc-8004-agent/agent-running.jpg)
 
 ### 7) Register & fund the agent
 
@@ -122,16 +122,16 @@ https://<dstack-app-id>-8000.<dstack-gateway-domain>
     - IdentityRegistry: [0x88a03a29fe2c9a5881bbbdece91cd75c4e816a4dcda3f4ed2610bc119c517011](https://sepolia.etherscan.io/tx/0x88a03a29fe2c9a5881bbbdece91cd75c4e816a4dcda3f4ed2610bc119c517011)
     - TEERegistry verify: [0x4b9810c3d1753b79c029938add20c237a4fd7b58eccd9b094bc54b3197c97a9e](https://sepolia.etherscan.io/tx/0x4b9810c3d1753b79c029938add20c237a4fd7b58eccd9b094bc54b3197c97a9e)
 
-![Agent Registration](./images/erc-8004-agent/Screenshot_2025-10-17_at_9.52.04_PM.jpg)
+![Agent Registration](./images/erc-8004-agent/agent-registration.jpg)
 
-![Registration Transaction](./images/erc-8004-agent/Screenshot_2025-10-17_at_8.37.44_PM.jpg)
+![Registration Transaction](./images/erc-8004-agent/registration-transaction.jpg)
 
 ### 8) Verify attestation via TEERegistry
 
 - Use the TEERegistry contract UI or explorer to confirm the attestation entry matches your IdentityRegistry entry.
 - [View TEERegistry verification transaction](https://sepolia.etherscan.io/tx/0x4b9810c3d1753b79c029938add20c237a4fd7b58eccd9b094bc54b3197c97a9e)
 
-![TEERegistry Verification](./images/erc-8004-agent/Screenshot_2025-10-17_at_8.38.50_PM.jpg)
+![TEERegistry Verification](./images/erc-8004-agent/tee-registry-verification.jpg)
 
 ### 9) Talk to the agent
 
