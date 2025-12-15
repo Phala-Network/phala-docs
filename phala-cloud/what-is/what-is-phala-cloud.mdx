@@ -59,8 +59,8 @@ Need help? We're here to assist:
 
 - **Documentation Issues**: Report problems with our docs on [GitHub](https://github.com/Phala-Network/phala-docs)
 - **Technical Support**: Join our [Telegram community](https://t.me/+nbhjx1ADG9EyYmI9) for real-time help
-- **Enterprise**: [Contact us](https://cloud.phala.network/contact) for enterprise solutions and partnerships
+- **Enterprise**: [Contact us](https://cloud.phala.com/contact) for enterprise solutions and partnerships
 
 ---
 
-Ready to build secure AI? [Get started with Phala Cloud →](https://cloud.phala.network)
+Ready to build secure AI? [Get started with Phala Cloud →](https://cloud.phala.com)

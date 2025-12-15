@@ -9,7 +9,7 @@ This is a starter template for building a Phala Cloud TEE application easily wit
 ### 📋 Prerequisites
 
 * Fork the GitHub repository [`cloud-tee-starter-template`](https://github.com/Phala-Network/cloud-tee-starter-template)&#x20;
-* Phala Cloud account ([Sign up with Redeem Code](https://cloud.phala.network/register?invite=beta))
+* Phala Cloud account ([Sign up with Redeem Code](https://cloud.phala.com/register?invite=beta))
 * Docker Hub/Registry account, to push the built docker image to the registry
 
 ### 🔧 Step 1: Configure Repository Secrets
@@ -21,7 +21,7 @@ This is a starter template for building a Phala Cloud TEE application easily wit
 | -------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `DOCKER_REGISTRY_USERNAME` | Your container registry username                        | From your Docker Hub/Registry account                                                       |
 | `DOCKER_REGISTRY_PASSWORD` | Registry password/access token                          | [Generate access token](https://docs.docker.com/docker-hub/access-tokens/)                  |
-| `PHALA_CLOUD_API_KEY`      | Phala Cloud authentication key                          | From [Phala Cloud Dashboard](https://cloud.phala.network/dashboard/tokens) → "Create Token" |
+| `PHALA_CLOUD_API_KEY`      | Phala Cloud authentication key                          | From [Phala Cloud Dashboard](https://cloud.phala.com/dashboard/tokens) → "Create Token" |
 | `APP_NAME`                 | Deployment name (e.g., `my-tee-app`)                    | Choose name without special characters except `-`                                           |
 | `DOCKER_IMAGE`             | Full image path (e.g., `docker.io/username/image-name`) | Follow registry naming conventions                                                          |
 
@@ -106,7 +106,7 @@ Lastly, the Phala deploy action will launch the CVM based on the configuration. 
 
 ### ✅ Step 3: Verify The Deployment
 
-After successful workflow run once the workflow is triggered and the deployment is successful, you can verify the deployment on [Phala Cloud Dashboard](https://cloud.phala.network/dashboard).
+After successful workflow run once the workflow is triggered and the deployment is successful, you can verify the deployment on [Phala Cloud Dashboard](https://cloud.phala.com/dashboard).
 
 <Frame>
     <img src="/images/image (22).png" alt="Phala Cloud Virtual Machines dashboard displaying running cloud-tee-starter-template CVM with status and app ID" />
