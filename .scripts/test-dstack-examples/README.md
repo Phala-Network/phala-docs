@@ -9,7 +9,7 @@ This directory contains test scripts to validate the dstack v0.5 SDK examples in
 
 ## Step 1: Deploy the Proxy to Phala Cloud
 
-1. Go to [Phala Cloud Dashboard](https://cloud.phala.network/dashboard)
+1. Go to [Phala Cloud Dashboard](https://cloud.phala.com/dashboard)
 2. Click **Deploy** → **docker-compose.yml**
 3. Copy and paste the entire contents of `docker-compose.yml` from this directory
 4. Set a name (e.g., "dstack-api-proxy")

@@ -160,7 +160,7 @@
   "name": "Phala",
   "navbar": {
     "primary": {
-      "href": "https://cloud.phala.network",
+      "href": "https://cloud.phala.com",
       "label": "Phala Cloud",
       "type": "button"
     }
