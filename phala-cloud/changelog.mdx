@@ -6,6 +6,77 @@ noindex: true
 icon: "clock"
 ---
 
+<Update label="December 15-19, 2025" tags={["GPU", "Billing", "ClickHouse"]} rss={{ title: "GPU Lifecycle & ClickHouse Improvements", description: "Enhanced GPU allocation lifecycle, ClickHouse migrations, and billing refinements" }}>
+
+  ## GPU Lifecycle Management
+
+  - **GPU Allocation on Start**: Ensure GPU allocation before CVM start operations
+  - **GPU Config Updates**: New CvmHandle.update_gpu_config for dynamic GPU configuration
+  - **CvmGpuContext Refactor**: Moved select_gpus logic to dedicated context class
+
+  ## ClickHouse & Data Infrastructure
+
+  - **Snowflake IDs**: Added snowflake_id column to all tables for global unique identification
+  - **ClickHouse Migrations**: New migration system for ClickHouse schema management
+  - **Session Configuration**: Optimized ClickHouse session settings
+  - **Query Fixes**: Fixed hashid conversion for ClickHouse query statements
+
+  ## Billing Improvements
+
+  - **Direct Metered Usage Queries**: Query metered_usages directly instead of intermediate views
+  - **Billing Rate Fixes**: Correct memory conversion (MB to GB) when creating BillingRate
+  - **Compute Unit Calculation**: Fixed CU value calculation for billing_compute_unit
+  - **Period Duration**: Calculate cost based on actual billing period duration
+  - **Minutes Rounding**: Round billing minutes to 2 decimals, require >= 1 min for charging
+
+  ## TEEScope Integration
+
+  - **TEEScope API**: New TEEScope integration for attestation verification
+  - **Node API Endpoint**: Added api_endpoint field to nodes
+
+  ## Documentation
+
+  - **Instance Types Page**: New instance types documentation page
+  - **Pricing/Billing Docs**: Updated pricing and billing documentation
+  - **Compliance Documentation**: Added comprehensive [Compliance & Certifications](/phala-cloud/security-and-privacy/compliance) page
+
+</Update>
+
+<Update label="December 1-14, 2025" tags={["Usage", "Workspace", "Security"]} rss={{ title: "Usage Export & Workspace Validation", description: "Usage data export, workspace slug validation, and security improvements" }}>
+
+  ## Usage Export
+
+  - **Export Endpoints**: New CSV, Excel, and PDF export endpoints for usage data
+  - **Export UI**: Added export dropdown in HistoricalUsageDisplay component
+  - **Time Range Fixes**: Unified time range parsing and UTC date calculations
+
+  ## Workspace Management
+
+  - **Slug Validation**: Workspace slug validation with reserved words checking
+  - **Required Slugs**: Slug now required in workspace create form
+  - **Slug Check API**: New authenticated slug availability check endpoint
+  - **Reserved Slugs Script**: Script to fetch and merge reserved slugs from multiple sources
+
+  ## Security & Anti-Spam
+
+  - **Spam Prevention**: Enhanced spam detection and blocking measures
+  - **Block List Updates**: Updated block list for known malicious patterns
+
+  ## UI/UX Improvements
+
+  - **Mava Support**: Open Mava support popup for logged-in users instead of /contact page
+  - **Resource Form**: Correct auto-selection logic for CVM resource form
+  - **Error Dialogs**: Improved error dialog for structured errors
+  - **Email Templates**: Updated email copy and templates
+
+  ## Infrastructure
+
+  - **Next.js Update**: Updated to Next.js 15.4.8 for security and performance
+  - **Routing Context**: Added routing context atom for CVM navigation links
+  - **Code Cleanup**: Removed unused instance_types/config.py
+
+</Update>
+
 <Update label="November 14-28, 2025" tags={["GPU TEE Models", "CVM Naming", "Security"]} rss={{ title: "GPU TEE AI Models & CVM Name Identifiers", description: "New GPU TEE AI models from multiple providers, CVM name-based identification, and supply chain security improvements" }}>
 
   ## GPU TEE AI Models

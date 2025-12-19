@@ -1,0 +1,204 @@
+---
+title: "Compliance & Certifications"
+description: "Security compliance certifications, controls, and data processing practices for Phala Cloud"
+icon: shield-check
+---
+
+# Compliance & Certifications
+
+Transparency is at the core of our security commitment. This page provides an overview of Phala's compliance certifications, security controls, and data processing practices.
+
+<Note>
+For compliance reports, security documentation, or to schedule a security review, visit the [Trust Center](https://phala.com/trust) or contact [security@phala.network](mailto:security@phala.network).
+</Note>
+
+## Compliance Reports
+
+Phala maintains industry-standard compliance certifications to demonstrate our commitment to security and privacy.
+
+### SOC 2 Type I
+
+<Card title="SOC 2 Type I Report" icon="shield-check" href="https://phala.com/phala_soc2_type1_report.pdf">
+  Service Organization Control 2 Type I report validating our security, availability, and confidentiality controls at a specific point in time.
+</Card>
+
+The SOC 2 Type I report covers:
+- **Security**: Protection against unauthorized access
+- **Availability**: System availability for operation and use
+- **Confidentiality**: Protection of confidential information
+
+### HIPAA Compliance
+
+<Card title="HIPAA Compliance" icon="heart-pulse">
+  Health Insurance Portability and Accountability Act compliance certification demonstrating our commitment to protecting sensitive patient health information. **Coming Soon**
+</Card>
+
+Phala is working toward HIPAA compliance certification to support healthcare and life sciences customers with protected health information (PHI) requirements.
+
+## Security Controls Framework
+
+Phala has implemented a comprehensive security control framework with **120+ controls** across multiple security domains. All controls are actively implemented and monitored.
+
+### Control Categories
+
+<AccordionGroup>
+  <Accordion title="Data & Customer Protection" icon="database">
+    - Customer data handling policies approved by management
+    - Least-privileged access to sensitive data
+    - Encryption of web-based management interfaces
+    - Data classification and retention policies
+  </Accordion>
+
+  <Accordion title="Access Control" icon="lock">
+    - Role-based access control (RBAC)
+    - Multi-factor authentication (MFA) required
+    - Periodic access reviews
+    - Unique user identities
+    - Access provisioning and deprovisioning procedures
+    - Root access restrictions
+  </Accordion>
+
+  <Accordion title="Encryption" icon="key">
+    - Data encrypted at rest using strong cryptographic algorithms
+    - Data encrypted in transit (TLS 1.2+)
+    - Key management procedures
+    - Removable media encryption
+    - Cryptography policies and standards
+  </Accordion>
+
+  <Accordion title="Network Security" icon="network-wired">
+    - Network security controls limiting inbound/outbound traffic
+    - Web Application Firewall (WAF)
+    - Intrusion Detection/Prevention System (IDS/IPS)
+    - Remote server administration port restrictions
+    - Encrypted remote production access
+  </Accordion>
+
+  <Accordion title="Incident Response" icon="bell">
+    - Documented incident response plan
+    - Incident response team with defined roles
+    - Security event tracking and evaluation
+    - Post-mortem reviews and lessons learned
+    - Breach notification procedures
+    - Annual incident response testing
+  </Accordion>
+
+  <Accordion title="Business Continuity & Disaster Recovery" icon="rotate">
+    - Documented disaster recovery plan
+    - Business continuity plan
+    - Business impact analysis
+    - High availability architecture
+    - Annual BCP/DR testing
+  </Accordion>
+
+  <Accordion title="Vulnerability Management" icon="bug">
+    - Regular vulnerability scans
+    - Annual third-party penetration testing
+    - Vulnerability management policy
+    - Patch management procedures
+  </Accordion>
+
+  <Accordion title="Logging & Monitoring" icon="chart-line">
+    - Centralized logging system
+    - Real-time alerting
+    - Database and server monitoring
+    - File integrity monitoring (FIM)
+    - Continuous control monitoring
+  </Accordion>
+
+  <Accordion title="Personnel Security" icon="users">
+    - Background checks for personnel
+    - Security awareness training
+    - Code of conduct
+    - Non-disclosure agreements
+    - Termination/offboarding procedures
+  </Accordion>
+
+  <Accordion title="Vendor Management" icon="building">
+    - Vendor risk assessments
+    - Compliance monitoring for critical vendors
+    - Data processing agreements
+    - Subprocessor management
+  </Accordion>
+</AccordionGroup>
+
+## Subprocessors
+
+Phala works with trusted third-party service providers to deliver our services. Below is a list of our current subprocessors and their purposes.
+
+| Subprocessor | Purpose | Jurisdiction |
+|-------------|---------|--------------|
+| Google Cloud | Infrastructure hosting | US, EU |
+| Stripe | Payment processing | US |
+| PostHog | Product analytics | US/EU |
+| Customer.io | Marketing & Email services | US |
+| Attio | CRM | UK |
+| LinkedIn | Marketing analytics | US |
+| Fingerprint | Security analytics | US |
+| GitHub | Code repository and software development | US |
+
+### Data Processing Agreement
+
+Our commitment to protecting your data extends to our relationships with subprocessors:
+
+- All subprocessor agreements impose data protection obligations substantially similar to those in our main DPA
+- We notify customers of any intended additions or replacements to the subprocessor list
+- Phala remains liable for subprocessor performance in accordance with our DPA terms
+
+<Card title="Data Processing Agreement" icon="file-contract" href="https://phala.com/data-processing-agreement">
+  View our full Data Processing Agreement for detailed information on data handling practices.
+</Card>
+
+## Privacy
+
+Phala maintains comprehensive privacy practices:
+
+- **Public Privacy Policy**: Available at [phala.com/privacy](https://phala.com/privacy)
+- **Privacy by Design**: TEE technology ensures data remains encrypted even during processing
+- **Data Subject Rights**: Users can access, correct, and delete their personal information
+- **Privacy Compliance Review**: Quarterly executive review of privacy compliance
+- **HIPAA Privacy Rule**: Policies for allowable use and disclosure of PHI (for covered entities)
+
+## Security Architecture
+
+Phala Cloud's security is built on Trusted Execution Environments (TEEs) that provide hardware-level isolation and cryptographic guarantees:
+
+<CardGroup cols={2}>
+  <Card title="Trust Center Verification" icon="shield" href="/phala-cloud/attestation/trust-center-verification">
+    Automated verification reports for every deployment
+  </Card>
+  <Card title="Security Architecture" icon="lock" href="/phala-cloud/security-and-privacy/security-architecture">
+    Technical security architecture and design documents
+  </Card>
+  <Card title="Security Audit" icon="magnifying-glass" href="/phala-cloud/security-and-privacy/security-audit">
+    Independent third-party security audit by zkSecurity
+  </Card>
+  <Card title="Chain of Trust" icon="link" href="/phala-cloud/attestation/chain-of-trust">
+    Understand the cryptographic chain of trust
+  </Card>
+</CardGroup>
+
+## Regulatory Compliance
+
+Phala Cloud helps customers meet various regulatory requirements:
+
+| Regulation | How Phala Helps |
+|-----------|-----------------|
+| **GDPR** | Data encryption at rest and in transit, DPA available, subprocessor transparency |
+| **HIPAA** | TEE-based data isolation, access controls, audit logging (BAA available upon request) |
+| **SOC 2** | Certified Type I report, comprehensive security controls |
+| **PCI DSS** | Encryption, access controls, network segmentation |
+
+## Contact
+
+For compliance inquiries, security documentation requests, or to schedule a security review:
+
+- **Email**: [security@phala.network](mailto:security@phala.network)
+- **Trust Center**: [phala.com/trust](https://phala.com/trust)
+
+## Additional Resources
+
+- [Trust Center](https://phala.com/trust) - Compliance reports and security documentation
+- [Privacy Policy](https://phala.com/privacy) - Data handling practices
+- [Terms of Service](https://phala.com/terms) - Service agreement
+- [Data Processing Agreement](https://phala.com/data-processing-agreement) - DPA for data processors
