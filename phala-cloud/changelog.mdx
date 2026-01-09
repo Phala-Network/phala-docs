@@ -6,7 +6,134 @@ noindex: true
 icon: "clock"
 ---
 
-<Update label="December 15-19, 2025" tags={["GPU", "Billing", "ClickHouse"]} rss={{ title: "GPU Lifecycle & ClickHouse Improvements", description: "Enhanced GPU allocation lifecycle, ClickHouse migrations, and billing refinements" }}>
+<Update label="January 5-9, 2026" tags={["AI Models", "Billing", "Invoicing", "Admin"]} rss={{ title: "New AI Models & Invoice Reconciliation", description: "New confidential AI models, credit balance application, and admin billing tools" }}>
+
+  ## New Confidential AI Models
+
+  New models available through the Redpill API with TEE attestation:
+
+  - **MiniMax M2.1** (Chutes) - 196K context, $0.30/$1.20 per 1M tokens
+  - **Kimi K2 Thinking** (Tinfoil) - 262K context, $2.00/$2.00 per 1M tokens - reasoning model with thinking modes
+
+  ## Billing & Invoicing
+
+  - **Credit Balance Application**: Support credit balance application in invoice creation
+  - **Transaction Merge**: Add transaction merge by VM for invoice creation
+  - **Reconciliation Deduction**: Add reconciliation deduction for ledger corrections
+  - **External Payments**: Add external payment and debt write-off admin tools
+  - **Credit Adjustments**: Credit adjustment uses amount=0 to preserve ledger integrity
+
+  ## Admin Tools
+
+  - **Billing Summary**: Add usage and invoice columns to billing summary table
+  - **Workspace Reconciliation**: Add billing summary for workspace reconciliation
+  - **Monthly Usage Summary**: Add summary row to monthly usage table
+  - **Ledger Balance Health**: Rename transactions_sum to ledger_balance and add health status
+
+  ## Database & Performance
+
+  - **Covering Indexes**: Add covering indexes for workspace billing queries
+  - **Auth Indexes Migration**: Add auth/workspace indexes migration
+  - **Micro-Tolerance**: Apply micro-tolerance to eliminate $0.000001 precision artifacts
+  - **Numeric Precision**: Change CreditTransaction.amount to Numeric for precision
+
+  ## Bug Fixes
+
+  - Fixed billing period enum case for database compatibility
+  - Fixed suggested action logic in credit health check
+  - Consolidated transaction blocks in get_request_context
+
+</Update>
+
+<Update label="December 29, 2025 - January 4, 2026" tags={["Billing", "Invoicing", "Admin"]} rss={{ title: "Invoice System & Billing Operations", description: "Complete invoice management, credit health checks, and admin billing operations" }}>
+
+  ## Invoice System
+
+  - **Draft Invoice Flow**: Add draft invoice flow and batch item update endpoint
+  - **Invoice Items**: Add invoice item import and sync from Stripe
+  - **Local Invoices**: Support for local invoice creation and management
+  - **Invoice Payment**: Direct invoice payment flow with credits
+  - **Auto-Refresh**: Auto-refresh invoice status on tab focus
+  - **Refund Handling**: Handle invoice refund by creating debt.refund record
+
+  ## Credit & Billing Operations
+
+  - **Credit Repository**: New CreditRepository with pay_invoice_with_credits action
+  - **Credit Adjustment**: Add credit adjustment for reconciliation
+  - **Settle with Credits**: Add settle-with-credits and improve reconciliation tools
+  - **Manual Settlement**: Add admin operations for manual settlement and sponsor credit
+  - **Manual Debt Creation**: Add admin manual debt creation for reconciliation
+
+  ## Append-Only Ledger
+
+  - **Ledger Model**: Use Append-Only ledger model for net debt calculation
+  - **Type-Based Queries**: Migrate has_paid queries to type-based hybrid properties
+  - **Debit Records**: Add missing debit record in auto_settle_debts
+
+  ## Admin Enhancements
+
+  - **Workspace Detail**: Enhanced workspace detail page with billing overview, Stripe IDs, and monthly usage
+  - **Resource Analytics**: Add resource & usage analytics to workspace detail page
+  - **Billing Operations UI**: Display admin billing operations and audit info in workspace pages
+  - **Workspace Filters**: Enhanced workspaces list filters and transactions sum
+
+  ## Bug Fixes & Improvements
+
+  - Fixed Coinbase order expiration logic and webhook handling
+  - Improved credit health check to distinguish debt from data issues
+  - Fixed invoice payment idempotency and status recovery
+  - Added ddns-ip.net to email domain blacklist
+
+</Update>
+
+<Update label="December 22-28, 2025" tags={["GPU", "OS Image", "Invoicing"]} rss={{ title: "GPU Mode Switch & OS Image Slug", description: "GPU confidential computing mode toggle, OS image slug decoupling, and invoice improvements" }}>
+
+  ## GPU Management
+
+  - **GPU Mode Switch**: APIs and UI for switching GPU between CC (Confidential Computing) and non-CC modes
+  - **Mode Switch UI**: Improve GPU mode switch UX with toggle and better feedback in admin GPU page
+  - **PCI Slot Utilities**: Extract PCI slot normalization to shared utility module
+  - **GPU Allocation Status**: Add GPU device info and allocation status query action
+
+  ## OS Image Management
+
+  - **Slug Decoupling**: Decouple OS image name from slug for more flexible image management
+  - **Slug Field**: Add slug field to OSImage model and admin API
+  - **Admin Forms**: Add slug field to OS Image create and edit forms
+  - **Display Name**: Add display_image_name property and get_dstack_slug method
+
+  ## Invoice System
+
+  - **Invoice Items Model**: Add InvoiceItem model and make Stripe fields optional
+  - **Invoice Repository**: Enhanced repository with status update and void support
+  - **Unpaid Notifications**: Add UnpaidInvoiceNotificationTemplate for local invoices
+  - **Draft Invoice Flow**: Add draft invoice flow and batch item update
+
+  ## API Improvements
+
+  - **QEMU Version**: Add qemu_version to attestation endpoint with cached TEEScope lookup
+  - **Guest Agent Cache**: Add cached guest agent info with configurable KMS endpoints
+  - **Proxy Support**: Add proxy support for dstack base client
+
+  ## Bug Fixes
+
+  - Fixed resize for GPU instances (disk-only resize, gpu-rental detection)
+  - Fixed stale cache validation errors in guest agent info lookup
+  - Removed deprecated base_image field writes
+
+</Update>
+
+<Update label="December 15-19, 2025" tags={["AI Models", "GPU", "Billing", "ClickHouse"]} rss={{ title: "New AI Models & GPU Lifecycle Improvements", description: "New flagship AI models, GPU allocation lifecycle, and billing refinements" }}>
+
+  ## New Confidential AI Models
+
+  Major new models available through the Redpill API:
+
+  - **OpenAI GPT-5.2** - 400K context, $1.75/$14.00 per 1M tokens
+  - **xAI Grok 4** - 256K context, $3.00/$15.00 per 1M tokens
+  - **xAI Grok 4.1 Fast** - 2M context, $0.20/$0.50 per 1M tokens
+  - **xAI Grok Code Fast 1** - 256K context, $0.20/$1.50 per 1M tokens - coding-optimized
+  - **Google Gemini 3 Pro Preview** - 1M context, $4.00/$18.00 per 1M tokens
 
   ## GPU Lifecycle Management
 
@@ -42,7 +169,11 @@ icon: "clock"
 
 </Update>
 
-<Update label="December 1-14, 2025" tags={["Usage", "Workspace", "Security"]} rss={{ title: "Usage Export & Workspace Validation", description: "Usage data export, workspace slug validation, and security improvements" }}>
+<Update label="December 1-14, 2025" tags={["AI Models", "Usage", "Workspace", "Security"]} rss={{ title: "New AI Models & Usage Export", description: "DeepSeek V3.2 model, usage data export, workspace slug validation, and security improvements" }}>
+
+  ## New Confidential AI Models
+
+  - **DeepSeek V3.2** (Phala) - 163K context, $0.28/$1.14 per 1M tokens - latest DeepSeek iteration with improved performance
 
   ## Usage Export
 
