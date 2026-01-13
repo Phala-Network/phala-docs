@@ -42,7 +42,7 @@ Click the **Deploy** -> **docker-compose.yml** in the top-right corner of the cl
         command: "start-notebook.sh --NotebookApp.token=${TOKEN}"
     ```
 
-3.  Choose the **Computing Resources** plan. There are some preset plans available, or you can customize them for more flexibility. In **Node & Image** section, we recommend choosing **dstack-dev-** as guest image if you are deploying for testing. It will enable the debug feature that you can login to the virtual machine in the future.
+3.  Choose the **Computing Resources** plan. There are some preset plans available, or you can customize them for more flexibility. In **Node & Image** section, we recommend choosing **dstack-dev-** as guest image if you are deploying for testing. This enables [SSH access](/phala-cloud/networking/enable-ssh-access) for debugging.
 
 
     <Frame caption="Compute Resources">

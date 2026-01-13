@@ -211,31 +211,33 @@ grpcurl -plaintext localhost:50051 list
 
 SSH only works with development OS images. Production images have SSH disabled.
 
-### Check Configuration
+### Debug with Verbose Mode
+
+Use the Phala CLI with verbose output to diagnose connection issues:
 
 ```bash
-# Verify environment variables are set
-DSTACK_ROOT_PASSWORD=yourpassword
-# OR
-DSTACK_ROOT_PUBLIC_KEY=ssh-rsa AAAA...
-
-# Test connection
-ssh -v my-cvm
-
-# Test ProxyCommand directly
-openssl s_client -connect <app-id>-22.dstack-prod5.phala.network:443
+phala ssh my-cvm -v
 ```
+
+This shows detailed connection information including gateway resolution and SSH handshake.
+
+### Check SSH Keys
+
+SSH keys from Account Settings are only injected at CVM creation time. If you added keys after deployment, use Code Update to set `DSTACK_ROOT_PUBLIC_KEY`.
 
 ### macOS OpenSSL Issue
 
-macOS uses LibreSSL which may cause issues:
+If using manual SSH configuration, macOS LibreSSL may cause timeouts:
+
 ```bash
 # Install OpenSSL via Homebrew
 brew install openssl
 
-# Update SSH config
-ProxyCommand /opt/homebrew/bin/openssl s_client -quiet -connect %h:%p
+# Use full path in ProxyCommand
+/opt/homebrew/bin/openssl s_client -quiet -connect %h:%p
 ```
+
+For detailed SSH setup, see [Enable SSH Access](/phala-cloud/networking/enable-ssh-access).
 
 ## Debugging Commands
 

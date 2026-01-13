@@ -1,35 +1,67 @@
 ---
-title: Enable SSH Access  
+title: Enable SSH Access
 description: Connect to your CVM via SSH for debugging and management
 ---
 
 <Warning>
-SSH access is only available when you deploy with a **dev** OS image. Select "dstack-dev" as the OS type when creating your CVM. Production OS images have SSH disabled for security.
+SSH access is only available with **dev** OS images. Select "dstack-dev" when creating your CVM. Production images have SSH disabled for security.
 </Warning>
 
-This guide shows you how to SSH into your CVM through the secure gateway tunnel.
+The easiest way to SSH into your CVM is with the Phala CLI. One command connects you through the secure gateway tunnel.
 
 ## Prerequisites
 
-- SSH client on your local machine
-- OpenSSL installed
+- [Phala CLI](/phala-cloud/phala-cloud-cli/overview) (latest version)
 - CVM deployed with Development OS
 
-## Step 1: Set Root Credentials
+## Step 1: Configure SSH Keys
 
-When deploying your CVM, set one of these environment variables:
+Start by adding your SSH keys in **Account Settings > SSH Keys** on the [Phala Cloud dashboard](https://cloud.phala.com/account/settings). You can add keys manually or sync them from GitHub. All saved keys are automatically added to every new CVM you deploy.
 
-**For password authentication:**
-- Add `DSTACK_ROOT_PASSWORD` as a secure environment variable
+When creating a CVM, the SSH Authorization section lets you add an additional root password or public key specific to that instance. These are added alongside your account keys.
 
-**For key-based authentication (recommended):**
-- Add `DSTACK_ROOT_PUBLIC_KEY` with your SSH public key
+<Note>
+SSH keys are injected **only at CVM creation time**. Updating your account keys won't affect already-deployed CVMs. To modify credentials on existing CVMs, use **Code Update** to set the `DSTACK_ROOT_PASSWORD` or `DSTACK_ROOT_PUBLIC_KEY` environment variables.
+</Note>
 
-If you need to add credentials after deployment, use "Code Update" in the dashboard to modify environment variables.
+## Step 2: Connect
 
-## Step 2: Configure Your SSH Client
+```bash
+# Connect using phala.toml configuration
+phala ssh
 
-Add this to your `~/.ssh/config` file:
+# Or specify the CVM name directly
+phala ssh my-cvm
+```
+
+That's it. The CLI handles the gateway tunnel and SSH configuration automatically.
+
+## Useful Options
+
+The `phala ssh` command supports several options:
+
+```bash
+# Preview the SSH command without connecting
+phala ssh my-cvm --dry-run
+
+# Enable verbose output for debugging
+phala ssh my-cvm -v
+
+# Forward a local port to the CVM
+phala ssh my-cvm -- -L 8080:localhost:80
+```
+
+See the [CLI reference](/phala-cloud/references/phala-cloud-cli/phala/ssh) for all options.
+
+<Accordion title="Manual SSH Configuration">
+
+If you prefer manual configuration or need to customize your setup, use `phala ssh --dry-run` to generate the SSH config:
+
+```bash
+phala ssh my-cvm --dry-run
+```
+
+This outputs a working SSH command you can adapt. The underlying mechanism uses OpenSSL to tunnel SSH through TLS:
 
 ```bash
 Host my-cvm
@@ -39,21 +71,13 @@ Host my-cvm
     ProxyCommand openssl s_client -quiet -connect %h:%p
 ```
 
-Replace:
-- `<app-id>` with your application ID (find it in the dashboard)
-- `<cluster>` with your cluster (e.g., `us`)
+Replace `<app-id>` with your application ID and `<cluster>` with your cluster (e.g., `dstack-pha-prod7`).
 
-## Step 3: Connect
+**macOS users:** If you encounter connection timeouts, you may have LibreSSL instead of OpenSSL. Install OpenSSL via Homebrew and use the full path: `/opt/homebrew/bin/openssl`.
 
-```bash
-ssh my-cvm
-```
+**Windows users:** Install OpenSSL via [Chocolatey](https://chocolatey.org/) (`choco install openssl`) and use the full path in ProxyCommand. Alternatively, use WSL where the Linux instructions work directly.
 
-That's it. You're now connected to your CVM through the secure gateway tunnel.
-
-<Note>
-**macOS users:** If you encounter connection timeouts, you may have LibreSSL instead of OpenSSL. Install OpenSSL via Homebrew (`brew install openssl`) and update your ProxyCommand to use the full path to the Homebrew OpenSSL binary.
-</Note>
+</Accordion>
 
 ## What You Can Do
 
@@ -71,82 +95,18 @@ docker stats
 # Debug networking
 curl http://localhost:8080
 netstat -tulpn
-wg show
 ```
 
-## Security Notes
-
-- SSH traffic is tunneled through TLS via the gateway
-- Only your code inside the TEE can see the decrypted SSH session
-- Use key-based authentication for production debugging
-- Remember to switch to Production OS when you're done debugging
-
-## Windows SSH Access
-
-Windows users can connect to CVMs using PowerShell or Windows Terminal with OpenSSL.
-
-### Option 1: Using Windows OpenSSL
-
-1. **Install OpenSSL for Windows:**
-   - Download from [slproweb.com/products/Win32OpenSSL.html](https://slproweb.com/products/Win32OpenSSL.html)
-   - Or install via Chocolatey: `choco install openssl`
-
-2. **Create SSH config file:**
-
-   Create or edit `C:\Users\<YourUsername>\.ssh\config`:
-   ```
-   Host my-cvm
-       HostName <app-id>-22.<cluster>.phala.network
-       User root
-       Port 443
-       ProxyCommand "C:\Program Files\OpenSSL-Win64\bin\openssl.exe" s_client -quiet -connect %h:%p
-   ```
-
-3. **Connect:**
-   ```powershell
-   ssh my-cvm
-   ```
-
-### Option 2: Using WSL (Windows Subsystem for Linux)
-
-If you have WSL installed, the Linux instructions work directly:
-
-1. Open WSL terminal
-2. Edit `~/.ssh/config` as shown in the main guide
-3. Connect with `ssh my-cvm`
-
-### Option 3: Using PuTTY with Plink
-
-1. Install [PuTTY](https://www.putty.org/)
-2. Use Plink with OpenSSL tunneling:
-   ```powershell
-   plink -proxycmd "openssl s_client -quiet -connect <app-id>-22.<cluster>.phala.network:443" root@<app-id>-22.<cluster>.phala.network
-   ```
-
-<Note>
-**Windows OpenSSL Path:** If you installed OpenSSL to a different location, update the path in the ProxyCommand accordingly.
-</Note>
+<Tip>
+Remember to switch to a Production OS image when you're done debugging.
+</Tip>
 
 ## Troubleshooting
 
-**Permission denied?**
-- Verify your credentials are set in environment variables
-- Use "Code Update" to add them if forgotten during deployment
+| Issue | Solution |
+|-------|----------|
+| Permission denied | Check Account Settings for saved keys. For existing CVMs, use Code Update to set credentials. |
+| Connection refused | Confirm you deployed with Development OS, not Production |
+| Connection timeout | Run `phala ssh -v` to see detailed connection info |
 
-**Connection timeout?**
-- Check your OpenSSL version: `openssl version`
-- macOS users: ensure you're using OpenSSL, not LibreSSL
-- Windows users: verify OpenSSL is in your PATH or use the full path
-
-**Connection refused?**
-- Confirm you deployed with Development OS, not Production OS
-
-**Windows: 'openssl' is not recognized**
-- Install OpenSSL and add it to your system PATH
-- Or use the full path to openssl.exe in the ProxyCommand
-
-## Next Steps
-
-- [Monitor logs](/phala-cloud/monitoring/public-logs)
-- [Set up custom domains](/phala-cloud/networking/setup-custom-domain)
-- [Learn about security](/phala-cloud/networking/security)
+For more detailed troubleshooting, see [Networking Troubleshooting](/phala-cloud/networking/troubleshooting#ssh-access-denied).

@@ -374,7 +374,8 @@
                       "/phala-cloud/references/phala-cloud-cli/phala/auth",
                       "/phala-cloud/references/phala-cloud-cli/phala/cvms",
                       "/phala-cloud/references/phala-cloud-cli/phala/docker",
-                      "/phala-cloud/references/phala-cloud-cli/phala/simulator"
+                      "/phala-cloud/references/phala-cloud-cli/phala/simulator",
+                      "/phala-cloud/references/phala-cloud-cli/phala/ssh"
                     ]
                   },
                   "/phala-cloud/references/migration-from-dstack-v03"
