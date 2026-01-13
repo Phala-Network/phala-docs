@@ -61,11 +61,48 @@ We offer pre-configured instance types optimized for different workloads. View a
 
 New accounts start at Tier 1. Need more resources? Contact us to upgrade your tier.
 
-## GPU Instances
+## GPU TEE Instances
 
-GPU instances are available for AI and machine learning workloads. Due to limited availability, GPU resources require a reservation.
+GPU TEE instances provide confidential AI computing with hardware-level isolation for machine learning workloads.
 
-To request GPU access, please contact us at cloud@phala.network with your use case and requirements.
+### GPU TEE Pricing
+
+| GPU Model | Commitment | Price | Notes |
+|-----------|------------|-------|-------|
+| **NVIDIA H200** | On-Demand | $3.50/hour | 24-hour minimum |
+| **NVIDIA H200** | 1-Month | $2.56/hour | Monthly commitment |
+| **NVIDIA H200** | 6-Month | $2.30/hour | Best value |
+| **NVIDIA B200** | On-Demand | $3.80/hour | 24-hour minimum |
+
+### GPU TEE Billing Rules
+
+<Warning>
+**GPU TEE uses hourly billing**, unlike regular CVMs which bill per-minute.
+</Warning>
+
+**On-Demand GPU TEE:**
+- **Minimum charge**: When you start an instance, you are charged **$84 upfront for the first 24 hours** (H200)
+- **When billing starts**: No charges until the instance is actually launched
+- Configuring Docker settings or topping up your account does NOT incur compute costs
+- Usage beyond 24 hours is billed hourly (pay-as-you-go)
+- If you stop and restart later, the 24-hour minimum applies again
+
+**Commitment Plans:**
+- Lower hourly rates with monthly or 6-month commitments
+- Contact cloud@phala.network for commitment pricing
+
+### GPU Configuration
+
+- Available GPUs per instance: 1, 2, 4, or 8 GPUs
+- Multi-GPU pricing scales linearly (e.g., 2x H200 = 2x hourly rate)
+
+### Refunds
+
+If GPU provisioning fails with "Resource matching failed: No teepod found matching all requirements", contact support@phala.network with:
+- Payment Order ID
+- Order reference
+
+Refunds are processed promptly for failed provisions.
 
 ## What You Don't Pay For
 

@@ -3,7 +3,11 @@ description: Reference documentation and resources for Phala Network development
 title: Acquiring PHA
 ---
 
-Phala tokens exist in multiple environments, and it is important for community members to correctly recognize and verify the token contracts they interact with.  
+Phala tokens exist in multiple environments, and it is important for community members to correctly recognize and verify the token contracts they interact with.
+
+<Note>
+**Migrating from Phala/Khala Parachain?** The Phala parachain has been sunset. If you have assets on Khala, Phala parachain, Hydration, or stuck in XCM bridges, see the [Migration Guide](#migrating-from-phala-parachain) section below.
+</Note>
 
 ## PHA as an ERC-20 Token
 **PHA** is an ERC-20 token and can be displayed, transferred, and managed in any **EVM-compatible wallet**, including:
@@ -58,7 +62,27 @@ Below are the *official and only valid* contract addresses:
 
 ## Transfer PHA/vPHA between Ethereum and Phala L2 <a href="#Transfer-PHA/vPHA-between-Ethereum-and-Phala-L2" id="Transfer-PHA/vPHA-between-Ethereum-and-Phala-L2"></a>
 
-For now, you can transfer your PHA between Ethereum and Phala L2, with [Superbridge](bridge.phala.network).
+You can transfer PHA and vPHA between Ethereum and Phala L2 using [Superbridge](https://bridge.phala.network).
+
+### Bridge from Ethereum to Phala L2
+
+1. Go to [bridge.phala.network](https://bridge.phala.network)
+2. Connect your wallet (MetaMask, Rabby, etc.)
+3. Select **Ethereum → Phala L2**
+4. Enter the amount of PHA or vPHA to bridge
+5. Confirm the transaction and pay gas fees
+
+### Bridge from Phala L2 to Ethereum
+
+1. Go to [bridge.phala.network](https://bridge.phala.network)
+2. Connect your wallet and switch to **Phala L2** network
+3. Select **Phala L2 → Ethereum**
+4. Enter the amount to bridge
+5. Confirm the transaction
+
+<Warning>
+**Gas fees required:** When bridging from Phala L2 to Ethereum, you need ETH on Phala L2 for gas. Bridge a small amount of ETH (~0.001 ETH is sufficient) from Ethereum to Phala L2 first.
+</Warning>
 
 ## Get your Phala Tokens (PHA) <a href="#get-your-phala-tokens-pha" id="get-your-phala-tokens-pha"></a>
 
@@ -111,3 +135,101 @@ If you do not hold any PHA, you can purchase PHA from any of the following excha
 <Note type="info">
 Not all brokers may be available in your jurisdiction. Note that some brokers require you to have an account with them for a certain period before you can transfer your funds to another wallet, such as the [Phala Wallet](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fphala.api.onfinality.io%2Fpublic-ws#/accounts).
 </Note>
+
+---
+
+## Migrating from Phala Parachain
+
+<Warning>
+The Phala/Khala parachain has been sunset. PHA tokens now exist primarily on Ethereum and Phala L2. If you have assets on the old parachain or related networks, follow the guides below to migrate them.
+</Warning>
+
+### Claim Assets from Khala/Phala Parachain
+
+If you had PHA staked, delegated in pools/vaults, or in your wallet on the original Khala or Phala parachain:
+
+1. Go to the **Khala Assets Portal**: [app.phala.network/khala-assets](https://app.phala.network/khala-assets)
+2. Connect your Ethereum wallet that corresponds to your old Substrate address
+3. Follow the claim process to receive your assets on Phala L2
+
+<Note>
+**Requirements for claiming:**
+- An Ethereum wallet with ETH for gas fees
+- Assets will be claimed to Phala L2
+- Add Phala L2 to your wallet first (see [How to Add Phala L2](#how-to-add-phala-l2-network-to-your-wallet))
+</Note>
+
+**Resources:**
+- [Claim System Tutorial](https://forum.phala.network/t/phala-assets-claim-system-now-alive/4002)
+- [Sunset Announcement](https://forum.phala.network/t/proposal-sunsetting-phala-parachain-and-migrating-to-ethereum-l2/3999)
+
+### Migrate PHA from Hydration
+
+If your PHA is on Hydration (formerly Basilisk), a Polkadot parachain with EVM-style addresses (0x...):
+
+<Warning>
+Hydration addresses look like Ethereum addresses but are NOT Ethereum accounts. The Phala snapshot did not include Hydration balances, so the claim UI will show "0 PHA".
+</Warning>
+
+**Manual Claim Process:**
+
+Since the Phala network is sunset, the team processes Hydration claims manually:
+
+1. **Transfer tokens to the burning address:**
+   ```
+   13UVJyLnbVp9RBZYFwFGyDvVd1y27Tt8tkntv6Q7JVPhFsTB
+   ```
+
+2. **Provide verification:**
+   - Your Hydration address (the one that held PHA)
+   - Your Ethereum address as recipient
+   - Signature data for ownership verification
+   - Link to the burning transaction
+
+3. **Alternative verification method:**
+   Send three batches to the burning address to prove ownership:
+   - First: 1 PHA
+   - Second: 2 PHA
+   - Third: All remaining PHA
+
+4. **Contact support** via the [Phala Forum](https://forum.phala.network/t/manual-claim-guide-for-hydration-users/4003) or support channels
+
+After verification, the team will execute the claim to your Ethereum address.
+
+### Stuck XCM Transfers (Moonbeam, etc.)
+
+If you have PHA stuck in an XCM transfer from Phala to Moonbeam or other parachains:
+
+Since the Phala parachain is sunset, XCM bridges are no longer operational. The team can help claim stuck assets manually.
+
+**Process:**
+1. Verify ownership of your Phala address: [Verification Guide](https://www.notion.so/phalanetwork/How-to-verify-your-Phala-address-2bc0317e04a1809291c7eb6f3e33ad6b)
+2. Provide:
+   - Signature proving address ownership
+   - Your Ethereum address as recipient
+3. Contact support with verification proof
+
+After verification, the team will issue the transfer to your Ethereum address.
+
+### Bridge PHA from BSC (Binance Smart Chain)
+
+For PHA on Binance Smart Chain (BEP-20), there is no direct bridge to Ethereum ERC-20. Use one of these options:
+
+**Option 1: Via Binance Exchange**
+1. Deposit your BSC PHA to Binance (the centralized exchange)
+2. Withdraw as ERC-20 PHA to your Ethereum wallet
+
+**Option 2: Swap on DEX**
+1. Go to [PancakeSwap](https://pancakeswap.finance/?chain=bsc)
+2. Swap your BSC PHA for another token (e.g., USDT, BNB)
+3. Bridge that token to Ethereum using a cross-chain bridge
+4. Swap back to PHA on Ethereum
+
+### Already Have PHA on Ethereum?
+
+If your PHA tokens are already on Ethereum (ERC-20), there's nothing you need to do. Your tokens are in the correct format.
+
+You can:
+- [Stake PHA to receive vPHA](/network/overview/phala-staking)
+- Use PHA with any DeFi protocol on Ethereum
+- Bridge to Phala L2 for lower gas fees

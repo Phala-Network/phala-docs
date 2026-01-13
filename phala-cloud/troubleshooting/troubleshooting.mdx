@@ -1,28 +1,168 @@
 ---
-description: Best practices and guidelines for production deployments on Phala Cloud.
+description: Common issues and solutions for Phala Cloud deployments.
 title: Troubleshooting Guide
 ---
 
-
 Join our support groups: 🌍 [Global](https://t.me/+nbhjx1ADG9EyYmI9), 🇨🇳 [Chinese](https://t.me/+4PcAE9qTZ1kzM2M9)
 
-## Errors in Cloud UI
+## Deployment Errors
 
-### No available nodes found. Please try again later or contact support.
+### No available nodes found
 
-This error indicates that there are no available nodes for deployment. Generally, this is because you are in the free tier and you have already deployed the maximum number of CVMs. Please upgrade to a paid plan to continue or delete your old CVMs.
+This error indicates no available nodes for deployment.
+
+**Common causes:**
+- You've reached your tier's CVM limit
+- All nodes are currently at capacity
+
+**Solutions:**
+1. Check your [account tier limits](/phala-cloud/pricing#account-tiers-and-limits)
+2. Delete unused CVMs to free up capacity
+3. Upgrade to a higher tier for more resources
+4. Try again later if nodes are temporarily at capacity
 
 <Frame caption="No available nodes found error">
     <img src="/images/error-no-available-nodes.png" alt="No available nodes found" />
 </Frame>
 
-## Errors in CVM Logs
+### Can't deploy more CVMs - tier limit reached
 
-### exec /usr/local/bin/docker-entrypoint.sh: exec format error
+Each account tier has CVM limits:
 
-When you see this error in the CVM logs, it indicates that your Docker images are not compatible with the x86 platform. This may happen if you built the image on an ARM or another platform. To resolve this issue, specify the platform by using the argument **`--platform linux/amd64`** when building your Docker images.
+| Tier | Max CVMs | Max vCPUs | Max Memory |
+|------|----------|-----------|------------|
+| **Tier 1** | 8 | 16 | 32GB |
+| **Tier 2** | 16 | 32 | 64GB |
+| **Enterprise** | Unlimited | Unlimited | Unlimited |
 
-### [FAILED] Failed to start Virtual Console Setup.
+**Solutions:**
+- Delete unused CVMs
+- Contact cloud@phala.network to upgrade your tier
 
-You can safely ignore this error. This is an [known issue](https://github.com/Dstack-TEE/dstack/issues/321) found in OS image dstack v0.5.4.
-It's because the virtual console module was partially but not completely removed from the OS image.
+### Deployment blocked - "violates terms & conditions"
+
+Some Docker images trigger anti-spam rules.
+
+**Known triggers:**
+- Certain base images that have been abused for spam
+- Images with suspicious patterns
+
+**Solutions:**
+1. Use official base images (e.g., `python:3.11`, `node:20`)
+2. Avoid deprecated or unmaintained base images
+3. Contact support if you believe your image was incorrectly flagged
+
+### CVM stuck, can't restart - "process already running"
+
+If your CVM is stuck and won't restart:
+
+**Solution:**
+Use the **"Power Off"** button in the Web UI for a force shutdown. This is different from "Stop" and will forcefully terminate the CVM.
+
+1. Go to your CVM in the dashboard
+2. Click **Power Off** (not Stop)
+3. Wait for the CVM to fully shut down
+4. Start the CVM again
+
+If this doesn't work, contact support for assistance.
+
+## Container & Image Errors
+
+### exec format error
+
+```
+exec /usr/local/bin/docker-entrypoint.sh: exec format error
+```
+
+Your Docker image is not compatible with x86_64 architecture. This happens when building on ARM (e.g., Apple Silicon Mac).
+
+**Solution:**
+Build your image with the correct platform:
+
+```bash
+docker build --platform linux/amd64 -t your-image:tag .
+```
+
+Or in docker-compose.yml:
+```yaml
+services:
+  your-service:
+    platform: linux/amd64
+    build: .
+```
+
+### TEE socket error - "No such file or directory" for dstack.sock
+
+```
+Error: /var/run/dstack.sock: No such file or directory
+```
+
+**Cause:** Incorrect volume configuration in docker-compose.yml.
+
+**Solution:**
+Only mount the socket file, NOT the lock file:
+
+```yaml
+# ✅ Correct
+volumes:
+  - /var/run/dstack.sock:/var/run/dstack.sock
+
+# ❌ Wrong - remove this line
+# - /var/run/dstack.sock.lock:/var/run/dstack.sock.lock
+```
+
+### [FAILED] Failed to start Virtual Console Setup
+
+You can safely ignore this error. This is a [known issue](https://github.com/Dstack-TEE/dstack/issues/321) in OS image dstack v0.5.4 where the virtual console module was partially removed.
+
+## Networking Issues
+
+### Can't expose non-HTTPS ports
+
+By default, Phala Cloud only exposes **HTTPS/TLS ports** to the public internet.
+
+**For TCP services (SSH, databases, etc.):**
+- Use [TCP port forwarding](/phala-cloud/networking/expose-service-to-internet) with TLS wrapping
+- See the [TCP services guide](/phala-cloud/networking/expose-service-to-internet#tcp-services)
+
+**For DNS servers:**
+Running a DNS server on Phala Cloud is possible but requires workarounds since UDP port 53 cannot be directly exposed. Consider running DNS on a separate server and connecting to your TEE backend.
+
+### SSH connection issues
+
+See the [SSH access guide](/phala-cloud/networking/enable-ssh-access) for detailed troubleshooting.
+
+**Common issues:**
+- Not using Development OS image (SSH is disabled on Production OS)
+- Missing `DSTACK_ROOT_PASSWORD` or `DSTACK_ROOT_PUBLIC_KEY` environment variables
+- Using LibreSSL instead of OpenSSL on macOS
+
+## GPU TEE Issues
+
+### "Resource matching failed: No teepod found"
+
+No GPU nodes are currently available matching your requirements.
+
+**Solutions:**
+1. Try a different GPU configuration (fewer GPUs)
+2. Try again later when resources become available
+3. Contact cloud@phala.network for dedicated capacity
+
+**For refunds on failed provisions:**
+Email support@phala.network with:
+- Payment Order ID
+- Order reference
+
+### GPU billing questions
+
+See [GPU TEE Billing](/phala-cloud/pricing#gpu-tee-billing-rules) for details on:
+- 24-hour minimum charges
+- When billing starts (only on launch)
+- Commitment pricing options
+
+## Still Need Help?
+
+- Join our [Global Telegram](https://t.me/+nbhjx1ADG9EyYmI9)
+- Join our [Chinese Telegram](https://t.me/+4PcAE9qTZ1kzM2M9)
+- Email: cloud@phala.network
+- [GitHub Issues](https://github.com/Phala-Network/phala-cloud-community/issues)

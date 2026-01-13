@@ -81,6 +81,52 @@ wg show
 - Use key-based authentication for production debugging
 - Remember to switch to Production OS when you're done debugging
 
+## Windows SSH Access
+
+Windows users can connect to CVMs using PowerShell or Windows Terminal with OpenSSL.
+
+### Option 1: Using Windows OpenSSL
+
+1. **Install OpenSSL for Windows:**
+   - Download from [slproweb.com/products/Win32OpenSSL.html](https://slproweb.com/products/Win32OpenSSL.html)
+   - Or install via Chocolatey: `choco install openssl`
+
+2. **Create SSH config file:**
+
+   Create or edit `C:\Users\<YourUsername>\.ssh\config`:
+   ```
+   Host my-cvm
+       HostName <app-id>-22.<cluster>.phala.network
+       User root
+       Port 443
+       ProxyCommand "C:\Program Files\OpenSSL-Win64\bin\openssl.exe" s_client -quiet -connect %h:%p
+   ```
+
+3. **Connect:**
+   ```powershell
+   ssh my-cvm
+   ```
+
+### Option 2: Using WSL (Windows Subsystem for Linux)
+
+If you have WSL installed, the Linux instructions work directly:
+
+1. Open WSL terminal
+2. Edit `~/.ssh/config` as shown in the main guide
+3. Connect with `ssh my-cvm`
+
+### Option 3: Using PuTTY with Plink
+
+1. Install [PuTTY](https://www.putty.org/)
+2. Use Plink with OpenSSL tunneling:
+   ```powershell
+   plink -proxycmd "openssl s_client -quiet -connect <app-id>-22.<cluster>.phala.network:443" root@<app-id>-22.<cluster>.phala.network
+   ```
+
+<Note>
+**Windows OpenSSL Path:** If you installed OpenSSL to a different location, update the path in the ProxyCommand accordingly.
+</Note>
+
 ## Troubleshooting
 
 **Permission denied?**
@@ -90,9 +136,14 @@ wg show
 **Connection timeout?**
 - Check your OpenSSL version: `openssl version`
 - macOS users: ensure you're using OpenSSL, not LibreSSL
+- Windows users: verify OpenSSL is in your PATH or use the full path
 
 **Connection refused?**
 - Confirm you deployed with Development OS, not Production OS
+
+**Windows: 'openssl' is not recognized**
+- Install OpenSSL and add it to your system PATH
+- Or use the full path to openssl.exe in the ProxyCommand
 
 ## Next Steps
 

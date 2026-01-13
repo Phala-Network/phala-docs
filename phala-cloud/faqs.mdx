@@ -143,21 +143,53 @@ To verify the report, user can get the report hex data from Phala Cloud dashboar
 
 ### What is the current pricing structure for Phala Cloud?
 
-Check the [pricing page](https://cloud.phala.com/pricing) for more details.
+Check the [pricing page](/phala-cloud/pricing) for more details.
+
+**Quick summary:**
+- **Compute**: Billed per-minute based on instance type (only while running)
+- **Storage**: $0.000139/GB/hour (~$0.10/GB/month) - charged even when stopped
+- **GPU TEE**: Billed hourly with 24-hour minimum for on-demand
 
 ### What kind of user levels do we have on Phala Cloud?
 
-* **Free**: User who registered on Phala Cloud, but have limit resource can be used.
+* **Free**: User who registered on Phala Cloud, with limited resources
 * **Pro**: Paid users with self-service capabilities
 * **Enterprise**: Customized pricing, available through Business Development only
 
+### What are the account tier limits?
+
+| Tier | Max CVMs | Max vCPUs | Max Memory | Max Total Disk |
+|------|----------|-----------|------------|----------------|
+| **Tier 1** | 8 | 16 | 32GB | 160GB |
+| **Tier 2** | 16 | 32 | 64GB | 1TB |
+| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited |
+
+New accounts start at Tier 1. Contact cloud@phala.network to upgrade.
+
+<Note>
+**Important:** Check your tier limits BEFORE deploying multiple CVMs. You'll receive a "No available nodes found" error if you exceed your limits.
+</Note>
+
 #### What are the resource limits for the Free tier users?
 
-User under **Free** tier can only create one single CVM. User can verify their account and set up payment to remove the limit.
+Users under **Free** tier can only create one single CVM. Verify your account and set up payment to access Tier 1 limits.
 
 ### What is the billing granularity for Phala Cloud? Is it by hour or minute?
 
-Phala Cloud bills by seconds. The pricing page displays hourly rates for ease of understanding, but actual billing is based on precise second-level usage.
+**Regular CVMs:** Billed by seconds. The pricing page displays hourly rates for ease of understanding, but actual billing is based on precise second-level usage.
+
+**GPU TEE:** Billed by hours with a 24-hour minimum. See [GPU TEE Billing](/phala-cloud/pricing#gpu-tee-billing-rules) for details.
+
+### How does GPU TEE billing work?
+
+For On-Demand GPU TEE (e.g., H200):
+- **Minimum charge**: $84 upfront for the first 24 hours
+- **When billing starts**: Only when the instance is actually launched
+- Topping up your account or configuring Docker settings does NOT incur charges
+- Usage beyond 24 hours is billed hourly
+- If you stop and restart later, the 24-hour minimum applies again
+
+For commitment plans (1-month or 6-month), you get lower hourly rates.
 
 ### What happens if my balance reaches zero?
 
@@ -174,3 +206,29 @@ Yes, Phala implements several measures:
 * Payment verification is required even for free VMs to prevent automated registrations
 * LLM APIs are not provided for free without a specific reason
 * Free VMs may be offered when they don't impact paying users
+* Certain Docker base images may be blocked if they've been used for abuse
+
+If your deployment is blocked with "violates terms & conditions", try using official base images (e.g., `python:3.11`, `node:20`) or contact support if you believe it's a false positive.
+
+### Can I deploy CVMs through GitHub Actions / CI/CD?
+
+Yes! Phala Cloud supports automated deployments through GitHub Actions.
+
+See the [CI/CD Pipeline Guide](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline) for:
+- Setting up repository secrets
+- Configuring the deployment workflow
+- Using the `phala-deploy-action`
+
+You can also use the [Phala Cloud API](https://cloud-api.phala.network/docs) for custom automation.
+
+### Is Phat Contract / DevPhase / Swanky still supported?
+
+<Warning>
+**Phat Contract has been sunset.** DevPhase and Swanky are no longer supported.
+</Warning>
+
+The tech stack has moved to **dstack**-based infrastructure. See the [announcement](https://x.com/PhalaNetwork/status/1988085610649973070) for details.
+
+For new projects, use:
+- [Phala Cloud CVMs](/phala-cloud/what-is/phala-cloud-overview) for TEE deployments
+- [dstack](/dstack/overview/what-is-dstack) for the underlying TEE infrastructure

@@ -64,12 +64,76 @@ To display vPHA, manually add the ERC-20 contract address in your wallet.
 
 ---
 
-## 4. About Unstaking & Safety Notes
+## Unstaking vPHA to PHA
 
-- Unstaking vPHA → PHA takes 21 days,  and you need to claim the unlocked PHA manually when the unlocked period finished.  
-- Always verify:
-  - Contract addresses  
-  - Transaction prompts  
-  - You are on Ethereum Mainnet  
+Unstaking converts your vPHA back to PHA. The process takes **21 days** to complete.
 
-With these steps, you're successfully participating in Phala’s staking ecosystem.
+### Step 1: Initiate Unstaking
+
+1. Go to [app.phala.network/staking](https://app.phala.network/staking)
+2. Connect your wallet (must be on **Ethereum Mainnet**)
+3. Click **Unstake**
+4. Enter the amount of vPHA to unstake
+5. Confirm the transaction and pay gas fees
+
+After the transaction confirms, your vPHA enters a 21-day unlock period.
+
+### Step 2: Wait for Unlock Period
+
+- Your tokens are locked for **21 days**
+- You can track the unlock countdown in the staking dashboard
+- You cannot cancel an unstaking request once initiated
+
+### Step 3: Claim Your PHA
+
+After the 21-day period ends:
+
+1. Return to [app.phala.network/staking](https://app.phala.network/staking)
+2. Connect your wallet
+3. You'll see your unlocked PHA available to claim
+4. Click **Claim** to receive your PHA
+5. Confirm the transaction
+
+<Warning>
+**You must manually claim your PHA** after the unlock period. Tokens do not automatically transfer to your wallet.
+</Warning>
+
+### Unstaking from Phala L2
+
+If your vPHA is on Phala L2 (not Ethereum Mainnet):
+
+1. First, bridge your vPHA to Ethereum using [bridge.phala.network](https://bridge.phala.network)
+2. You need ETH on Phala L2 for gas fees (~0.001 ETH is sufficient)
+3. Once on Ethereum, follow the unstaking steps above
+
+<Note>
+**Need ETH on Phala L2?** Bridge a small amount from Ethereum first using [bridge.phala.network](https://bridge.phala.network).
+</Note>
+
+### Troubleshooting
+
+**"Insufficient ETH" error when bridging from L2:**
+- You need ETH on Phala L2 for gas, not just on Ethereum
+- Bridge ~0.001 ETH from Ethereum to Phala L2 first
+
+**Can't see vPHA in portfolio:**
+- Check if your vPHA is on Phala L2 or Ethereum
+- Add the vPHA token contract to your wallet: `0x21d6eC8fc14CaAcc55aFA23cBa66798DAB3a0ec0`
+
+**vPHA balance seems lower than expected:**
+- vPHA represents staked value at a conversion rate that increases over time
+- Check your deposit history at the bottom of the staking page
+- If you provided liquidity on Uniswap, your vPHA won't show in the Phala app
+
+---
+
+## Safety Notes
+
+Always verify:
+- Contract addresses before any transaction
+- Transaction prompts match your intended action
+- You are connected to **Ethereum Mainnet**
+
+<Warning>
+Never send tokens to unknown addresses. Only use the official contract addresses listed in this documentation.
+</Warning>
