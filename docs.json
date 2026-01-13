@@ -348,6 +348,13 @@
               },
               "/phala-cloud/production-checklist",
               {
+                "group": "Pricing & Billing",
+                "icon": "credit-card",
+                "pages": [
+                  "/phala-cloud/pricing"
+                ]
+              },
+              {
                 "group": "References",
                 "icon": "book",
                 "pages": [

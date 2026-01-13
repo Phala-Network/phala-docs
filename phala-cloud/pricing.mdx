@@ -1,0 +1,97 @@
+---
+title: Pricing
+description: Simple, transparent pricing for Phala Cloud compute and storage resources
+icon: credit-card
+---
+
+# Phala Cloud Pricing
+
+We've made our pricing simple and clear so you can easily plan your costs.
+
+## How Pricing Works
+
+- **Pay-as-you-go**: Only pay for time your CVMs are running
+- **Per-minute billing**: Pay for exact minutes used
+- **No hidden fees**: We track usage automatically
+- **No minimums**: No subscription or minimum usage required
+
+## Compute and Storage
+
+Pricing consists of two separate components:
+
+### Compute
+
+- Billed based on the instance type you select
+- **Only charged while your CVM is running**
+- When you stop a CVM, compute billing stops immediately
+
+### Storage
+
+- Billed at **$0.000139 per GB per hour** (~$0.10 per GB per month)
+- **Charged for both running and stopped CVMs**
+- To stop storage charges completely, you must delete the CVM
+- Minimum disk size is 20GB per CVM
+- System space is not included in disk allocation - you get the full disk size for your data
+
+## Pricing Example
+
+A CVM using `tdx.large` (4 vCPU, 8GB RAM) with 100GB disk:
+
+**While running:**
+- Compute: $0.232/hour (based on instance type)
+- Storage: 100 × $0.000139 = $0.0139/hour
+- **Total: ~$0.246/hour**
+
+**While stopped:**
+- Compute: $0/hour
+- Storage: 100 × $0.000139 = $0.0139/hour
+- **Total: ~$0.014/hour**
+
+## Instance Types
+
+We offer pre-configured instance types optimized for different workloads. View available instance types and pricing in the [Phala Cloud dashboard](https://cloud.phala.com/pricing).
+
+## Account Tiers and Limits
+
+| Tier | CVMs | vCPUs | Memory | Total Disk | Per-CVM Disk |
+|------|------|-------|--------|------------|--------------|
+| **Tier 1** | 8 | 16 | 32GB | 160GB | 80GB |
+| **Tier 2** | 16 | 32 | 64GB | 1TB | 256GB |
+| **Enterprise** | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+
+New accounts start at Tier 1. Need more resources? Contact us to upgrade your tier.
+
+## GPU Instances
+
+GPU instances are available for AI and machine learning workloads. Due to limited availability, GPU resources require a reservation.
+
+To request GPU access, please contact us at cloud@phala.network with your use case and requirements.
+
+## What You Don't Pay For
+
+- **Compute for stopped CVMs**: $0 when powered off (storage fees still apply)
+- **Setup time**: No charge for image pulling or creation
+- **Failed starts**: Not charged if CVM fails to start
+
+## Network and Regions
+
+- **Regions**: Currently available in US, with EU coming soon
+- **Pricing**: Same rates across all regions (all prices in USD)
+- **Data Transfer**: Each CVM includes bandwidth based on size
+
+## Legacy Free CVM Instance
+
+For legacy accounts with existing free CVM instances:
+- **Legacy instances** will be automatically reclaimed 6 months after their creation date
+- **Manual deletion** may occur at any time for inactive or non-compliant instances
+- **Migration recommended** to paid plans for continued service
+
+## Enterprise Support
+
+For larger workloads:
+- **Volume discounts** for sustained usage
+- **Annual billing** options
+- **Custom support packages**
+- **99.9% uptime SLA**
+
+Questions? Contact us at cloud@phala.network for enterprise pricing.
