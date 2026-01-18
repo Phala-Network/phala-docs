@@ -170,9 +170,17 @@ function parseHelpOutput(output, commandPath) {
       // "  --api-token TOKEN, --api-key TOKENAPI token used for authentication"
       // "  --cvm-id <value>        Description"
       // "  -n, --name <value>      Description"
+      // "  -t, --instance-type <value>Instance type..." (no space between <value> and description)
 
       // Look for pattern: flags (with optional value placeholder) followed by 2+ spaces then description
-      const optMatch = trimmedLine.match(/^(-[^\s]+(?:[\s,]+(?:<[^>]+>|\w+|--[^\s]+))*)\s{2,}(.+)$/);
+      let optMatch = trimmedLine.match(/^(-[^\s]+(?:[\s,]+(?:<[^>]+>|\w+|--[^\s]+))*)\s{2,}(.+)$/);
+
+      // Fallback: handle cases where description immediately follows <value> with no space
+      // e.g., "-t, --instance-type <value>Instance type..."
+      if (!optMatch) {
+        optMatch = trimmedLine.match(/^(-[^\s]+(?:,\s*-[^\s]+)?(?:\s+<[^>]+>)?)([A-Z].*)$/);
+      }
+
       if (optMatch) {
         let flags = optMatch[1].trim();
         let description = optMatch[2].trim();

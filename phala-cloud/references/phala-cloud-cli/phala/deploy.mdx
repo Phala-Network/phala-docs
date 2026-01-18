@@ -27,6 +27,7 @@ Create a new CVM with on-chain KMS in one step.
 | `--debug` | Enable debug logging |
 | `-n, --name <value>` | Name of the CVM |
 | `-c, --compose <value>` | Path to Docker Compose file (default: docker-compose.yml in current directory) |
+| `-t, --instance-type <value>` | Instance type (e.g., tdx.small, tdx.medium, tdx.large). Optional - auto-selected if not specified. |
 | `--vcpu <value>` | Number of vCPUs (optional, auto-matched if not specified), default is 1 |
 | `--memory <value>` | Memory with optional unit (optional, auto-matched if not specified), e.g., 2G, 1024MB, default is 2048MB |
 | `--disk-size <value>` | Disk size with optional unit (optional, auto-matched if not specified), e.g., 50G, 100GB, default is 40GB |
@@ -36,6 +37,7 @@ Create a new CVM with on-chain KMS in one step.
 | `-e, --env <value>` | Environment variable (KEY=VALUE) or path to env file. Can be specified multiple times. |
 | `-i, --interactive` | Enable interactive mode for required parameters |
 | `--kms-id <value>` | KMS ID to use. |
+| `--pre-launch-script <value>` | Path to pre-launch script |
 | `--private-key <value>` | Private key for signing transactions. |
 | `--rpc-url <value>` | RPC URL for the blockchain. |
 | `--wait` | Wait for CVM to complete deployment/update before returning (only applies to updates) |
