@@ -1,0 +1,39 @@
+---
+title: "login"
+description: "Authenticate with Phala Cloud"
+---
+
+## Command: `phala login`
+
+### Syntax
+
+```
+phala login [options] [<api-key>]
+```
+
+### Description
+
+Authenticate with Phala Cloud
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<api-key>?` | API key for authentication (optional, triggers device flow if not provided) |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--manual` | Manually enter API key instead of using device flow |
+| `--no-open` | Don't automatically open browser for device flow |
+
+### Examples
+
+* Display help:
+
+```bash
+phala login --help
+```

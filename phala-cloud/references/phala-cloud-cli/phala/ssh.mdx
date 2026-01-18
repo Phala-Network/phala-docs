@@ -1,11 +1,15 @@
 ---
-description: Connect to a CVM via SSH through the secure gateway tunnel.
-title: ssh
+title: "ssh"
+description: "Connect to a CVM via SSH"
 ---
 
-## Command: `ssh`
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
 
-#### Syntax
+## Command: `phala ssh`
+
+### Syntax
 
 ```
 phala ssh [options] [<cvm-name>] [--] [...]
@@ -13,114 +17,83 @@ phala ssh [options] [<cvm-name>] [--] [...]
 
 ### Description
 
-The `phala ssh` command connects you to a CVM via SSH through the secure gateway tunnel. It handles all the gateway configuration automatically.
-
-```bash
-Usage: phala ssh [options] [<cvm-name>] [--] [...]
-
 Connect to a CVM via SSH
 
-Arguments:
-  <cvm-name>?       CVM name. If not provided, reads from phala.toml
+### Arguments
 
-Options:
-  -h, --help              Show help information
-  -p, --port <value>      Gateway port (default: 443)
-  -g, --gateway <value>   Gateway domain (skips API call for offline usage)
-  -t, --timeout <value>   Connection timeout in seconds (default: 30)
-  -v, --verbose           Show verbose connection details
-  --dry-run               Print the SSH command without executing it
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm-name>?` | CVM name. If not provided, reads from phala.toml |
 
-Pass-through (after --):
-  All arguments after -- are passed directly to ssh.
-```
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `-p, --port <value>` | Gateway port. Priority: CLI option > phala.toml gateway_port > 443 |
+| `-g, --gateway <value>` | Gateway domain. Priority: CLI option > phala.toml gateway_domain > API. When specified, skips API call for offline usage |
+| `-t, --timeout <value>` | Connection timeout in seconds (default: 30) |
+| `-v, --verbose` | Show verbose connection details |
+| `--dry-run` | Print the SSH command without executing it |
+
+### Pass-through Arguments
+
+All arguments after -- are passed directly to ssh. Common options: -i (identity file), -L (local forward), -R (remote forward), -D (SOCKS proxy), -N (no command), -v (ssh verbose). Any trailing arguments are executed as remote command. Note: -o ProxyCommand is blocked.
 
 ### Examples
 
-* Connect using phala.toml configuration
+* Connect using configuration from phala.toml
 
 ```bash
 phala ssh
 ```
 
-* Connect to a specific CVM
+* Connect to a specific CVM (queries API for gateway)
 
 ```bash
-phala ssh my-app
+phala ssh app_123
 ```
 
-* Preview the SSH command without connecting
+* Offline mode: connect without API (using phala.toml gateway)
 
 ```bash
-phala ssh my-app --dry-run
+phala ssh app_123 -g dstack-prod5.phala.network -p 16185
 ```
 
-<details>
-
-<summary>Example Output</summary>
+* Connect with custom SSH key
 
 ```bash
-ssh -o ProxyCommand="openssl s_client -quiet -connect %h:%p" \
-    -o StrictHostKeyChecking=no \
-    root@abc123def456-22.dstack-prod5.phala.network -p 443
+phala ssh app_123 -- -i ~/.ssh/custom_key
 ```
 
-</details>
+* Forward local port 8080 to remote port 80
+
+```bash
+phala ssh app_123 -- -L 8080:localhost:80
+```
+
+* SOCKS proxy without remote command
+
+```bash
+phala ssh app_123 -- -D 1080 -N
+```
+
+* Execute remote command
+
+```bash
+phala ssh app_123 -- ls -la /app
+```
 
 * Connect with verbose output for debugging
 
 ```bash
-phala ssh my-app -v
+phala ssh app_123 -v
 ```
 
-* Forward a local port to the CVM
+* Print the SSH command without executing
 
 ```bash
-phala ssh my-app -- -L 8080:localhost:80
+phala ssh app_123 --dry-run -- -L 8080:localhost:80
 ```
 
-This forwards your local port 8080 to port 80 on the CVM.
-
-* Set up a SOCKS proxy
-
-```bash
-phala ssh my-app -- -D 1080 -N
-```
-
-This creates a SOCKS proxy on local port 1080 without executing a remote command.
-
-* Execute a remote command
-
-```bash
-phala ssh my-app -- docker ps -a
-```
-
-* Connect with a custom SSH key
-
-```bash
-phala ssh my-app -- -i ~/.ssh/custom_key
-```
-
-* Offline mode (skip API lookup)
-
-```bash
-phala ssh my-app -g dstack-prod5.phala.network -p 443
-```
-
-When you specify the gateway domain, the CLI skips the API call and connects directly.
-
-### Pass-through Options
-
-Any arguments after `--` are passed directly to the underlying SSH command. Common options include:
-
-| Option | Description |
-|--------|-------------|
-| `-i <keyfile>` | Use a specific identity file |
-| `-L <local>:<remote>` | Local port forwarding |
-| `-R <remote>:<local>` | Remote port forwarding |
-| `-D <port>` | Dynamic SOCKS proxy |
-| `-v` | SSH verbose mode |
-
-<Note>
-The `-o ProxyCommand` option is blocked since the CLI manages the proxy configuration automatically.
-</Note>

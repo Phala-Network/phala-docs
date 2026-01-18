@@ -1,23 +1,19 @@
 ---
-title: "simulator"
-description: "TEE simulator commands"
+title: "config"
+description: "Manage your local configuration"
 ---
 
-<Note>
-This command is marked as unstable and may change in future releases.
-</Note>
-
-## Command: `phala simulator`
+## Command: `phala config`
 
 ### Syntax
 
 ```
-phala simulator <command> [options]
+phala config <command> [options]
 ```
 
 ### Description
 
-TEE simulator commands
+Manage your local configuration
 
 ### Options
 
@@ -30,13 +26,14 @@ TEE simulator commands
 
 | Command | Description |
 | ------- | ----------- |
-| `start` | Start the TEE simulator |
-| `stop` | Stop the TEE simulator |
+| `get` | Get a configuration value |
+| `list` | List all configuration values |
+| `set` | Set a configuration value |
 
 ### Examples
 
 * Display help:
 
 ```bash
-phala simulator --help
+phala config --help
 ```

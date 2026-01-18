@@ -1,23 +1,23 @@
 ---
-title: "simulator"
-description: "TEE simulator commands"
+title: "nodes"
+description: "List and manage TEE nodes"
 ---
 
 <Note>
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala simulator`
+## Command: `phala nodes`
 
 ### Syntax
 
 ```
-phala simulator <command> [options]
+phala nodes <command> [options]
 ```
 
 ### Description
 
-TEE simulator commands
+List and manage TEE nodes
 
 ### Options
 
@@ -30,13 +30,12 @@ TEE simulator commands
 
 | Command | Description |
 | ------- | ----------- |
-| `start` | Start the TEE simulator |
-| `stop` | Stop the TEE simulator |
+| `list` | List all available worker nodes |
 
 ### Examples
 
 * Display help:
 
 ```bash
-phala simulator --help
+phala nodes --help
 ```
