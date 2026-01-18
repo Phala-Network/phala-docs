@@ -1,0 +1,107 @@
+---
+title: "deploy"
+description: "Create a new CVM with on-chain KMS in one step."
+---
+
+## Command: `phala deploy`
+
+### Syntax
+
+```
+phala deploy [options]
+```
+
+### Description
+
+Create a new CVM with on-chain KMS in one step.
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--uuid <value>` | [DEPRECATED] Use --cvm-id instead. CVM UUID. |
+| `--json, --no-json` | Output in JSON format |
+| `--debug` | Enable debug logging |
+| `-n, --name <value>` | Name of the CVM |
+| `-c, --compose <value>` | Path to Docker Compose file (default: docker-compose.yml in current directory) |
+| `--vcpu <value>` | Number of vCPUs (optional, auto-matched if not specified), default is 1 |
+| `--memory <value>` | Memory with optional unit (optional, auto-matched if not specified), e.g., 2G, 1024MB, default is 2048MB |
+| `--disk-size <value>` | Disk size with optional unit (optional, auto-matched if not specified), e.g., 50G, 100GB, default is 40GB |
+| `--image <value>` | OS image version (optional, auto-selected if not specified) |
+| `-r, --region <value>` | Preferred region (e.g., us-west, eu-central). Optional - auto-selected if not specified. |
+| `--node-id <value>` | Node ID (optional, auto-selected if not specified) |
+| `-e, --env <value>` | Environment variable (KEY=VALUE) or path to env file. Can be specified multiple times. |
+| `-i, --interactive` | Enable interactive mode for required parameters |
+| `--kms-id <value>` | KMS ID to use. |
+| `--private-key <value>` | Private key for signing transactions. |
+| `--rpc-url <value>` | RPC URL for the blockchain. |
+| `--wait` | Wait for CVM to complete deployment/update before returning (only applies to updates) |
+| `--ssh-pubkey <value>` | Path to SSH public key file (default: ~/.ssh/id_rsa.pub) |
+| `--dev-os` | Use development OS image (requires SSH public key) |
+| `--non-dev-os` | Use non-development OS image (SSH public key only if explicitly specified) |
+
+### Examples
+
+* Deploy with auto-selection (simplest)
+
+```bash
+phala deploy
+```
+
+* Deploy with environment variables
+
+```bash
+phala deploy -e NODE_ENV=production -e DEBUG=true
+```
+
+* Deploy with env file
+
+```bash
+phala deploy -e .env
+```
+
+* Deploy with env file and overrides
+
+```bash
+phala deploy -e .env -e NODE_ENV=production
+```
+
+* Deploy with specific instance type
+
+```bash
+phala deploy --instance-type tdx.medium
+```
+
+* Deploy to specific region
+
+```bash
+phala deploy --region us-west
+```
+
+* Deploy with instance type and region
+
+```bash
+phala deploy --instance-type tdx.small --region eu-central
+```
+
+* Deploy with manual resource specs
+
+```bash
+phala deploy --vcpu 4 --memory 8G --disk-size 100G
+```
+
+* Deploy with on-chain KMS
+
+```bash
+phala deploy --kms-id ethereum --private-key <key> --rpc-url <url>
+```
+
+* Deploy to specific node (advanced)
+
+```bash
+phala deploy --node-id 6
+```
+

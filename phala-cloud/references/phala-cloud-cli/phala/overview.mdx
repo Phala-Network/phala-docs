@@ -1,51 +1,174 @@
 ---
-description: Deploy confidential applications with Phala Cloud's managed TEE infrastructure.
-title: Overview
+title: "Overview"
+description: "Complete reference for the Phala Cloud CLI - deploy and manage confidential applications from the command line."
 ---
 
+The Phala Cloud CLI (`phala`) is a command-line tool for deploying and managing Confidential Virtual Machines (CVMs) on Phala Cloud. It provides commands for authentication, deployment, remote access, and CVM lifecycle management.
 
-## Base Command: `phala`
-
-#### Syntax
-
-```
-phala [options] [command]
-```
-
-### Description
-
-The `phala` base command is used to interact with Phala Cloud and manage your deployments from the command line interface.
+## Installation
 
 ```bash
-Phala Cloud CLI - Manage your Phala Cloud Deployments
-
-Options:
-  -V, --version   output the version number
-  -h, --help      display help for command
-
-Commands:
-  auth            Authenticate with Phala Cloud
-  cvms            Manage Phala Confidential Virtual Machines (CVMs)
-  docker          Login to Docker Hub and manage Docker images
-  simulator       TEE simulator commands
-  help [command]  display help for command
+npm install -g phala
 ```
 
-### Examples
+Verify installation:
 
-*   Display help:
+```bash
+phala --version
+```
 
-    ```bash
-    phala --help
-    ```
-*   Check version:
+## Update
 
-    ```bash
-    phala --version
-    ```
-*   Display help for subcommand
+```bash
+npm update -g phala
+```
 
-    ```bash
-    phala help auth
-    ```
+## Quick Start
 
+```bash
+# 1. Authenticate with your API key
+phala login
+
+# 2. Deploy your application
+phala deploy
+
+# 3. Check deployment status
+phala status
+```
+
+## Command Overview
+
+### Authentication
+
+| Command | Description |
+| ------- | ----------- |
+| [`login`](/phala-cloud/references/phala-cloud-cli/phala/login) | Authenticate with Phala Cloud |
+| [`logout`](/phala-cloud/references/phala-cloud-cli/phala/logout) | Remove stored credentials |
+| [`status`](/phala-cloud/references/phala-cloud-cli/phala/status) | Check authentication and account status |
+
+### Deployment
+
+| Command | Description |
+| ------- | ----------- |
+| [`deploy`](/phala-cloud/references/phala-cloud-cli/phala/deploy) | Create or update a CVM with Docker Compose |
+
+### CVM Management
+
+| Command | Description |
+| ------- | ----------- |
+| [`cvms`](/phala-cloud/references/phala-cloud-cli/phala/cvms) | List, inspect, start, stop, restart, and delete CVMs |
+
+### Remote Access
+
+| Command | Description |
+| ------- | ----------- |
+| [`ssh`](/phala-cloud/references/phala-cloud-cli/phala/ssh) | Connect to a CVM via SSH |
+| [`cp`](/phala-cloud/references/phala-cloud-cli/phala/cp) | Copy files to/from a CVM via SCP |
+
+### Docker Integration
+
+| Command | Description |
+| ------- | ----------- |
+| [`docker`](/phala-cloud/references/phala-cloud-cli/phala/docker) | Build, push images and generate Docker Compose files |
+
+### Local Development
+
+| Command | Description |
+| ------- | ----------- |
+| [`simulator`](/phala-cloud/references/phala-cloud-cli/phala/simulator) | Run a local TEE simulator for development |
+
+### Configuration
+
+| Command | Description |
+| ------- | ----------- |
+| [`config`](/phala-cloud/references/phala-cloud-cli/phala/config) | Manage local CLI configuration |
+| [`nodes`](/phala-cloud/references/phala-cloud-cli/phala/nodes) | List available TEE worker nodes |
+
+## Global Options
+
+These options are available for all commands:
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help for the current command |
+| `-v, --version` | Show CLI version |
+
+## Configuration File
+
+The CLI reads configuration from `phala.toml` in your project directory. This file stores deployment settings:
+
+```toml
+# phala.toml
+name = "my-app"
+cvm_id = "app_abc123def456"
+gateway_domain = "dstack-prod5.phala.network"
+gateway_port = 443
+```
+
+When `phala.toml` exists, commands like `deploy`, `ssh`, and `cp` use these values as defaults.
+
+## Shell Completion
+
+Generate shell completion scripts for your shell:
+
+```bash
+# Bash
+phala completion --shell bash >> ~/.bashrc
+
+# Zsh
+phala completion --shell zsh >> ~/.zshrc
+
+# Fish
+phala completion --shell fish > ~/.config/fish/completions/phala.fish
+```
+
+## Environment Variables
+
+| Variable | Description |
+| -------- | ----------- |
+| `PHALA_API_TOKEN` | API token for authentication (alternative to `phala login`) |
+
+## Common Workflows
+
+### Deploy a new application
+
+```bash
+# Create docker-compose.yml in your project
+phala deploy --name my-app --region us-west
+```
+
+### Update an existing deployment
+
+```bash
+# Re-run deploy to update (uses phala.toml settings)
+phala deploy
+```
+
+### Debug a running CVM
+
+```bash
+# Connect via SSH
+phala ssh my-app
+
+# View container logs
+phala cvms logs my-app
+
+# View VM serial logs
+phala cvms serial-logs my-app
+```
+
+### Copy files to/from CVM
+
+```bash
+# Upload a file
+phala cp ./config.json my-app:/app/config.json
+
+# Download a file
+phala cp my-app:/app/data.json ./data.json
+```
+
+## See Also
+
+- [Getting Started with the CLI](/phala-cloud/phala-cloud-cli/start-from-cloud-cli)
+- [CI/CD Integration](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline)
+- [CVM Overview](/phala-cloud/cvm/overview)

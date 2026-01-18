@@ -1,0 +1,85 @@
+---
+title: "cp"
+description: "Copy files to/from a CVM via SCP"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala cp`
+
+### Syntax
+
+```
+phala cp [options] <source> <destination>
+```
+
+### Description
+
+Copy files to/from a CVM via SCP
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<source>` | Source path. Local file or remote in format 'cvm-name:path'. Use ':path' to read cvm_id from phala.toml |
+| `<destination>` | Destination path. Local file or remote in format 'cvm-name:path'. Use ':path' to read cvm_id from phala.toml |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `-i, --identity <value>` | SSH identity file (private key) |
+| `-p, --port <value>` | SSH port. Priority: CLI option > phala.toml gateway_port > 443 |
+| `-g, --gateway <value>` | Gateway domain. Priority: CLI option > phala.toml gateway_domain > API. When specified, skips API call for offline usage |
+| `-r, --recursive` | Recursively copy directories |
+| `-v, --verbose` | Show verbose SCP details |
+| `--dry-run` | Print the SCP command without executing it |
+
+### Examples
+
+* Upload using phala.toml cvm_id
+
+```bash
+phala cp ./local.txt :/root/remote.txt
+```
+
+* Upload to a specific CVM (queries API for gateway)
+
+```bash
+phala cp ./local.txt app_123:/root/remote.txt
+```
+
+* Download from CVM
+
+```bash
+phala cp app_123:/root/remote.txt ./local.txt
+```
+
+* Offline mode: copy without API (using phala.toml gateway)
+
+```bash
+phala cp -g dstack-prod5.phala.network -p 16185 ./file.txt app_123:/root/
+```
+
+* Upload directory recursively
+
+```bash
+phala cp -r ./local_dir app_123:/root/remote_dir
+```
+
+* Copy with custom SSH key
+
+```bash
+phala cp -i ~/.ssh/custom_key app_123:/root/file.txt ./file.txt
+```
+
+* Print the SCP command without executing
+
+```bash
+phala cp ./local.txt app_123:/root/remote.txt --dry-run
+```
+
