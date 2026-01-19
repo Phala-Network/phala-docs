@@ -11,8 +11,6 @@ Automate your Phala Cloud deployments with GitHub Actions. Push to main, and you
 - A [Phala Cloud account](https://cloud.phala.network/register)
 - A Docker Hub or container registry account
 
-The fastest way to start is forking the [cloud-tee-starter-template](https://github.com/Phala-Network/cloud-tee-starter-template) repository.
-
 ## Configure Repository Secrets
 
 Go to your repo's **Settings > Secrets and variables > Actions** and add these secrets:
@@ -56,39 +54,55 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}
 
+      - name: Update compose with image tag
+        run: |
+          sed -i "s|\${DOCKER_IMAGE}|${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}|g" docker-compose.yml
+
+      - name: Install Phala CLI
+        run: npm install -g phala
+
       - name: Deploy to Phala Cloud
-        uses: Leechael/phala-deploy-action@v2
-        with:
-          phala-api-key: ${{ secrets.PHALA_CLOUD_API_KEY }}
-          cvm-name: ${{ secrets.APP_NAME }}
-          compose-file: './docker-compose.yml'
+        env:
+          PHALA_CLOUD_API_KEY: ${{ secrets.PHALA_CLOUD_API_KEY }}
+        run: phala deploy -c docker-compose.yml -n ${{ secrets.APP_NAME }}
 ```
 
-## Action Parameters
+Your `docker-compose.yml` should reference the image variable:
 
-The `phala-deploy-action` supports these options:
+```yaml
+services:
+  app:
+    image: ${DOCKER_IMAGE}
+    ports:
+      - "80:80"
+```
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `phala-api-key` | required | Your Phala Cloud API key |
-| `cvm-name` | repo name | Name shown in dashboard |
-| `compose-file` | `./docker-compose.yml` | Path to compose file |
-| `vcpu` | `2` | Number of vCPUs |
-| `memory` | `2048` | Memory in MB |
-| `disk-size` | `40` | Disk size in GB |
-| `envs` | - | Environment variables (YAML format) |
-| `app-id` | - | Existing CVM ID (for updates) |
+## How It Works
 
-For updates to an existing CVM, set `app-id` to your CVM's app ID. The action will update rather than create.
+1. **Push to main** triggers the workflow
+2. **Build** creates a Docker image tagged with the commit SHA
+3. **Push** uploads the image to your registry
+4. **Update** replaces the image variable in docker-compose.yml
+5. **Deploy** creates or updates the CVM with `phala deploy`
+
+The CLI automatically detects existing CVMs by name. If `my-tee-app` exists, it updates; otherwise, it creates a new one.
 
 ## Verify Deployment
 
-After the workflow completes, check your [Phala Cloud Dashboard](https://cloud.phala.network/dashboard) to confirm the CVM is running. The endpoint URL appears in the CVM's Network tab.
+After the workflow completes, check your [Phala Cloud Dashboard](https://cloud.phala.network/dashboard) to confirm the CVM is running. The endpoint URL appears in the CVM details.
+
+You can also verify from the command line:
+
+```bash
+phala cvms get my-tee-app
+```
 
 ## Troubleshooting
 
-**Authentication errors**: Double-check that `PHALA_CLOUD_API_KEY` and Docker credentials are set correctly in repository secrets.
+**Authentication errors**: Verify `PHALA_CLOUD_API_KEY` is set correctly. Test locally with `phala status`.
 
-**Build failures**: Verify your Dockerfile builds locally with `docker build .` before pushing.
+**Build failures**: Ensure your Dockerfile builds locally with `docker build .`
 
-**Debug locally**: Use [act](https://github.com/nektos/act) to run GitHub Actions locally. Create a `.env` file with your secrets and run `act push`.
+**Deploy failures**: Check that `docker-compose.yml` is valid and the image path matches your registry.
+
+**Debug locally**: Use [act](https://github.com/nektos/act) to run GitHub Actions locally with a `.env` file containing your secrets.
