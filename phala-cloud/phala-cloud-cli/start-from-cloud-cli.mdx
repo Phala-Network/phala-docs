@@ -1,244 +1,186 @@
 ---
-description: Est. 4-5 Minutes
-title: Deploy CVM
+title: Deploy Your First CVM
+description: Deploy a Jupyter notebook to Phala Cloud and test TEE functions using the CLI
 ---
 
-
-<Note type="warning">
-Make sure you have gone through the [Sign-up for Cloud Account](/phala-cloud/getting-started/sign-up-for-cloud-account) section before continuing.
-</Note>
+Deploy a Jupyter notebook to Phala Cloud and run code inside a TEE in under 10 minutes. You'll use the CLI to deploy, then test key derivation and remote attestation from inside the secure environment.
 
 ## Prerequisites
 
-* [Docker](https://docker.com) installed and running
-  * (optional) Use [Orbstack ](https://orbstack.dev)as an alternative to Docker Desktop
-* Node & [Bun](https://bun.sh) or npx installed
-* [Docker Hub](https://hub.docker.com/) account for publishing images
-* [Phala Cloud](https://cloud.phala.com/register?invite=PHALAWIKI) API key
+- Node.js 18+ or [Bun](https://bun.sh) installed
+- A [Phala Cloud account](https://cloud.phala.network/register)
 
-## Installation
+## Install the CLI
 
-Install globally or use `npx`or `bunx` in this tutorial we will use `npx`to call the Phala Cloud CLI.
+Install the Phala Cloud CLI globally:
 
 ```bash
-# Skip build install globally 
 npm install -g phala
-# use npx phala
-npx phala
-# or use bunx
-bunx phala
 ```
 
-## Log into Phala Cloud Account
+Or use `npx phala` / `bunx phala` to run commands without installing.
 
-First we will log into the Phala Cloud with your account. If you have not signed up for an account and you are in the terminal, follow the steps in **Sign Up for an Account via CLI** below. Otherwise, skip to [#generate-a-phala-cloud-api-key](#generate-a-phala-cloud-api-key "mention").
+## Authenticate
 
-<details>
-
-<summary>Sign Up for an Account via CLI</summary>
-
-Run `npx phala free`to get started with your Phala Cloud account and a free CVM deployment.
+The CLI supports device flow authentication—run the login command and follow the browser prompt:
 
 ```bash
-npx phala free
+phala login
 ```
 
-This will open a browser to the Phala Cloud sign-up page. Get your free account then get started on generating your Phala Cloud API Key.
+```
+⟳ Starting device flow authentication... ✓
+ℹ Opening browser to complete authentication...
+✓ Authentication successful!
+  Logged in as: yourname
+  Workspace: yourname's projects
+```
 
-<Frame caption="Signup Page">
-    <img src="/images/signup-page.png" alt="Phala Cloud registration page with sign up form" />
-
-</Frame>
-
-</details>
-
-## Generate a Phala Cloud API Key
-
-Log into your dashboard and select the logo in the top left corner.
-
-<Frame>
-    <img src="/images/dashboard-logo-highlight.png" alt="Phala Cloud dashboard with logo highlighted in top left corner" />
-</Frame>
-
-Click your username and select "**API Tokens**".
-
-<Frame>
-    <img src="/images/api-tokens-menu.png" alt="User dropdown menu with API Tokens option highlighted" />
-</Frame>
-
-Click Create Token and then copy your newly generated API Key.
-
-<Frame>
-    <img src="/images/api-token-creation.png" alt="API token creation interface with newly generated token displayed" />
-</Frame>
-
-With your API Key in hand, authenticate your CLI:
+Alternatively, generate an API key manually from the [dashboard](https://cloud.phala.network/dashboard) by clicking your username → **API Tokens** → **Create Token**, then authenticate with:
 
 ```bash
-npx phala auth login
+phala login --manual
 ```
 
-When prompted, paste your API Key. The CLI will confirm successful authentication.
-
-```
-phala auth login
-✔ Enter your API key: … ************************************************
-✓ Welcome hashwarlock! API key validated and saved successfully
-ℹ Open in Web UI at https://cloud.phala.com/dashboard/
-```
-
-Congratulations! You've now set up the Phala Cloud CLI and authenticated your account. You're ready to start deploying and managing confidential applications on Phala Cloud.
-
-Remember, you can always check your authentication status with:
+Verify your authentication:
 
 ```bash
-npx phala auth status
+phala status
 ```
+
+## Deploy a Jupyter Notebook
+
+Create a `docker-compose.yml` file:
+
+```yaml
+services:
+  jupyter:
+    image: quay.io/jupyter/base-notebook
+    ports:
+      - 8080:8888
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+    environment:
+      - GRANT_SUDO=yes
+    user: root
+    command: "start-notebook.sh --NotebookApp.token=${TOKEN}"
+```
+
+The `dstack.sock` volume mount enables your code to communicate with the TEE environment.
+
+Deploy with a name and access token:
 
 ```bash
-⟳ Checking authentication status... ✓
-
-✓ Authenticated as hashwarlock
-│ Username   │ hashwarlock                            │
-│ Email      │ hashwarlock@usergroup.phala.network    │
-│ Role       │ admin                                  │
-│ Team       │ hashwarlock's projects (enterprise)    │
-│ Credits    │ $20                                    │
+phala deploy -c docker-compose.yml -n jupyter-notebook -e TOKEN=my-secret-token
 ```
 
-If you need to log out or switch accounts:
+```json
+{
+  "success": true,
+  "vm_uuid": "425f4f38-5c48-40c3-8a9c-1be22caba517",
+  "name": "jupyter-notebook",
+  "app_id": "d8d6db935df75104a825fb96b6bbbcfc8d1753ca",
+  "dashboard_url": "https://cloud.phala.network/dashboard/cvms/..."
+}
+```
+
+## Access Your Notebook
+
+Check deployment status:
 
 ```bash
-npx phala auth logout
-# ✓ API key removed successfully.
+phala cvms get jupyter-notebook
 ```
 
-## Launch a Juptyer Notebook in CVM&#x20;
-
-Now that we are authenticated to our Phala Cloud account with our API Key, let's deploy our first CVM
-
-The process is easy as we have setup a `demo` command for you to try this out quickly.
+Once the status shows `running`, get the public URL:
 
 ```bash
-phala demo
+phala cvms get jupyter-notebook --json | jq -r '.public_urls[0].app'
 ```
 
-You’ll have a list of demos to test, and we will try the Jupyter Notebook demo. This part of the guide is very simple. Run the command, sit back and watch the magic unfold.
+```
+https://d8d6db935df75104a825fb96b6bbbcfc8d1753ca-8080.dstack-pha-prod3.phala.network
+```
+
+Open this URL in your browser. You'll see a login page with a "Password or token" field—enter the token you set during deployment (`my-secret-token` in this example) and click **Log in**.
+
+View container logs if needed:
 
 ```bash
-phala demo
-⟳ Verifying your credentials... ✓
-✓ Logged in as hashwarlock
-✔ Select a template to deploy: Jupyter Notebook
-✓ Selected template: Jupyter Notebook
-✔ Enter a name for your CVM: Jupyter-Notebook
-ℹ Preparing to deploy your CVM...
-⟳ Preparing CVM configuration... ✓
-⟳ Creating your demo CVM... ✓
-✓ Demo CVM created successfully! 🎉
-
-│ CVM ID              │ 3751                                                                                              │
-│ Name                │ Jupyter-Notebook                                                                                  │
-│ Status              │ creating                                                                                          │
-│ App ID              │ app_ecc21474f89b47a8e33ecd4e53a0ed744fff4eb2                                                      │
-│ App URL             │ https://cloud.phala.com/dashboard/cvms/app_ecc21474f89b47a8e33ecd4e53a0ed744fff4eb2           │
-│ Template            │ Jupyter Notebook                                                                                  │
-│ Resources           │ 2 vCPUs, 2GB RAM, 20GB Storage                                                                    │
-│ Jupyter Token       │ e4d13458163d6b8314a9d976a55600ad                                                                  │
-│ Access Instructions │ Access your Jupyter notebook using the token above. Go to 'Network' tab to see the public URL.    │
-
-✓ Your demo is being created. You can check its status with:
-phala cvms get app_ecc21474f89b47a8e33ecd4e53a0ed744fff4eb2
+phala cvms logs jupyter-notebook
 ```
 
-Congratulations! Your Jupyter Notebook is deployed! Let’s checkout the deployment and use the Jupyter Token to access our notebook. Go to the “Network” Tab:
+## Test TEE Functions
 
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-8008-9767-fe58091b1b69.jpg" alt="CVM Network tab showing public endpoint URL for Jupyter notebook access" />
-</Frame>
+Once logged in, click **Python 3 (ipykernel)** under "Notebook" to create a new notebook.
 
-Open in New Tab and enter the Jupyter Token generated for your Jupyter Notebook.
+In the first cell, install the dstack SDK:
 
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80ef-89cd-fd41a11f63fa.jpg" alt="Jupyter notebook login page requesting authentication token" />
-</Frame>
+```python
+!pip install dstack-sdk
+```
 
-We are now inside the Jupyter Notebook!
-
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80da-bbbf-c3db53200b7f.jpg" alt="Jupyter notebook interface running inside Phala Cloud CVM" />
-</Frame>
-
-### Call TEE Native Functions
-
-Let’s try a couple function to test with the [dstack python SDK](https://github.com/Dstack-TEE/dstack/tree/master/sdk/python):
-
-* **Remote Attestation**
-* **Key Derive with Key Management Service**
-
-#### Install dstack SDK
-
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80a1-91e9-fe32a4f39af9.jpg" alt="Installing dstack SDK in Jupyter notebook with pip install command" />
-</Frame>
-
-Now, we can use some sample code from the SDK README below to test out.
+Run the cell with **Shift+Enter**. In a new cell, test TEE-native capabilities:
 
 ```python
 from dstack_sdk import DstackClient
 import hashlib
 
-# Synchronous client
 client = DstackClient()
 
-# Get the information of the Base Image.
+# Get TEE environment info
 info = client.info()
-print(info.app_id)  # Application ID
-print(info.tcb_info.mrtd)  # Access TCB info directly
-print(info.tcb_info.event_log[0].event)  # Access event log entries
+print(f"App ID: {info.app_id}")
+print(f"MRTD: {info.tcb_info.mrtd}")
 
-# Get a deterministic key with path
-key_result = client.get_key('my-app/encryption/v1')
-print(key_result.key)  # Hex string
-print(key_result.signature_chain)  # Signature chain
-key_bytes = key_result.decode_key()  # Decode to bytes (32 bytes)
+# Derive a deterministic key
+key_result = client.get_key("my-app/encryption/v1")
+key_bytes = key_result.decode_key()  # 32 bytes
+print(f"Derived key (hex): {key_result.key[:32]}...")
 
-# Generate TDX quote (manually hash data if > 64 bytes)
-data = b'some-data'
+# Generate a TDX attestation quote
+data = b"data-to-attest"
 hash_value = hashlib.sha256(data).digest()
 quote_result = client.get_quote(hash_value[:32])
-print(quote_result.quote)  # TDX quote in hex format
-print(quote_result.event_log)  # Event log
-rtmrs = quote_result.replay_rtmrs()  # Replay RTMRs
+print(f"Quote: {quote_result.quote[:64]}...")
 ```
 
-We get the following result:
+Generate blockchain wallet addresses using TEE-derived keys. In a new cell, install the additional dependencies:
 
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80a4-b543-fe32e846cffb.jpg" alt="Dstack SDK output showing app ID, TCB info, and TEE quote generation results" />
-</Frame>
+```python
+!pip install "dstack-sdk[all]"
+```
 
-#### Generate a Wallet on Ethereum and Solana
+Then in another cell:
 
-This is a great start, but let’s try something more specific like generating:
+```python
+from dstack_sdk import DstackClient, ethereum, solana
 
-* **Ethereum Account**
-* **Solana Keypair**
+client = DstackClient()
 
-First, run `pip install "dstack-sdk[all]"` to get the right dependencies.
+# Derive Ethereum account
+eth_key = client.get_key("ethereum/main")
+eth_account = ethereum.to_account(eth_key)
+print(f"ETH Address: {eth_account.address}")
 
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80ae-907d-fe3f7dd15a3d.jpg" alt="Installing dstack SDK with all dependencies for wallet generation" />
-</Frame>
+# Derive Solana keypair
+sol_key = client.get_key("solana/main")
+sol_keypair = solana.to_keypair(sol_key)
+print(f"SOL Address: {sol_keypair.pubkey()}")
+```
 
-Let's write some code to get an ETH and SOL account.
+## Clean Up
 
-<Frame>
-    <img src="https://img0.phala.world/files/1c20317e-04a1-80c5-ab56-eb68133d0dfd.jpg" alt="Jupyter notebook code generating Ethereum and Solana wallet addresses using TEE-derived keys" />
-</Frame>
+When you're done experimenting, delete the CVM to stop billing:
 
-This is great! We have now shown we can interact with the TEE special functions for deriving keys through the key management service and generate remote attestations. We will have another blogpost to dive deeper into this information later, but to get a head start check out [Key Management Service Docs](https://phala.com/dstack/design-documents/key-management-protocol) and the [Attestation Guide for Dstack](https://github.com/Dstack-TEE/dstack/blob/master/attestation.mdx).
+```bash
+phala cvms delete jupyter-notebook
+```
 
-## Conclusion
+Other useful commands: `phala cvms stop` to pause without deleting, `phala cvms start` to resume, and `phala cvms attestation` to view the TEE attestation report.
 
-Congratulations! You have deployed your first CVM into the Phala Cloud. Let's dive into some of the templates we have.
+## Next Steps
+
+- [Deploy a custom application](/phala-cloud/cvm/create-with-docker-compose) with your own Docker Compose file
+- [Set up CI/CD](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline) for automated deployments
+- Learn about [TEE attestation](/phala-cloud/attestation/overview) and verification
