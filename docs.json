@@ -360,6 +360,7 @@
                 "pages": [
                   "/phala-cloud/references/overview",
                   "/phala-cloud/references/performance-report",
+                  "/phala-cloud/references/error-codes",
                   {
                     "group": "Phala Cloud API",
                     "pages": [

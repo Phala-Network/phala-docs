@@ -1,0 +1,80 @@
+---
+title: Error Codes
+description: Reference for Phala Cloud API error codes
+---
+# Error Code Catalog
+
+This document lists all error codes used by Phala Cloud API.
+
+Error codes follow the format `ERR-{MODULE}-{CODE}` where:
+- **MODULE**: Two-digit module identifier (01, 02, 03, ...)
+- **CODE**: Three-digit sequential error number within the module
+
+## Modules
+
+- **Module 01** - CVM API / Preflight
+- **Module 02** - Inventory
+- **Module 03** - CVM Operations
+- **Module 04** - Workspace
+
+---
+
+## Module 01: CVM API / Preflight
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-01-001` | `NodeNotFoundError` | The requested node is not available<br/>*Raised when specified node is not found* |
+| `ERR-01-002` | `ComposeFileRequiredError` | The request contains invalid parameters<br/>*Raised when compose_file is required but not provided* |
+| `ERR-01-003` | `InvalidComposeFileError` | The Docker Compose file contains errors<br/>*Raised when Docker Compose file is invalid* |
+| `ERR-01-004` | `DuplicateCvmNameError` | (dynamic: A CVM with name '...)<br/>*Raised when a CVM name already exists in the workspace (HTTP 409)* |
+| `ERR-01-005` | `HashRegistrationRequired` | Compose hash registration required on-chain<br/>*Raised when compose hash needs to be registered on-chain (HTTP 465)* |
+| `ERR-01-006` | `HashInvalidOrExpired` | The provided compose hash is invalid or has expired<br/>*Raised when compose hash is invalid or expired (HTTP 466)* |
+| `ERR-01-007` | `TxVerificationFailed` | Transaction verification failed<br/>*Raised when transaction verification fails (HTTP 467)* |
+| `ERR-01-008` | `HashNotAllowed` | The compose hash is not allowed by the on-chain contract<br/>*Raised when compose hash is not allowed by the contract (HTTP 468)* |
+
+
+## Module 02: Inventory
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-02-001` | `InstanceTypeNotFoundError` | The requested instance type does not exist<br/>*Raised when a requested instance type is not found.* |
+| `ERR-02-002` | `ResourceNotAvailableError` | No available resources match your requirements<br/>*Raised when no suitable resources are found* |
+| `ERR-02-003` | `InsufficientVcpuError` | The selected node does not have enough CPU capacity<br/>*Raised when teepod has insufficient vCPU resources.* |
+| `ERR-02-004` | `InsufficientMemoryError` | The selected node does not have enough memory<br/>*Raised when teepod has insufficient memory resources.* |
+| `ERR-02-005` | `InsufficientSlotsError` | The selected node has reached its maximum capacity<br/>*Raised when teepod has no available CVM slots.* |
+| `ERR-02-006` | `GpuAllocationError` | The selected node does not have enough GPU resources<br/>*Raised when GPU allocation fails* |
+| `ERR-02-007` | `InsufficientGpuError` | The selected node does not have enough GPU resources<br/>*Raised when teepod has insufficient GPU resources.* |
+| `ERR-02-008` | `InvalidRequestError` | The request contains invalid parameters<br/>*Raised when request parameters are invalid* |
+| `ERR-02-009` | `IncompatibleConfigurationError` | The configuration parameters are not compatible with each other<br/>*Raised when resource configuration is not compatible* |
+| `ERR-02-010` | `ImageNotFoundError` | The requested operating system image is not available<br/>*Raised when a requested OS image is not found.* |
+| `ERR-02-011` | `KmsNotFoundError` | The requested security configuration is not available on this node<br/>*Raised when no matching KMS is found on teepod.* |
+| `ERR-02-012` | `TeepodNotAccessibleError` | The requested node is not available<br/>*Raised when user doesn't have permission to access a teepod.* |
+| `ERR-02-013` | `OsImageNotCompatibleError` | The requested operating system image is not available<br/>*Raised when no compatible OS image is found.* |
+| `ERR-02-014` | `NodeCapacityNotConfiguredError` | The requested node is not available<br/>*Raised when node capacity is not properly configured.* |
+| `ERR-02-015` | `QuotaExceededError` | Your account has reached its resource quota<br/>*Raised when team resource quota would be exceeded.* |
+
+
+## Module 03: CVM Operations
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-03-001` | `CvmNotFoundError` | The requested CVM was not found<br/>*Raised when a CVM is not found by the given identifier.* |
+| `ERR-03-002` | `MultipleCvmsWithSameNameError` | Multiple CVMs have the same name in this workspace<br/>*Raised when multiple CVMs share the same name in a workspace.* |
+| `ERR-03-005` | `CvmAccessDeniedError` | The requested CVM was not found<br/>*Raised when user lacks permission for CVM operation.* |
+
+
+## Module 04: Workspace
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-04-001` | `InsufficientBalanceError` | Your account balance is too low to create new resources<br/>*Raised when account balance is too low* |
+| `ERR-04-002` | `MaxCvmLimitError` | Your account has reached the maximum number of instances<br/>*Raised when VM count limit is reached* |
+| `ERR-04-003` | `ResourceLimitExceededError` | The requested resources exceed your account limits<br/>*Raised when resource limits are exceeded* |
+
+
+---
+
