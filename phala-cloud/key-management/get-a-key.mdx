@@ -59,13 +59,13 @@ The `getKey()` method accepts an optional second parameter called `purpose`:
 const result = await client.getKey('wallet/ethereum', 'mainnet');
 ```
 
-This is equivalent to using a longer path: `getKey('wallet/ethereum/mainnet')`. The purpose parameter is purely for organization - use whichever approach feels cleaner to you.
+The `purpose` parameter is purely for organization and signature chain management. It doesn't affect the returned key material (only `path` participates in key derivation). `getKey()` returns an ECDSA-based signature chain where `purpose` is hased into the signed message to isolate the namespace. Please leave it empty it if you are not sure what it does.
 </Tip>
 
 ## Key Properties
 
 - **Application-specific**: Keys are derived from your app's unique master key (tied to app ID)
-- **Deterministic**: Same `path` + `purpose` always generates the same key
+- **Deterministic**: Same `path` always generates the same key
 - **Isolated**: Different applications cannot derive each other's keys
 - **32 bytes**: Raw key material suitable for various cryptographic operations
 
