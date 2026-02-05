@@ -268,7 +268,8 @@
                 "group": "Trust Center",
                 "icon": "shield-check",
                 "pages": [
-                  "/phala-cloud/attestation/trust-center-verification"
+                  "/phala-cloud/attestation/trust-center-verification",
+                  "/phala-cloud/attestation/feature-builder"
                 ]
               },
               {
