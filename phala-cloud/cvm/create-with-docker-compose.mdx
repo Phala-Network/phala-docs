@@ -7,41 +7,40 @@ title: CVM with Docker Compose
 
 - [Phala Cloud account](/phala-cloud/getting-started/sign-up-for-cloud-account)
 - Basic understanding of Docker Compose syntax
-- Docker Compose configuration file for your application
+- A valid `docker-compose.yml` for your application
 
-## Advanced Deployment Options
+## Deploy in Advanced Mode
 
-Phala Cloud provides a familiar Docker Compose experience within a secure TEE environment. To access these advanced configuration options:
+Phala Cloud provides a familiar Docker Compose workflow in a secure TEE environment.
 
-1. Navigate to the deployment section in the Phala Cloud dashboard
-2. Switch to the **Advanced** tab
-3. Edit the Docker Compose configuration directly in the provided editor
+1. Go to the deployment section in the dashboard.
+2. Switch to the **Advanced** tab.
+3. Edit and validate your Docker Compose content in the built-in editor.
 
-## Docker Compose Capabilities
+## What You Can Configure
 
-Deploying with Docker Compose on Phala Cloud works just like on a standard server, with the added benefit of confidential computing. You can:
+With Docker Compose deployment, you can:
 
-* Specify Docker image names and versions
-* Configure port mappings to expose services
-* Define environment variables
-* Set up volume mounts for persistent storage
-* Deploy multi-container applications within a single CVM
+- Specify Docker image names and versions
+- Configure port mappings for public services
+- Define environment variables
+- Configure volume mounts for persistence
+- Deploy multiple services in one CVM
 
 ## Multi-Service Deployments
 
-One of the key advantages of using Docker Compose is the ability to orchestrate multiple services that work together. All containers defined in your Docker Compose file will run within the same Confidential Virtual Machine (CVM), allowing for secure inter-service communication.
+All services in one compose file run inside the same CVM, enabling secure service-to-service communication within the trusted environment.
 
-## Private Docker Images
+## Private Container Registry
 
-For applications requiring additional security or proprietary code, Phala Cloud supports deployment from private Docker repositories.
+For proprietary or restricted images, Phala Cloud supports private registries including **Docker Hub**, **<Tooltip tip="GitHub Container Registry">GHCR</Tooltip>**, and **AWS <Tooltip tip="Elastic Container Registry">ECR</Tooltip>**.
 
-➡️ [Learn more about private Docker image deployment](/phala-cloud/cvm/create-with-private-docker-image)
+➡️ [Learn more about private registry deployment](/phala-cloud/cvm/create-with-private-docker-image)
 
-## Example Configuration
+## Example Interface
 
 <Frame caption="Docker Compose deployment interface">
-    <img src="/images/cloud-compose-deployment.png" alt="Docker Compose deployment interface" />
-
+  <img src="/images/cloud-compose-deployment.png" alt="Docker Compose deployment interface" />
 </Frame>
 
-The interface provides a full-featured editor with syntax highlighting to help you create and validate your Docker Compose configuration before deployment.
+The editor provides syntax highlighting and makes it easier to review configuration before deployment.

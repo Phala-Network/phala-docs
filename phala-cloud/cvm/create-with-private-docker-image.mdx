@@ -1,135 +1,206 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
-title: Private Docker Image
+description: Configure private container registry access for CVM deployments on Phala Cloud.
+title: Private Container Registry
 ---
 
 ## Prerequisites
 
 - [Phala Cloud account](/phala-cloud/getting-started/sign-up-for-cloud-account)
-- Private Docker registry credentials (Docker Hub, AWS ECR, or other supported registry)
+- Credentials for one of the supported registries:
+  - Docker Hub
+  - GitHub Container Registry (GHCR)
+  - AWS <Tooltip tip="Elastic Container Registry">ECR</Tooltip>
 
 ## Overview
 
-Phala Cloud enables secure deployment of private Docker images from popular container registries, maintaining confidentiality throughout the deployment process. This capability is essential for organizations with proprietary code or sensitive applications.
+Phala Cloud supports private image pulls during CVM startup. Registry credentials are passed as encrypted environment variables and only used at runtime inside the trusted boot flow.
 
-## Configuration Methods
+## Method 1: Configure in Cloud UI
 
-### Method 1: Using the Phala Cloud UI
+1. Open CVM creation and go to **Advanced Features**.
+2. Open **Private Container Registry**.
+3. Select one provider:
+   - **No private registry**
+   - **Docker Hub**
+   - **<Tooltip tip="GitHub Container Registry">GHCR</Tooltip>**
+   - **AWS <Tooltip tip="Elastic Container Registry">ECR</Tooltip>**
+4. Fill in credentials for the selected provider.
+5. Submit deployment.
 
-The most straightforward approach is configuring registry access through the user interface:
-
-1. Navigate to **Advanced Features** in the Phala Cloud dashboard
-2. Select **Private Container Registry**
-3. Enter your registry credentials
-4. Save your configuration
-
-<Frame caption="Private Docker registry configuration">
-    <img src="/images/cloud-private-docker.png" alt="Private Docker registry configuration" />
-
+<Frame caption="Private Container Registry providers">
+  <img src="/images/cloud-private-registry-providers.png" alt="Private container registry provider selection" />
 </Frame>
 
-> 💡 **Security Note:** All authorization information is protected with end-to-end encryption, ensuring your credentials remain confidential.
+<Note>
+All registry credentials are encrypted before submission and consumed only at runtime.
+</Note>
 
-### Method 2: Using Encrypted Secrets
+## Method 2: Configure with Encrypted Secrets
 
-For automated deployments or enhanced security, you can set registry credentials as encrypted environment variables:
+Set the following environment variables for CLI or API workflows.
 
-#### Docker Hub Registry
+### Docker Hub
 
-* To download images from Docker Registry, you need to set the following encrypted environment variables: DSTACK\_DOCKER\_USERNAME and DSTACK\_DOCKER\_PASSWORD.
-* To download images from AWS ECR Private Registry, you need to set the following encrypted environment variables: DSTACK\_AWS\_ACCESS\_KEY\_ID, DSTACK\_AWS\_SECRET\_ACCESS\_KEY, and DSTACK\_AWS\_REGION, DSTACK\_AWS\_ECR\_REGISTRY.
+Use your Docker Hub username and password (or [access token](https://docs.docker.com/security/for-developers/access-tokens/)). Image paths follow the format `username/image:tag` or `docker.io/username/image:tag`.
 
-## Deploy Private Docker Image with CLI
+See [Docker Hub documentation](https://docs.docker.com/docker-hub/) for account and repository setup.
 
-**Using a Private Docker Registry with** [**Phala Cloud CLI**](/phala-cloud/phala-cloud-cli/overview)
+| Variable | Required | Description |
+|---|---|---|
+| `DSTACK_DOCKER_USERNAME` | Yes | Docker Hub username |
+| `DSTACK_DOCKER_PASSWORD` | Yes | Docker Hub password or access token |
 
-You can deploy images from a private Docker registry by setting the appropriate environment variables.
+Docker Hub is the default registry — you do **not** need to set `DSTACK_DOCKER_REGISTRY`.
 
-**🔐 DockerHub:**
+### GHCR
 
-Set these variables:
+<Frame caption="GHCR credential form">
+  <img src="/images/cloud-private-registry-ghcr.png" alt="GHCR credential fields" />
+</Frame>
 
-* `DSTACK_DOCKER_USERNAME` – Your DockerHub username _(required)_
-* `DSTACK_DOCKER_PASSWORD` – Your DockerHub password or personal access token _(required)_
-* `DSTACK_DOCKER_REGISTRY` – Registry URL (optional, defaults to DockerHub)
+Use your GitHub username and a <Tooltip tip="Personal Access Token">PAT</Tooltip> with `read:packages` scope. Image paths follow the format `ghcr.io/OWNER/IMAGE:TAG`.
 
-**🔐 AWS ECR:**
+With [GitHub CLI](https://cli.github.com/), check your token scopes, add `read:packages` if missing, and print the token:
 
-Set these variables:
+```bash
+gh auth status                      # check current scopes
+gh auth refresh -s read:packages    # add read:packages if missing
+gh auth token                       # print token for DSTACK_DOCKER_PASSWORD
+```
 
-* `DSTACK_AWS_ACCESS_KEY_ID` – AWS access key _(required)_
-* `DSTACK_AWS_SECRET_ACCESS_KEY` – AWS secret key _(required)_
-* `DSTACK_AWS_REGION` – AWS region of the ECR _(required)_
-* `DSTACK_AWS_ECR_REGISTRY` – Full ECR registry URL _(required)_
+You can also create a PAT manually at [GitHub Settings → Personal access tokens](https://github.com/settings/tokens).
 
-Once set and added to your docker-compose.yml file, the CLI will automatically authenticate and pull your private image securely.
+See [GHCR documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) for package visibility and permission details.
 
-Example compose file that includes the encrypted environment variables to pull the private docker image.
+| Variable | Required | Description |
+|---|---|---|
+| `DSTACK_DOCKER_USERNAME` | Yes | GitHub username |
+| `DSTACK_DOCKER_PASSWORD` | Yes | GitHub <Tooltip tip="Personal Access Token">PAT</Tooltip> |
+| `DSTACK_DOCKER_REGISTRY` | Yes | Must be `ghcr.io` |
+
+### AWS ECR
+
+<Frame caption="AWS ECR credential form">
+  <img src="/images/cloud-private-registry-aws-ecr.png" alt="AWS ECR credential fields" />
+</Frame>
+
+Use an IAM access key with `ecr:GetAuthorizationToken` and `ecr:BatchGetImage` permissions. Image paths follow the format `ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/REPO:TAG`.
+
+With [AWS CLI](https://aws.amazon.com/cli/):
+
+```bash
+aws sts get-caller-identity                          # verify current identity
+aws ecr describe-repositories --region <region>      # list repos to confirm access
+aws iam create-access-key --user-name <username>     # create a new access key
+```
+
+Verify registry login:
+
+```bash
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <account_id>.dkr.ecr.<region>.amazonaws.com
+```
+
+See [Amazon ECR documentation](https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html) for repository creation and IAM policy setup.
+
+| Variable | Required | Description |
+|---|---|---|
+| `DSTACK_AWS_ACCESS_KEY_ID` | Yes | AWS access key ID |
+| `DSTACK_AWS_SECRET_ACCESS_KEY` | Yes | AWS secret access key |
+| `DSTACK_AWS_REGION` | Yes | ECR region |
+| `DSTACK_AWS_ECR_REGISTRY` | Yes | Full ECR registry URL |
+
+## Deploy with Phala Cloud CLI
+
+You can deploy with [`phala` CLI](/phala-cloud/phala-cloud-cli/overview) and pass secrets via `-e .env`.
+
+### GHCR example
+
+`.env`:
+
+```bash
+DSTACK_DOCKER_USERNAME=your_github_username
+DSTACK_DOCKER_PASSWORD=your_github_pat
+DSTACK_DOCKER_REGISTRY=ghcr.io
+```
+
+`docker-compose.yml`:
 
 ```yaml
 version: '3.8'
 
 services:
-  brave-search:
-    image: hashwarlock/brave-search-mcp:v0.0.1
+  app:
+    image: ghcr.io/your-org/your-image:v1.0.0
     ports:
       - "3000:3000"
     environment:
-      - PORT=3000
-      - NODE_ENV=production
-      - BRAVE_API_KEY=${BRAVE_API_KEY}
       - DSTACK_DOCKER_USERNAME=${DSTACK_DOCKER_USERNAME}
       - DSTACK_DOCKER_PASSWORD=${DSTACK_DOCKER_PASSWORD}
-    restart: unless-stopped
+      - DSTACK_DOCKER_REGISTRY=${DSTACK_DOCKER_REGISTRY}
 ```
 
-Once these are set, run the command:
+Deploy:
 
-```sh
-phala cvms create --name brave-search --compose docker-compose.yml --teepod-id 3 -e .env
+```bash
+phala cvms create --name my-private-app --compose docker-compose.yml --teepod-id 3 -e .env
 ```
 
-You will see a log that will clarify if you are using a private registry or not.
+### AWS ECR example
 
-```sh
-✓ Deleted DSTACK_SIMULATOR_ENDPOINT from current process
-⟳ Fetching available TEEPods... ✓
-⟳ Getting public key from CVM... ✓
-ℹ 🔐 Using public DockerHub registry...
-⟳ Encrypting environment variables... ✓
-⟳ Creating CVM... ✓
-✓ CVM created successfully
+`.env`:
 
-╭────────────┬────────────────────────────────────────────────────────────────────────────────────────────╮
-├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
-│ CVM ID     │ 5952                                                                                       │
-├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Name       │ brave-search                                                                               │
-├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Status     │ creating                                                                                   │
-├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
-│ App ID     │ app_9292e497bee0f6885df155c79635606c33b9c160                                               │
-├────────────┼────────────────────────────────────────────────────────────────────────────────────────────┤
-│ App URL    │ https://cloud.phala.com/dashboard/cvms/app_9292e497bee0f6885df155c79635606c33b9c160    │
-╰────────────┴────────────────────────────────────────────────────────────────────────────────────────────╯
-ℹ 
-✓ Your CVM is being created. You can check its status with:
-phala cvms get app_9292e497bee0f6885df155c79635606c33b9c160
+```bash
+DSTACK_AWS_ACCESS_KEY_ID=AKIA...
+DSTACK_AWS_SECRET_ACCESS_KEY=...
+DSTACK_AWS_REGION=us-east-1
+DSTACK_AWS_ECR_REGISTRY=123456789012.dkr.ecr.us-east-1.amazonaws.com
 ```
 
-## Setting with Phala Cloud API
+## Deploy with Phala Cloud API
 
-When using Phala Cloud API to deploy, you still need to set above environment variables.
+When using the API, set the same environment variables listed above.
 
-Check the [Phala Cloud API](https://cloud-api.phala.network/docs) for more details.
+See [Phala Cloud API docs](https://cloud-api.phala.network/docs) for endpoint details.
+
+## Pull Rate Limits
+
+Each registry enforces pull rate limits. During frequent debugging and redeployment cycles, these limits can block image pulls and cause CVM startup failures.
+
+### Docker Hub
+
+| Account type | Limit |
+|---|---|
+| Unauthenticated | 100 pulls / 6 hours per IP |
+| Docker Personal (free, authenticated) | 200 pulls / 6 hours |
+| Docker Pro / Team / Business | Unlimited |
+
+<Warning>
+CVM instances pull images on every startup. If you are iterating quickly on a public Docker Hub image **without** setting `DSTACK_DOCKER_USERNAME` / `DSTACK_DOCKER_PASSWORD`, pulls are unauthenticated and share the 100-pull limit across the host IP. Always configure Docker Hub credentials during active development to get the higher authenticated limit.
+</Warning>
+
+See [Docker Hub pull usage and limits](https://docs.docker.com/docker-hub/usage/pulls/) for details.
+
+### GHCR
+
+GitHub does not publish hard pull rate limits for GHCR. Public image pulls are effectively unlimited. Private image pulls are subject to your GitHub plan's data transfer quota. See [GitHub billing for Packages](https://docs.github.com/en/billing/managing-billing-for-github-packages/about-billing-for-github-packages) for details.
+
+### AWS ECR
+
+Private <Tooltip tip="Elastic Container Registry">ECR</Tooltip> does not impose per-image pull rate limits. API calls (e.g. `GetAuthorizationToken`) are throttled at ~20 TPS per region per account. See [Amazon ECR service quotas](https://docs.aws.amazon.com/AmazonECR/latest/userguide/service-quotas.html) for details.
 
 ## Troubleshooting
 
-If you encounter issues with private image deployment:
+If private image deployment fails:
 
-1. Verify your credentials are correct and have not expired
-2. Ensure the image exists in the specified registry
-3. Check that your account has pull permissions for the image
-4. Review the CVM logs for detailed error messages
+1. Verify credentials are valid and not expired.
+2. Ensure image path and tag exist.
+3. Confirm pull permissions for the account used.
+4. Check CVM serial logs for pre-launch errors.
 
-For additional assistance, join our support groups: 🌍 [Global](https://t.me/+nbhjx1ADG9EyYmI9), 🇨🇳 [Chinese](https://t.me/+4PcAE9qTZ1kzM2M9).
+### GHCR-specific checks
+
+- `DSTACK_DOCKER_REGISTRY` is set to `ghcr.io`
+- <Tooltip tip="Personal Access Token">PAT</Tooltip> contains at least `read:packages`
+- The package visibility and permission settings allow this account to pull
+
+For additional assistance, join support groups: 🌍 [Global](https://t.me/+nbhjx1ADG9EyYmI9), 🇨🇳 [Chinese](https://t.me/+4PcAE9qTZ1kzM2M9).
