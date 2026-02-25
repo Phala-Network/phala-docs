@@ -1,0 +1,45 @@
+---
+title: "phala completion"
+description: "Generate shell completion scripts for bash, zsh, or fish."
+---
+
+## Usage
+
+```
+phala completion [options]
+```
+
+## Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--shell` | | auto-detect | Shell type (bash, zsh, fish) |
+| `--fig` | | | Generate Fig/Amazon Q completion spec |
+
+If `--shell` is omitted, the CLI auto-detects the shell from the `$SHELL` environment variable.
+
+## Examples
+
+### Bash
+
+```bash
+$ phala completion --shell bash >> ~/.bashrc && source ~/.bashrc
+```
+
+### Zsh
+
+```bash
+$ phala completion --shell zsh >> ~/.zshrc && source ~/.zshrc
+```
+
+### Fish
+
+```bash
+$ phala completion --shell fish > ~/.config/fish/completions/phala.fish
+```
+
+### Fig/Amazon Q
+
+```bash
+$ phala completion --fig
+```

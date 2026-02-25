@@ -1,41 +1,51 @@
 ---
-title: "nodes"
-description: "List and manage TEE nodes"
+title: "phala nodes"
+description: "Manage TEE (Trusted Execution Environment) nodes in your Phala Cloud workspace."
 ---
 
-<Note>
-This command is marked as unstable and may change in future releases.
-</Note>
-
-## Command: `phala nodes`
-
-### Syntax
+## Usage
 
 ```
-phala nodes <command> [options]
+phala nodes <subcommand> [options]
 ```
 
-### Description
+## Subcommands
 
-List and manage TEE nodes
+### nodes list / nodes ls
 
-### Options
+List all TEE worker nodes available in your workspace.
 
-| Option | Description |
-| ------ | ----------- |
-| `-h, --help` | Show help information for the current command |
-| `-v, --version` | Show CLI version |
+#### Usage
 
-### Subcommands
+```
+phala nodes list [options]
+phala nodes ls [options]
+```
 
-| Command | Description |
-| ------- | ----------- |
-| `list` | List all available worker nodes |
+#### Options
 
-### Examples
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--page` | 1 | Page number for pagination |
+| `--page-size` | 30 | Number of items per page (max: 100) |
+| `--json` / `-j` | false | JSON output |
 
-* Display help:
+#### Examples
 
-```bash
-phala nodes --help
+List all nodes:
+
+```
+$ phala nodes list
+```
+
+List nodes with pagination:
+
+```
+$ phala nodes ls --page 2 --page-size 50
+```
+
+List nodes with JSON output:
+
+```
+$ phala nodes list --json
 ```

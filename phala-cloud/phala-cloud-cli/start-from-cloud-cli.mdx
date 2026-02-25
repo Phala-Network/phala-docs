@@ -107,7 +107,7 @@ Open this URL in your browser. You'll see a login page with a "Password or token
 View container logs if needed:
 
 ```bash
-phala cvms logs jupyter-notebook
+phala logs --cvm-id jupyter-notebook
 ```
 
 ## Test TEE Functions
@@ -178,6 +178,37 @@ phala cvms delete jupyter-notebook
 ```
 
 Other useful commands: `phala cvms stop` to pause without deleting, `phala cvms start` to resume, and `phala cvms attestation` to view the TEE attestation report.
+
+## Link Your Project for Faster Deploys
+
+After deploying, link your local directory to the CVM so subsequent commands don't need the CVM name:
+
+```bash
+phala link jupyter-notebook
+```
+
+This creates a `phala.toml` file in your project directory:
+
+```toml
+cvm_id = "d8d6db935df75104a825fb96b6bbbcfc8d1753ca"
+```
+
+Commit `phala.toml` to version control. Once linked, commands use the CVM from `phala.toml` automatically:
+
+```bash
+# These now target the linked CVM without specifying a name
+phala deploy              # update the CVM
+phala logs                # view logs
+phala ssh                 # SSH into the CVM
+phala cvms get            # check status
+```
+
+The recommended workflow:
+
+1. **First deploy**: `phala deploy -n my-app -c docker-compose.yml`
+2. **Link**: `phala link my-app`
+3. **Commit** `phala.toml` to your repo
+4. **Subsequent deploys**: just `phala deploy`
 
 ## Next Steps
 

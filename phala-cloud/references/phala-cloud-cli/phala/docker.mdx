@@ -1,45 +1,108 @@
 ---
-title: "docker"
-description: "Login to Docker Hub and manage Docker images"
+title: "phala docker"
+description: "Docker Hub login and image management helpers."
 ---
 
-<Note>
-This command is marked as unstable and may change in future releases.
-</Note>
-
-## Command: `phala docker`
-
-### Syntax
+## Usage
 
 ```
-phala docker <command> [options]
+phala docker <subcommand> [args] [options]
 ```
 
-### Description
+## Subcommands
 
-Login to Docker Hub and manage Docker images
+### docker login
 
-### Options
+Login to Docker Hub.
 
-| Option | Description |
-| ------ | ----------- |
-| `-h, --help` | Show help information for the current command |
-| `-v, --version` | Show CLI version |
+#### Options
 
-### Subcommands
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--username` | `-u` | | Docker Hub username |
+| `--password` | `-p` | | Docker Hub password |
+| `--registry` | `-r` | | Docker registry URL |
 
-| Command | Description |
-| ------- | ----------- |
-| `login` | Login to Docker Hub |
-| `build` | Build a Docker image |
-| `push` | Push a Docker image to Docker Hub |
-| `generate` | Generate a Docker Compose file |
-| `run` | Run a Docker Compose setup |
-
-### Examples
-
-* Display help:
+#### Examples
 
 ```bash
-phala docker --help
+$ phala docker login -u myuser
+$ phala docker login -u myuser -p mypassword
+$ phala docker login -u myuser -r https://registry.example.com
+```
+
+### docker build
+
+Build a Docker image.
+
+#### Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--image` | `-i` | | Image name |
+| `--tag` | `-t` | | Image tag |
+| `--file` | `-f` | Dockerfile | Dockerfile path |
+
+#### Examples
+
+```bash
+$ phala docker build -i my-app -t v1.0
+$ phala docker build -i my-app -t v1.0 -f custom.Dockerfile
+```
+
+### docker push
+
+Push image to Docker Hub.
+
+#### Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--image` | `-i` | | Full image name (e.g. username/image:tag) |
+
+#### Examples
+
+```bash
+$ phala docker push -i myuser/my-app:v1.0
+```
+
+### docker generate
+
+Generate a Docker Compose file.
+
+#### Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--image` | `-i` | | Image name |
+| `--env-file` | `-e` | | Environment file path |
+| `--output` | `-o` | | Output file path |
+| `--template` | | | Template file path |
+
+#### Examples
+
+```bash
+$ phala docker generate -i my-app -o docker-compose.yml
+$ phala docker generate -i my-app -e .env -o docker-compose.yml
+$ phala docker generate -i my-app -o docker-compose.yml --template custom.template
+```
+
+### docker run
+
+Run Docker Compose setup.
+
+#### Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--compose` | `-c` | | Docker Compose file path |
+| `--env-file` | `-e` | | Environment file path |
+| `--skip-env` | | true | Skip environment file loading |
+
+#### Examples
+
+```bash
+$ phala docker run -c docker-compose.yml
+$ phala docker run -c docker-compose.yml -e .env
+$ phala docker run -c docker-compose.yml --skip-env=false
 ```
