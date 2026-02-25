@@ -1,0 +1,109 @@
+---
+title: "phala api"
+description: "Make authenticated HTTP requests to the Phala Cloud API with automatic credential handling."
+---
+
+## Usage
+
+```
+phala api <endpoint> [options]
+```
+
+## Arguments
+
+| Name | Required | Description |
+|------|----------|-------------|
+| `endpoint` | Yes | API endpoint path (e.g., `/api/v1/cvms`) |
+
+## Options
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--method <method>` | `-X` | GET | HTTP method (GET, POST, PUT, DELETE, PATCH, etc.) |
+| `--field <field>` | `-f` | | String parameter `key=value` (use `key=@file` for file). Repeatable |
+| `--raw-field <field>` | `-F` | | Typed JSON parameter `key:=value` (use `key:=@file` for JSON file). Repeatable |
+| `--header <header>` | `-H` | | HTTP header `key:value`. Repeatable |
+| `--data <data>` | `-d` | | Request body (cURL-style). Repeatable |
+| `--input <file>` | | | Read body from file (use `-` for stdin) |
+| `--include` | `-i` | false | Print response headers |
+| `--jq <expression>` | `-q` | | Filter output with jq expression |
+| `--silent` | | false | Suppress response body |
+| `--api-token <token>` | | | Override API token |
+
+## Environment Variables
+
+- `PHALA_CLOUD_API_KEY`: Override API key
+- `PHALA_CLOUD_API_PREFIX`: Override API base URL
+
+## Examples
+
+List CVMs:
+
+```
+$ phala api /api/v1/cvms
+```
+
+Extract CVM names with jq:
+
+```
+$ phala api /api/v1/cvms -q '.[].name'
+```
+
+Create CVM with string field:
+
+```
+$ phala api /api/v1/cvms -X POST -f name=my-app
+```
+
+Create CVM with typed JSON fields:
+
+```
+$ phala api /api/v1/cvms -X POST -F vcpu:=2 -F memory:=4096
+```
+
+Delete CVM:
+
+```
+$ phala api /api/v1/cvms/123 -X DELETE
+```
+
+Include response headers:
+
+```
+$ phala api /api/v1/status -i
+```
+
+Send JSON body from stdin:
+
+```
+$ echo '{"name":"test"}' | phala api /api/v1/cvms -X POST --input -
+```
+
+Send JSON body from file:
+
+```
+$ phala api /api/v1/cvms -X POST --input request.json
+```
+
+Add custom headers:
+
+```
+$ phala api /api/v1/cvms -H "X-Custom-Header:value" -H "X-Another:test"
+```
+
+Complex query with multiple fields:
+
+```
+$ phala api /api/v1/cvms -X POST \
+    -f name=my-app \
+    -f region=us-west \
+    -F vcpu:=4 \
+    -F memory:=8192 \
+    -F env:='{"KEY":"value"}'
+```
+
+Filter nested JSON with jq:
+
+```
+$ phala api /api/v1/cvms -q '.[].status | select(.state == "running")'
+```

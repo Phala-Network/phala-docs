@@ -376,15 +376,27 @@
                       "/phala-cloud/references/phala-cloud-cli/phala/login",
                       "/phala-cloud/references/phala-cloud-cli/phala/logout",
                       "/phala-cloud/references/phala-cloud-cli/phala/status",
+                      "/phala-cloud/references/phala-cloud-cli/phala/whoami",
+                      "/phala-cloud/references/phala-cloud-cli/phala/profiles",
+                      "/phala-cloud/references/phala-cloud-cli/phala/switch",
                       "/phala-cloud/references/phala-cloud-cli/phala/deploy",
+                      "/phala-cloud/references/phala-cloud-cli/phala/instance-types",
+                      "/phala-cloud/references/phala-cloud-cli/phala/apps",
                       "/phala-cloud/references/phala-cloud-cli/phala/cvms",
+                      "/phala-cloud/references/phala-cloud-cli/phala/link",
+                      "/phala-cloud/references/phala-cloud-cli/phala/nodes",
+                      "/phala-cloud/references/phala-cloud-cli/phala/ssh-keys",
+                      "/phala-cloud/references/phala-cloud-cli/phala/logs",
+                      "/phala-cloud/references/phala-cloud-cli/phala/ps",
                       "/phala-cloud/references/phala-cloud-cli/phala/ssh",
                       "/phala-cloud/references/phala-cloud-cli/phala/cp",
+                      "/phala-cloud/references/phala-cloud-cli/phala/runtime-config",
+                      "/phala-cloud/references/phala-cloud-cli/phala/api",
+                      "/phala-cloud/references/phala-cloud-cli/phala/self",
+                      "/phala-cloud/references/phala-cloud-cli/phala/config",
                       "/phala-cloud/references/phala-cloud-cli/phala/docker",
                       "/phala-cloud/references/phala-cloud-cli/phala/simulator",
-                      "/phala-cloud/references/phala-cloud-cli/phala/nodes",
-                      "/phala-cloud/references/phala-cloud-cli/phala/config",
-                      "/phala-cloud/references/phala-cloud-cli/phala/auth"
+                      "/phala-cloud/references/phala-cloud-cli/phala/completion"
                     ]
                   },
                   "/phala-cloud/references/migration-from-dstack-v03"
@@ -467,6 +479,10 @@
     ]
   },
   "redirects": [
+    {
+      "destination": "/phala-cloud/references/phala-cloud-cli/phala/login",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/auth"
+    },
     {
       "destination": "/phala-cloud/attestation/quickstart",
       "source": "/phala-cloud/attestation/api-quickstart"

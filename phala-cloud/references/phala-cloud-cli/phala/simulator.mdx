@@ -1,42 +1,52 @@
 ---
-title: "simulator"
-description: "TEE simulator commands"
+title: "phala simulator"
+description: "TEE simulator for local development."
 ---
 
-<Note>
-This command is marked as unstable and may change in future releases.
-</Note>
-
-## Command: `phala simulator`
-
-### Syntax
+## Usage
 
 ```
-phala simulator <command> [options]
+phala simulator [subcommand] [options]
 ```
 
-### Description
+Running `phala simulator` without subcommands shows the current status.
 
-TEE simulator commands
+## Subcommands
 
-### Options
+### simulator start
 
-| Option | Description |
-| ------ | ----------- |
-| `-h, --help` | Show help information for the current command |
-| `-v, --version` | Show CLI version |
+Start the TEE simulator.
 
-### Subcommands
+#### Options
 
-| Command | Description |
-| ------- | ----------- |
-| `start` | Start the TEE simulator |
-| `stop` | Stop the TEE simulator |
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--port` | `-p` | 8090 | Port number for the simulator |
+| `--verbose` | `-v` | false | Enable verbose logging |
 
-### Examples
-
-* Display help:
+#### Examples
 
 ```bash
-phala simulator --help
+$ phala simulator start
+$ phala simulator start -p 9000
+$ phala simulator start -p 9000 --verbose
+```
+
+### simulator stop
+
+Stop the TEE simulator.
+
+#### Examples
+
+```bash
+$ phala simulator stop
+```
+
+## Environment Variables
+
+When the simulator is running, set these environment variables to connect your application:
+
+```bash
+export DSTACK_SIMULATOR_ENDPOINT=/path/to/dstack.sock
+export TAPPD_SIMULATOR_ENDPOINT=/path/to/tappd.sock
 ```
