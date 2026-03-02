@@ -1,9 +1,15 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
-title: Secure Environment Variables
+description: Manage encrypted secrets and built-in environment variables for your CVM.
+title: Environment Variables
 ---
 
+## Encrypted Secrets
+
 When your application requires environment variables, **never set them directly in the Docker Compose file**. Instead, use the **Encrypted Secrets** section to ensure your sensitive data remains secure.
+
+All encrypted secrets are **encrypted locally on the client side** (using X25519 + AES-256-GCM)
+before being sent to the server. The Phala Cloud server never sees the plaintext values — only the
+CVM's TEE can decrypt them at boot time.
 
 Encrypted secrets are a list of key-value pairs that are passed into the docker compose file in the
 same way as the variables defined in `.env` files. You should first define the encrypted secrets in
@@ -12,6 +18,12 @@ syntax.
 
 A typical use case is pass secrets to your containers via environment variables, using the
 `environment:` docker compose directive.
+
+<Warning>
+Updating encrypted secrets is a **full replacement** operation. You cannot update a single variable
+— every update requires submitting the complete set of all variables. This applies to both the
+Dashboard UI and the CLI.
+</Warning>
 
 1.  **Declare Environment Variables in Docker Compose**
 
@@ -48,3 +60,91 @@ Learn more about Docker .env files [here](https://docs.docker.com/compose/how-to
 </Note>
 
 We recommend using **Text** type for environment variables if you have many variables to set.
+
+## Built-in Environment Variables
+
+Phala Cloud attaches a [default pre-launch script](https://github.com/Dstack-TEE/dstack-examples/tree/main/phala-cloud-prelaunch-script)
+to every CVM deployment. This script runs before your Docker Compose services start, handling
+private registry authentication, root access setup, and injecting environment variables you can
+reference in your `docker-compose.yml`.
+
+The built-in variables documented below are provided by the **default pre-launch script**. If you
+replace it with a custom script via [`--pre-launch-script`](/phala-cloud/references/phala-cloud-cli/phala/deploy#deploy-with-pre-launch-script), these variables will no
+longer be available unless your script implements them.
+
+<Note>
+The pre-launch script is versioned (currently **v0.0.14**). New deployments always use the latest
+version, but existing CVMs keep the version they were deployed with — there is no automatic update.
+To use a newer version, you need to redeploy your CVM.
+</Note>
+
+### Private Docker Registry Authentication
+
+Set the following encrypted secrets to pull images from a private Docker registry (Docker Hub, <Tooltip tip="GitHub Container Registry">GHCR</Tooltip>, etc.):
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DSTACK_DOCKER_USERNAME` | Yes | Registry username |
+| `DSTACK_DOCKER_PASSWORD` | Yes | Registry password or access token |
+| `DSTACK_DOCKER_REGISTRY` | No | Registry URL. Defaults to `docker.io`. Set to `ghcr.io` for GHCR, etc. |
+
+The pre-launch script logs in to the registry before pulling your images. If login fails, the CVM
+boot is aborted.
+
+### AWS ECR Authentication
+
+Set the following encrypted secrets to pull images from Amazon <Tooltip tip="Elastic Container Registry">ECR</Tooltip>:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DSTACK_AWS_ACCESS_KEY_ID` | Yes | AWS access key ID |
+| `DSTACK_AWS_SECRET_ACCESS_KEY` | Yes | AWS secret access key |
+| `DSTACK_AWS_REGION` | Yes | AWS region of your ECR repository |
+| `DSTACK_AWS_ECR_REGISTRY` | Yes | Your ECR registry URL |
+| `DSTACK_AWS_SESSION_TOKEN` | No | For temporary AWS credentials (e.g. assumed roles). If expired, the CVM continues to boot but may fail to pull images. |
+
+<Note>
+The AWS CLI is installed inside the CVM when ECR credentials are detected — you do not need to
+include it in your Docker image.
+</Note>
+
+### Root Access
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DSTACK_ROOT_PASSWORD` | No | Linux root password for DStack OS. If not set, a random 32-character password is generated. |
+| `DSTACK_ROOT_PUBLIC_KEY` | No | SSH public key added to `/home/root/.ssh/authorized_keys` |
+| `DSTACK_AUTHORIZED_KEYS` | No | SSH authorized keys for `/home/root/.ssh/authorized_keys`. Overwrites `DSTACK_ROOT_PUBLIC_KEY` if both are set. |
+
+<Warning>
+For security, `DSTACK_ROOT_PASSWORD`, `DSTACK_ROOT_PUBLIC_KEY`, and `DSTACK_AUTHORIZED_KEYS` are
+**unset** from the environment immediately after they are applied. They will **not** be visible to
+your Docker Compose services.
+</Warning>
+
+### App Metadata
+
+The following variables are automatically injected by the pre-launch script. You do not need to set
+them — they are available in your `docker-compose.yml`.
+
+| Variable | Description |
+| --- | --- |
+| `DSTACK_APP_ID` | Unique identifier for the CVM app |
+| `DSTACK_GATEWAY_DOMAIN` | Gateway domain for accessing the app |
+| `DSTACK_APP_DOMAIN` | Default app domain. Equals `${DSTACK_APP_ID}.${DSTACK_GATEWAY_DOMAIN}`, routes to port 80. |
+
+You can reference these in your Docker Compose file:
+
+```yaml
+services:
+  my-app:
+    environment:
+      - APP_ID=${DSTACK_APP_ID}
+      - PUBLIC_URL=https://${DSTACK_APP_DOMAIN}
+```
+
+<Note>
+`DSTACK_APP_DOMAIN` points to port 80 by default. To access a different port, use the pattern
+`${DSTACK_APP_ID}-<port>.${DSTACK_GATEWAY_DOMAIN}`. For example, to access port 3000:
+`${DSTACK_APP_ID}-3000.${DSTACK_GATEWAY_DOMAIN}`.
+</Note>
