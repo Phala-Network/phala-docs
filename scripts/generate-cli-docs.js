@@ -15,7 +15,7 @@ const path = require("path");
 const ROOT_DIR = process.cwd();
 const OUTPUT_DIR = path.join(
   ROOT_DIR,
-  "phala-cloud/references/phala-cloud-cli/phala"
+  "phala-cloud/phala-cloud-cli"
 );
 const DOCS_JSON_PATH = path.join(ROOT_DIR, "docs.json");
 
@@ -519,7 +519,7 @@ function updateDocsJson(commandNames) {
 
   // Build the new pages array
   const cliPages = sortedNames.map(
-    (name) => `/phala-cloud/references/phala-cloud-cli/phala/${name}`
+    (name) => `/phala-cloud/phala-cloud-cli/${name}`
   );
 
   // Find and update the CLI Reference group in docs.json
@@ -531,7 +531,7 @@ function updateDocsJson(commandNames) {
         }
       }
     } else if (typeof obj === "object" && obj !== null) {
-      if (obj.group === "CLI Reference") {
+      if (obj.group === "Phala Cloud CLI") {
         obj.pages = cliPages;
         return true;
       }

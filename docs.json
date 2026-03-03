@@ -210,6 +210,56 @@
                 "pages": [
                   "/phala-cloud/phala-cloud-cli/overview",
                   "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
+                  "/phala-cloud/phala-cloud-cli/changelog",
+                  {
+                    "group": "Auth",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/login",
+                      "/phala-cloud/phala-cloud-cli/logout",
+                      "/phala-cloud/phala-cloud-cli/status",
+                      "/phala-cloud/phala-cloud-cli/whoami",
+                      "/phala-cloud/phala-cloud-cli/profiles",
+                      "/phala-cloud/phala-cloud-cli/switch"
+                    ]
+                  },
+                  {
+                    "group": "Deployment",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/deploy",
+                      "/phala-cloud/phala-cloud-cli/instance-types"
+                    ]
+                  },
+                  {
+                    "group": "App Management",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/apps",
+                      "/phala-cloud/phala-cloud-cli/cvms",
+                      "/phala-cloud/phala-cloud-cli/link",
+                      "/phala-cloud/phala-cloud-cli/nodes",
+                      "/phala-cloud/phala-cloud-cli/ssh-keys"
+                    ]
+                  },
+                  {
+                    "group": "CVM Operations",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/logs",
+                      "/phala-cloud/phala-cloud-cli/ps",
+                      "/phala-cloud/phala-cloud-cli/ssh",
+                      "/phala-cloud/phala-cloud-cli/cp",
+                      "/phala-cloud/phala-cloud-cli/runtime-config"
+                    ]
+                  },
+                  {
+                    "group": "Advanced",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/api",
+                      "/phala-cloud/phala-cloud-cli/self",
+                      "/phala-cloud/phala-cloud-cli/config",
+                      "/phala-cloud/phala-cloud-cli/docker",
+                      "/phala-cloud/phala-cloud-cli/simulator",
+                      "/phala-cloud/phala-cloud-cli/completion"
+                    ]
+                  },
                   {
                     "group": "CI/CD Automation",
                     "pages": [
@@ -368,7 +418,31 @@
                       "/phala-cloud/references/cloud-js-sdk/overview",
                       "/phala-cloud/references/cloud-js-sdk/api-versioning",
                       "/phala-cloud/references/cloud-js-sdk/schema-reference",
-                      "/phala-cloud/references/cloud-js-sdk/error-handling"
+                      "/phala-cloud/references/cloud-js-sdk/error-handling",
+                      "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide",
+                      "/phala-cloud/references/cloud-js-sdk/changelog",
+                      {
+                        "group": "Reference",
+                        "pages": [
+                          "/phala-cloud/references/cloud-js-sdk/authentication",
+                          "/phala-cloud/references/cloud-js-sdk/cvm-query",
+                          "/phala-cloud/references/cloud-js-sdk/cvm-lifecycle",
+                          "/phala-cloud/references/cloud-js-sdk/cvm-configuration",
+                          "/phala-cloud/references/cloud-js-sdk/provision-cvm",
+                          "/phala-cloud/references/cloud-js-sdk/commit-cvm-provision",
+                          "/phala-cloud/references/cloud-js-sdk/update-cvm-envs",
+                          "/phala-cloud/references/cloud-js-sdk/update-docker-compose",
+                          "/phala-cloud/references/cloud-js-sdk/watch-cvm-state",
+                          "/phala-cloud/references/cloud-js-sdk/kms",
+                          "/phala-cloud/references/cloud-js-sdk/get-app-env-encrypt-pubkey",
+                          "/phala-cloud/references/cloud-js-sdk/deploy-app-auth",
+                          "/phala-cloud/references/cloud-js-sdk/add-compose-hash",
+                          "/phala-cloud/references/cloud-js-sdk/apps",
+                          "/phala-cloud/references/cloud-js-sdk/workspaces",
+                          "/phala-cloud/references/cloud-js-sdk/nodes-and-instance-types",
+                          "/phala-cloud/references/cloud-js-sdk/ssh-keys"
+                        ]
+                      }
                     ]
                   },
                   {
@@ -376,36 +450,6 @@
                     "pages": [
                       "/phala-cloud/phala-cloud-api/overview",
                       "/phala-cloud/phala-cloud-api/attestations"
-                    ]
-                  },
-                  {
-                    "group": "CLI Reference",
-                    "pages": [
-                      "/phala-cloud/references/phala-cloud-cli/phala/overview",
-                      "/phala-cloud/references/phala-cloud-cli/phala/login",
-                      "/phala-cloud/references/phala-cloud-cli/phala/logout",
-                      "/phala-cloud/references/phala-cloud-cli/phala/status",
-                      "/phala-cloud/references/phala-cloud-cli/phala/whoami",
-                      "/phala-cloud/references/phala-cloud-cli/phala/profiles",
-                      "/phala-cloud/references/phala-cloud-cli/phala/switch",
-                      "/phala-cloud/references/phala-cloud-cli/phala/deploy",
-                      "/phala-cloud/references/phala-cloud-cli/phala/instance-types",
-                      "/phala-cloud/references/phala-cloud-cli/phala/apps",
-                      "/phala-cloud/references/phala-cloud-cli/phala/cvms",
-                      "/phala-cloud/references/phala-cloud-cli/phala/link",
-                      "/phala-cloud/references/phala-cloud-cli/phala/nodes",
-                      "/phala-cloud/references/phala-cloud-cli/phala/ssh-keys",
-                      "/phala-cloud/references/phala-cloud-cli/phala/logs",
-                      "/phala-cloud/references/phala-cloud-cli/phala/ps",
-                      "/phala-cloud/references/phala-cloud-cli/phala/ssh",
-                      "/phala-cloud/references/phala-cloud-cli/phala/cp",
-                      "/phala-cloud/references/phala-cloud-cli/phala/runtime-config",
-                      "/phala-cloud/references/phala-cloud-cli/phala/api",
-                      "/phala-cloud/references/phala-cloud-cli/phala/self",
-                      "/phala-cloud/references/phala-cloud-cli/phala/config",
-                      "/phala-cloud/references/phala-cloud-cli/phala/docker",
-                      "/phala-cloud/references/phala-cloud-cli/phala/simulator",
-                      "/phala-cloud/references/phala-cloud-cli/phala/completion"
                     ]
                   },
                   "/phala-cloud/references/migration-from-dstack-v03"
@@ -489,8 +533,108 @@
   },
   "redirects": [
     {
-      "destination": "/phala-cloud/references/phala-cloud-cli/phala/login",
+      "destination": "/phala-cloud/phala-cloud-cli/login",
       "source": "/phala-cloud/references/phala-cloud-cli/phala/auth"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/overview"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/login",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/login"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/logout",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/logout"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/status",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/status"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/whoami",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/whoami"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/profiles",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/profiles"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/switch",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/switch"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/deploy",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/deploy"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/instance-types",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/instance-types"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/apps",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/apps"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/cvms",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/cvms"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/link",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/link"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/nodes",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/nodes"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/ssh-keys",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/ssh-keys"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/logs",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/logs"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/ps",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/ps"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/ssh",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/ssh"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/cp",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/cp"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/runtime-config",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/runtime-config"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/api",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/api"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/self",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/self"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/config",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/config"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/docker"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/simulator",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/simulator"
+    },
+    {
+      "destination": "/phala-cloud/phala-cloud-cli/completion",
+      "source": "/phala-cloud/references/phala-cloud-cli/phala/completion"
     },
     {
       "destination": "/phala-cloud/attestation/quickstart",
@@ -577,7 +721,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image"
     },
     {
-      "destination": "/phala-cloud/references/phala-cloud-cli/phala/docker",
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
       "source": "/phala-cloud/references/tee-cloud-cli/phala/docker"
     },
     {
@@ -589,7 +733,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options"
     },
     {
-      "destination": "/phala-cloud/references/phala-cloud-cli/phala/docker",
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
       "source": "/phala-cloud/references/tee-cloud-cli"
     },
     {
@@ -1229,7 +1373,7 @@
       "source": "/phala-cloud/migration/access-database"
     },
     {
-      "destination": "/phala-cloud/references/phala-cloud-cli/phala/simulator",
+      "destination": "/phala-cloud/phala-cloud-cli/simulator",
       "source": "/phala-cloud/tee-cloud-cli/phala/simulator"
     },
     {

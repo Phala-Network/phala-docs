@@ -22,26 +22,25 @@ node scripts/generate-cli-docs.js
    - Subcommands with status indicators (Deprecated, Unstable)
    - Command examples
    - Arguments and pass-through options
-4. Generates MDX files in `phala-cloud/references/phala-cloud-cli/phala/`
+4. Generates MDX files in `phala-cloud/phala-cloud-cli/`
 5. Updates `docs.json` navigation with the correct page order
 
 ### Output files
 
 The script generates/updates these files (except `overview.mdx` which is preserved):
 
-- `phala-cloud/references/phala-cloud-cli/phala/overview.mdx` - Main CLI reference
-- `phala-cloud/references/phala-cloud-cli/phala/login.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/logout.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/status.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/deploy.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/cvms.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/ssh.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/cp.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/docker.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/simulator.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/nodes.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/config.mdx`
-- `phala-cloud/references/phala-cloud-cli/phala/auth.mdx` (deprecated)
+- `phala-cloud/phala-cloud-cli/overview.mdx` - Main CLI reference
+- `phala-cloud/phala-cloud-cli/login.mdx`
+- `phala-cloud/phala-cloud-cli/logout.mdx`
+- `phala-cloud/phala-cloud-cli/status.mdx`
+- `phala-cloud/phala-cloud-cli/deploy.mdx`
+- `phala-cloud/phala-cloud-cli/cvms.mdx`
+- `phala-cloud/phala-cloud-cli/ssh.mdx`
+- `phala-cloud/phala-cloud-cli/cp.mdx`
+- `phala-cloud/phala-cloud-cli/docker.mdx`
+- `phala-cloud/phala-cloud-cli/simulator.mdx`
+- `phala-cloud/phala-cloud-cli/nodes.mdx`
+- `phala-cloud/phala-cloud-cli/config.mdx`
 
 ### Preserved files
 
