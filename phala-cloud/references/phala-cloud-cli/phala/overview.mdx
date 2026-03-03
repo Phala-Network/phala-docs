@@ -18,6 +18,11 @@ The CLI sends an `X-Phala-Version` header with every request. This determines th
 | `2026-01-21` | Default (current) |
 | `2025-10-28` | Legacy |
 
+You can override the API version via:
+
+- The `--api-version` global flag: `phala cvms list --api-version 2025-10-28`
+- The `api_version` field in `phala.toml`
+
 ## Profiles & Credentials
 
 The CLI supports multiple authentication profiles stored in `~/.phala-cloud/credentials.json`.
@@ -94,8 +99,32 @@ Use [`profiles`](/phala-cloud/references/phala-cloud-cli/phala/profiles) to list
 
 ## Configuration
 
-- Project config: `phala.toml` in working directory (see [`deploy`](/phala-cloud/references/phala-cloud-cli/phala/deploy))
-- Credentials: `~/.phala-cloud/credentials.json` (schema version 1, supports multiple profiles)
+Credentials are stored in `~/.phala-cloud/credentials.json` (schema version 1, supports multiple profiles).
+
+Project-level configuration is in `phala.toml` in the working directory. Supported fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` / `uuid` / `app_id` / `instance_id` / `name` | `string` | CVM identifier (any format) |
+| `profile` | `string` | Auth profile to use for this project |
+| `api_version` | `string` | API version override (e.g., `"2025-10-28"`) |
+| `gateway_domain` | `string` | Custom gateway domain |
+| `gateway_port` | `number` | Custom gateway port |
+| `compose_file` | `string` | Path to Docker Compose file |
+| `env_file` | `string` | Path to `.env` file |
+| `public_logs` | `boolean` | Make container logs public |
+| `public_sysinfo` | `boolean` | Make system info public |
+| `listed` | `boolean` | List CVM in the public directory |
+
+Example `phala.toml`:
+
+```toml
+id = "cvm-abc123"
+profile = "production"
+compose_file = "docker-compose.yml"
+env_file = ".env"
+public_logs = true
+```
 
 ## Global Flags
 
@@ -103,7 +132,7 @@ Use [`profiles`](/phala-cloud/references/phala-cloud-cli/phala/profiles) to list
 |------|-------------|
 | `--json` | Output in JSON format for programmatic use |
 | `--api-token <token>` | Override the stored API key for this command |
-| `--profile <name>` | Use a specific auth profile |
+| `--api-version <version>` | Override the API version (e.g., `2025-10-28`, `2026-01-21`) |
 
 ## Related
 

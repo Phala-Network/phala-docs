@@ -84,9 +84,9 @@ const user = await getCurrentUser(client);
 const cvms = await getCvmList(client);
 ```
 
-### Extending the Client
+### Extending the Base Client
 
-Add custom actions to the client using `.extend()`:
+`createClient` already includes all built-in actions as methods. The `.extend()` method on `createBaseClient` is useful when you want to selectively include actions (for tree-shaking) or add your own custom actions:
 
 ```typescript
 import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
@@ -96,24 +96,26 @@ const client = createBaseClient({ apiKey: "your-api-key" }).extend({
   getCvmList,
 });
 
-// Now available as methods
+// Only the actions you included are available as methods
 const user = await client.getCurrentUser();
 ```
 
 ## Available Actions
 
+Actions marked with **V** return different response types depending on the client's [API version](/phala-cloud/references/cloud-js-sdk/api-versioning).
+
 ### Authentication & User
 
 | Method | Description |
 |--------|-------------|
-| `getCurrentUser()` | Get current user, workspace, and credits info |
+| `getCurrentUser()` **V** | Get current user, workspace, and credits info |
 
 ### CVM Query
 
 | Method | Description |
 |--------|-------------|
-| `getCvmList(request?)` | List all CVMs (paginated) |
-| `getCvmInfo(request)` | Get single CVM details |
+| `getCvmList(request?)` **V** | List all CVMs (paginated) |
+| `getCvmInfo(request)` **V** | Get single CVM details |
 | `getCvmStats(request)` | Get CVM system stats |
 | `getCvmNetwork(request)` | Get CVM network info |
 | `getCvmState(request)` | Get CVM current state |
@@ -153,9 +155,9 @@ const user = await client.getCurrentUser();
 
 | Method | Description |
 |--------|-------------|
-| `getAppList(request?)` | List apps |
-| `getAppInfo(request)` | Get app details |
-| `getAppCvms(request)` | List CVMs for an app |
+| `getAppList(request?)` **V** | List apps |
+| `getAppInfo(request)` **V** | Get app details |
+| `getAppCvms(request)` **V** | List CVMs for an app |
 | `getAppRevisions(request)` | List app revision history |
 | `getAppFilterOptions()` | Get available filter options for app list |
 
