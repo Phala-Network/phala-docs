@@ -1,0 +1,87 @@
+---
+title: watchCvmState
+description: Watch CVM state changes via Server-Sent Events until a target status is reached
+---
+
+## watchCvmState
+
+`GET /cvms/{cvmId}/state` (Server-Sent Events)
+
+Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves when the CVM reaches the target status; rejects on timeout or abort. Automatically retries on connection timeouts.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `target` | `string` | Yes | Target status to wait for (e.g., `"running"`, `"stopped"`) |
+| `interval` | `number` | No | Polling interval in seconds (5-30, default: 5) |
+| `timeout` | `number` | No | Per-attempt timeout in seconds (10-600, default: 300) |
+| `maxRetries` | `number` | No | Maximum retry attempts (default: `Infinity`) |
+| `retryDelay` | `number` | No | Delay between retries in ms (default: 5000) |
+
+**Options:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `signal` | `AbortSignal` | Cancellation signal |
+| `onEvent` | `(event) => void` | Callback for each SSE event |
+
+**Returns:** `CvmState` — the final state when target is reached.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | CVM ID |
+| `instance_id` | `string` | Instance ID |
+| `name` | `string` | CVM name |
+| `status` | `string` | Final status (matches `target`) |
+| `uptime` | `string?` | Uptime duration |
+| `boot_progress` | `string?` | Boot progress |
+| `boot_error` | `string?` | Boot error if failed |
+
+**Errors:**
+
+| Error | Description |
+|-------|-------------|
+| `WatchAbortedError` | Thrown when the operation is cancelled via `AbortSignal` |
+| `MaxRetriesExceededError` | Thrown when `maxRetries` is exceeded without reaching target |
+
+**Example — Wait for CVM to start:**
+
+```typescript
+const state = await client.watchCvmState({
+  id: "my-app",
+  target: "running",
+  timeout: 120,
+  onEvent: (event) => {
+    console.log(`Status: ${event.status}, Progress: ${event.boot_progress}`);
+  },
+});
+
+console.log(`CVM is now ${state.status}`);
+```
+
+**Example — With abort support:**
+
+```typescript
+const controller = new AbortController();
+
+// Cancel after 60 seconds
+setTimeout(() => controller.abort(), 60_000);
+
+try {
+  const state = await client.watchCvmState({
+    id: "my-app",
+    target: "running",
+    signal: controller.signal,
+  });
+} catch (error) {
+  if (error instanceof WatchAbortedError) {
+    console.log("Watch was cancelled");
+  }
+}
+```
+
+<Note>
+Unlike other SDK functions, `watchCvmState` does not have a `safe` variant. Use try/catch for error handling.
+</Note>

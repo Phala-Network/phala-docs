@@ -1,0 +1,56 @@
+---
+title: getAppEnvEncryptPubKey
+description: Retrieve the KMS-managed encryption public key for encrypting environment variables
+---
+
+## getAppEnvEncryptPubKey
+
+`GET /kms/{kms}/pubkey/{app_id}`
+
+Retrieves the encryption public key managed by a KMS instance for a specific app. This key is used to encrypt environment variables before sending them to the Phala Cloud API.
+
+For **PHALA KMS**, the public key is returned directly in the [`provisionCvm`](/phala-cloud/references/cloud-js-sdk/provision-cvm) response as `app_env_encrypt_pubkey`. You only need to call this function explicitly when using **on-chain KMS** (ETHEREUM/BASE), where the app ID comes from deploying a contract.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kms` | `string` | Yes | KMS ID or slug |
+| `app_id` | `string` | Yes | App ID (40 hex chars, optional `0x` prefix) |
+
+**Returns:** `GetAppEnvEncryptPubKey`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `public_key` | `string` | RSA public key for encrypting env vars |
+| `signature` | `string` | KMS signature over the public key |
+
+**Example:**
+
+```typescript
+import { encryptEnvVars, parseEnvVars } from "@phala/cloud";
+
+// Get the encryption key from KMS
+const { public_key } = await client.getAppEnvEncryptPubKey({
+  kms: "ethereum-mainnet",
+  app_id: "0x1234abcd...",
+});
+
+// Encrypt environment variables
+const envVars = parseEnvVars("API_KEY=secret\nDB_URL=postgres://...");
+const encrypted = await encryptEnvVars(envVars, public_key);
+
+// Use the encrypted env in commitCvmProvision or updateCvmEnvs
+await client.commitCvmProvision({
+  app_id: "0x1234abcd...",
+  compose_hash: provision.compose_hash,
+  encrypted_env: encrypted,
+  env_keys: ["API_KEY", "DB_URL"],
+});
+```
+
+---
+
+## safeGetAppEnvEncryptPubKey
+
+Safe variant that returns a `SafeResult<GetAppEnvEncryptPubKey>` instead of throwing on errors.

@@ -1,0 +1,94 @@
+---
+title: Workspaces
+description: Functions for querying workspace information, nodes, and quotas
+---
+
+## listWorkspaces
+
+`GET /workspaces`
+
+Returns a paginated list of workspaces the user has access to.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cursor` | `string` | No | Pagination cursor |
+| `limit` | `number` | No | Items per page |
+
+**Returns:** `ListWorkspaces`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | `WorkspaceResponse[]` | Workspace list |
+| `pagination` | `object` | `{ has_more, next_cursor, total }` |
+
+**Example:**
+
+```typescript
+const workspaces = await client.listWorkspaces({ limit: 10 });
+workspaces.data.forEach(ws => console.log(ws.name, ws.slug));
+```
+
+---
+
+## getWorkspace
+
+`GET /workspaces/{teamSlug}`
+
+Returns details about a specific workspace.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `teamSlug` | `string` | Yes | Workspace slug |
+
+**Returns:** `WorkspaceResponse` — workspace details.
+
+---
+
+## getWorkspaceNodes
+
+`GET /workspaces/{teamSlug}/nodes`
+
+Returns the list of nodes available to a workspace.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `teamSlug` | `string` | Yes | Workspace slug |
+
+**Returns:** Array of node information.
+
+---
+
+## getWorkspaceQuotas
+
+`GET /workspaces/{teamSlug}/quotas`
+
+Returns resource quotas and usage for a workspace.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `teamSlug` | `string` | Yes | Workspace slug |
+
+**Returns:** `GetWorkspaceQuotas`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `team_slug` | `string` | Workspace slug |
+| `tier` | `string` | Workspace tier |
+| `quotas` | `object` | Resource limits: `vm_slots`, `vcpu`, `memory_mb`, `disk_gb` (each has `limit` and `remaining`) |
+| `reserved_nodes` | `object` | `{ limit, remaining }` |
+| `reserved_gpu` | `object` | `{ gpus, in_use, misconfigured }` |
+
+**Example:**
+
+```typescript
+const quotas = await client.getWorkspaceQuotas({ teamSlug: "my-team" });
+console.log(`VM slots: ${quotas.quotas.vm_slots.remaining}/${quotas.quotas.vm_slots.limit}`);
+```

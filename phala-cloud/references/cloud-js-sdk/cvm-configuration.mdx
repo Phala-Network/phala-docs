@@ -1,0 +1,193 @@
+---
+title: CVM Configuration
+description: Functions for updating CVM resources, visibility, OS images, and compose files
+---
+
+## updateCvmResources
+
+`PATCH /cvms/{cvmId}/resources`
+
+Updates CVM compute resources (vCPU, memory, disk).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `vcpu` | `number` | No | Number of vCPUs |
+| `memory` | `number` | No | Memory in MB |
+| `disk_size` | `number` | No | Disk size in GB |
+
+**Returns:** Updated CVM details.
+
+**Example:**
+
+```typescript
+await client.updateCvmResources({
+  id: "my-app",
+  vcpu: 4,
+  memory: 8192,
+  disk_size: 100,
+});
+```
+
+---
+
+## updateCvmVisibility
+
+`PATCH /cvms/{cvmId}/visibility`
+
+Updates CVM visibility settings (public listing, public TCB info).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `listed` | `boolean` | No | List in public directory |
+
+**Returns:** Updated CVM details.
+
+---
+
+## updatePreLaunchScript
+
+`PATCH /cvms/{cvmId}/pre-launch-script`
+
+Updates the pre-launch script for a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `pre_launch_script` | `string` | Yes | Script content |
+| `compose_hash` | `string` | No | For on-chain KMS (Phase 2) |
+| `transaction_hash` | `string` | No | For on-chain KMS (Phase 2) |
+
+**Returns:** Union type:
+
+- `{ status: "in_progress", message, correlation_id }` — update accepted
+- `{ status: "precondition_required", message, compose_hash, app_id, device_id, kms_info }` — on-chain KMS requires compose hash registration first
+
+<Note>
+For CVMs using on-chain KMS, this function may return `precondition_required`. You must register the `compose_hash` on-chain using [`addComposeHash`](/phala-cloud/references/cloud-js-sdk/add-compose-hash) before retrying with the `compose_hash` and `transaction_hash` parameters.
+</Note>
+
+---
+
+## updateOsImage
+
+`PATCH /cvms/{cvmId}/os-image`
+
+Updates the OS image for a CVM. The CVM will restart with the new image.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `image` | `string` | Yes | OS image name |
+
+**Returns:** Updated CVM details.
+
+---
+
+## getAvailableOsImages
+
+`GET /os-images`
+
+Returns the list of available OS images.
+
+**Parameters:** None (optional filters).
+
+**Returns:** `GetAvailableOSImagesResponse` — array of OS image variants with version info.
+
+**Example:**
+
+```typescript
+const images = await client.getAvailableOsImages();
+images.forEach(img => console.log(img.name, img.version));
+```
+
+---
+
+## refreshCvmInstanceId
+
+`POST /cvms/{cvmId}/refresh-instance-id`
+
+Generates a new instance ID for a CVM. This invalidates the old instance ID.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `InstanceIdRefreshResult` with the new `instance_id`.
+
+---
+
+## refreshCvmInstanceIds
+
+`POST /cvms/refresh-instance-ids`
+
+Generates new instance IDs for multiple CVMs in a single request.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `ids` | `string[]` | Yes | Array of CVM identifiers |
+
+**Returns:** `RefreshCvmInstanceIdsResponse` — batch results.
+
+---
+
+## provisionCvmComposeFileUpdate
+
+`POST /cvms/{cvmId}/compose_file/provision`
+
+Provisions a compose file update — the first phase of a two-phase compose file change. Returns a `compose_hash` needed for the commit step.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier (also accepts `uuid`) |
+| `app_compose` | `object` | Yes | Updated compose file object |
+
+**Returns:** `ProvisionCvmComposeFileUpdateResult` with `compose_hash`.
+
+**Example:**
+
+```typescript
+const compose = await client.getCvmComposeFile({ id: "my-app" });
+compose.docker_compose_file = newYaml;
+
+const provision = await client.provisionCvmComposeFileUpdate({
+  uuid: "my-app",
+  app_compose: compose,
+});
+console.log(provision.compose_hash);
+```
+
+---
+
+## commitCvmComposeFileUpdate
+
+`POST /cvms/{cvmId}/compose_file/commit`
+
+Commits a compose file update — the second phase. For on-chain KMS, the `compose_hash` must be registered on-chain before calling this.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `compose_hash` | `string` | Yes | From `provisionCvmComposeFileUpdate` |
+| `encrypted_env` | `string` | No | Hex-encoded encrypted env vars |
+| `env_keys` | `string[]` | No | Allowed env variable keys |
+| `transaction_hash` | `string` | No | On-chain transaction hash |
+
+**Returns:** `CommitCvmComposeFileUpdate` — update details.

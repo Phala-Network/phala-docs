@@ -1,0 +1,90 @@
+---
+title: Changelog
+description: Release history for the @phala/cloud JavaScript SDK
+---
+
+## [0.2.4](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.3...js-v0.2.4) (2026-02-25)
+
+### feat
+
+* **sdk+cli:** add SSH key and CVM runtime-config commands ([692321a](https://github.com/Phala-Network/phala-cloud/commit/692321a05bacdbc4da9bcfbc9b82ab8fcfc9d25a))
+* **sdk:** add create, delete, and sync SSH key actions ([a688f29](https://github.com/Phala-Network/phala-cloud/commit/a688f2909932500be88ac238d5fcb894f7af98d6))
+
+## [0.2.3](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.2...js-v0.2.3) (2026-02-07)
+
+### feat
+
+* add 200KB size limit for compose file + pre-launch script ([fe45765](https://github.com/Phala-Network/phala-cloud/commit/fe4576593cc08c2576e4c91d1c2b6b68cb3b9601))
+* add profile field to app schemas and getAppFilterOptions action ([cf3c2eb](https://github.com/Phala-Network/phala-cloud/commit/cf3c2eb2e1ddc1b9984484630bc603e48f48aafb))
+* add public_tcbinfo to update visibility action ([39cfd3f](https://github.com/Phala-Network/phala-cloud/commit/39cfd3f0c5f0628d8c13a25fb99a400a32cecb06))
+
+### fix
+
+* rename teepod_name to node in get_app_list action ([f863436](https://github.com/Phala-Network/phala-cloud/commit/f8634367fb5b03eb3f84877b56c8e914dc03fd55))
+
+### refactor
+
+* **js:** add revision_id to app revisions and use revisionId for detail ([8d72149](https://github.com/Phala-Network/phala-cloud/commit/8d72149e69a71bfc11eb35c2240753b4ecc014b7))
+
+## [0.2.2](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.1...js-v0.2.2) (2026-01-31)
+
+### feat
+
+* **sdk-js:** add is_default to workspaces response schema ([85996b3](https://github.com/Phala-Network/phala-cloud/commit/85996b395c5fa7efdfe37dbf1a300964d4d441fd))
+* use workspace slug as profile name, add profiles command, update default API dom ([5c150a0](https://github.com/Phala-Network/phala-cloud/commit/5c150a024d575414e60d6ead26f19a1fc9eaad4a))
+
+### refactor
+
+* sync NodeRef schema from backend ([f699002](https://github.com/Phala-Network/phala-cloud/commit/f699002fc24785c58cfa0452c0ab151d6c661117))
+
+## [0.2.1](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.1-beta.4...js-v0.2.1) (2026-01-31)
+
+### feat
+
+* add standalone patch api for docker compose & prelaunch script ([efc9a05](https://github.com/Phala-Network/phala-cloud/commit/efc9a052c2fb0b4cf6eedce628c81ef86826fa4d))
+* add validate rule to cvm name when creating cvm ([92138c0](https://github.com/Phala-Network/phala-cloud/commit/92138c0de0021aa06e597aa321c9a293bb078e2a))
+* **js:** add batch CVM status action ([e99e0d8](https://github.com/Phala-Network/phala-cloud/commit/e99e0d86b79b9cf871f58d0e878a569e4808d6bc))
+* **js:** add workspace nodes and quotas API ([2adf971](https://github.com/Phala-Network/phala-cloud/commit/2adf971646d0b628ad68e9a07a28b98bba02e88d))
+* **sdk:** add apps API actions and fix versioned client types ([3ee04e9](https://github.com/Phala-Network/phala-cloud/commit/3ee04e9611047a47890e852bdf6f3244fd457c98))
+* **sdk:** add generic request methods with full response support ([b15c2c6](https://github.com/Phala-Network/phala-cloud/commit/b15c2c627ece4472edf1ecb8a877cd619808e662))
+* **sdk:** add versioned API client with type-safe return types ([4378e37](https://github.com/Phala-Network/phala-cloud/commit/4378e373966efbd72d987d399e0f7c9136c2d9dd))
+* unify name convention across cli & sdk ([9f0d1e5](https://github.com/Phala-Network/phala-cloud/commit/9f0d1e5d5f7b600a1c963816ce38bd1b402885ef))
+
+### fix
+
+* api path for batch cvm status query ([5764b05](https://github.com/Phala-Network/phala-cloud/commit/5764b05be417e568f91b88235d7f1511b62b4724))
+* **js:** expose instance_type in CVM response ([0c30066](https://github.com/Phala-Network/phala-cloud/commit/0c300668e821a58d30cceff5dff264dcbedbddee))
+* migrate URLs from cloud.phala.network to cloud.phala.com ([cd48ed4](https://github.com/Phala-Network/phala-cloud/commit/cd48ed4a69ffc3bd4f4c8483946cf21c2b5d38a6))
+* **sdk,cli:** send update_env_vars flag when updating CVM env vars ([26077d1](https://github.com/Phala-Network/phala-cloud/commit/26077d17e418182d96b995e23e26a48da697d3ea))
+* **sdk:** add missing kms_info field to ProvisionCvmSchema ([6fc3b6a](https://github.com/Phala-Network/phala-cloud/commit/6fc3b6aa9d0c733ad2394108e388ebb907324e22))
+* **sdk:** smart default for instance_type to allow vcpu/memory params to work ([9f0780d](https://github.com/Phala-Network/phala-cloud/commit/9f0780d892d43bcb354a5ada1b8edf7c2912e0fc))
+
+## [0.2.0](https://github.com/Phala-Network/phala-cloud/compare/js-v0.1.2...js-v0.2.0) (2025-11-05)
+
+### feat
+
+* added actions get_available_os_images and update_os_image ([95e5688](https://github.com/Phala-Network/phala-cloud/commit/95e5688c14f9451791fd8b59bef6950a5e326652))
+* added getCvmState & safeGetCvmState ([fc791ac](https://github.com/Phala-Network/phala-cloud/commit/fc791acc28834f1255b5a8def32494cc128935cf))
+* added next-app-ids API ([26d9dfc](https://github.com/Phala-Network/phala-cloud/commit/26d9dfce02e29f80bf572aff1268e60db314d580))
+* experimental watchCvmState implementation ([ce316d9](https://github.com/Phala-Network/phala-cloud/commit/ce316d9d3af9c865c7b27471a8844f5d8e025485))
+
+## [0.1.2](https://github.com/Phala-Network/phala-cloud/compare/js-v0.1.1...js-v0.1.2) (2025-10-29)
+
+### feat
+
+* **sdk:** redesign errors & added event emitter support ([c2036fa](https://github.com/Phala-Network/phala-cloud/commit/c2036fa6a87587269c516538ea9573bed7596f9a))
+
+### fix
+
+* **cvms:** include update_env_vars in compose file update request body ([f3eb2cd](https://github.com/Phala-Network/phala-cloud/commit/f3eb2cd40ae7515e5e26fd8543e088da780d579c))
+
+## [0.1.1](https://github.com/Phala-Network/phala-cloud/compare/js-v0.1.1-beta.3...js-v0.1.1) (2025-10-24)
+
+### feat
+
+* attach getHash & toString to AppCompose object ([d013f99](https://github.com/Phala-Network/phala-cloud/commit/d013f99ac269a5bea196c801104e1868fcaa91df))
+* export utils function in get_compose_hash ([4c4c5fc](https://github.com/Phala-Network/phala-cloud/commit/4c4c5fcce1c2cfe2aaaad48f7539512d220e4621))
+
+## [0.0.12](https://github.com/Phala-Network/phala-cloud/compare/57cb8ef05d2227ee6f9fb9135aa9f1ff5dfbd021...js-v0.0.12) (2025-10-11)
+
+Initial release with action functions for deploy, provision, authentication, CVM management, KMS integration, and workspace APIs.

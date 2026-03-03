@@ -1,0 +1,60 @@
+---
+title: commitCvmProvision
+description: Commit a CVM provision — second phase of the two-phase deployment flow
+---
+
+## commitCvmProvision
+
+`POST /cvms`
+
+Commits a CVM provision, finalizing the deployment. This is the **second phase** of the two-phase flow started by [`provisionCvm`](/phala-cloud/references/cloud-js-sdk/provision-cvm).
+
+The required parameters differ based on the KMS type:
+
+- **PHALA KMS:** `app_id` comes from the `provisionCvm` response.
+- **On-chain KMS (ETHEREUM/BASE):** `app_id` comes from deploying an AppAuth contract via [`deployAppAuth`](/phala-cloud/references/cloud-js-sdk/deploy-app-auth). You must also provide `kms_id`, `contract_address`, and `deployer_address`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `string` | Yes | App ID from provision (PHALA) or contract deployment (on-chain) |
+| `compose_hash` | `string` | Yes | Hash from `provisionCvm` |
+| `encrypted_env` | `string` | No | Hex-encoded encrypted environment variables |
+| `env_keys` | `string[]` | No | Allowed environment variable keys |
+| `kms_id` | `string` | No | KMS instance slug (required for on-chain KMS) |
+| `contract_address` | `string` | No | AppAuth contract address (on-chain KMS only) |
+| `deployer_address` | `string` | No | Deployer wallet address (on-chain KMS only) |
+
+**Returns:** `CommitCvmProvision` — full CVM details with metadata.
+
+**Example — PHALA KMS:**
+
+```typescript
+const result = await client.commitCvmProvision({
+  app_id: provision.app_id!,
+  compose_hash: provision.compose_hash,
+  encrypted_env: encryptedEnvHex,
+  env_keys: ["API_KEY"],
+});
+```
+
+**Example — On-chain KMS:**
+
+```typescript
+const result = await client.commitCvmProvision({
+  app_id: deployedContract.appId,
+  compose_hash: provision.compose_hash,
+  encrypted_env: encryptedEnvHex,
+  env_keys: ["API_KEY"],
+  kms_id: kmsSlug,
+  contract_address: deployedContract.appAuthAddress,
+  deployer_address: deployedContract.deployer,
+});
+```
+
+---
+
+## safeCommitCvmProvision
+
+Safe variant that returns a `SafeResult<CommitCvmProvision>` instead of throwing on errors.

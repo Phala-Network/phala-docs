@@ -1,0 +1,109 @@
+---
+title: SSH Keys
+description: Functions for managing SSH keys used for CVM access
+---
+
+## listSshKeys
+
+`GET /user/ssh-keys`
+
+Returns all SSH keys associated with the authenticated user.
+
+**Parameters:** None
+
+**Returns:** Array of `SshKey` objects.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Key identifier |
+| `name` | `string` | Key name |
+| `public_key` | `string` | Public key content |
+| `fingerprint` | `string` | Key fingerprint |
+| `created_at` | `string` | Creation timestamp |
+
+**Example:**
+
+```typescript
+const keys = await client.listSshKeys();
+keys.forEach(k => console.log(k.name, k.fingerprint));
+```
+
+---
+
+## createSshKey
+
+`POST /user/ssh-keys`
+
+Adds a new SSH public key to the user's account.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | Yes | Display name for the key |
+| `public_key` | `string` | Yes | SSH public key content |
+
+**Returns:** `SshKey` — the created key with computed fingerprint.
+
+**Example:**
+
+```typescript
+const key = await client.createSshKey({
+  name: "my-laptop",
+  public_key: "ssh-ed25519 AAAA... user@host",
+});
+console.log(key.fingerprint);
+```
+
+---
+
+## deleteSshKey
+
+`DELETE /user/ssh-keys/{key_id}`
+
+Removes an SSH key from the user's account.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | Key identifier |
+
+**Returns:** `void`
+
+---
+
+## importGithubProfileSshKeys
+
+`POST /user/ssh-keys/import/github-profile`
+
+Imports SSH public keys from a GitHub user's profile.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `github_username` | `string` | Yes | GitHub username |
+
+**Returns:** `ImportGithubProfileResponse` — import results with count of keys added.
+
+**Example:**
+
+```typescript
+const result = await client.importGithubProfileSshKeys({
+  github_username: "octocat",
+});
+console.log(`Imported ${result.imported} keys`);
+```
+
+---
+
+## syncGithubSshKeys
+
+`POST /user/ssh-keys/sync/github`
+
+Syncs SSH keys with the authenticated user's linked GitHub account.
+
+**Parameters:** None
+
+**Returns:** `SyncGithubSshKeysResponse` — sync results.
