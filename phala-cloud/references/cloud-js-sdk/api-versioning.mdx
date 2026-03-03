@@ -1,0 +1,227 @@
+---
+title: API Versioning
+description: How the Phala Cloud API versioning works in the JS SDK — supported versions, header-based negotiation, and version-specific types.
+---
+
+The Phala Cloud API uses **header-based versioning**. Each request includes an `X-Phala-Version` header, and the server returns a response structure matching that version. The SDK provides compile-time type safety — TypeScript automatically infers the correct response types based on the version you select.
+
+## Supported Versions
+
+| Version | Status | Description |
+|---------|--------|-------------|
+| `2026-01-21` | **Default (current)** | Three-layer user response, restructured CVM info, workspace-aware |
+| `2025-10-28` | Legacy | Flat user response, legacy CVM structure |
+
+## Selecting a Version
+
+### At Client Creation
+
+```typescript
+import { createClient } from "@phala/cloud";
+
+// Uses default version (2026-01-21)
+const client = createClient({ apiKey: "your-api-key" });
+```
+
+```typescript
+// Explicitly select a version
+const client = createClient({
+  apiKey: "your-api-key",
+  version: "2026-01-21",
+});
+```
+
+```typescript
+// Use legacy version
+const legacyClient = createClient({
+  apiKey: "your-api-key",
+  version: "2025-10-28",
+});
+```
+
+### Switching Versions at Runtime
+
+Use `.withVersion()` to create a new client with a different API version without re-authenticating:
+
+```typescript
+const client = createClient({ apiKey: "your-api-key" }); // 2026-01-21
+const legacyClient = client.withVersion("2025-10-28");
+
+// Each client returns version-specific types
+const user = await client.getCurrentUser();
+// user: { user: UserInfo, workspace: WorkspaceInfo, credits: CreditsInfo }
+
+const legacyUser = await legacyClient.getCurrentUser();
+// legacyUser: { username, email, credits, granted_credits, avatar, team_name, team_tier }
+```
+
+## How It Works
+
+When you create a client with a version, the SDK:
+
+1. Sends the `X-Phala-Version` header with every request
+2. Validates responses against the version-specific Zod schema
+3. Returns TypeScript types matching the selected version
+
+```
+Client("2026-01-21")  ──>  X-Phala-Version: 2026-01-21  ──>  CvmInfoV20260121
+Client("2025-10-28")  ──>  X-Phala-Version: 2025-10-28  ──>  CvmInfoV20251028
+```
+
+## Version-Specific Response Types
+
+The SDK uses conditional types to map API versions to response types:
+
+| Endpoint | `2026-01-21` | `2025-10-28` |
+|----------|-------------|-------------|
+| Get current user | `CurrentUserV20260121` | `CurrentUserV20251028` |
+| List CVMs | `PaginatedCvmInfosV20260121` | `PaginatedCvmInfosV20251028` |
+| Get CVM info | `CvmInfoDetailV20260121` | `CvmDetailV20251028` |
+| List apps | `DstackAppListResponseV20260121` | `DstackAppListResponseV20251028` |
+| Get app info | `DstackAppWithCvmResponseV20260121` | `DstackAppWithCvmResponseV20251028` |
+| Get app CVMs | `CvmInfoV20260121[]` | `CvmInfoV20251028[]` |
+
+### Using with Standalone Functions
+
+Version-aware typing also works with standalone action functions:
+
+```typescript
+import { createBaseClient, getCvmInfo } from "@phala/cloud";
+
+const client = createBaseClient({ apiKey: "key", version: "2026-01-21" });
+const cvm = await getCvmInfo(client, { id: "cvm-abc123" });
+// cvm is CvmInfoDetailV20260121
+
+const legacyClient = createBaseClient({ apiKey: "key", version: "2025-10-28" });
+const legacyCvm = await getCvmInfo(legacyClient, { id: "cvm-abc123" });
+// legacyCvm is CvmDetailV20251028
+```
+
+## Key Differences Between Versions
+
+### User Response
+
+**`2026-01-21`** — Three-layer structure:
+
+```typescript
+{
+  user: {
+    username: string;
+    email: string;
+    role: "admin" | "user";
+    avatar: string;
+    email_verified: boolean;
+    totp_enabled: boolean;
+    has_backup_codes: boolean;
+    flag_has_password: boolean;
+  };
+  workspace: {
+    id: string;
+    name: string;
+    slug: string | null;
+    tier: string;
+    role: string;
+  };
+  credits: {
+    balance: string | number;
+    granted_balance: string | number;
+    is_post_paid: boolean;
+    outstanding_amount: string | number | null;
+  };
+}
+```
+
+**`2025-10-28`** — Flat structure:
+
+```typescript
+{
+  username: string;
+  email: string;
+  credits: number;
+  granted_credits: number;
+  avatar: string;
+  team_name: string;
+  team_tier: string;
+}
+```
+
+### CVM Info
+
+**`2026-01-21`** — Nested resource objects, workspace-aware:
+
+```typescript
+{
+  id: string;        // hashed CVM ID
+  name: string;
+  app_id: string;
+  status: string;
+  resource: {
+    instance_type: string;
+    vcpu: number;
+    memory_in_gb: number;
+    disk_in_gb: number;
+    gpus: number;
+    billing_period: "skip" | "hourly" | "monthly";
+  };
+  node_info: { object_type: "node", id: number, name: string, region: string };
+  os: { name: string, version: string, is_dev: boolean };
+  kms_info: { chain_id: number, dstack_kms_address: string, ... };
+  gateway: { base_domain: string, cname: string };
+  workspace: { object_type: "workspace", id: string, name: string, slug: string };
+  creator: { object_type: "user", id: string, username: string };
+}
+```
+
+**`2025-10-28`** — Flat fields, legacy naming:
+
+```typescript
+{
+  hosted: { id: string, name: string, status: string, app_url: string, ... };
+  name: string;
+  node: { id: number, name: string, region_identifier: string };
+  vcpu: number;
+  memory: number;
+  disk_size: number;
+  gateway_domain: string;
+  public_urls: Array<{ app: string, instance: string }>;
+}
+```
+
+## Migration Guide
+
+To migrate from `2025-10-28` to `2026-01-21`:
+
+1. Update client creation (or omit `version` to use the default):
+   ```typescript
+   // Before
+   const client = createClient({ apiKey: "key", version: "2025-10-28" });
+   // After
+   const client = createClient({ apiKey: "key" });
+   ```
+
+2. Update user response access:
+   ```typescript
+   // Before
+   const username = user.username;
+   const credits = user.credits;
+   // After
+   const username = user.user.username;
+   const credits = user.credits.balance;
+   ```
+
+3. Update CVM info access:
+   ```typescript
+   // Before
+   const vcpu = cvm.vcpu;
+   const memory = cvm.memory;
+   const region = cvm.node?.region_identifier;
+   // After
+   const vcpu = cvm.resource.vcpu;
+   const memory = cvm.resource.memory_in_gb;
+   const region = cvm.node_info?.region;
+   ```
+
+## Related
+
+- [SDK Overview](/phala-cloud/references/cloud-js-sdk/overview) — getting started with the SDK
+- [Schema Reference](/phala-cloud/references/cloud-js-sdk/schema-reference) — full schema definitions per version

@@ -3,7 +3,7 @@ title: CLI Overview
 description: Deploy and manage CVMs from your terminal
 ---
 
-The Phala Cloud CLI lets you deploy, manage, and monitor Confidential Virtual Machines without leaving your terminal. It handles authentication, deployment, logs, and SSH access.
+The Phala Cloud CLI (`phala`) is a command-line tool for deploying and managing Confidential Virtual Machines (CVMs) on Phala Cloud. It is also available as the `pha` alias.
 
 ## Install
 
@@ -17,31 +17,136 @@ Or run without installing: `npx phala` / `bunx phala`
 
 Follow the [Deploy Your First CVM](/phala-cloud/phala-cloud-cli/start-from-cloud-cli) tutorial to deploy a Jupyter notebook and test TEE functions in under 10 minutes.
 
-## Common Commands
+## API Versioning
+
+The CLI communicates with the Phala Cloud API using header-based versioning. The current default API version is `2026-01-21`.
+
+The CLI sends an `X-Phala-Version` header with every request. This determines the response format returned by the server. See the [JS SDK API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) page for details on version differences.
+
+| Version | Status |
+|---------|--------|
+| `2026-01-21` | Default (current) |
+| `2025-10-28` | Legacy |
+
+You can override the API version via:
+
+- The `--api-version` global flag: `phala cvms list --api-version 2025-10-28`
+- The `api_version` field in `phala.toml`
+
+## Authentication
 
 | Command | Description |
 |---------|-------------|
-| `phala login` | Authenticate with Phala Cloud |
-| `phala status` | Check authentication and account info |
-| `phala deploy` | Deploy a CVM from a docker-compose.yml |
-| `phala cvms list` | List all your CVMs |
-| `phala cvms get <name>` | Get CVM details and status |
-| `phala logs <name>` | View container logs |
-| `phala ssh <name>` | SSH into a CVM |
-| `phala cvms delete <name>` | Delete a CVM |
+| [`login`](/phala-cloud/phala-cloud-cli/login) | Authenticate with Phala Cloud |
+| [`logout`](/phala-cloud/phala-cloud-cli/logout) | Remove stored API key |
+| [`status`](/phala-cloud/phala-cloud-cli/status) | Check authentication status |
+| [`whoami`](/phala-cloud/phala-cloud-cli/whoami) | Print the current user |
+| [`profiles`](/phala-cloud/phala-cloud-cli/profiles) | List auth profiles |
+| [`switch`](/phala-cloud/phala-cloud-cli/switch) | Switch auth profiles |
 
-For the full command reference, see [CLI Reference](/phala-cloud/references/phala-cloud-cli/phala/overview).
+## Deployment
 
-## Local Development
+| Command | Description |
+|---------|-------------|
+| [`deploy`](/phala-cloud/phala-cloud-cli/deploy) | Deploy new CVM or update existing one |
+| [`instance-types`](/phala-cloud/phala-cloud-cli/instance-types) | List available instance types |
 
-Test your application locally before deploying:
+## App Management
 
-```bash
-phala simulator start
+| Command | Description |
+|---------|-------------|
+| [`apps`](/phala-cloud/phala-cloud-cli/apps) | List deployed CVMs |
+| [`cvms`](/phala-cloud/phala-cloud-cli/cvms) | Manage CVMs (start, stop, restart, delete, resize, ...) |
+| [`link`](/phala-cloud/phala-cloud-cli/link) | Link a local directory to a CVM |
+| [`nodes`](/phala-cloud/phala-cloud-cli/nodes) | List TEE worker nodes |
+| [`ssh-keys`](/phala-cloud/phala-cloud-cli/ssh-keys) | Manage SSH keys (list, add, remove, import from GitHub) |
+
+## CVM Operations
+
+| Command | Description |
+|---------|-------------|
+| [`logs`](/phala-cloud/phala-cloud-cli/logs) | Fetch logs from a CVM (container, serial, stdout/stderr) |
+| [`ps`](/phala-cloud/phala-cloud-cli/ps) | List containers of a CVM |
+| [`ssh`](/phala-cloud/phala-cloud-cli/ssh) | Connect to a CVM via SSH |
+| [`cp`](/phala-cloud/phala-cloud-cli/cp) | Copy files to/from a CVM via SCP |
+| [`runtime-config`](/phala-cloud/phala-cloud-cli/runtime-config) | Show CVM runtime configuration |
+
+## Advanced
+
+| Command | Description |
+|---------|-------------|
+| [`api`](/phala-cloud/phala-cloud-cli/api) | Make authenticated API requests |
+| [`self`](/phala-cloud/phala-cloud-cli/self) | CLI self-management (update) |
+| [`config`](/phala-cloud/phala-cloud-cli/config) | Manage local CLI configuration |
+| [`docker`](/phala-cloud/phala-cloud-cli/docker) | Docker image build/push helpers |
+| [`simulator`](/phala-cloud/phala-cloud-cli/simulator) | Local TEE simulator for development |
+| [`completion`](/phala-cloud/phala-cloud-cli/completion) | Generate shell completion scripts |
+
+## Profiles & Credentials
+
+The CLI supports multiple authentication profiles stored in `~/.phala-cloud/credentials.json`.
+
+Each profile stores:
+
+| Field | Description |
+|-------|-------------|
+| `token` | API key |
+| `api_prefix` | API base URL |
+| `workspace` | Linked workspace (name + slug) |
+| `user` | Linked user (username + email) |
+| `updated_at` | Last update timestamp |
+
+Use [`profiles`](/phala-cloud/phala-cloud-cli/profiles) to list profiles and [`switch`](/phala-cloud/phala-cloud-cli/switch) to change the active profile.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PHALA_CLOUD_API_KEY` | Override the stored API key |
+| `PHALA_CLOUD_API_PREFIX` | Override the API base URL |
+| `PHALA_CLOUD_DIR` | Override the credentials directory (default: `~/.phala-cloud`) |
+| `PHALA_UPDATE_CHANNEL` | Release channel for `self update` (e.g., `latest`, `beta`) |
+
+## Configuration
+
+Credentials are stored in `~/.phala-cloud/credentials.json` (schema version 1, supports multiple profiles).
+
+Project-level configuration is in `phala.toml` in the working directory. Supported fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` / `uuid` / `app_id` / `instance_id` / `name` | `string` | CVM identifier (any format) |
+| `profile` | `string` | Auth profile to use for this project |
+| `api_version` | `string` | API version override (e.g., `"2025-10-28"`) |
+| `gateway_domain` | `string` | Custom gateway domain |
+| `gateway_port` | `number` | Custom gateway port |
+| `compose_file` | `string` | Path to Docker Compose file |
+| `env_file` | `string` | Path to `.env` file |
+| `public_logs` | `boolean` | Make container logs public |
+| `public_sysinfo` | `boolean` | Make system info public |
+| `listed` | `boolean` | List CVM in the public directory |
+
+Example `phala.toml`:
+
+```toml
+id = "cvm-abc123"
+profile = "production"
+compose_file = "docker-compose.yml"
+env_file = ".env"
+public_logs = true
 ```
 
-The simulator provides a local TEE environment for development. See [Local Development](/dstack/local-development) for details.
+## Global Flags
 
-## CI/CD
+| Flag | Description |
+|------|-------------|
+| `--json` | Output in JSON format for programmatic use |
+| `--api-token <token>` | Override the stored API key for this command |
+| `--api-version <version>` | Override the API version (e.g., `2025-10-28`, `2026-01-21`) |
 
-Automate deployments with GitHub Actions. See [Set Up a CI/CD Pipeline](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline).
+## Related
+
+- [Cloud JS SDK](/phala-cloud/references/cloud-js-sdk/overview) — programmatic access via JavaScript/TypeScript
+- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs
+- [Local Development](/dstack/local-development) — local TEE simulator
+- [CI/CD Pipeline](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline) — GitHub Actions automation

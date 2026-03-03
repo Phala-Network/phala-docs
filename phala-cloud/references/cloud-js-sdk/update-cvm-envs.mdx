@@ -1,0 +1,102 @@
+---
+title: updateCvmEnvs
+description: Update encrypted environment variables for a CVM
+---
+
+## updateCvmEnvs
+
+`PATCH /cvms/{cvmId}/envs`
+
+Updates the encrypted environment variables for a running CVM.
+
+This function uses a **two-phase flow** when the set of allowed env keys changes on a CVM with on-chain KMS:
+
+1. **Phase 1:** Call with `encrypted_env` and `env_keys`. If the env keys changed and the CVM uses on-chain KMS, the API returns `precondition_required` with a `compose_hash`.
+2. **Register on-chain:** Call [`addComposeHash`](/phala-cloud/references/cloud-js-sdk/add-compose-hash) to register the new compose hash on the blockchain.
+3. **Phase 2:** Retry the call with the original parameters plus `compose_hash` and `transaction_hash`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `encrypted_env` | `string` | Yes | Hex-encoded encrypted environment variables |
+| `env_keys` | `string[]` | No | Allowed environment variable keys |
+| `compose_hash` | `string` | No | Compose hash (Phase 2, after on-chain registration) |
+| `transaction_hash` | `string` | No | On-chain transaction hash (Phase 2) |
+
+**Returns:** Union of two possible responses:
+
+**Success (`in_progress`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | `"in_progress"` | Update accepted |
+| `message` | `string` | Status message |
+| `correlation_id` | `string` | Tracking ID |
+| `allowed_envs_changed` | `boolean` | Whether env keys changed |
+
+**Precondition required (`precondition_required`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | `"precondition_required"` | On-chain registration needed |
+| `message` | `string` | Instructions |
+| `compose_hash` | `string` | Hash to register on-chain |
+| `app_id` | `string` | App ID for contract interaction |
+| `device_id` | `string` | Device ID |
+| `kms_info` | `KmsInfo` | KMS details for chain interaction |
+
+**Example — PHALA KMS (single phase):**
+
+```typescript
+import { encryptEnvVars, parseEnvVars } from "@phala/cloud";
+
+const envVars = parseEnvVars("API_KEY=secret\nDB_URL=postgres://...");
+const pubkey = cvm.encrypted_env_pubkey;
+const encrypted = await encryptEnvVars(envVars, pubkey);
+
+const result = await client.updateCvmEnvs({
+  id: "my-app",
+  encrypted_env: encrypted,
+  env_keys: ["API_KEY", "DB_URL"],
+});
+// result.status === "in_progress"
+```
+
+**Example — On-chain KMS (two phases):**
+
+```typescript
+// Phase 1: attempt update
+const result = await client.updateCvmEnvs({
+  id: "my-app",
+  encrypted_env: encrypted,
+  env_keys: ["API_KEY", "NEW_VAR"],
+});
+
+if (result.status === "precondition_required") {
+  // Register compose hash on-chain
+  const receipt = await addComposeHash({
+    chain: result.kms_info.chain,
+    kmsContractAddress: result.kms_info.kms_contract_address,
+    appId: result.app_id as `0x${string}`,
+    composeHash: result.compose_hash,
+    privateKey: privateKey,
+  });
+
+  // Phase 2: retry with transaction proof
+  await client.updateCvmEnvs({
+    id: "my-app",
+    encrypted_env: encrypted,
+    env_keys: ["API_KEY", "NEW_VAR"],
+    compose_hash: result.compose_hash,
+    transaction_hash: receipt.transactionHash,
+  });
+}
+```
+
+---
+
+## safeUpdateCvmEnvs
+
+Safe variant that returns a `SafeResult` instead of throwing on errors.

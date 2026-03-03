@@ -1,0 +1,318 @@
+---
+title: CVM Query
+description: Functions for querying CVM information, state, and metrics
+---
+
+All CVM query functions accept a CVM identifier. The SDK auto-detects the format:
+
+| Format | Example |
+|--------|---------|
+| Name | `my-app` |
+| UUID | `550e8400-e29b-41d4-a716-446655440000` |
+| App ID | `0x1234abcd...` (40 hex chars, optional `0x` prefix) |
+| Instance ID | `instance-abc123` |
+
+## getCvmInfo
+
+`GET /cvms/{cvmId}`
+
+Returns full CVM details including configuration, status, and metadata.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier (any format above) |
+
+**Returns:** `CvmInfo` — version-aware response with CVM details.
+
+**Example:**
+
+```typescript
+const cvm = await client.getCvmInfo({ id: "my-app" });
+console.log(cvm.name, cvm.status);
+```
+
+---
+
+## getCvmList
+
+`GET /cvms/paginated`
+
+Returns a paginated list of CVMs.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `page` | `number` | No | Page number |
+| `page_size` | `number` | No | Items per page |
+| `node_id` | `number` | No | Filter by node |
+| `user_id` | `string` | No | Filter by user |
+
+**Returns:** Paginated list of CVM objects.
+
+**Example:**
+
+```typescript
+const list = await client.getCvmList({ page: 1, page_size: 10 });
+```
+
+---
+
+## getCvmState
+
+`GET /cvms/{cvmId}/state`
+
+Returns the current state of a CVM (non-streaming, immediate response).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmState`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | CVM ID |
+| `instance_id` | `string` | Instance ID |
+| `name` | `string` | CVM name |
+| `status` | `string` | Current status |
+| `uptime` | `string?` | Uptime duration |
+| `boot_progress` | `string?` | Boot progress percentage |
+| `boot_error` | `string?` | Boot error if failed |
+
+**Example:**
+
+```typescript
+const state = await client.getCvmState({ id: "my-app" });
+console.log(state.status); // "running", "stopped", etc.
+```
+
+---
+
+## getCvmStats
+
+`GET /cvms/{cvmId}/stats`
+
+Returns system information and resource usage for a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmSystemInfo`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_online` | `boolean` | Whether CVM is reachable |
+| `is_public` | `boolean` | Whether stats are public |
+| `sysinfo` | `object?` | CPU, memory, disk usage |
+| `status` | `string?` | Current status |
+| `boot_progress` | `string?` | Boot progress |
+
+**Example:**
+
+```typescript
+const stats = await client.getCvmStats({ id: "my-app" });
+if (stats.sysinfo) {
+  console.log(`CPU: ${stats.sysinfo.cpu_usage}%`);
+}
+```
+
+---
+
+## getCvmNetwork
+
+`GET /cvms/{cvmId}/network`
+
+Returns network information including public URLs and internal IP.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmNetwork`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_online` | `boolean` | Whether CVM is reachable |
+| `internal_ip` | `string?` | WireGuard internal IP |
+| `public_urls` | `array?` | Public URL mappings |
+
+**Example:**
+
+```typescript
+const net = await client.getCvmNetwork({ id: "my-app" });
+console.log(net.public_urls);
+```
+
+---
+
+## getCvmContainersStats
+
+`GET /cvms/{cvmId}/composition`
+
+Returns container-level information including running state and log endpoints.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmContainersStats`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_online` | `boolean` | Whether CVM is reachable |
+| `docker_compose_file` | `string?` | Active compose YAML |
+| `containers` | `array?` | Container info (id, names, image, state, status, log_endpoint) |
+
+**Example:**
+
+```typescript
+const stats = await client.getCvmContainersStats({ id: "my-app" });
+stats.containers?.forEach(c => console.log(c.names, c.state));
+```
+
+---
+
+## getCvmAttestation
+
+`GET /cvms/{cvmId}/attestation`
+
+Returns TEE attestation details including certificates and TCB info.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmAttestation`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_online` | `boolean` | Whether CVM is reachable |
+| `app_certificates` | `array?` | TLS certificates with attestation |
+| `tcb_info` | `object?` | TCB measurements (mrtd, rtmr0-3, event_log, app_compose hash) |
+
+**Example:**
+
+```typescript
+const att = await client.getCvmAttestation({ id: "my-app" });
+console.log(att.tcb_info?.app_compose);
+```
+
+---
+
+## getCvmDockerCompose
+
+`GET /cvms/{cvmId}/docker-compose`
+
+Returns the raw docker-compose configuration as a string.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `string` — raw docker-compose YAML content.
+
+**Example:**
+
+```typescript
+const compose = await client.getCvmDockerCompose({ id: "my-app" });
+console.log(compose);
+```
+
+---
+
+## getCvmComposeFile
+
+`GET /cvms/{cvmId}/compose_file`
+
+Returns the full compose file object with utility methods for hashing.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `LooseAppCompose` — compose file object with `getHash()` and `toString()` methods.
+
+**Example:**
+
+```typescript
+const compose = await client.getCvmComposeFile({ id: "my-app" });
+console.log(compose.docker_compose_file);
+console.log(compose.getHash());
+```
+
+---
+
+## getCvmPreLaunchScript
+
+`GET /cvms/{cvmId}/pre-launch-script`
+
+Returns the pre-launch script content.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `string` — pre-launch script content.
+
+---
+
+## getCvmStatusBatch
+
+`GET /cvms/status/batch`
+
+Returns the status of multiple CVMs in a single request.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `ids` | `string[]` | Yes | Array of CVM IDs |
+
+**Returns:** `GetCvmStatusBatchResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `statuses` | `CvmStatus[]` | Status for each requested CVM |
+
+**Example:**
+
+```typescript
+const batch = await client.getCvmStatusBatch({ ids: ["id-1", "id-2"] });
+batch.statuses.forEach(s => console.log(s.id, s.status));
+```
+
+---
+
+## getCvmUserConfig
+
+`GET /cvms/{cvmId}/user-config`
+
+Returns the user-level configuration for a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `CvmUserConfig` — user configuration details.

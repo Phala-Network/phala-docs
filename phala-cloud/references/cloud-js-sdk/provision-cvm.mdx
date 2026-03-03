@@ -1,0 +1,114 @@
+---
+title: provisionCvm
+description: Provision a new CVM — first phase of the two-phase deployment flow
+---
+
+## provisionCvm
+
+`POST /cvms/provision`
+
+Provisions a new CVM. This is the **first phase** of the two-phase deployment flow — call [`commitCvmProvision`](/phala-cloud/references/cloud-js-sdk/commit-cvm-provision) to finalize.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | Yes | CVM name (5-63 chars, must start with a letter) |
+| `compose_file` | `object` | Yes | Compose file configuration (see below) |
+| `instance_type` | `string` | No | Instance type (default: `"tdx.small"`) |
+| `node_id` | `number` | No | Deploy to a specific node |
+| `region` | `string` | No | Region filter |
+| `image` | `string` | No | OS image name |
+| `disk_size` | `number` | No | Disk size in GB |
+| `kms` | `string` | No | KMS type: `"PHALA"` (default), `"ETHEREUM"`, or `"BASE"` |
+| `kms_contract` | `string` | No | KMS contract address (on-chain KMS only) |
+| `env_keys` | `string[]` | No | Allowed environment variable keys |
+| `nonce` | `number` | No | Nonce for deterministic `app_id` (PHALA KMS only) |
+| `app_id` | `string` | No | Expected `app_id` (must match nonce) |
+| `listed` | `boolean` | No | List CVM in public directory |
+
+**`compose_file` object:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `docker_compose_file` | `string` | Yes | Docker Compose YAML content |
+| `allowed_envs` | `string[]` | No | Env var keys the CVM may receive |
+| `pre_launch_script` | `string` | No | Script to run before containers start |
+| `gateway_enabled` | `boolean` | No | Enable gateway/proxy |
+| `kms_enabled` | `boolean` | No | Enable KMS integration |
+| `public_logs` | `boolean` | No | Make container logs public |
+| `public_sysinfo` | `boolean` | No | Make system info public |
+
+**Returns:** `ProvisionCvm`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `compose_hash` | `string` | Hash of the compose configuration — pass to `commitCvmProvision` |
+| `app_id` | `string?` | App ID (only for PHALA KMS) |
+| `app_env_encrypt_pubkey` | `string?` | Encryption public key (only for PHALA KMS) |
+| `kms_id` | `string?` | KMS instance ID |
+| `kms_info` | `KmsInfo?` | KMS details |
+| `device_id` | `string?` | Device ID for on-chain KMS |
+| `fmspc` | `string?` | FMSPC of the selected node |
+| `os_image_hash` | `string?` | OS image hash |
+| `instance_type` | `string?` | Selected instance type |
+| `node_id` | `number?` | Selected node ID |
+
+**Example — PHALA KMS (default):**
+
+```typescript
+import { createClient, encryptEnvVars, parseEnvVars } from "@phala/cloud";
+
+const client = createClient();
+
+const provision = await client.provisionCvm({
+  name: "my-app",
+  instance_type: "tdx.small",
+  compose_file: {
+    docker_compose_file: composeYaml,
+    allowed_envs: ["API_KEY", "SECRET"],
+  },
+});
+
+// PHALA KMS returns app_id and pubkey directly
+const encrypted = await encryptEnvVars(envVars, provision.app_env_encrypt_pubkey!);
+
+await client.commitCvmProvision({
+  app_id: provision.app_id!,
+  compose_hash: provision.compose_hash,
+  encrypted_env: encrypted,
+  env_keys: ["API_KEY", "SECRET"],
+});
+```
+
+**Example — On-chain KMS (ETHEREUM/BASE):**
+
+```typescript
+const provision = await client.provisionCvm({
+  name: "my-app",
+  compose_file: { docker_compose_file: composeYaml },
+  kms: "ETHEREUM",
+});
+
+// On-chain KMS does NOT return app_id — deploy a contract to get one
+// See the on-chain KMS guide for the full flow
+```
+
+<Note>
+The combined size of `docker_compose_file` and `pre_launch_script` must not exceed 200KB.
+</Note>
+
+---
+
+## safeProvisionCvm
+
+Safe variant that returns a `SafeResult<ProvisionCvm>` instead of throwing on errors.
+
+```typescript
+const result = await client.safeProvisionCvm({ ... });
+if (result.success) {
+  console.log(result.data.compose_hash);
+} else {
+  console.error(result.error);
+}
+```

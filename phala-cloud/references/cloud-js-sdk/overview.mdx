@@ -1,0 +1,282 @@
+---
+title: Cloud JS SDK
+description: JavaScript/TypeScript SDK for Phala Cloud API — manage CVMs, deployments, and resources programmatically.
+---
+
+The `@phala/cloud` SDK provides a type-safe JavaScript/TypeScript client for the Phala Cloud API. It includes built-in API versioning, Zod schema validation, and comprehensive error handling.
+
+## Installation
+
+```bash
+npm install @phala/cloud
+```
+
+```bash
+pnpm add @phala/cloud
+```
+
+```bash
+yarn add @phala/cloud
+```
+
+## Quick Start
+
+```typescript
+import { createClient } from "@phala/cloud";
+
+const client = createClient({ apiKey: "your-api-key" });
+
+// Get current user info
+const user = await client.getCurrentUser();
+console.log(user.user.username);
+
+// List all CVMs
+const cvms = await client.getCvmList();
+console.log(cvms.items);
+```
+
+## Client Creation
+
+### `createClient(config?)`
+
+Creates a full-featured client with all action methods.
+
+```typescript
+import { createClient } from "@phala/cloud";
+
+// Minimal — reads API key from PHALA_CLOUD_API_KEY env var
+const client = createClient();
+```
+
+```typescript
+// Explicit configuration
+const client = createClient({
+  apiKey: "your-api-key",
+  baseURL: "https://cloud-api.phala.com/api/v1",
+  version: "2026-01-21",
+  timeout: 30000,
+});
+```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `apiKey` | `string` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
+| `baseURL` | `string` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
+| `version` | `ApiVersion` | `"2026-01-21"` | [API version](/phala-cloud/references/cloud-js-sdk/api-versioning) to use |
+| `timeout` | `number` | `30000` | Request timeout in milliseconds |
+| `useCookieAuth` | `boolean` | `false` | Use cookie-based auth instead of API key |
+| `headers` | `Record<string, string>` | — | Additional request headers |
+| `onResponseError` | `function` | — | Custom response error handler |
+
+### Tree-Shaking with `createBaseClient`
+
+For smaller bundles, use `createBaseClient` with individual action imports:
+
+```typescript
+import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
+
+const client = createBaseClient({ apiKey: "your-api-key" });
+
+// Call actions as standalone functions
+const user = await getCurrentUser(client);
+const cvms = await getCvmList(client);
+```
+
+### Extending the Base Client
+
+`createClient` already includes all built-in actions as methods. The `.extend()` method on `createBaseClient` is useful when you want to selectively include actions (for tree-shaking) or add your own custom actions:
+
+```typescript
+import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
+
+const client = createBaseClient({ apiKey: "your-api-key" }).extend({
+  getCurrentUser,
+  getCvmList,
+});
+
+// Only the actions you included are available as methods
+const user = await client.getCurrentUser();
+```
+
+## Available Actions
+
+Actions marked with **V** return different response types depending on the client's [API version](/phala-cloud/references/cloud-js-sdk/api-versioning).
+
+### Authentication & User
+
+| Method | Description |
+|--------|-------------|
+| `getCurrentUser()` **V** | Get current user, workspace, and credits info |
+
+### CVM Query
+
+| Method | Description |
+|--------|-------------|
+| `getCvmList(request?)` **V** | List all CVMs (paginated) |
+| `getCvmInfo(request)` **V** | Get single CVM details |
+| `getCvmStats(request)` | Get CVM system stats |
+| `getCvmNetwork(request)` | Get CVM network info |
+| `getCvmState(request)` | Get CVM current state |
+| `getCvmDockerCompose(request)` | Get Docker Compose config |
+| `getCvmComposeFile(request)` | Get compose file content |
+| `getCvmContainersStats(request)` | Get container stats |
+| `getCvmAttestation(request)` | Get TEE attestation |
+| `getCvmPreLaunchScript(request)` | Get pre-launch script |
+
+### CVM Lifecycle
+
+| Method | Description |
+|--------|-------------|
+| `provisionCvm(request)` | Create a new CVM |
+| `commitCvmProvision(request)` | Commit a CVM provision |
+| `startCvm(request)` | Start a CVM |
+| `stopCvm(request)` | Stop a CVM |
+| `shutdownCvm(request)` | Shutdown a CVM |
+| `restartCvm(request)` | Restart a CVM |
+| `deleteCvm(request)` | Delete a CVM |
+
+### CVM Configuration
+
+| Method | Description |
+|--------|-------------|
+| `updateCvmEnvs(request)` | Update environment variables |
+| `updateDockerCompose(request)` | Update Docker Compose config |
+| `updatePreLaunchScript(request)` | Update pre-launch script |
+| `updateCvmResources(request)` | Update resource allocation |
+| `updateCvmVisibility(request)` | Update visibility settings |
+| `updateOsImage(request)` | Update OS image |
+| `getAvailableOsImages(request?)` | List available OS images |
+| `provisionCvmComposeFileUpdate(request)` | Provision a compose file update |
+| `commitCvmComposeFileUpdate(request)` | Commit a compose file update |
+
+### Apps
+
+| Method | Description |
+|--------|-------------|
+| `getAppList(request?)` **V** | List apps |
+| `getAppInfo(request)` **V** | Get app details |
+| `getAppCvms(request)` **V** | List CVMs for an app |
+| `getAppRevisions(request)` | List app revision history |
+| `getAppFilterOptions()` | Get available filter options for app list |
+
+### Workspace
+
+| Method | Description |
+|--------|-------------|
+| `listWorkspaces(request?)` | List workspaces |
+| `getWorkspace(request)` | Get workspace details |
+
+### Nodes & Instance Types
+
+| Method | Description |
+|--------|-------------|
+| `getAvailableNodes()` | List available TEE nodes |
+| `listAllInstanceTypeFamilies()` | List all instance type families |
+| `listFamilyInstanceTypes(request)` | List instance types in a family |
+
+### KMS (Key Management)
+
+| Method | Description |
+|--------|-------------|
+| `getKmsInfo(request)` | Get KMS info |
+| `getKmsList(request?)` | List KMS instances |
+| `getAppEnvEncryptPubKey(request)` | Get env encryption public key |
+| `nextAppIds(request?)` | Get next available app IDs |
+
+### SSH Keys
+
+| Method | Description |
+|--------|-------------|
+| `listSshKeys()` | List SSH keys |
+| `createSshKey(request)` | Add an SSH key |
+| `deleteSshKey(request)` | Remove an SSH key |
+| `importGithubProfileSshKeys(request)` | Import SSH keys from GitHub profile |
+| `syncGithubSshKeys()` | Sync SSH keys from GitHub |
+
+## Safe Methods
+
+Every action has a `safe` variant that returns a `SafeResult` instead of throwing:
+
+```typescript
+const result = await client.safeGetCvmInfo({ id: "cvm-abc123" });
+
+if (result.success) {
+  console.log(result.data);
+} else {
+  console.error(result.error.message);
+}
+```
+
+The `SafeResult` type:
+
+```typescript
+type SafeResult<T, E = SafeError> =
+  | { success: true; data: T; error?: never }
+  | { success: false; data?: never; error: E };
+```
+
+## Custom Schema Validation
+
+Every action accepts an optional `schema` parameter for custom response validation.
+
+For actions **without** required request parameters, pass `schema` as the first argument:
+
+```typescript
+import { z } from "zod";
+
+const MySchema = z.object({ username: z.string() });
+const user = await client.getCurrentUser({ schema: MySchema });
+// user is typed as { username: string }
+
+// Disable validation (returns unknown)
+const raw = await client.getCurrentUser({ schema: false });
+```
+
+For actions **with** required request parameters, pass `schema` as the second argument:
+
+```typescript
+const MyCvmSchema = z.object({ id: z.string(), name: z.string() });
+const cvm = await client.getCvmInfo({ id: "cvm-abc123" }, { schema: MyCvmSchema });
+```
+
+## Event Handling
+
+Listen for error events across all API calls:
+
+```typescript
+client.on("error", (error) => {
+  console.error("API Error:", error.message);
+});
+
+// Listen once
+client.once("error", (error) => {
+  console.error("First error:", error.message);
+});
+
+// Remove listener
+client.off("error", handler);
+```
+
+## Debug Logging
+
+Enable detailed cURL-format request/response logging:
+
+```bash
+DEBUG=phala::api-client node your-script.js
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PHALA_CLOUD_API_KEY` | API key for authentication |
+| `PHALA_CLOUD_API_PREFIX` | Base URL for the API |
+
+## Related
+
+- [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) — version management and migration
+- [Schema Reference](/phala-cloud/references/cloud-js-sdk/schema-reference) — response schema details per version
+- [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling) — error classes and safe methods
+- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs

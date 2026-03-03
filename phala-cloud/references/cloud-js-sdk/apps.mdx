@@ -1,0 +1,123 @@
+---
+title: Apps
+description: Functions for querying app information, CVMs, and revision history
+---
+
+## getAppList
+
+`GET /apps`
+
+Returns a paginated, filterable list of apps.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `page` | `number` | No | Page number |
+| `page_size` | `number` | No | Items per page (max 100) |
+| `search` | `string` | No | Search by name |
+| `status` | `string[]` | No | Filter by status |
+| `listed` | `boolean` | No | Filter by public listing |
+| `base_image` | `string` | No | Filter by OS image |
+| `instance_type` | `string` | No | Filter by instance type |
+| `kms_slug` | `string` | No | Filter by KMS slug |
+| `kms_type` | `string` | No | Filter by KMS type |
+| `node` | `string` | No | Filter by node |
+| `region` | `string` | No | Filter by region |
+
+**Returns:** Paginated list of apps (version-aware schema).
+
+**Example:**
+
+```typescript
+const apps = await client.getAppList({
+  page: 1,
+  page_size: 20,
+  status: ["running"],
+});
+```
+
+---
+
+## getAppInfo
+
+`GET /apps/{app_id}`
+
+Returns detailed information about a specific app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `string` | Yes | App identifier |
+
+**Returns:** `AppInfo` — version-aware app details.
+
+---
+
+## getAppCvms
+
+`GET /apps/{app_id}/cvms`
+
+Returns the list of CVMs associated with an app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `string` | Yes | App identifier |
+
+**Returns:** Array of CVM objects.
+
+---
+
+## getAppRevisions
+
+`GET /apps/{app_id}/revisions`
+
+Returns the revision history for an app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `string` | Yes | App identifier |
+
+**Returns:** Array of app revisions.
+
+---
+
+## getAppRevisionDetail
+
+`GET /apps/{app_id}/revisions/{revision_id}`
+
+Returns details about a specific app revision.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `string` | Yes | App identifier |
+| `revision_id` | `string` | Yes | Revision identifier |
+
+**Returns:** `AppRevisionDetail` — revision details including compose file and configuration.
+
+---
+
+## getAppFilterOptions
+
+`GET /apps/filter-options`
+
+Returns the available filter values for app list queries.
+
+**Parameters:** None
+
+**Returns:** `AppFilterOptions` — available values for status, base_image, instance_type, kms_slug, etc.
+
+**Example:**
+
+```typescript
+const filters = await client.getAppFilterOptions();
+console.log("Available statuses:", filters.statuses);
+console.log("Available regions:", filters.regions);
+```

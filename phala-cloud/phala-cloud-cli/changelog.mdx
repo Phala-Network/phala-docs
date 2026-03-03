@@ -1,0 +1,114 @@
+---
+title: Changelog
+description: Release history for the Phala Cloud CLI
+---
+
+## [1.1.11](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.10...cli-v1.1.11) (2026-03-02)
+
+### fix
+
+* **cli:** error when body provided with GET/HEAD/OPTIONS ([abf6ab9](https://github.com/Phala-Network/phala-cloud/commit/abf6ab9fd8eeddc0e2465cf10ac536dcfd479a61))
+* **cli:** restore -i/--interactive flag for switch command ([b4786fa](https://github.com/Phala-Network/phala-cloud/commit/b4786fae5a2449b19e123905407c09e7c2b06239))
+
+## [1.1.10](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.9...cli-v1.1.10) (2026-02-25)
+
+### feat
+
+* **sdk+cli:** add SSH key and CVM runtime-config commands ([692321a](https://github.com/Phala-Network/phala-cloud/commit/692321a05bacdbc4da9bcfbc9b82ab8fcfc9d25a))
+* **cli:** improve SSH key commands ([565f36a](https://github.com/Phala-Network/phala-cloud/commit/565f36a90a1145bd68bd493d9b3857a15e24866f))
+
+### fix
+
+* **cli:** add --json output support to all ssh-keys commands ([6c93846](https://github.com/Phala-Network/phala-cloud/commit/6c938469d6bee77b36d34c70d5b5a5e8ff89c6ac))
+* **cli:** fix selectCvm() to use correct API response shape ([47f2c34](https://github.com/Phala-Network/phala-cloud/commit/47f2c346463fdc0ee3d2dcb07660817adad29a96))
+
+## [1.1.9](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.8...cli-v1.1.9) (2026-02-12)
+
+### feat
+
+* **cli:** add `phala whoami` command ([4fa9e30](https://github.com/Phala-Network/phala-cloud/commit/4fa9e3039f28e7e0bef55b55e476c5f84946a313))
+* **cli:** redesign `phala logs` as unified log command ([f3b8a5b](https://github.com/Phala-Network/phala-cloud/commit/f3b8a5b2e1e44c516971bc85fc67c93a7c6bde26))
+* **cli:** show workspace in whoami, add upgrade check to status ([5bac9cc](https://github.com/Phala-Network/phala-cloud/commit/5bac9cc2b46944c0541efd713214479233b8ea1f))
+
+### fix
+
+* **cli:** percent-encode query parameter values in `phala api` ([f407411](https://github.com/Phala-Network/phala-cloud/commit/f407411ebab2d5588118cab8939af84616e3ec2c))
+* **cli:** unify CVM ID handling across commands ([abff9bb](https://github.com/Phala-Network/phala-cloud/commit/abff9bb2e906a80a61607f7b324860763f348727))
+
+## [1.1.8](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.7...cli-v1.1.8) (2026-02-07)
+
+### feat
+
+* add 200KB size limit for compose file + pre-launch script ([fe45765](https://github.com/Phala-Network/phala-cloud/commit/fe4576593cc08c2576e4c91d1c2b6b68cb3b9601))
+* add filter flags to apps and cvms list commands ([3f5ac90](https://github.com/Phala-Network/phala-cloud/commit/3f5ac907a08155171d93ad487ba8b226f2682e97))
+
+### fix
+
+* wire --pre-launch-script flag to payload and fix combined size check ([cecca57](https://github.com/Phala-Network/phala-cloud/commit/cecca57279eafecaffe4bce207f77bb561067ed6))
+
+## [1.1.7](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.6...cli-v1.1.7) (2026-01-31)
+
+### feat
+
+* use workspace slug as profile name, add profiles command, update default API domain ([5c150a0](https://github.com/Phala-Network/phala-cloud/commit/5c150a024d575414e60d6ead26f19a1fc9eaad4a))
+
+## [1.1.6](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.5...cli-v1.1.6) (2026-01-31)
+
+### feat
+
+* **cli:** add `phala ps` command to list CVM containers ([4e218b1](https://github.com/Phala-Network/phala-cloud/commit/4e218b1f91b6b315422600ba037343fdf7d25ddc))
+* **cli:** add `phala switch` command for profile switching ([907f1fe](https://github.com/Phala-Network/phala-cloud/commit/907f1fe693d8ca90843726b118f371cefd6deb84))
+* **cli:** add phala apps command and align cvms ls output ([eb194b7](https://github.com/Phala-Network/phala-cloud/commit/eb194b74adb7433a15ee806715a2053c7ddeba3f))
+* **cli:** add phala instance-types command ([7cba272](https://github.com/Phala-Network/phala-cloud/commit/7cba272c4156d79f1ed8ecf7fce0ca0d38de9e8a))
+* **cli:** add phala logs command ([fa281ba](https://github.com/Phala-Network/phala-cloud/commit/fa281ba3705208f0d66ef1f6c776ba156204e8ab))
+* **cli:** migrate nodes list to workspace nodes API ([08e39e7](https://github.com/Phala-Network/phala-cloud/commit/08e39e7825bf72cd627c27ff4c91ab3056213be9))
+
+### fix
+
+* **cli:** fix boolean flag handling and visibility update race condition ([a9f94e1](https://github.com/Phala-Network/phala-cloud/commit/a9f94e1c177e675009ea503afe92a12514d903b1))
+* upgrade CLI to API version 2026-01-21 ([9a92b54](https://github.com/Phala-Network/phala-cloud/commit/9a92b54038daba79f9e54e6e6c42c37744031d5c))
+
+## [1.1.5](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.4...cli-v1.1.5) (2026-01-23)
+
+### feat
+
+* **cli:** add -d/--data and @file syntax for api command ([93d6bb3](https://github.com/Phala-Network/phala-cloud/commit/93d6bb3670283e92fd15f8ba676d615b96b20e98))
+* **cli:** add privacy settings to deploy command ([edf9b40](https://github.com/Phala-Network/phala-cloud/commit/edf9b407d154f696ca2521af2bbc1d01971f3cd3))
+* **cli:** simplify KMS option to --kms [phala|ethereum|eth|base] ([35d1fcd](https://github.com/Phala-Network/phala-cloud/commit/35d1fcd090c4dceaa8b502297a26d552b3ca4195))
+
+## [1.1.4](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.4-beta.1...cli-v1.1.4) (2026-01-19)
+
+### feat
+
+* **cli:** add link command to connect local directory to existing CVM ([9c33607](https://github.com/Phala-Network/phala-cloud/commit/9c33607e546ded7e373b3b80173fdeac07ad419e))
+* **cli:** add update check and self update ([714ea99](https://github.com/Phala-Network/phala-cloud/commit/714ea995c17992a43fe69dfd2069641238ef5861))
+* **cli:** add api command for raw HTTP requests ([eaaecec](https://github.com/Phala-Network/phala-cloud/commit/eaaecec8a38421b29f62b6e9eb908215b837f987))
+
+## [1.1.2](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.1...cli-v1.1.2) (2026-01-09)
+
+### fix
+
+* **cli:** Update environment variables when using onchain KMS ([3acbb61](https://github.com/Phala-Network/phala-cloud/commit/3acbb618ccc2b6e95fd134ceb7a8286fd27e7569))
+
+## [1.1.1](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.0...cli-v1.1.1) (2026-01-06)
+
+### feat
+
+* **cli:** add --interactive flag to logs commands ([4d7e7f4](https://github.com/Phala-Network/phala-cloud/commit/4d7e7f4889125fe8e6007447ff006ac3a830f53e))
+* **cli:** add logs and serial-logs commands for CVMs ([793de6b](https://github.com/Phala-Network/phala-cloud/commit/793de6b6c5e1545e270109228fbfc127c0692cf3))
+
+## [1.1.0](https://github.com/Phala-Network/phala-cloud/tree/cli-v1.1.0) (2025-12-22)
+
+Major release with CLI completion, phala.toml support, SSH commands, cp command, and link command.
+
+### feat
+
+* add CLI completion support ([37dc21b](https://github.com/Phala-Network/phala-cloud/commit/37dc21b14bb7377bbdefd35c9663bf0a74bda4ab))
+* added phala.toml support ([e02c130](https://github.com/Phala-Network/phala-cloud/commit/e02c1307790066f0de4e2d9913acb8ebb5ab6650))
+* **cli:** added command ssh ([89161d9](https://github.com/Phala-Network/phala-cloud/commit/89161d930321833abbb2f85fe2d93ae7619182f1))
+* **cli:** added cp command ([4d320c5](https://github.com/Phala-Network/phala-cloud/commit/4d320c5ed07541200aa2a21f16b340afb7f3df2d))
+* **cli:** add --json flag support to multiple commands ([1ea0c34](https://github.com/Phala-Network/phala-cloud/commit/1ea0c348bb5b7fb3d5db055a67dfb29b758fa4f3))
+* **cli:** add --wait flag to deploy command for CVM updates ([b11f739](https://github.com/Phala-Network/phala-cloud/commit/b11f73982391fa1c46beef4f968cd8ad02dacbc2))
+* **cli:** add stability classification to commands ([46635fe](https://github.com/Phala-Network/phala-cloud/commit/46635febba351ef8f34c75a8c74009d0677c031d))
+* **cli:** open browser & login workflow ([2b56074](https://github.com/Phala-Network/phala-cloud/commit/2b560742b9e6f9e1d3f1da173d3d05e6feac880e))
+* **cli:** support -e KEY=VALUE format for deploy command ([d152c12](https://github.com/Phala-Network/phala-cloud/commit/d152c12d63e5f168c6c70d7d56f1b5f8f3aa3e87))

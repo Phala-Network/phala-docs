@@ -1,0 +1,77 @@
+---
+title: addComposeHash
+description: Register a compose hash on-chain for CVM updates with on-chain KMS
+---
+
+## addComposeHash
+
+Registers a new compose hash on the AppAuth smart contract. This is required when updating a CVM that uses on-chain KMS (ETHEREUM/BASE) — the updated compose hash must be registered on-chain before the Phala Cloud API will accept the update.
+
+This function interacts directly with the blockchain (not the Phala Cloud API).
+
+**When to use:** Call this function when [`updateDockerCompose`](/phala-cloud/references/cloud-js-sdk/update-docker-compose), [`updateCvmEnvs`](/phala-cloud/references/cloud-js-sdk/update-cvm-envs), or [`updatePreLaunchScript`](/phala-cloud/references/cloud-js-sdk/cvm-configuration) returns `{ status: "precondition_required" }`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | `Chain` | Conditional | Viem chain config (required if no `walletClient`) |
+| `kmsContractAddress` | `Address` | Yes | KMS contract address (for lookup) |
+| `appId` | `Address` | Yes | App identifier (AppAuth contract address) |
+| `composeHash` | `string` | Yes | Compose hash to register |
+| `privateKey` | `Hex` | Conditional | Caller private key (provide this or `walletClient`) |
+| `walletClient` | `WalletClient` | Conditional | Custom wallet client (provide this or `privateKey`) |
+| `rpcUrl` | `string` | No | Custom RPC URL |
+| `publicClient` | `PublicClient` | No | Custom public client |
+| `skipPrerequisiteChecks` | `boolean` | No | Skip balance checks (default: `false`) |
+| `minBalance` | `string` | No | Minimum ETH balance (default: `"0.001"`) |
+| `timeout` | `number` | No | Transaction timeout in ms |
+| `retryOptions` | `object` | No | Retry configuration |
+
+**Callbacks:**
+
+| Callback | Description |
+|----------|-------------|
+| `onTransactionStateChange` | Called when transaction state changes |
+| `onTransactionSubmitted` | Called when transaction is submitted |
+| `onTransactionConfirmed` | Called when transaction is confirmed |
+
+**Returns:** `AddComposeHash`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `composeHash` | `string` | The registered compose hash |
+| `appId` | `string` | App identifier |
+| `appAuthAddress` | `string` | AppAuth contract address |
+| `transactionHash` | `string` | On-chain transaction hash |
+| `blockNumber` | `bigint?` | Block number |
+| `gasUsed` | `bigint?` | Gas consumed |
+
+**Example:**
+
+```typescript
+import { addComposeHash } from "@phala/cloud";
+
+// After updateDockerCompose returns precondition_required:
+const receipt = await addComposeHash({
+  chain: cvmInfo.kms_info.chain,
+  kmsContractAddress: cvmInfo.kms_info.kms_contract_address,
+  appId: cvmInfo.app_id as `0x${string}`,
+  composeHash: preconditionResult.compose_hash,
+  privateKey: "0xabc123...",
+});
+
+// Now retry the update with the transaction hash
+await client.updateDockerCompose({
+  id: "my-app",
+  docker_compose_file: newYaml,
+  compose_hash: preconditionResult.compose_hash,
+  transaction_hash: receipt.transactionHash,
+});
+```
+
+---
+
+## safeAddComposeHash
+
+Safe variant that returns a `SafeResult<AddComposeHash>` instead of throwing on errors.

@@ -1,0 +1,77 @@
+---
+title: Nodes & Instance Types
+description: Functions for querying available TEE nodes and instance type configurations
+---
+
+## getAvailableNodes
+
+`GET /teepods/available`
+
+Returns available TEE nodes with capacity information and KMS details.
+
+**Parameters:** None
+
+**Returns:** `AvailableNodes`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tier` | `string` | Workspace tier |
+| `capacity` | `object` | Max limits: `max_instances`, `max_vcpu`, `max_memory`, `max_disk` |
+| `nodes` | `array` | Available nodes with resource info |
+| `kms_list` | `array` | Available KMS instances |
+
+**Example:**
+
+```typescript
+const available = await client.getAvailableNodes();
+console.log(`Tier: ${available.tier}`);
+available.nodes.forEach(node => {
+  console.log(`Node ${node.id}: ${node.region}`);
+});
+```
+
+---
+
+## listAllInstanceTypeFamilies
+
+`GET /instance-types`
+
+Returns all instance type families and their configurations.
+
+**Parameters:** None
+
+**Returns:** `AllFamiliesResponse` — families with their instance types.
+
+**Example:**
+
+```typescript
+const families = await client.listAllInstanceTypeFamilies();
+families.forEach(family => {
+  console.log(`${family.name}:`);
+  family.instance_types.forEach(t => {
+    console.log(`  ${t.slug}: ${t.vcpu} vCPU, ${t.memory_mb}MB`);
+  });
+});
+```
+
+---
+
+## listFamilyInstanceTypes
+
+`GET /instance-types/{family}`
+
+Returns instance types for a specific family (e.g., `cpu`, `gpu`).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `family` | `string` | Yes | Family name (e.g., `"cpu"`, `"gpu"`) |
+
+**Returns:** `FamilyInstanceTypesResponse` — instance types in the family.
+
+**Example:**
+
+```typescript
+const cpuTypes = await client.listFamilyInstanceTypes({ family: "cpu" });
+```

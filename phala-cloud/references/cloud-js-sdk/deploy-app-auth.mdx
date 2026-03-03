@@ -1,0 +1,78 @@
+---
+title: deployAppAuth
+description: Deploy an AppAuth smart contract for on-chain KMS
+---
+
+## deployAppAuth
+
+Deploys an AppAuth smart contract on Ethereum or Base. This is required for on-chain KMS deployments — the contract acts as the access-control layer and generates the `app_id` used in [`commitCvmProvision`](/phala-cloud/references/cloud-js-sdk/commit-cvm-provision).
+
+This function interacts directly with the blockchain (not the Phala Cloud API).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | `Chain` | Conditional | Viem chain config (required if no `walletClient`) |
+| `kmsContractAddress` | `Address` | Yes | KMS factory contract address |
+| `privateKey` | `Hex` | Conditional | Deployer private key (provide this or `walletClient`) |
+| `walletClient` | `WalletClient` | Conditional | Custom wallet client (provide this or `privateKey`) |
+| `rpcUrl` | `string` | No | Custom RPC URL |
+| `publicClient` | `PublicClient` | No | Custom public client |
+| `deviceId` | `string` | No | Device ID for access control (default: 32 zero bytes) |
+| `composeHash` | `string` | No | App compose hash (default: 32 zero bytes) |
+| `allowAnyDevice` | `boolean` | No | Allow any device (default: `false`) |
+| `disableUpgrades` | `boolean` | No | Make contract immutable (default: `false`) |
+| `skipPrerequisiteChecks` | `boolean` | No | Skip balance/chain checks (default: `false`) |
+| `minBalance` | `string` | No | Minimum ETH balance required (default: `"0.001"`) |
+| `timeout` | `number` | No | Transaction timeout in ms |
+| `retryOptions` | `object` | No | Retry configuration |
+
+**Callbacks:**
+
+| Callback | Description |
+|----------|-------------|
+| `onTransactionStateChange` | Called when transaction state changes |
+| `onTransactionSubmitted` | Called when transaction is submitted to mempool |
+| `onTransactionConfirmed` | Called when transaction is confirmed on-chain |
+
+**Returns:** `DeployAppAuth`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `appId` | `string` | Generated app ID (use in `commitCvmProvision`) |
+| `appAuthAddress` | `string` | Deployed contract address |
+| `deployer` | `string` | Deployer wallet address |
+| `transactionHash` | `string` | Deployment transaction hash |
+| `blockNumber` | `bigint?` | Block number of confirmation |
+| `gasUsed` | `bigint?` | Gas consumed |
+
+**Example:**
+
+```typescript
+import { deployAppAuth } from "@phala/cloud";
+
+const result = await deployAppAuth({
+  chain: kmsInfo.chain,
+  kmsContractAddress: kmsInfo.kms_contract_address,
+  privateKey: "0xabc123...",
+  deviceId: provision.device_id,
+  composeHash: provision.compose_hash,
+  onTransactionSubmitted: (hash) => {
+    console.log(`Transaction submitted: ${hash}`);
+  },
+});
+
+console.log(`App ID: ${result.appId}`);
+console.log(`Contract: ${result.appAuthAddress}`);
+```
+
+<Warning>
+This function requires ETH on the target chain to pay for gas. The default minimum balance check is 0.001 ETH.
+</Warning>
+
+---
+
+## safeDeployAppAuth
+
+Safe variant that returns a `SafeResult<DeployAppAuth>` instead of throwing on errors.

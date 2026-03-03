@@ -1,0 +1,133 @@
+---
+title: CVM Lifecycle
+description: Functions for starting, stopping, restarting, and deleting CVMs
+---
+
+## startCvm
+
+`POST /cvms/{cvmId}/start`
+
+Starts a stopped CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `VMSchema` — updated CVM details.
+
+**Example:**
+
+```typescript
+const result = await client.startCvm({ id: "my-app" });
+console.log(result.status); // "starting"
+```
+
+---
+
+## stopCvm
+
+`POST /cvms/{cvmId}/stop`
+
+Force-stops a CVM immediately.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `VMSchema` — updated CVM details.
+
+---
+
+## shutdownCvm
+
+`POST /cvms/{cvmId}/shutdown`
+
+Gracefully shuts down a CVM, allowing containers to stop cleanly.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `VMSchema` — updated CVM details.
+
+---
+
+## restartCvm
+
+`POST /cvms/{cvmId}/restart`
+
+Restarts a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `force` | `boolean` | No | Force restart without graceful shutdown |
+
+**Returns:** `VMSchema` — updated CVM details.
+
+**Example:**
+
+```typescript
+await client.restartCvm({ id: "my-app", force: true });
+```
+
+---
+
+## deleteCvm
+
+`DELETE /cvms/{cvmId}`
+
+Permanently deletes a CVM and all its data.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+
+**Returns:** `void` (HTTP 204)
+
+<Warning>
+This action is irreversible. All data associated with the CVM will be permanently deleted.
+</Warning>
+
+**Example:**
+
+```typescript
+await client.deleteCvm({ id: "my-app" });
+```
+
+---
+
+## replicateCvm
+
+`POST /cvms/{cvmId}/replicate`
+
+Creates a copy of an existing CVM with a new name.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | Source CVM identifier |
+| `name` | `string` | No | Name for the replica |
+| `image` | `string` | No | OS image override |
+
+**Returns:** Replicated CVM details.
+
+**Example:**
+
+```typescript
+const replica = await client.replicateCvm({
+  id: "my-app",
+  name: "my-app-replica",
+});
+```

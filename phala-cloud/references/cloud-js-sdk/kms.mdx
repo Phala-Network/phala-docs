@@ -1,0 +1,92 @@
+---
+title: KMS
+description: Functions for querying Key Management Service instances and reserving app IDs
+---
+
+## getKmsInfo
+
+`GET /kms/{kms_id}`
+
+Returns details about a specific KMS instance.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kms_id` | `string` | Yes | KMS ID or slug |
+
+**Returns:** `KmsInfo`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | KMS identifier |
+| `slug` | `string` | URL-friendly name |
+| `version` | `string` | KMS version |
+| `url` | `string` | KMS endpoint URL |
+| `chain_id` | `number?` | Blockchain chain ID (on-chain KMS only) |
+| `kms_contract_address` | `string?` | Contract address (on-chain KMS only) |
+| `chain` | `Chain?` | Viem chain configuration (on-chain KMS only) |
+
+**Example:**
+
+```typescript
+const kms = await client.getKmsInfo({ kms_id: "phala" });
+console.log(kms.slug, kms.url);
+```
+
+---
+
+## getKmsList
+
+`GET /kms`
+
+Returns a paginated list of available KMS instances.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `page` | `number` | No | Page number |
+| `page_size` | `number` | No | Items per page |
+| `is_onchain` | `boolean` | No | Filter for on-chain KMS only |
+
+**Returns:** `GetKmsListResponse` — paginated list of `KmsInfo` objects.
+
+**Example:**
+
+```typescript
+// List all on-chain KMS instances
+const kmsList = await client.getKmsList({ is_onchain: true });
+kmsList.items.forEach(kms => {
+  console.log(kms.slug, kms.chain_id, kms.kms_contract_address);
+});
+```
+
+---
+
+## nextAppIds
+
+`GET /kms/phala/next_app_id`
+
+Reserves one or more app IDs from the centralized Phala KMS. Use these with the `nonce` and `app_id` parameters in `provisionCvm` for deterministic app ID assignment.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `counts` | `number` | No | Number of IDs to reserve (1-20, default: 1) |
+
+**Returns:** `NextAppIds`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `app_ids` | `array` | Array of `{ app_id, nonce }` pairs |
+
+**Example:**
+
+```typescript
+const reserved = await client.nextAppIds({ counts: 3 });
+reserved.app_ids.forEach(({ app_id, nonce }) => {
+  console.log(`Reserved: ${app_id} (nonce: ${nonce})`);
+});
+```
