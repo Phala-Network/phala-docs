@@ -254,10 +254,15 @@
                     "pages": [
                       "/phala-cloud/phala-cloud-cli/api",
                       "/phala-cloud/phala-cloud-cli/self",
-                      "/phala-cloud/phala-cloud-cli/config",
-                      "/phala-cloud/phala-cloud-cli/docker",
                       "/phala-cloud/phala-cloud-cli/simulator",
                       "/phala-cloud/phala-cloud-cli/completion"
+                    ]
+                  },
+                  {
+                    "group": "Deprecated",
+                    "pages": [
+                      "/phala-cloud/phala-cloud-cli/config",
+                      "/phala-cloud/phala-cloud-cli/docker"
                     ]
                   },
                   {
