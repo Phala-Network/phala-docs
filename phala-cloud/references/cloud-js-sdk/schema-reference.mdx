@@ -1,0 +1,376 @@
+---
+title: Schema Reference
+description: Zod schema definitions for Phala Cloud API responses — CVM info, user info, and pagination schemas across API versions.
+---
+
+The `@phala/cloud` SDK uses [Zod](https://zod.dev) schemas for runtime validation of all API responses. Schemas are versioned — each API version has its own set of schemas.
+
+## Schema Validation
+
+By default, every action validates the API response against the version-specific Zod schema. You can customize this:
+
+```typescript
+import { z } from "zod";
+
+// Default: uses built-in schema
+const user = await client.getCurrentUser();
+
+// Custom schema: validate with your own Zod schema
+const MySchema = z.object({ username: z.string() });
+const user = await client.getCurrentUser({ schema: MySchema });
+
+// No validation: returns raw response as unknown
+const raw = await client.getCurrentUser({ schema: false });
+```
+
+## Version `2026-01-21` (Current)
+
+### CurrentUserV20260121
+
+Three-layer user response with separate user, workspace, and credits objects.
+
+```typescript
+{
+  user: {
+    username: string;
+    email: string;
+    role: "admin" | "user";
+    avatar: string;
+    email_verified: boolean;
+    totp_enabled: boolean;
+    has_backup_codes: boolean;
+    flag_has_password: boolean;
+  };
+  workspace: {
+    id: string;
+    name: string;
+    slug: string | null;
+    tier: string;
+    role: string;
+    avatar?: string | null;
+  };
+  credits: {
+    balance: string | number;
+    granted_balance: string | number;
+    is_post_paid: boolean;
+    outstanding_amount: string | number | null;
+  };
+}
+```
+
+### CvmInfoV20260121
+
+Compact CVM info returned in list endpoints.
+
+```typescript
+{
+  id: string;                              // Hashed CVM ID
+  name: string;
+  app_id?: string | null;
+  vm_uuid?: string | null;
+  instance_id?: string | null;
+  resource: CvmResourceInfoV20260121;
+  node_info?: NodeRef | null;
+  os?: CvmOsInfoV20260121 | null;
+  kms_type?: "phala" | "ethereum" | "base" | "legacy" | null;
+  kms_info?: CvmKmsInfoV20260121 | null;
+  status: string;
+  progress?: CvmProgressInfoV20260121 | null;
+  compose_hash?: string | null;
+  gateway: CvmGatewayInfoV20260121;
+  services: Array<Record<string, any>>;
+  endpoints?: Array<{ app: string; instance: string }> | null;
+  public_logs?: boolean;
+  public_sysinfo?: boolean;
+  public_tcbinfo?: boolean;
+  gateway_enabled?: boolean;
+  secure_time?: boolean;
+  listed: boolean;
+  storage_fs?: string;
+  workspace?: WorkspaceRef | null;
+  creator?: UserRef | null;
+}
+```
+
+### CvmInfoDetailV20260121
+
+Extended CVM info with compose file (returned by single-CVM endpoints).
+
+```typescript
+CvmInfoV20260121 & {
+  compose_file?: Record<string, any> | string | null;
+}
+```
+
+### PaginatedCvmInfosV20260121
+
+Paginated list of CVMs.
+
+```typescript
+{
+  items: CvmInfoV20260121[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}
+```
+
+### Nested Objects
+
+#### CvmResourceInfoV20260121
+
+```typescript
+{
+  instance_type?: string | null;
+  vcpu?: number | null;
+  memory_in_gb?: number | null;
+  disk_in_gb?: number | null;
+  gpus?: number | null;
+  compute_billing_price?: string | null;
+  billing_period?: "skip" | "hourly" | "monthly" | null;
+}
+```
+
+#### CvmOsInfoV20260121
+
+```typescript
+{
+  name?: string | null;
+  version?: string | null;
+  is_dev?: boolean | null;
+  os_image_hash?: string | null;
+}
+```
+
+#### CvmKmsInfoV20260121
+
+```typescript
+{
+  chain_id?: number | null;
+  dstack_kms_address?: string | null;
+  dstack_app_address?: string | null;
+  deployer_address?: string | null;
+  rpc_endpoint?: string | null;
+  encrypted_env_pubkey?: string | null;
+}
+```
+
+#### CvmProgressInfoV20260121
+
+```typescript
+{
+  target?: string | null;
+  started_at?: string | null;
+  correlation_id?: string | null;
+}
+```
+
+#### CvmGatewayInfoV20260121
+
+```typescript
+{
+  base_domain?: string | null;
+  cname?: string | null;
+}
+```
+
+#### NodeRef
+
+```typescript
+{
+  object_type: "node";
+  id?: number | null;
+  name?: string | null;
+  region?: string | null;
+  device_id?: string | null;
+  ppid?: string | null;
+  status?: string | null;
+  version?: string | null;
+}
+```
+
+#### WorkspaceRef
+
+```typescript
+{
+  object_type: "workspace";
+  id: string;
+  name: string;
+  slug?: string | null;
+  avatar_url?: string | null;
+}
+```
+
+#### UserRef
+
+```typescript
+{
+  object_type: "user";
+  id?: string | null;
+  username?: string | null;
+  avatar_url?: string | null;
+}
+```
+
+## Version `2025-10-28` (Legacy)
+
+### CurrentUserV20251028
+
+Flat user response.
+
+```typescript
+{
+  username: string;
+  email: string;
+  credits: number;
+  granted_credits: number;
+  avatar: string;
+  team_name: string;
+  team_tier: string;
+}
+```
+
+### KmsInfoLegacy
+
+Legacy KMS information. Used in `CvmInfoV20251028` and `CvmDetailV20251028`.
+
+```typescript
+{
+  id: string;
+  slug: string | null;
+  url: string;
+  version: string;
+  chain_id: number | null;
+  kms_contract_address: string | null;  // Hex address
+  gateway_app_id: string | null;        // Hex
+}
+```
+
+### CvmInfoV20251028
+
+Legacy CVM info with nested `hosted` VM object.
+
+```typescript
+{
+  hosted: {
+    id: string;
+    name: string;
+    status: string;
+    uptime: string;
+    app_url: string | null;
+    app_id: string;
+    instance_id: string | null;
+    configuration?: any;
+    exited_at: string | null;
+    boot_progress: string | null;
+    boot_error: string | null;
+    shutdown_progress: string | null;
+    image_version: string | null;
+  };
+  name: string;
+  managed_user: { id: number; username: string } | null;
+  node: { id: number; name: string; region_identifier?: string | null } | null;
+  listed: boolean;
+  status: string;
+  in_progress: boolean;
+  dapp_dashboard_url: string | null;
+  syslog_endpoint: string | null;
+  allow_upgrade: boolean;
+  project_id: string | null;
+  project_type: string | null;
+  billing_period: string | null;
+  kms_info: KmsInfoLegacy | null;
+  vcpu: number | null;
+  memory: number | null;
+  disk_size: number | null;
+  gateway_domain: string | null;
+  public_urls: Array<{ app: string; instance: string }>;
+  machine_info?: { vcpu: number; memory: number; disk_size: number; gpu_count: number } | null;
+  updated_at?: string | null;
+}
+```
+
+### CvmDetailV20251028
+
+Legacy CVM detail for single-CVM endpoints.
+
+```typescript
+{
+  id: number;
+  name: string;
+  status: string;
+  in_progress: boolean;
+  teepod_id: number | null;
+  teepod?: { id: number; name: string; region_identifier?: string | null } | null;
+  app_id: string;
+  vm_uuid: string | null;
+  instance_id: string | null;
+  vcpu: number;
+  memory: number;
+  disk_size: number;
+  base_image: string | null;
+  encrypted_env_pubkey: string | null;
+  listed: boolean;
+  instance_type?: string | null;
+  public_sysinfo: boolean;
+  public_logs: boolean;
+  kms_info?: KmsInfoLegacy | null;
+  public_urls: Array<{ app: string; instance: string }>;
+  gateway_domain?: string | null;
+  machine_info?: { vcpu: number; memory: number; disk_size: number; gpu_count: number } | null;
+}
+```
+
+### PaginatedCvmInfosV20251028
+
+```typescript
+{
+  items: CvmInfoV20251028[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}
+```
+
+## Importing Schemas
+
+All Zod schemas are exported from `@phala/cloud`:
+
+```typescript
+import {
+  // v2026-01-21
+  CvmInfoV20260121Schema,
+  CvmInfoDetailV20260121Schema,
+  PaginatedCvmInfosV20260121Schema,
+  CurrentUserV20260121Schema,
+
+  // v2025-10-28
+  CvmInfoV20251028Schema,
+  CvmDetailV20251028Schema,
+  PaginatedCvmInfosV20251028Schema,
+  CurrentUserV20251028Schema,
+} from "@phala/cloud";
+```
+
+Use them for custom validation or to build derivative schemas:
+
+```typescript
+import { CvmInfoV20260121Schema } from "@phala/cloud";
+
+// Pick only the fields you need
+const MyCvmSchema = CvmInfoV20260121Schema.pick({
+  id: true,
+  name: true,
+  status: true,
+});
+
+const cvm = await client.getCvmInfo({ id: "cvm-abc123" }, { schema: MyCvmSchema });
+// cvm: { id: string; name: string; status: string }
+```
+
+## Related
+
+- [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) — how versions affect response types
+- [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling) — error schemas and handling

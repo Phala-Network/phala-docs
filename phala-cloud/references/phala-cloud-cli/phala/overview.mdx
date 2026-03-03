@@ -3,9 +3,36 @@ title: "CLI Reference"
 description: "Complete reference for all phala CLI commands."
 ---
 
-The Phala Cloud CLI (`phala`) is a command-line tool for deploying and managing Confidential Virtual Machines (CVMs) on Phala Cloud.
+The Phala Cloud CLI (`phala`) is a command-line tool for deploying and managing Confidential Virtual Machines (CVMs) on Phala Cloud. It is also available as the `pha` alias.
 
 For installation and quick start, see [Getting Started with the CLI](/phala-cloud/phala-cloud-cli/start-from-cloud-cli).
+
+## API Versioning
+
+The CLI communicates with the Phala Cloud API using header-based versioning. The current default API version is `2026-01-21`.
+
+The CLI sends an `X-Phala-Version` header with every request. This determines the response format returned by the server. See the [JS SDK API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) page for details on version differences.
+
+| Version | Status |
+|---------|--------|
+| `2026-01-21` | Default (current) |
+| `2025-10-28` | Legacy |
+
+## Profiles & Credentials
+
+The CLI supports multiple authentication profiles stored in `~/.phala-cloud/credentials.json`.
+
+Each profile stores:
+
+| Field | Description |
+|-------|-------------|
+| `token` | API key |
+| `api_prefix` | API base URL |
+| `workspace` | Linked workspace (name + slug) |
+| `user` | Linked user (username + email) |
+| `updated_at` | Last update timestamp |
+
+Use [`profiles`](/phala-cloud/references/phala-cloud-cli/phala/profiles) to list profiles and [`switch`](/phala-cloud/references/phala-cloud-cli/phala/switch) to change the active profile.
 
 ## Authentication
 
@@ -68,4 +95,17 @@ For installation and quick start, see [Getting Started with the CLI](/phala-clou
 ## Configuration
 
 - Project config: `phala.toml` in working directory (see [`deploy`](/phala-cloud/references/phala-cloud-cli/phala/deploy))
-- Credentials: `~/.phala-cloud/`
+- Credentials: `~/.phala-cloud/credentials.json` (schema version 1, supports multiple profiles)
+
+## Global Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output in JSON format for programmatic use |
+| `--api-token <token>` | Override the stored API key for this command |
+| `--profile <name>` | Use a specific auth profile |
+
+## Related
+
+- [Cloud JS SDK](/phala-cloud/references/cloud-js-sdk/overview) — programmatic access via JavaScript/TypeScript
+- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs

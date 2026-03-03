@@ -1,0 +1,287 @@
+---
+title: Error Handling
+description: Error classes, safe methods, and error formatting utilities in the Phala Cloud JS SDK.
+---
+
+The `@phala/cloud` SDK provides a structured error hierarchy and two error handling patterns: throwing (default) and safe (result-based).
+
+## Error Hierarchy
+
+All API errors extend `PhalaCloudError`:
+
+```
+PhalaCloudError (base)
+├── RequestError          — HTTP/network errors
+├── ValidationError       — 422 validation errors (Pydantic)
+├── AuthError             — 401/403 authentication errors
+├── BusinessError         — 400/409 business logic errors
+│   └── ResourceError     — Structured errors with ERR-xxxx codes
+├── ServerError           — 500+ server errors
+└── UnknownError          — Network issues, unexpected errors
+```
+
+## Catching Errors
+
+### Using `instanceof`
+
+```typescript
+import {
+  PhalaCloudError,
+  ValidationError,
+  AuthError,
+  BusinessError,
+  ResourceError,
+  ServerError,
+} from "@phala/cloud";
+
+try {
+  await client.provisionCvm(payload);
+} catch (error) {
+  if (error instanceof ResourceError) {
+    // Structured error with error code
+    console.error(`Error [${error.errorCode}]: ${error.message}`);
+    error.suggestions?.forEach((s) => console.log("Suggestion:", s));
+  } else if (error instanceof ValidationError) {
+    // Field-level validation errors
+    error.validationErrors.forEach((e) => {
+      console.error(`${e.field}: ${e.message}`);
+    });
+  } else if (error instanceof AuthError) {
+    console.error("Authentication failed:", error.message);
+  } else if (error instanceof BusinessError) {
+    console.error("Business error:", error.message);
+  } else if (error instanceof ServerError) {
+    console.error("Server error:", error.message);
+  }
+}
+```
+
+### Using Discriminator Properties
+
+Each error class has a boolean discriminator property:
+
+```typescript
+try {
+  await client.provisionCvm(payload);
+} catch (error) {
+  if (error.isValidationError) {
+    // error is ValidationError
+  } else if (error.isAuthError) {
+    // error is AuthError
+  } else if (error.isResourceError) {
+    // error is ResourceError (extends BusinessError)
+  } else if (error.isBusinessError) {
+    // error is BusinessError
+  } else if (error.isServerError) {
+    // error is ServerError
+  } else if (error.isUnknownError) {
+    // error is UnknownError
+  }
+}
+```
+
+## Error Classes
+
+### PhalaCloudError
+
+Base class for all errors. Properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `message` | `string` | Error message |
+| `status` | `number` | HTTP status code |
+| `statusText` | `string` | HTTP status text |
+| `detail` | `string \| Record<string, unknown> \| Array<{ msg: string }>` | Raw error detail from API |
+
+### ValidationError
+
+Thrown on HTTP 422. Contains parsed field-level validation errors from FastAPI/Pydantic.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isValidationError` | `true` | Discriminator |
+| `validationErrors` | `ValidationErrorItem[]` | Parsed validation errors |
+
+Each `ValidationErrorItem`:
+
+```typescript
+{
+  field: string;    // e.g., "name", "resources.memory"
+  message: string;  // e.g., "String should have at least 4 characters"
+  type: string;     // e.g., "string_too_short", "greater_than_equal"
+  context?: Record<string, unknown>;  // e.g., { min_length: 4 }
+}
+```
+
+### AuthError
+
+Thrown on HTTP 401 or 403.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isAuthError` | `true` | Discriminator |
+
+### BusinessError
+
+Thrown on HTTP 400, 409, and other 4xx errors.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isBusinessError` | `true` | Discriminator |
+
+### ResourceError
+
+Extends `BusinessError`. Thrown for structured errors with `ERR-xxxx` codes.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isResourceError` | `true` | Discriminator |
+| `errorCode` | `string` | Error code (e.g., `"ERR-01-001"`) |
+| `structuredDetails` | `StructuredErrorDetail[]` | Field-level details |
+| `suggestions` | `string[]` | Suggested fixes |
+| `links` | `ErrorLink[]` | Links to documentation |
+
+### ServerError
+
+Thrown on HTTP 500+.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isServerError` | `true` | Discriminator |
+
+### UnknownError
+
+Thrown for network issues or unexpected errors.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isUnknownError` | `true` | Discriminator |
+
+## Safe Methods
+
+Every action has a `safe` variant that returns `SafeResult` instead of throwing:
+
+```typescript
+const result = await client.safeProvisionCvm(payload);
+
+if (result.success) {
+  console.log("Created:", result.data);
+} else {
+  // result.error is PhalaCloudError
+  if (result.error instanceof ValidationError) {
+    result.error.validationErrors.forEach((e) => {
+      console.error(`${e.field}: ${e.message}`);
+    });
+  }
+}
+```
+
+All safe methods follow the naming convention `safe<ActionName>`:
+
+```typescript
+client.safeGetCurrentUser()
+client.safeGetCvmInfo({ id: "..." })
+client.safeProvisionCvm(payload)
+client.safeDeleteCvm({ id: "..." })
+// etc.
+```
+
+## Formatting Utilities
+
+### `formatValidationErrors(errors, options?)`
+
+Format validation errors for display:
+
+```typescript
+import { ValidationError, formatValidationErrors } from "@phala/cloud";
+
+if (error instanceof ValidationError) {
+  const formatted = formatValidationErrors(error.validationErrors, {
+    numbered: true,
+    indent: 2,
+    showFields: true,
+  });
+  console.error(formatted);
+}
+// Output:
+//   1. name: String should have at least 4 characters
+//   2. memory: Input should be greater than or equal to 1024
+```
+
+Options:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `numbered` | `boolean` | `true` | Number each error |
+| `indent` | `number` | `2` | Indent size in spaces |
+| `showFields` | `boolean` | `true` | Show field names |
+
+### `formatErrorMessage(error, options?)`
+
+Format any `PhalaCloudError` for display:
+
+```typescript
+import { PhalaCloudError, formatErrorMessage } from "@phala/cloud";
+
+if (error instanceof PhalaCloudError) {
+  console.error(formatErrorMessage(error));
+}
+```
+
+Options:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `showFields` | `boolean` | `true` | Show field names in validation errors |
+| `showType` | `boolean` | `false` | Include error class name |
+
+### `formatStructuredError(error, options?)`
+
+Format `ResourceError` with codes, details, suggestions, and links:
+
+```typescript
+import { ResourceError, formatStructuredError } from "@phala/cloud";
+
+if (error instanceof ResourceError) {
+  console.error(formatStructuredError(error));
+}
+// Output:
+// Error [ERR-01-001]: The requested instance type does not exist
+//
+// Details:
+//   - Instance type 'invalid' is not recognized
+//
+// Suggestions:
+//   - Use a valid instance type: tdx.small, tdx.medium, or tdx.large
+//
+// Learn more:
+//   - View available instance types: https://cloud.phala.com/instances
+```
+
+Options:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `showErrorCode` | `boolean` | `true` | Show error code in output |
+| `showSuggestions` | `boolean` | `true` | Show suggestions |
+| `showLinks` | `boolean` | `true` | Show documentation links |
+
+## Event-Based Error Handling
+
+Listen to errors globally via the client event system:
+
+```typescript
+const client = createClient({ apiKey: "your-api-key" });
+
+client.on("error", (error) => {
+  // Called for every API error, even when using safe methods
+  if (error instanceof AuthError) {
+    // Redirect to login
+  }
+});
+```
+
+## Related
+
+- [SDK Overview](/phala-cloud/references/cloud-js-sdk/overview) — getting started
+- [Error Codes Reference](/phala-cloud/references/error-codes) — full list of `ERR-xxxx` codes

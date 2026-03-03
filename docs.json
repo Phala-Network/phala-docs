@@ -363,6 +363,15 @@
                   "/phala-cloud/references/performance-report",
                   "/phala-cloud/references/error-codes",
                   {
+                    "group": "Cloud JS SDK",
+                    "pages": [
+                      "/phala-cloud/references/cloud-js-sdk/overview",
+                      "/phala-cloud/references/cloud-js-sdk/api-versioning",
+                      "/phala-cloud/references/cloud-js-sdk/schema-reference",
+                      "/phala-cloud/references/cloud-js-sdk/error-handling"
+                    ]
+                  },
+                  {
                     "group": "Phala Cloud API",
                     "pages": [
                       "/phala-cloud/phala-cloud-api/overview",
