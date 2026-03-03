@@ -77,10 +77,30 @@ You can override the API version via:
 |---------|-------------|
 | [`api`](/phala-cloud/phala-cloud-cli/api) | Make authenticated API requests |
 | [`self`](/phala-cloud/phala-cloud-cli/self) | CLI self-management (update) |
-| [`config`](/phala-cloud/phala-cloud-cli/config) | Manage local CLI configuration |
-| [`docker`](/phala-cloud/phala-cloud-cli/docker) | Docker image build/push helpers |
 | [`simulator`](/phala-cloud/phala-cloud-cli/simulator) | Local TEE simulator for development |
 | [`completion`](/phala-cloud/phala-cloud-cli/completion) | Generate shell completion scripts |
+
+## Deprecated
+
+These commands are deprecated and will be removed in a future release.
+
+| Command | Use instead |
+|---------|-------------|
+| `auth` | [`login`](/phala-cloud/phala-cloud-cli/login), [`logout`](/phala-cloud/phala-cloud-cli/logout), [`status`](/phala-cloud/phala-cloud-cli/status) |
+| [`config`](/phala-cloud/phala-cloud-cli/config) | Profile-based credentials (`~/.phala-cloud/credentials.json`) |
+| [`docker`](/phala-cloud/phala-cloud-cli/docker) | Standard `docker` CLI for build/push |
+| `cvms create` | [`deploy`](/phala-cloud/phala-cloud-cli/deploy) |
+| `cvms upgrade` | [`deploy --cvm-id <id>`](/phala-cloud/phala-cloud-cli/deploy) |
+| `cvms logs` | [`logs`](/phala-cloud/phala-cloud-cli/logs) |
+| `cvms serial-logs` | [`logs --serial`](/phala-cloud/phala-cloud-cli/logs) |
+
+Deprecated `deploy` options:
+
+| Option | Use instead |
+|--------|-------------|
+| `--vcpu`, `--memory` | `--instance-type` |
+| `--env-file` | `-e` |
+| `--kms-id`, `--uuid` | `--custom-app-id` |
 
 ## Profiles & Credentials
 
