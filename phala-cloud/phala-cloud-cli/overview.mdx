@@ -28,10 +28,11 @@ The CLI sends an `X-Phala-Version` header with every request. This determines th
 | `2026-01-21` | Default (current) |
 | `2025-10-28` | Legacy |
 
-You can override the API version via:
+You can override the API version with the `--api-version` global flag *(added in v1.1.12)*:
 
-- The `--api-version` global flag: `phala cvms list --api-version 2025-10-28`
-- The `api_version` field in `phala.toml`
+```bash
+phala apps --api-version 2025-10-28
+```
 
 ## Authentication
 
@@ -137,7 +138,6 @@ Project-level configuration is in `phala.toml` in the working directory. Support
 |-------|------|-------------|
 | `id` / `uuid` / `app_id` / `instance_id` / `name` | `string` | CVM identifier (any format) |
 | `profile` | `string` | Auth profile to use for this project |
-| `api_version` | `string` | API version override (e.g., `"2025-10-28"`) |
 | `gateway_domain` | `string` | Custom gateway domain |
 | `gateway_port` | `number` | Custom gateway port |
 | `compose_file` | `string` | Path to Docker Compose file |
@@ -162,7 +162,7 @@ public_logs = true
 |------|-------------|
 | `--json` | Output in JSON format for programmatic use |
 | `--api-token <token>` | Override the stored API key for this command |
-| `--api-version <version>` | Override the API version (e.g., `2025-10-28`, `2026-01-21`) |
+| `--api-version <version>` | Override the API version (e.g., `2025-10-28`, `2026-01-21`). *Added in v1.1.12* |
 
 ## Related
 
