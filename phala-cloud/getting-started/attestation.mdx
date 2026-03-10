@@ -3,37 +3,32 @@ title: Get Attestation and Verifying
 description: This guide walks you through how to get an attestation and verify it, step by step.
 ---
 
-
 ## Introduction
 
-Remote Attestation (RA) is a critical security mechanism in Trusted Execution Environments (TEEs) like Intel TDX. It allows a remote verifier to confirm that an application is running inside a genuine, secure TEE with the expected configuration and code. This guide explains the key fields in TEE attestation reports, with a specific focus on Intel TDX attestation as used by Phala Cloud.
+Remote Attestation (RA) is a critical security mechanism in Trusted Execution Environments (TEEs) like Intel TDX. It allows a remote verifier to confirm that an application is running inside a genuine, secure TEE with the expected configuration and code. This guide explains how to access and verify TEE attestation reports in Phala Cloud.
 
-Let’s get into it!
+### How to Get the Attestation Report
 
-### How to get Attestation Report
-
-You can get full attestation report at the **CVM Dashboard→Attestation** page.
+Navigate to **Attestations** in your CVM's sidebar to view the full Remote Attestation report.
 
 <Frame caption="Attestation Report">
-    <img src="/images/getting-started/attestation-01.png" alt="Phala Cloud dashboard attestation tab showing TEE proof and remote attestation report" />
+    <img src="/images/getting-started/attestation-01.png" alt="Phala Cloud attestation page showing TEE proof and remote attestation report" />
 </Frame>
 
+## How to Verify Attestation
 
-## How to verify attestation?
-
-Scroll down and click the button of `Check Attestation` in section of `Certificate Chain → App Cert`.
+Scroll down to the **Certificate Chain** section and click the **Check Attestation** button next to **App Cert**.
 
 <Frame caption="Check Attestation">
     <img src="/images/getting-started/attestation-02.png" alt="Certificate chain section with Check Attestation button highlighted for App Cert verification" />
 </Frame>
 
-It will navigate to **TEE Attestation Explorer** to get the verification report of the attestation.
+This opens the [TEE Attestation Explorer](https://proof.t16z.com/) where you can verify the attestation quote. You can share this quote with anyone as proof that your application is running inside a genuine TEE.
 
 <Frame caption="Attestation Verification Report">
     <img src="/images/getting-started/attestation-03.png" alt="TEE Attestation Explorer showing verified attestation status with detailed verification report" />
 </Frame>
 
-This attestation verification report confirms that the attestation is **VERIFIED**. All relevant details are displayed in the image above.
+You can also request customized Remote Attestation reports programmatically via API: [Generate Remote Attestation](/phala-cloud/attestation/get-attestation).
 
-Check more instructions [here](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md) on how Dstack attestation work.
-
+Check more details on [how Dstack attestation works](https://github.com/Dstack-TEE/dstack/blob/master/attestation.md).
