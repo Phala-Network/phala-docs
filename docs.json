@@ -931,7 +931,7 @@
       "source": "/cloud/getting-started/start-from-scratch"
     },
     {
-      "destination": "/phala-cloud/getting-started/explore-templates/start-from-template",
+      "destination": "/phala-cloud/getting-started/explore-templates/overview",
       "source": "/cloud/getting-started/start-from-template"
     },
     {
@@ -1251,7 +1251,7 @@
       "source": "/phala-cloud/getting-started/start-from-cloud-cli"
     },
     {
-      "destination": "/phala-cloud/getting-started/explore-templates/launch-an-eliza-agent",
+      "destination": "/phala-cloud/getting-started/explore-templates/overview",
       "source": "/phala-cloud/launch-an-eliza-agent"
     },
     {
