@@ -202,7 +202,12 @@ def main():
             if destination:
                 redirected_links.append((normalized_link, destination))
             else:
-                uncovered_links.append(normalized_link)
+                # Check if the .mdx file exists on disk (page exists but not in nav)
+                mdx_path = Path(f"{normalized_link}.mdx")
+                if mdx_path.exists():
+                    accessible_links_list.append(normalized_link)
+                else:
+                    uncovered_links.append(normalized_link)
 
     # Report results
     print(f"\n🔗 ACCESSIBLE LINKS ({len(accessible_links_list)}):")
