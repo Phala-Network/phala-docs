@@ -410,6 +410,7 @@
                   "/phala-cloud/references/overview",
                   "/phala-cloud/references/performance-report",
                   "/phala-cloud/references/error-codes",
+                  "/phala-cloud/references/webhooks",
                   {
                     "group": "Cloud JS SDK",
                     "pages": [

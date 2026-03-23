@@ -1,0 +1,162 @@
+---
+title: Webhooks
+description: Receive real-time HTTP notifications for CVM lifecycle events
+---
+
+Phala Cloud sends HTTP POST requests to your endpoint when events occur in your workspace — CVM deployments, updates, stops, deletes, and multisig approval requests.
+
+Each request includes an HMAC-SHA256 signature for verification.
+
+## Supported Events
+
+| Event | When |
+|-------|------|
+| `cvm.created` | CVM first deployment completed, now running |
+| `cvm.started` | Existing CVM started (after stop) |
+| `cvm.create_failed` | CVM deployment failed (boot error, timeout) |
+| `cvm.restarted` | CVM restart completed |
+| `cvm.updated` | CVM compose update completed, now running |
+| `cvm.stopped` | CVM stopped or shut down |
+| `cvm.deleted` | CVM deleted |
+| `cvm.update.pending_approval` | On-chain KMS update requires multisig approval |
+
+## Payload Format
+
+```json
+{
+  "id": "evt_a1b2c3d4e5f67890",
+  "event": "cvm.created",
+  "version": "1",
+  "created_at": "2026-03-19T10:30:00Z",
+  "workspace": {
+    "id": "my-team-slug",
+    "name": "My Team"
+  },
+  "data": {
+    "cvm_id": "1a09d706-2686-4e0a-8b1d-323ff0e3504b",
+    "cvm_name": "my-app",
+    "app_id": "0xabc...",
+    "status": "running"
+  }
+}
+```
+
+For failure events, `data` includes an `error` field:
+
+```json
+{
+  "data": {
+    "cvm_id": "...",
+    "cvm_name": "my-app",
+    "app_id": "0xabc...",
+    "status": "error",
+    "error": "CVM 82: Failed to request app keys: ..."
+  }
+}
+```
+
+## HTTP Headers
+
+| Header | Example |
+|--------|---------|
+| `Content-Type` | `application/json` |
+| `User-Agent` | `PhalaCloud-Webhook/1.0` |
+| `X-Webhook-Id` | `evt_a1b2c3d4e5f67890` |
+| `X-Webhook-Event` | `cvm.created` |
+| `X-Webhook-Timestamp` | `1679012345` |
+| `X-Webhook-Signature` | `sha256=a1b2c3...` |
+
+## Verifying Signatures
+
+Each webhook has a signing secret (starts with `whsec_`). Use it to verify requests are authentic and untampered.
+
+The signature is: `sha256=HMAC-SHA256(secret, "{timestamp}.{raw_body}")`
+
+<CodeGroup>
+```python Python
+import hmac
+import hashlib
+
+def verify_webhook(secret: str, timestamp: str, body: bytes, signature: str) -> bool:
+    message = f"{timestamp}.{body.decode('utf-8')}".encode("utf-8")
+    expected = "sha256=" + hmac.new(
+        secret.encode("utf-8"), message, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+```
+
+```javascript Node.js
+const crypto = require("crypto");
+
+function verifyWebhook(secret, timestamp, body, signature) {
+  const message = `${timestamp}.${body}`;
+  const expected = "sha256=" +
+    crypto.createHmac("sha256", secret).update(message).digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+```
+</CodeGroup>
+
+**Replay protection:** reject events where `X-Webhook-Timestamp` is older than 5 minutes.
+
+## Delivery Behavior
+
+| Aspect | Behavior |
+|--------|----------|
+| **Success** | HTTP `2xx` (`200`, `201`, `202`, etc.) |
+| **Failure** | Any non-`2xx` status, network error, or timeout |
+| **Redirects** | Not followed (`3xx` = failure) |
+| **Timeout** | 10 seconds |
+| **Retries** | Up to 3 retries: 1 min → 10 min → 1 hour |
+| **Total attempts** | 4 (1 initial + 3 retries) |
+| **Recording** | One delivery record per event (final result only) |
+
+## Managing Webhooks
+
+### Dashboard
+
+**Settings → Webhooks** in your workspace:
+
+- Create, edit, enable/disable, delete webhooks
+- Select subscribed events
+- Send test events
+- View delivery history with stats (success rate, response time)
+- Resend failed deliveries
+
+### API
+
+```bash
+# Create
+POST /api/v1/workspace/webhooks
+{"url": "https://example.com/webhook", "events": ["cvm.created", "cvm.stopped"], "name": "My Hook"}
+
+# List
+GET /api/v1/workspace/webhooks
+
+# Update
+PUT /api/v1/workspace/webhooks/{id}
+{"enabled": false}
+
+# Delete
+DELETE /api/v1/workspace/webhooks/{id}
+
+# Test
+POST /api/v1/workspace/webhooks/{id}/test
+
+# Deliveries
+GET /api/v1/workspace/webhooks/{id}/deliveries
+
+# Stats
+GET /api/v1/workspace/webhooks/{id}/stats
+
+# Resend
+POST /api/v1/workspace/webhooks/{id}/deliveries/{event_id}/resend
+```
+
+## Best Practices
+
+1. **Verify signatures** — always check `X-Webhook-Signature` before processing
+2. **Respond fast** — return `200` immediately, process asynchronously (10s timeout)
+3. **Be idempotent** — use `id` field to deduplicate in case of retries
+4. **Check timestamps** — reject events older than 5 minutes
+5. **Use HTTPS** — always use HTTPS for webhook URLs
