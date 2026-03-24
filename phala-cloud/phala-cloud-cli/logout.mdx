@@ -1,29 +1,34 @@
 ---
-title: "phala logout"
-description: "Remove stored API key from the current profile."
+title: "logout"
+description: "Remove stored API key"
 ---
 
-## Usage
+## Command: `phala logout`
 
-```bash
+### Syntax
+
+```
 phala logout
 ```
 
-## Examples
+### Description
 
-### Log out from current profile
+Remove stored API key
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Display help:
 
 ```bash
-$ phala logout
-✓ Logged out successfully
-```
-
-### Verify logout
-
-```bash
-$ phala logout
-✓ Logged out successfully
-
-$ phala status
-✗ Not authenticated. Run 'phala login' to authenticate.
+phala logout --help
 ```

@@ -1,23 +1,19 @@
 ---
-title: "config (Deprecated)"
-description: "Manage local CLI state"
+title: "envs"
+description: "Encrypt and update CVM sealed environment variables"
 ---
 
-<Warning>
-This command is deprecated. See the newer alternatives.
-</Warning>
-
-## Command: `phala config`
+## Command: `phala envs`
 
 ### Syntax
 
 ```
-phala config <command> [options]
+phala envs <command> [options]
 ```
 
 ### Description
 
-Manage local CLI state
+Encrypt and update CVM sealed environment variables
 
 ### Global Options
 
@@ -33,14 +29,13 @@ Manage local CLI state
 
 | Command | Description |
 | ------- | ----------- |
-| `get` | Get a configuration value |
-| `list` | (ls)         List config values |
-| `set` | Set a configuration value |
+| `encrypt` | Encrypt environment variables for a CVM (sealed, only readable inside TEE) |
+| `update` | Encrypt and push sealed environment variables to a CVM (only readable inside TEE) |
 
 ### Examples
 
 * Display help:
 
 ```bash
-phala config --help
+phala envs --help
 ```

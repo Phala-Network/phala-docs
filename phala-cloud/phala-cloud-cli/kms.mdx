@@ -1,23 +1,23 @@
 ---
-title: "config (Deprecated)"
-description: "Manage local CLI state"
+title: "kms"
+description: "Manage on-chain KMS contracts"
 ---
 
-<Warning>
-This command is deprecated. See the newer alternatives.
-</Warning>
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
 
-## Command: `phala config`
+## Command: `phala kms`
 
 ### Syntax
 
 ```
-phala config <command> [options]
+phala kms <command> [options]
 ```
 
 ### Description
 
-Manage local CLI state
+Manage on-chain KMS contracts
 
 ### Global Options
 
@@ -33,14 +33,14 @@ Manage local CLI state
 
 | Command | Description |
 | ------- | ----------- |
-| `get` | Get a configuration value |
-| `list` | (ls)         List config values |
-| `set` | Set a configuration value |
+| `list` | (ls)         List on-chain KMS contracts |
+| `ethereum` | Show on-chain KMS details for ethereum |
+| `base` | Show on-chain KMS details for base |
 
 ### Examples
 
 * Display help:
 
 ```bash
-phala config --help
+phala kms --help
 ```

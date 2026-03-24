@@ -1,72 +1,93 @@
 ---
-title: "phala cp"
-description: "Copy files to/from a CVM via SCP through the Phala Cloud gateway."
+title: "cp"
+description: "Copy files to/from a CVM via SCP"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala cp`
+
+### Syntax
 
 ```
-phala cp <source> <destination> [options]
+phala cp [options] <source> <destination>
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `source` | Yes | Source path (local or `cvm-name:path`, use `:path` for linked CVM) |
-| `destination` | Yes | Destination path (same format as source) |
+Copy files to/from a CVM via SCP
 
-## Options
+### Arguments
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--identity <file>` | `-i` | | SSH identity file |
-| `--port <port>` | `-p` | 443 | SSH port (priority: CLI > phala.toml > 443) |
-| `--gateway <domain>` | `-g` | | Gateway domain (priority: CLI > phala.toml > API) |
-| `--recursive` | `-r` | false | Copy directories recursively |
-| `--verbose` | `-v` | false | Verbose SCP details |
-| `--dry-run` | | false | Print SCP command without executing |
+| Argument | Description |
+| -------- | ----------- |
+| `<source>` | Source path (local or cvm-name:path, use :path for phala.toml cvm_id) |
+| `<destination>` | Destination path (local or cvm-name:path, use :path for phala.toml cvm_id) |
 
-## Path Format
+### Options
 
-- **Local path**: `./config.yml`, `/tmp/script.sh`
-- **Linked CVM**: `:~/config.yml` (uses `cvm_id` from `phala.toml`)
-- **Named CVM**: `my-app:~/logs/`, `app_abc123:/tmp/script.sh`
+| Option | Description |
+| ------ | ----------- |
+| `-i, --identity <value>` | SSH identity file (private key) |
+| `-p, --port <value>` | SSH port (priority: CLI > phala.toml > 443) |
+| `-g, --gateway <value>` | Gateway domain (priority: CLI > phala.toml > API) |
+| `-r, --recursive` | Recursively copy directories |
+| `-v, --verbose` | Show verbose SCP details |
+| `--dry-run` | Print SCP command without executing |
 
-## Examples
+### Global Options
 
-Upload file to linked CVM:
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `--version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-```
-$ phala cp ./config.yml :~/config.yml
-```
+### Examples
 
-Download directory from named CVM:
+* Upload from phala.toml
 
-```
-$ phala cp my-app:~/logs/ ./logs/ -r
-```
-
-Upload to specific CVM by ID:
-
-```
-$ phala cp ./script.sh app_abc123:/tmp/script.sh
+```bash
+phala cp ./local.txt :/root/remote.txt
 ```
 
-Print SCP command without executing:
+* Upload to CVM
 
-```
-$ phala cp --dry-run ./file.txt :~/file.txt
-```
-
-Copy with custom SSH identity:
-
-```
-$ phala cp -i ~/.ssh/custom_key ./data.json :~/data.json
+```bash
+phala cp ./local.txt app_123:/root/remote.txt
 ```
 
-Copy with verbose output:
+* Download from CVM
 
+```bash
+phala cp app_123:/root/remote.txt ./local.txt
 ```
-$ phala cp -v -r ./dist/ my-app:/app/dist/
+
+* Offline mode
+
+```bash
+phala cp -g dstack-pha-prod7.phala.network -p 16185 ./file.txt app_123:/root/
 ```
+
+* Upload directory recursively
+
+```bash
+phala cp -r ./local_dir app_123:/root/remote_dir
+```
+
+* Copy with custom SSH key
+
+```bash
+phala cp -i ~/.ssh/custom_key app_123:/root/file.txt ./file.txt
+```
+
+* Print the SCP command without executing
+
+```bash
+phala cp ./local.txt app_123:/root/remote.txt --dry-run
+```
+

@@ -1,23 +1,23 @@
 ---
-title: "config (Deprecated)"
-description: "Manage local CLI state"
+title: "auth (Deprecated)"
+description: "Authenticate with Phala Cloud"
 ---
 
 <Warning>
-This command is deprecated. See the newer alternatives.
+This command is deprecated. Use `phala login`, `phala logout`, and `phala status` instead.
 </Warning>
 
-## Command: `phala config`
+## Command: `phala auth`
 
 ### Syntax
 
 ```
-phala config <command> [options]
+phala auth <command> [options]
 ```
 
 ### Description
 
-Manage local CLI state
+Authenticate with Phala Cloud
 
 ### Global Options
 
@@ -29,18 +29,18 @@ Manage local CLI state
 | `-j, --json, --no-json` | Output in JSON format |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### Subcommands
+### Deprecated Subcommands
 
 | Command | Description |
 | ------- | ----------- |
-| `get` | Get a configuration value |
-| `list` | (ls)         List config values |
-| `set` | Set a configuration value |
+| `login` | Authenticate with Phala Cloud (use 'phala login' instead) |
+| `logout` | Remove stored API key (use 'phala logout' instead) |
+| `status` | Check auth status (use 'phala status' instead) |
 
 ### Examples
 
 * Display help:
 
 ```bash
-phala config --help
+phala auth --help
 ```

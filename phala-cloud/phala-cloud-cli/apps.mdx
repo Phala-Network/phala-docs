@@ -1,126 +1,78 @@
 ---
-title: "phala apps"
-description: "List deployed CVMs (Confidential Virtual Machines)."
+title: "apps"
+description: "List dstack apps"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
 
-```bash
+## Command: `phala apps`
+
+### Syntax
+
+```
 phala apps [options]
 ```
 
-## Options
+### Description
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--page <number>` | 1 | Page number for pagination |
-| `--page-size <number>` | 50 | Number of items per page (max: 100) |
-| `--search <query>` | | Search by name, app_id, vm_uuid, or instance_id |
-| `--status <status>` | | Filter by CVM status (repeatable) |
-| `--listed` | | Filter to only listed CVMs |
-| `--no-listed` | | Filter to only unlisted CVMs |
-| `--base-image <name>` | | Filter by base OS image name |
-| `--instance-type <type>` | | Filter by instance type |
-| `--kms-type <type>` | | Filter by KMS type (phala, ethereum, base) |
-| `--node <name>` | | Filter by node name |
-| `--region <region>` | | Filter by region |
-| `-j, --json` | false | Output in JSON format |
+List dstack apps
 
-## CVM Status Values
+### Options
 
-Common status values for filtering:
+| Option | Description |
+| ------ | ----------- |
+| `--page <value>` | Page number (1-based) |
+| `--page-size <value>` | Number of items per page |
+| `--search <value>` | Search by name, app_id, vm_uuid, or instance_id |
+| `--status <value>` | Filter by CVM status (can be specified multiple times) |
+| `--listed, --no-listed` | Filter by listed status |
+| `--base-image <value>` | Filter by base image name |
+| `--instance-type <value>` | Filter by instance type |
+| `--kms-type <value>` | Filter by KMS type |
+| `--node <value>` | Filter by node name |
+| `--region <value>` | Filter by region identifier |
 
-- `pending` - CVM is being created
-- `starting` - CVM is starting up
-- `running` - CVM is running normally
-- `stopped` - CVM has been stopped
-- `error` - CVM encountered an error
-- `terminated` - CVM has been terminated
+### Global Options
 
-## Examples
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### List all CVMs
+### Examples
 
-```bash
-$ phala apps
-CVMs (3 total):
-
-  app_abc123  my-production-app   running   tdx.medium  us-west
-  app_def456  staging-api         running   tdx.small   us-east
-  app_ghi789  test-app            stopped   tdx.small   eu-central
-```
-
-### Search by name
+* List apps
 
 ```bash
-$ phala apps --search production
-CVMs (1 total):
-
-  app_abc123  my-production-app   running   tdx.medium  us-west
+phala apps
 ```
 
-### Filter by status
+* Second page
 
 ```bash
-$ phala apps --status running
-CVMs (2 total):
-
-  app_abc123  my-production-app   running   tdx.medium  us-west
-  app_def456  staging-api         running   tdx.small   us-east
+phala apps --page 2
 ```
 
-### Filter by multiple statuses
+* Search by name
 
 ```bash
-$ phala apps --status running --status starting
+phala apps --search my-app
 ```
 
-### Filter by instance type
+* Filter by status
 
 ```bash
-$ phala apps --instance-type tdx.medium
+phala apps --status running
 ```
 
-### Filter by region
+* Output as JSON
 
 ```bash
-$ phala apps --region us-west
+phala apps --json
 ```
 
-### JSON output
-
-```bash
-$ phala apps --json
-{
-  "apps": [
-    {
-      "app_id": "app_abc123",
-      "name": "my-production-app",
-      "status": "running",
-      "instance_type": "tdx.medium",
-      "region": "us-west",
-      "vcpu": 4,
-      "memory_gb": 8,
-      "created_at": "2026-01-15T10:30:00Z",
-      "url": "https://app_abc123.phala.cloud"
-    }
-  ],
-  "total": 3,
-  "page": 1,
-  "page_size": 50
-}
-```
-
-### Pagination
-
-```bash
-$ phala apps --page 2 --page-size 10
-```
-
-### Combine multiple filters
-
-```bash
-$ phala apps --status running \
-  --instance-type tdx.medium \
-  --region us-west
-```

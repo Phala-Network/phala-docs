@@ -1,220 +1,151 @@
 ---
-title: "phala deploy"
-description: "Deploy a new CVM or update an existing one."
+title: "deploy"
+description: "Deploy new CVM or update existing one"
 ---
 
-Creates a new CVM by default. If `--cvm-id` is provided or `phala.toml` contains a CVM ID, updates the existing CVM instead.
+## Command: `phala deploy`
 
-## Usage
+### Syntax
 
-```bash
+```
 phala deploy [options]
 ```
 
-## Basic Options
+### Description
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-n, --name <name>` | directory name | CVM name |
-| `-c, --compose <path>` | docker-compose.yml | Docker Compose file path |
-| `-t, --instance-type <type>` | auto-selected | Instance type (e.g., tdx.small, tdx.medium) |
-| `-r, --region <region>` | auto-selected | Preferred region (e.g., us-west, eu-central) |
-| `-e, --env <value>` | | Environment variable (KEY=VALUE) or path to .env file. Repeatable |
-| `--kms <type>` | phala | KMS type: phala, ethereum/eth, or base |
-| `--wait` | false | Wait for deployment/update to complete |
-| `--ssh-pubkey <path>` | ~/.ssh/id_rsa.pub | SSH public key path for access |
-| `--dev-os` | false | Use development OS image (requires SSH key) |
-| `--public-logs` | true | Make CVM logs publicly accessible |
-| `--no-public-logs` | | Disable public log access |
-| `--public-sysinfo` | true | Make CVM system info publicly accessible |
-| `--no-public-sysinfo` | | Disable public system info access |
-| `--listed` | false | List CVM on Phala Trust Center |
-| `--no-listed` | | Don't list CVM on Trust Center |
+Deploy new CVM or update existing one
 
-## Advanced Options
+### Options
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--cvm-id <id>` | | CVM ID for updating existing deployment |
-| `--disk-size <size>` | 20G | Disk size with unit (e.g., 50G, 100G) |
-| `--image <image>` | latest | OS image version |
-| `--node-id <id>` | | Deploy to specific node ID |
-| `--custom-app-id <id>` | | Use custom App ID (requires --nonce for PHALA KMS) |
-| `--nonce <nonce>` | | Nonce for deterministic app_id generation |
-| `--pre-launch-script <path>` | | Path to pre-launch script |
-| `--private-key <key>` | | Private key for on-chain KMS (ethereum/base) |
-| `--rpc-url <url>` | | RPC URL for blockchain interaction |
-| `--debug` | false | Enable debug logging |
+| Option | Description |
+| ------ | ----------- |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `-i, --interactive` | Enable interactive mode |
+| `-n, --name <value>` | CVM name (defaults to directory name) |
+| `-c, --compose <value>` | Path to Docker Compose file (default: docker-compose.yml) |
+| `-t, --instance-type <value>` | Instance type (e.g., tdx.small, auto-selected if omitted) |
+| `-r, --region <value>` | Preferred region (e.g., us-west, auto-selected if omitted) |
+| `-e, --env <value>` | Environment variable (KEY=VALUE) or env file path (repeatable) |
+| `--kms <value>` | KMS type: phala (default), ethereum/eth, or base |
+| `--wait` | Wait for deployment/update completion |
+| `--ssh-pubkey <value>` | SSH public key path (default: ~/.ssh/id_rsa.pub) |
+| `--dev-os, --no-dev-os` | Use dev OS image (requires SSH key) |
+| `--public-logs, --no-public-logs` | Make CVM logs publicly accessible (default: true) |
+| `--public-sysinfo, --no-public-sysinfo` | Make CVM system info publicly accessible (default: true) |
+| `--listed, --no-listed` | List CVM on the public Trust Center (default: false) |
 
-## Deprecated Options
+### Advanced Options
 
-The following options are deprecated and will be removed in future versions:
+| Option | Description |
+| ------ | ----------- |
+| `--debug` | Enable debug logging |
+| `--disk-size <value>` | Disk size with unit (e.g., 50G, default: 40GB) |
+| `--fs <value>` | Filesystem type (ext4 or zfs, default: zfs) |
+| `--image <value>` | OS image version (auto-selected if omitted) |
+| `--node-id <value>` | Node ID (auto-selected if omitted) |
+| `--custom-app-id <value>` | Custom App ID (requires --nonce for PHALA KMS) |
+| `--nonce <value>` | Nonce for deterministic app_id (requires --custom-app-id, PHALA KMS only) |
+| `--pre-launch-script <value>` | Path to pre-launch script |
+| `--private-key <value>` | Private key for signing transactions. |
+| `--rpc-url <value>` | RPC URL for the blockchain. |
 
-- `--vcpu <count>` - Use `--instance-type` instead
-- `--memory <size>` - Use `--instance-type` instead
-- `--env-file <path>` - Use `-e <path>` instead
-- `--kms-id <id>` - Use `--custom-app-id` instead
-- `--uuid <uuid>` - Use `--custom-app-id` instead
+### Deprecated Options
 
-## Examples
+| Option | Description |
+| ------ | ----------- |
+| `--uuid <value>` | [DEPRECATED] Use --cvm-id instead. CVM UUID. |
+| `--vcpu <value>` | Use --instance-type instead |
+| `--memory <value>` | Use --instance-type instead |
+| `--env-file <value>` | Use -e instead |
+| `--kms-id <value>` | Use --kms instead |
 
-### Simplest deployment (auto-select everything)
+### Global Options
 
-```bash
-$ phala deploy
-Analyzing docker-compose.yml...
-Selected instance type: tdx.small
-Selected region: us-west
-Deploying CVM...
-✓ CVM deployed successfully
-App ID: app_abc123
-URL: https://app_abc123.phala.cloud
-```
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### Specify instance type and region
+### Examples
 
-```bash
-$ phala deploy -t tdx.medium -r us-west
-```
-
-### Deploy with environment variables
+* Deploy new CVM
 
 ```bash
-$ phala deploy -e DATABASE_URL=postgres://... -e API_KEY=secret
+phala deploy
 ```
 
-### Deploy with .env file
+* Deploy with environment variables
 
 ```bash
-$ phala deploy -e .env
+phala deploy -e NODE_ENV=production -e DEBUG=true
 ```
 
-### Deploy and wait for completion
+* Deploy with env file
 
 ```bash
-$ phala deploy --wait
-Deploying CVM...
-Waiting for CVM to start...
-✓ CVM is running
-✓ All containers are healthy
+phala deploy -e .env
 ```
 
-### Update existing CVM
+* Deploy with specific instance type
 
 ```bash
-$ phala deploy --cvm-id app_abc123 --wait
-Updating CVM app_abc123...
-✓ CVM updated successfully
+phala deploy --instance-type tdx.medium
 ```
 
-### Deploy with custom name
+* Deploy to specific region
 
 ```bash
-$ phala deploy -n my-production-app
+phala deploy --region us-west
 ```
 
-### Deploy with larger disk
+* Deploy with Ethereum KMS
 
 ```bash
-$ phala deploy --disk-size 100G
+phala deploy --kms ethereum --private-key <key> --rpc-url <url>
 ```
 
-### Deploy with dev OS image and SSH access
+* Update existing CVM by ID
 
 ```bash
-$ phala deploy --dev-os --ssh-pubkey ~/.ssh/id_ed25519.pub
+phala deploy --cvm-id app_abc123
 ```
 
-### Deploy with Ethereum KMS
+* Update CVM with new compose file and env
 
 ```bash
-$ phala deploy --kms ethereum \
-  --private-key 0x1234... \
-  --rpc-url https://eth-mainnet.g.alchemy.com/v2/...
+phala deploy --cvm-id my-app --compose ./new-docker-compose.yml -e .env
 ```
 
-### Deploy with Base KMS
+* Update CVM and wait for completion
 
 ```bash
-$ phala deploy --kms base \
-  --private-key 0x1234... \
-  --rpc-url https://base-mainnet.g.alchemy.com/v2/...
+phala deploy --cvm-id app_abc123 --wait
 ```
 
-### Deploy with custom App ID
+* Update CVM from phala.toml
 
 ```bash
-$ phala deploy --custom-app-id app_custom123 --nonce 42
+phala deploy
 ```
 
-### Deploy to specific node
+* Deploy with logs and sysinfo disabled
 
 ```bash
-$ phala deploy --node-id node_xyz789
+phala deploy --no-public-logs --no-public-sysinfo
 ```
 
-### Deploy with pre-launch script
+* Deploy and list on Trust Center
 
 ```bash
-$ phala deploy --pre-launch-script ./setup.sh
+phala deploy --listed
 ```
 
-### Deploy unlisted CVM (private)
+* Update existing CVM to disable logs
 
 ```bash
-$ phala deploy --no-listed --no-public-logs --no-public-sysinfo
+phala deploy --cvm-id app_123 --no-public-logs
 ```
 
-## Error Codes
-
-Common deployment errors:
-
-| Code | Description | Solution |
-|------|-------------|----------|
-| ERR-1001 | Instance type not found | Check available types with `phala instance-types` |
-| ERR-1002 | No available resources match requirements | Try different instance type or region |
-| ERR-1003 | Insufficient CPU capacity | Reduce CPU requirements or try different region |
-| ERR-1004 | Insufficient memory | Reduce memory requirements or try different region |
-| ERR-2003 | OS image not available | Use `--image` to specify valid image version |
-| ERR-2005 | Node not accessible | Node may be offline, try different node or omit `--node-id` |
-
-## Instance Types
-
-Common instance types:
-
-- `tdx.small` - 2 vCPU, 4GB RAM
-- `tdx.medium` - 4 vCPU, 8GB RAM
-- `tdx.large` - 8 vCPU, 16GB RAM
-- `tdx.xlarge` - 16 vCPU, 32GB RAM
-
-See all types: [`phala instance-types`](/phala-cloud/phala-cloud-cli/instance-types)
-
-## KMS Types
-
-### Phala KMS (Default)
-
-Managed by Phala Cloud:
-
-```bash
-$ phala deploy --kms phala
-```
-
-### Ethereum KMS
-
-Use Ethereum wallet for key management:
-
-```bash
-$ phala deploy --kms ethereum \
-  --private-key 0x... \
-  --rpc-url https://eth-mainnet.g.alchemy.com/v2/...
-```
-
-### Base KMS
-
-Use Base network wallet:
-
-```bash
-$ phala deploy --kms base \
-  --private-key 0x... \
-  --rpc-url https://base-mainnet.g.alchemy.com/v2/...
-```

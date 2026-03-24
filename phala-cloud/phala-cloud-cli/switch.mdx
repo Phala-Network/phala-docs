@@ -1,61 +1,50 @@
 ---
-title: "phala switch"
-description: "Switch between authentication profiles."
+title: "switch"
+description: "Switch auth profiles"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
 
-```bash
-phala switch [profile-name]
+## Command: `phala switch`
+
+### Syntax
+
+```
+phala switch [options] <profile-name>
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `profile-name` | No | Name of the profile to switch to. If omitted, shows interactive picker |
+Switch auth profiles
 
-If no profile name is provided, shows an interactive picker.
+### Arguments
 
-## Examples
+| Argument | Description |
+| -------- | ----------- |
+| `<profile-name>` | Profile name |
 
-### Switch to specific profile
+### Options
 
-```bash
-$ phala switch work
-✓ Switched to profile: work
-```
+| Option | Description |
+| ------ | ----------- |
+| `-i, --interactive` | Select profile interactively |
 
-### Interactive profile picker
+### Global Options
 
-```bash
-$ phala switch
-? Select a profile:
-  default
-❯ work
-  personal
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-✓ Switched to profile: work
-```
+### Examples
 
-### Verify active profile
-
-```bash
-$ phala switch work
-✓ Switched to profile: work
-
-$ phala status
-✓ Authenticated as work@example.com
-Profile: work
-```
-
-### Switch in scripts
+* Display help:
 
 ```bash
-#!/bin/bash
-phala switch work
-phala deploy -n work-app
-
-phala switch personal
-phala deploy -n personal-app
+phala switch --help
 ```

@@ -1,52 +1,45 @@
 ---
-title: "phala simulator"
-description: "TEE simulator for local development."
+title: "simulator"
+description: "TEE simulator commands"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala simulator`
+
+### Syntax
 
 ```
-phala simulator [subcommand] [options]
+phala simulator <command> [options]
 ```
 
-Running `phala simulator` without subcommands shows the current status.
+### Description
 
-## Subcommands
+TEE simulator commands
 
-### simulator start
+### Global Options
 
-Start the TEE simulator.
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-#### Options
+### Subcommands
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--port` | `-p` | 8090 | Port number for the simulator |
-| `--verbose` | `-v` | false | Enable verbose logging |
+| Command | Description |
+| ------- | ----------- |
+| `start` | Start the TEE simulator |
+| `stop` | Stop the TEE simulator |
 
-#### Examples
+### Examples
+
+* Display help:
 
 ```bash
-$ phala simulator start
-$ phala simulator start -p 9000
-$ phala simulator start -p 9000 --verbose
-```
-
-### simulator stop
-
-Stop the TEE simulator.
-
-#### Examples
-
-```bash
-$ phala simulator stop
-```
-
-## Environment Variables
-
-When the simulator is running, set these environment variables to connect your application:
-
-```bash
-export DSTACK_SIMULATOR_ENDPOINT=/path/to/dstack.sock
-export TAPPD_SIMULATOR_ENDPOINT=/path/to/tappd.sock
+phala simulator --help
 ```

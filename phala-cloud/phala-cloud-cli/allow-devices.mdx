@@ -1,0 +1,49 @@
+---
+title: "allow-devices"
+description: "Manage on-chain device allowlist for a CVM's app contract"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala allow-devices`
+
+### Syntax
+
+```
+phala allow-devices <command> [options]
+```
+
+### Description
+
+Manage on-chain device allowlist for a CVM's app contract
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Subcommands
+
+| Command | Description |
+| ------- | ----------- |
+| `list` | (ls)         List allowed devices from the on-chain contract |
+| `add` | Add device(s) to the on-chain allowlist |
+| `remove` | (rm)       Remove device(s) from the on-chain allowlist |
+| `allow-any` | Set allow-any-device flag on the contract |
+| `disallow-any` | Disable allow-any-device on the contract |
+| `toggle-allow-any` | Toggle allow-any-device on the contract (or force via --enable/--disable) |
+
+### Examples
+
+* Display help:
+
+```bash
+phala allow-devices --help
+```

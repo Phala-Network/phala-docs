@@ -1,0 +1,122 @@
+---
+title: "phala.toml Configuration"
+description: "Project configuration file for the Phala Cloud CLI, defining default settings for CVM deployments and operations."
+icon: "file-code"
+---
+
+`phala.toml` is the project configuration file for Phala Cloud CLI. Place it in your project root to set default CVM identity, gateway settings, and API version for all CLI commands.
+
+## Quick Start
+
+Create a minimal config with just a CVM name:
+
+```toml
+name = "my-awesome-app"
+```
+
+Or generate one interactively:
+
+```bash
+phala init
+```
+
+## CVM Identifier
+
+Use the `name` field to identify your CVM. It's human-readable and follows RFC 1123 hostname format.
+
+```toml
+name = "payment-service"
+```
+
+Name requirements: 5–63 characters, starts with a letter, lowercase letters/numbers/hyphens only.
+
+<Note>
+If you have existing deployments using UUIDs or app IDs, those legacy fields still work. See [Legacy Identifiers](#legacy-identifier-fields) below.
+</Note>
+
+## Gateway Configuration
+
+Configure custom gateway settings for CVM access:
+
+```toml
+name = "payment-api"
+gateway_domain = "gateway.example.com"
+gateway_port = 8080
+```
+
+Both fields are optional. The CLI uses Phala's default gateway when omitted.
+
+## API Version
+
+Rarely needed — the CLI defaults to the latest supported version:
+
+```toml
+api_version = "v1"
+```
+
+## How the CLI Resolves CVM Identity
+
+When you run commands like `phala deploy` or `phala ssh`, the CVM ID is resolved in this order:
+
+1. **Interactive selection** — `-i` or `--interactive` flag
+2. **Command-line flag** — `--cvm-id` or `--uuid`
+3. **phala.toml** — configuration in the current directory
+
+```bash
+# Without phala.toml — must specify every time
+phala ssh --cvm-id my-service
+
+# With phala.toml — automatic
+phala ssh
+```
+
+## Legacy Identifier Fields
+
+For backward compatibility, these fields are supported. Use them only for existing deployments.
+
+| Field | Format | Example |
+|-------|--------|---------|
+| `id` | Any string | `"my-custom-id"` |
+| `uuid` | UUID v4 | `"550e8400-e29b-41d4-a716-446655440000"` |
+| `app_id` | 40-char hex | `"50b0e827cc6c53f4010b57e588a18c5ef9388cc1"` |
+| `instance_id` | Instance ID | `"instance_abc123xyz"` |
+
+Priority when multiple fields exist: `id` > `uuid` > `app_id` > `instance_id` > `name`. Specify only one to avoid confusion.
+
+### Migrating from UUID to Name
+
+```toml
+# Before
+uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+# After — check your CVM's name with: phala cvms list
+name = "my-production-api"
+```
+
+## Schema Reference
+
+```typescript
+{
+  // CVM Identifiers (choose one)
+  id?: string;
+  uuid?: string;
+  app_id?: string;
+  instance_id?: string;
+  name?: string;              // Recommended
+
+  // Gateway (optional)
+  gateway_domain?: string;
+  gateway_port?: number;
+
+  // API Version (optional)
+  api_version?: string;
+}
+```
+
+## Troubleshooting
+
+**CVM not found** — Verify the name matches: `phala cvms list`. Check you're in the right workspace.
+
+**File not found** — Run `phala init` or ensure you're in the correct directory.
+
+**Validation errors** — Names must be 5–63 chars, lowercase, starting with a letter. UUIDs must be valid v4 format. Ports must be positive integers.
