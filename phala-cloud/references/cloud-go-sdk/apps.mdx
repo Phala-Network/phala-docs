@@ -1,0 +1,265 @@
+---
+title: Apps
+description: List applications, query app details, revisions, attestations, and device allowlists.
+icon: grid-2
+---
+
+App methods provide read access to your Phala Cloud applications. An "app" is a logical grouping that can contain one or more CVMs (e.g., the primary instance and its replicas).
+
+## GetAppList
+
+`GET /apps`
+
+Returns all applications for the authenticated user.
+
+```go
+func (c *Client) GetAppList(ctx context.Context) (*GetAppListResponse, error)
+```
+
+**Returns:** `*GetAppListResponse` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `DstackApps` | `[]AppInfo` | List of applications |
+| `Page` | `int` | Current page |
+| `PageSize` | `int` | Items per page |
+| `Total` | `int` | Total number of apps |
+| `TotalPages` | `int` | Total number of pages |
+
+```go
+apps, err := client.GetAppList(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+for _, app := range apps.DstackApps {
+	fmt.Printf("%s — %s (%d CVMs)\n", app.AppID, app.Name, app.CVMCount)
+}
+```
+
+---
+
+## GetAppInfo
+
+`GET /apps/{appId}`
+
+Returns detailed information about a specific application, including its current CVM and profile.
+
+```go
+func (c *Client) GetAppInfo(ctx context.Context, appID string) (*AppInfo, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+
+**Returns:** `*AppInfo` with these key fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | `string` | Internal ID |
+| `Name` | `string` | App name |
+| `AppID` | `string` | Public app ID |
+| `KMSType` | `string` | KMS type (e.g., `"phala"`) |
+| `CurrentCVM` | `*CVMInfo` | Currently active CVM |
+| `CVMs` | `[]CVMInfo` | All CVMs under this app |
+| `CVMCount` | `int` | Number of CVMs |
+| `Profile` | `*AppProfile` | Display name, avatar, description |
+
+```go
+app, err := client.GetAppInfo(ctx, "app-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("App: %s, KMS: %s, CVMs: %d\n", app.Name, app.KMSType, app.CVMCount)
+```
+
+---
+
+## GetAppCVMs
+
+`GET /apps/{appId}/cvms`
+
+Returns all CVMs associated with an application. This is useful for apps that have replicas or multiple deployments.
+
+```go
+func (c *Client) GetAppCVMs(ctx context.Context, appID string) ([]GenericObject, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+
+**Returns:** `[]GenericObject` — a slice of CVM data as generic maps.
+
+```go
+cvms, err := client.GetAppCVMs(ctx, "app-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Found %d CVMs\n", len(cvms))
+```
+
+---
+
+## GetAppRevisions
+
+`GET /apps/{appId}/revisions`
+
+Returns the revision history for an application. Each revision represents a configuration change (deploy, update, restart, etc.).
+
+```go
+func (c *Client) GetAppRevisions(ctx context.Context, appID string, opts *PaginationOptions) (*AppRevisionsResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+| `opts` | `*PaginationOptions` | No | Pagination (pass `nil` for defaults) |
+
+**PaginationOptions fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Page` | `*int` | Page number |
+| `PageSize` | `*int` | Items per page |
+
+**Returns:** `*AppRevisionsResponse` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Revisions` | `[]AppRevision` | List of revisions |
+| `Total` | `int` | Total revisions |
+| `Page` | `int` | Current page |
+| `PageSize` | `int` | Items per page |
+| `TotalPages` | `int` | Total pages |
+
+```go
+revisions, err := client.GetAppRevisions(ctx, "app-abc123", &phala.PaginationOptions{
+	Page:     phala.Int(1),
+	PageSize: phala.Int(10),
+})
+if err != nil {
+	log.Fatal(err)
+}
+for _, rev := range revisions.Revisions {
+	fmt.Printf("[%s] %s — %s\n", rev.CreatedAt, rev.OperationType, rev.ComposeHash)
+}
+```
+
+---
+
+## GetAppRevisionDetail
+
+`GET /apps/{appId}/revisions/{revisionId}`
+
+Returns detailed information about a specific revision, including the full compose file and encrypted environment variables at that point in time.
+
+```go
+func (c *Client) GetAppRevisionDetail(ctx context.Context, appID, revisionID string) (*AppRevisionDetail, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+| `revisionID` | `string` | Yes | Revision identifier |
+
+**Returns:** `*AppRevisionDetail`
+
+```go
+detail, err := client.GetAppRevisionDetail(ctx, "app-abc123", "rev-xyz789")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Operation: %s, Compose hash: %s\n", detail.OperationType, detail.ComposeHash)
+```
+
+---
+
+## GetAppAttestation
+
+`GET /apps/{appId}/attestations`
+
+Returns TEE attestation data for an application, including certificates and TCB info.
+
+```go
+func (c *Client) GetAppAttestation(ctx context.Context, appID string) (*AppAttestationResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+
+**Returns:** `*AppAttestationResponse` (generic map)
+
+```go
+attestation, err := client.GetAppAttestation(ctx, "app-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+---
+
+## GetAppDeviceAllowlist
+
+`GET /apps/{appId}/device-allowlist`
+
+Returns the device allowlist for an on-chain KMS application. This shows which TEE devices are authorized to run the app.
+
+```go
+func (c *Client) GetAppDeviceAllowlist(ctx context.Context, appID string) (*DeviceAllowlistResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appID` | `string` | Yes | Application identifier |
+
+**Returns:** `*DeviceAllowlistResponse` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `IsOnchainKMS` | `bool` | Whether the app uses on-chain KMS |
+| `AllowAnyDevice` | `*bool` | Whether any device is allowed |
+| `ChainID` | `*int` | Blockchain chain ID |
+| `AppContractAddress` | `*string` | On-chain app contract address |
+| `Devices` | `[]DeviceAllowlistItem` | List of allowed devices |
+
+```go
+allowlist, err := client.GetAppDeviceAllowlist(ctx, "app-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+if allowlist.IsOnchainKMS {
+	fmt.Printf("On-chain KMS, %d devices allowed\n", len(allowlist.Devices))
+}
+```
+
+---
+
+## GetAppFilterOptions
+
+`GET /apps/filter-options`
+
+Returns available filter options for the app list endpoint. Useful for building UI filters.
+
+```go
+func (c *Client) GetAppFilterOptions(ctx context.Context) (*AppFilterOptions, error)
+```
+
+**Returns:** `*AppFilterOptions` (generic map)
+
+```go
+filters, err := client.GetAppFilterOptions(ctx)
+```

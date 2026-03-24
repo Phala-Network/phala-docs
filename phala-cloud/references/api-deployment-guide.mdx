@@ -1,0 +1,186 @@
+---
+title: "CVM Deployment via API"
+description: "Step-by-step guide to deploying Confidential Virtual Machines using the Phala Cloud REST API, covering node discovery, provisioning, and environment encryption."
+icon: "rocket"
+---
+
+Deploy CVMs programmatically using the Phala Cloud V2 API. This guide walks through the complete provision-then-create workflow with both built-in and onchain KMS.
+
+## Authentication
+
+All requests require an API key in the header:
+
+```bash
+curl -H "X-API-Key: YOUR_API_KEY" https://cloud-api.phala.com/api/v1/auth/me
+```
+
+Generate your API key at **Settings → API Keys** in the [Phala Cloud dashboard](https://cloud.phala.com).
+
+## Deployment Flow
+
+CVM deployment is a two-step process: **provision** resources first, then **create** the CVM.
+
+<Steps>
+<Step title="Discover available nodes">
+
+Find compute nodes with their capabilities and supported images.
+
+```bash
+curl -H "X-API-Key: $API_KEY" \
+  https://cloud-api.phala.com/api/v1/teepods/available
+```
+
+From the response, note the `teepod_id`, an image `name` (prefer non-dev), and whether `support_onchain_kms` is true.
+
+</Step>
+
+<Step title="Provision resources">
+
+Reserve resources and get encryption keys for your deployment.
+
+```bash
+curl -X POST https://cloud-api.phala.com/api/v1/cvms/provision \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-app",
+    "image": "dstack-0.5.7-9b6a5239",
+    "vcpu": 2,
+    "memory": 4096,
+    "disk_size": 40,
+    "teepod_id": 123,
+    "compose_file": {
+      "docker_compose_file": "services:\n  web:\n    image: nginx:stable\n    ports:\n      - \"80:80\"",
+      "allowed_envs": [],
+      "features": ["kms"],
+      "kms_enabled": true,
+      "manifest_version": 2,
+      "name": "my-app",
+      "public_logs": true,
+      "public_sysinfo": true,
+      "tproxy_enabled": false
+    },
+    "env_keys": [],
+    "listed": true,
+    "instance_type": "tdx.medium"
+  }'
+```
+
+The response returns `app_id`, `app_env_encrypt_pubkey`, `compose_hash`, and `os_image_hash`. Save these for the next step.
+
+<Note>
+For **built-in KMS** nodes, `app_id` is derived from the compose hash (`compose_hash[:40]`). For **onchain KMS** nodes, `app_id` is null — you must deploy an App Auth contract first.
+</Note>
+
+</Step>
+
+<Step title="Create the CVM">
+
+Commit the deployment with the provisioned values.
+
+```bash
+curl -X POST https://cloud-api.phala.com/api/v1/cvms \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "app_id": "abc123def456...",
+    "compose_hash": "sha256:...",
+    "encrypted_env": ""
+  }'
+```
+
+Start with empty `encrypted_env` to verify the deployment works, then add encrypted variables later.
+
+</Step>
+
+<Step title="Monitor status">
+
+Poll the CVM status until it reaches `running`.
+
+```bash
+curl -H "X-API-Key: $API_KEY" \
+  https://cloud-api.phala.com/api/v1/cvms/{cvm_id}
+```
+
+Status values: `creating` → `running` (success) or `failed` (check logs).
+
+</Step>
+</Steps>
+
+## KMS Types
+
+### Built-in KMS
+
+The simpler path. App ID is derived from the compose hash automatically.
+
+- `app_id = compose_hash[:40]`
+- Works on all nodes
+- Good for development and standard production
+
+### Onchain KMS
+
+Enterprise-grade security with blockchain-based authentication. Requires:
+
+- A node with `support_onchain_kms: true`
+- An Ethereum-compatible wallet with funds
+- Deploying an App Auth contract via the KMS factory
+
+After provisioning, deploy the App Auth contract using the `kms_contract_address` and `compose_hash` from the provision response. The deployed contract address becomes your `app_id`.
+
+For SDK-based onchain KMS deployment, see the [JavaScript SDK on-chain KMS guide](/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide).
+
+## Compose Hash Generation
+
+The compose hash is a SHA-256 digest of the canonicalized compose manifest. The algorithm:
+
+1. Sort manifest keys alphabetically
+2. Serialize to JSON with `indent=4`, `separators=(",", ":")`, `ensure_ascii=False`
+3. SHA-256 hash the UTF-8 encoded string
+
+<CodeGroup>
+```python Python
+import hashlib, json
+from collections import OrderedDict
+
+def generate_compose_hash(manifest: dict) -> str:
+    ordered = OrderedDict(sorted(manifest.items()))
+    manifest_str = json.dumps(ordered, indent=4, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(manifest_str.encode("utf-8")).hexdigest()
+```
+
+```typescript TypeScript
+import { createHash } from 'crypto';
+
+function generateComposeHash(manifest: Record<string, unknown>): string {
+  const sorted = Object.fromEntries(Object.entries(manifest).sort());
+  const str = JSON.stringify(sorted, null, 4).replace(/: /g, ':');
+  return createHash('sha256').update(str, 'utf-8').digest('hex');
+}
+```
+</CodeGroup>
+
+## Environment Variable Encryption
+
+Environment variables are encrypted end-to-end using x25519 key exchange and AES-GCM before being sent to the TEE.
+
+Use the `app_env_encrypt_pubkey` from the provision response to encrypt your env vars. For SDK-based encryption, use the `dstack-sdk` package.
+
+<Warning>
+For OS images version ≥ 0.5.0, the `allowed_envs` field in `compose_file` is **required** when using environment variables. All variable names in `env_keys` must be declared in `allowed_envs`.
+</Warning>
+
+## Using SDKs
+
+For a simpler experience, use one of the official SDKs instead of raw API calls:
+
+<CardGroup cols={3}>
+<Card title="JavaScript SDK" icon="js" href="/phala-cloud/references/cloud-js-sdk/provision-cvm">
+  `@phala/cloud` — provision, deploy, and manage CVMs
+</Card>
+<Card title="Python SDK" icon="python" href="/phala-cloud/references/cloud-python-sdk/overview">
+  `phala-cloud` — sync and async client
+</Card>
+<Card title="Go SDK" icon="golang" href="/phala-cloud/references/cloud-go-sdk/overview">
+  `github.com/Phala-Network/phala-cloud/sdks/go`
+</Card>
+</CardGroup>

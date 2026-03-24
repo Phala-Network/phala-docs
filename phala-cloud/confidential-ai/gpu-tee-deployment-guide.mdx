@@ -1,0 +1,272 @@
+---
+title: Deploy AI Models in GPU TEE
+description: End-to-end guide for deploying custom LLMs on GPU TEE with vLLM and accessing them via OpenAI-compatible API
+---
+
+Deploy a custom LLM on Phala Cloud GPU TEE and serve it through an OpenAI-compatible API. This guide walks you through the full workflow from choosing hardware to making your first inference request with verified TEE attestation.
+
+For pre-deployed models that don't require infrastructure setup, use [On-demand API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) or [Dedicated Models](/phala-cloud/confidential-ai/confidential-gpu/model-template) instead.
+
+## Prerequisites
+
+- Phala Cloud account with sufficient credits for GPU instances
+- A model you want to deploy (Hugging Face model ID or custom weights)
+- Basic familiarity with Docker Compose and LLM serving
+
+## Choose your GPU hardware
+
+Pick a GPU based on your model's VRAM requirements. Larger models need more VRAM, and you can scale up to 8 GPUs per instance for models that support tensor parallelism.
+
+| GPU type | VRAM per GPU | Best for |
+|----------|-------------|----------|
+| H200 | 141 GB | Most 70B+ models, long context |
+| B200 | 180 GB | Largest models, maximum throughput |
+
+A 7B model fits comfortably on a single GPU. A 70B model typically needs 2-4 GPUs depending on quantization. Check your model's documentation for exact VRAM requirements.
+
+<Note>
+GPU instances incur hourly charges starting from provisioning. Check current pricing on the [GPU TEE](https://cloud.phala.com) dashboard before launching.
+</Note>
+
+## Deploy your instance
+
+<Steps>
+  <Step title="Launch the GPU TEE wizard">
+    Sign in to [cloud.phala.com](https://cloud.phala.com), click **GPU TEE** in the navigation bar, then click **Start Building**. Select your GPU type and count.
+  </Step>
+
+  <Step title="Choose the vLLM template">
+    In the deployment configuration, select **vLLM** as your template. This gives you a production-ready inference server with OpenAI-compatible API endpoints out of the box.
+
+    If you prefer full control, choose **Custom Configuration** and provide your own Docker Compose file. See the [custom vLLM compose example](#custom-vllm-docker-compose) below.
+  </Step>
+
+  <Step title="Configure your model">
+    Set the model you want to serve. For Hugging Face models, use the model ID directly (e.g., `meta-llama/Llama-3.1-70B-Instruct`). Add any required environment variables like `HUGGING_FACE_HUB_TOKEN` as encrypted secrets if your model needs authentication.
+  </Step>
+
+  <Step title="Launch and wait for provisioning">
+    Review the pricing summary and click **Launch Instance**. GPU provisioning takes approximately 1 day. Monitor the status in your dashboard as it progresses through **Preparing**, **Starting**, and **Running**.
+  </Step>
+</Steps>
+
+## Custom vLLM Docker Compose
+
+If you chose Custom Configuration, here's a Docker Compose file for serving a model with vLLM. This example serves Qwen 2.5 7B on a single GPU.
+
+```yaml
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.8.5@sha256:abc123...  # Pin to digest for attestation
+    ports:
+      - "8000:8000"
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+    command: >
+      --model qwen/Qwen2.5-7B-Instruct
+      --tensor-parallel-size 1
+      --max-model-len 32768
+      --trust-remote-code
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+```
+
+For multi-GPU serving, increase `--tensor-parallel-size` to match your GPU count. For example, with 4 GPUs:
+
+```yaml
+    command: >
+      --model meta-llama/Llama-3.1-70B-Instruct
+      --tensor-parallel-size 4
+      --max-model-len 65536
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+```
+
+<Warning>
+Pin your Docker images by SHA256 digest (not tags) for attestation verification. Tags like `vllm/vllm-openai:latest` are mutable and break the chain of trust. See [Verify Your Application](/phala-cloud/attestation/verify-your-application) for details.
+</Warning>
+
+## Access the OpenAI-compatible API
+
+Once your instance is running, vLLM exposes an OpenAI-compatible API. Find your instance's URL in the dashboard under your GPU TEE instance details.
+
+<CodeGroup>
+```bash curl
+curl https://<your-instance-url>/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "qwen/Qwen2.5-7B-Instruct",
+    "messages": [
+      {"role": "user", "content": "What is confidential computing?"}
+    ],
+    "max_tokens": 256
+  }'
+```
+
+```python Python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://<your-instance-url>/v1",
+    api_key="not-needed"  # No auth by default; add if configured
+)
+
+response = client.chat.completions.create(
+    model="qwen/Qwen2.5-7B-Instruct",
+    messages=[
+        {"role": "user", "content": "What is confidential computing?"}
+    ],
+    max_tokens=256
+)
+print(response.choices[0].message.content)
+```
+
+```typescript TypeScript
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: 'https://<your-instance-url>/v1',
+  apiKey: 'not-needed',
+});
+
+const response = await client.chat.completions.create({
+  model: 'qwen/Qwen2.5-7B-Instruct',
+  messages: [
+    { role: 'user', content: 'What is confidential computing?' }
+  ],
+  maxTokens: 256,
+});
+console.log(response.choices[0].message.content);
+```
+</CodeGroup>
+
+You can also check the available models and server health:
+
+```bash
+# List loaded models
+curl https://<your-instance-url>/v1/models
+
+# Health check
+curl https://<your-instance-url>/health
+```
+
+## Verify TEE attestation
+
+Your GPU TEE instance runs on genuine Intel TDX + NVIDIA confidential compute hardware. Verify this to confirm your model is actually running inside a trusted execution environment.
+
+<Steps>
+  <Step title="Check GPU TEE status">
+    Open JupyterLab (if using the Jupyter template) or SSH into your instance and run:
+
+    ```bash
+    nvidia-smi conf-compute -q
+    ```
+
+    Confirm `CC State: ON` and `CPU CC Capabilities: INTEL TDX` in the output.
+  </Step>
+
+  <Step title="Run local GPU verification">
+    Install NVIDIA's attestation tools and run the verifier:
+
+    ```bash
+    pip install nv-local-gpu-verifier nv_attestation_sdk
+    python -m verifier.cc_admin
+    ```
+
+    Successful output confirms your GPUs are genuine NVIDIA hardware with confidential compute enabled.
+  </Step>
+
+  <Step title="Verify the Intel TDX quote">
+    Fetch and verify the CPU attestation through Phala's verification API:
+
+    ```bash
+    # Get the attestation quote from your instance
+    curl https://<your-instance-url>/attestation -o attestation.json
+
+    # Verify through Phala's API
+    curl -X POST https://cloud-api.phala.network/api/v1/attestations/verify \
+      -H "Content-Type: application/json" \
+      -d @attestation.json
+    ```
+
+    You can also paste the quote into the [TEE Proof Explorer](https://proof.t16z.com/) for a visual breakdown.
+  </Step>
+</Steps>
+
+For programmatic attestation verification in your application, see [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
+
+## Add a custom domain
+
+Expose your model API on your own domain by adding dstack-ingress to your Docker Compose. This handles DNS and TLS certificates automatically.
+
+```yaml
+services:
+  dstack-ingress:
+    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
+    ports:
+      - "443:443"
+    environment:
+      - DOMAIN=ai.mycompany.com
+      - TARGET_ENDPOINT=http://vllm:8000
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SET_CAA=true
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      - cert-data:/etc/letsencrypt
+
+  vllm:
+    # ... your vLLM config from above
+
+volumes:
+  cert-data:
+```
+
+See [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain) for the full guide including DNS provider configuration and troubleshooting.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    icon="shield-check"
+    title="Verify attestation"
+    href="/phala-cloud/confidential-ai/verify/verify-attestation"
+  >
+    Programmatically verify your GPU TEE hardware and software stack
+  </Card>
+
+  <Card
+    icon="signature"
+    title="Verify signatures"
+    href="/phala-cloud/confidential-ai/verify/verify-signature"
+  >
+    Confirm inference responses are authentic using cryptographic signatures
+  </Card>
+
+  <Card
+    icon="gauge"
+    title="Performance benchmark"
+    href="/phala-cloud/confidential-ai/benchmark"
+  >
+    See how TEE mode performs compared to native GPU execution
+  </Card>
+
+  <Card
+    icon="network"
+    title="Networking guides"
+    href="/phala-cloud/networking/overview"
+  >
+    Expose services, set up gRPC, and configure TCP endpoints
+  </Card>
+</CardGroup>

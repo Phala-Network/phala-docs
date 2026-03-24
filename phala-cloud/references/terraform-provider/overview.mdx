@@ -1,0 +1,157 @@
+---
+title: Terraform Provider
+description: Deploy confidential apps on Phala Cloud with Terraform — install, configure, and deploy your first CVM in minutes.
+---
+
+The Phala Cloud Terraform provider lets you manage confidential virtual machines (CVMs) using standard Terraform workflows. It follows an app-first model where `phala_app` is the primary resource, managing one application identity with shared Docker Compose configuration, shared environment variables, and one or more CVM replicas.
+
+If you have used providers like DigitalOcean or AWS, the patterns here will feel familiar: catalog data sources for discovery, declarative compute resources, explicit power control, and SSH key management.
+
+## Installation
+
+The provider is published on the Terraform Registry under `phala-network/phala`. Add it to your `required_providers` block:
+
+```hcl
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    phala = {
+      source  = "phala-network/phala"
+      version = "0.2.0-beta.1"
+    }
+  }
+}
+
+provider "phala" {}
+```
+
+Run `terraform init` to download the provider binary. Terraform handles the rest automatically.
+
+## Authentication
+
+The provider authenticates with a Phala Cloud API key. You can get one from the dashboard:
+
+1. Sign in at [cloud.phala.com](https://cloud.phala.com).
+2. Go to **Settings** then **API Keys**.
+3. Create a key and export it in your shell:
+
+```bash
+export PHALA_CLOUD_API_KEY="phak_xxx"
+```
+
+The provider reads `PHALA_CLOUD_API_KEY` automatically. You can also set it explicitly in the provider block, though environment variables are recommended for security.
+
+## Provider Configuration
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `api_key` | String, Sensitive | Phala Cloud API key. Falls back to `PHALA_CLOUD_API_KEY` env var. |
+| `api_prefix` | String | API base URL. Falls back to `PHALA_CLOUD_API_PREFIX`. Most users do not need this. |
+| `api_version` | String | API version sent in `X-Phala-Version` header. |
+| `timeout_seconds` | Number | HTTP timeout in seconds. |
+
+```hcl
+# Explicit configuration (usually not needed)
+provider "phala" {
+  api_key         = var.phala_api_key
+  timeout_seconds = 60
+}
+```
+
+## Quick Start
+
+This deploys a single nginx CVM and outputs the app ID and public endpoint. The values below (`tdx.medium`, `US-WEST-1`, 40 GB disk) are tested defaults that work out of the box.
+
+```hcl
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    phala = {
+      source  = "phala-network/phala"
+      version = "0.2.0-beta.1"
+    }
+  }
+}
+
+provider "phala" {}
+
+resource "phala_app" "hello" {
+  name      = "hello-phala"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  image     = "dstack-dev-0.5.7-9b6a5239"
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+output "app_id" {
+  value = phala_app.hello.app_id
+}
+
+output "endpoint" {
+  value = phala_app.hello.endpoint
+}
+```
+
+Run the standard Terraform workflow:
+
+```bash
+terraform init
+terraform apply -auto-approve
+terraform output
+```
+
+When it completes, Terraform prints the `app_id` and a public `endpoint` URL. Your app also appears in the Phala Cloud dashboard in a running state.
+
+To tear down:
+
+```bash
+terraform destroy -auto-approve
+```
+
+## What's in the Provider
+
+The provider includes three resources and seven data sources:
+
+**Resources:**
+- [`phala_app`](/phala-cloud/references/terraform-provider/app-resource) — the primary lifecycle resource for deploying apps with CVM replicas
+- [`phala_cvm_power`](/phala-cloud/references/terraform-provider/cvm-power) — start/stop power control for existing CVMs
+- [`phala_ssh_key`](/phala-cloud/references/terraform-provider/ssh-key) — manage account-level SSH keys
+
+**Data Sources:**
+- [`phala_account`](/phala-cloud/references/terraform-provider/data-sources) — current user and workspace info
+- [`phala_workspace`](/phala-cloud/references/terraform-provider/data-sources) — active workspace metadata
+- [`phala_sizes`](/phala-cloud/references/terraform-provider/data-sources) — available instance types
+- [`phala_regions`](/phala-cloud/references/terraform-provider/data-sources) — available deployment regions
+- [`phala_images`](/phala-cloud/references/terraform-provider/data-sources) — available OS images
+- [`phala_nodes`](/phala-cloud/references/terraform-provider/data-sources) — worker nodes for placement pinning
+- [`phala_attestation`](/phala-cloud/references/terraform-provider/data-sources) — TEE attestation data for a CVM
+
+## Common Workflow
+
+A typical deployment follows this pattern:
+
+1. Use data sources (`phala_sizes`, `phala_regions`, `phala_images`) to discover valid slugs.
+2. Define a `phala_app` with your Docker Compose file and desired replica count.
+3. Wait for readiness, then consume `app_id`, `cvm_ids`, and `endpoint` as outputs.
+4. Optionally use `phala_cvm_power` for explicit start/stop control after deployment.
+
+## Related
+
+- [App Resource Reference](/phala-cloud/references/terraform-provider/app-resource)
+- [Data Sources](/phala-cloud/references/terraform-provider/data-sources)
+- [Examples](/phala-cloud/references/terraform-provider/examples)
+- [Changelog](/phala-cloud/references/terraform-provider/changelog)

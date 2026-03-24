@@ -1,0 +1,182 @@
+---
+title: Watch CVM State
+description: Monitor CVM state changes in real-time using Server-Sent Events (SSE) with Go channels.
+icon: satellite-dish
+---
+
+The `WatchCVMState` method streams CVM state changes in real-time using Server-Sent Events (SSE). It returns a Go channel that emits events as the CVM transitions between states, making it natural to use with `for range` loops.
+
+## WatchCVMState
+
+`GET /cvms/{cvmId}/state` (SSE stream)
+
+Opens an SSE connection and delivers state events through a channel. The channel is closed when the stream ends, the target state is reached, or the context is cancelled.
+
+```go
+func (c *Client) WatchCVMState(ctx context.Context, cvmID string, opts *WatchCVMStateOptions) (<-chan CVMStateEvent, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier |
+| `opts` | `*WatchCVMStateOptions` | No | Stream options (pass `nil` for defaults) |
+
+**WatchCVMStateOptions fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Target` | `string` | `""` | Target state to wait for (e.g., `"running"`, `"stopped"`) |
+| `Interval` | `int` | `5` | Polling interval in seconds (5-30) |
+| `Timeout` | `int` | `60` | Server-side timeout in seconds (10-600) |
+| `MaxRetries` | `*int` | `nil` (unlimited) | Max reconnection attempts; `nil` = unlimited, `0` = no retries |
+| `RetryDelay` | `time.Duration` | `5s` | Delay between reconnection attempts |
+
+**Returns:** `<-chan CVMStateEvent` — a receive-only channel of state events.
+
+## CVMStateEvent
+
+Each event received from the channel has this structure:
+
+```go
+type CVMStateEvent struct {
+	Event string                 // Event type: "state", "complete", "error", "timeout"
+	Data  map[string]any         // Event payload (parsed from JSON)
+	Error error                  // Non-nil if this is an error event
+}
+```
+
+The `Event` field indicates what happened:
+
+| Event | Meaning |
+|-------|---------|
+| `"state"` | A state update; `Data` contains the current state |
+| `"complete"` | Target state reached; stream will close |
+| `"error"` | An error occurred; check the `Error` field |
+| `"timeout"` | Server-side timeout reached; stream will close |
+
+## Basic Usage
+
+The simplest pattern is ranging over the channel until it closes:
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+defer cancel()
+
+ch, err := client.WatchCVMState(ctx, "my-app", &phala.WatchCVMStateOptions{
+	Target:   "running",
+	Interval: 5,
+	Timeout:  300,
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+for event := range ch {
+	if event.Error != nil {
+		log.Printf("Error: %v", event.Error)
+		continue
+	}
+	fmt.Printf("[%s] %v\n", event.Event, event.Data)
+}
+fmt.Println("Stream ended")
+```
+
+## Cancellation with Context
+
+Use context cancellation as the Go equivalent of JavaScript's `AbortController`. Cancelling the context closes the SSE connection and the channel.
+
+```go
+ctx, cancel := context.WithCancel(context.Background())
+
+ch, err := client.WatchCVMState(ctx, "my-app", &phala.WatchCVMStateOptions{
+	Target: "running",
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+// Cancel from another goroutine after some condition
+go func() {
+	time.Sleep(30 * time.Second)
+	cancel() // Stops the SSE stream
+}()
+
+for event := range ch {
+	fmt.Printf("State: %s\n", event.Event)
+}
+```
+
+<Note>
+Always use a context with a timeout or deadline to avoid watching indefinitely. The server-side `Timeout` option is a safety net, but client-side context timeouts give you more control.
+</Note>
+
+## Retry Behavior
+
+By default, the watcher reconnects indefinitely when the SSE connection drops. Configure retries to limit this behavior.
+
+```go
+// Retry up to 3 times
+ch, err := client.WatchCVMState(ctx, "my-app", &phala.WatchCVMStateOptions{
+	Target:     "running",
+	MaxRetries: phala.Int(3),
+	RetryDelay: 5 * time.Second,
+})
+```
+
+```go
+// No retries — fail immediately on disconnect
+ch, err := client.WatchCVMState(ctx, "my-app", &phala.WatchCVMStateOptions{
+	Target:     "running",
+	MaxRetries: phala.Int(0),
+})
+```
+
+When all retries are exhausted, the channel receives a final `CVMStateEvent` with `Event: "error"` and the underlying error in the `Error` field. Then the channel closes.
+
+## Wait for Deployment
+
+A common pattern is to provision a CVM and then watch it until it reaches the `"running"` state:
+
+```go
+// Provision and commit...
+cvm, err := client.CommitCVMProvision(ctx, &phala.CommitCVMProvisionRequest{
+	AppID:       provision.AppID,
+	ComposeHash: provision.ComposeHash,
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+// Watch until running
+watchCtx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+defer cancel()
+
+ch, err := client.WatchCVMState(watchCtx, cvm.CvmID(), &phala.WatchCVMStateOptions{
+	Target:     "running",
+	Interval:   5,
+	Timeout:    600,
+	MaxRetries: phala.Int(5),
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+for event := range ch {
+	switch event.Event {
+	case "complete":
+		fmt.Println("CVM is running!")
+	case "error":
+		log.Printf("Watch error: %v", event.Error)
+	case "timeout":
+		log.Println("Watch timed out")
+	default:
+		fmt.Printf("State update: %v\n", event.Data)
+	}
+}
+```
+
+<Warning>
+The `Timeout` option controls the server-side SSE stream timeout, not the overall watch duration. For long-running watches, set a generous server timeout and use the Go context for client-side control.
+</Warning>

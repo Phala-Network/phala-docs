@@ -1,31 +1,37 @@
 ---
 title: Set Up a CI/CD Pipeline
-description: Automate CVM deployments with GitHub Actions
+description: Automate CVM deployments with GitHub Actions, GitLab CI, and Phala Cloud SDKs.
 ---
 
-Automate your Phala Cloud deployments with GitHub Actions. Push to main, and your CVM updates automatically.
+Automating deployments means every push to your main branch updates your CVM without manual intervention. This guide covers four approaches: the Phala CLI in GitHub Actions, the JS SDK in GitHub Actions, a GitLab CI pipeline, and Terraform in CI.
 
 ## Prerequisites
 
-- A GitHub repository with your application code
-- A [Phala Cloud account](https://cloud.phala.network/register)
-- A Docker Hub or container registry account
+- A Git repository with your application code and a `docker-compose.yml`
+- A [Phala Cloud account](https://cloud.phala.com/register) with an [API key](/phala-cloud/references/api-key)
+- A container registry account (Docker Hub, GHCR, or similar)
 
-## Configure Repository Secrets
+## Secrets Management
 
-Go to your repo's **Settings > Secrets and variables > Actions** and add these secrets:
+Regardless of which CI platform you use, store your Phala Cloud API key as a secret. Never hardcode it in workflow files.
+
+**GitHub:** Go to **Settings > Secrets and variables > Actions** and add:
 
 | Secret | Description |
 |--------|-------------|
-| `PHALA_CLOUD_API_KEY` | From [Phala Cloud Dashboard](https://cloud.phala.network/dashboard) > Avatar > API Tokens |
-| `DOCKER_REGISTRY_USERNAME` | Your Docker Hub username |
-| `DOCKER_REGISTRY_PASSWORD` | Docker Hub [access token](https://docs.docker.com/docker-hub/access-tokens/) |
-| `DOCKER_IMAGE` | Full image path, e.g., `docker.io/username/my-app` |
-| `APP_NAME` | CVM name, e.g., `my-tee-app` |
+| `PHALA_CLOUD_API_KEY` | Your Phala Cloud API key |
+| `DOCKER_REGISTRY_USERNAME` | Container registry username |
+| `DOCKER_REGISTRY_PASSWORD` | Registry password or access token |
 
-## Create the Workflow
+**GitLab:** Go to **Settings > CI/CD > Variables** and add the same values as masked variables.
 
-Create `.github/workflows/deploy.yml`:
+<Warning>
+Rotate your API key immediately if it's ever exposed in logs or committed to a repository. Generate a new one from **Settings > API Keys** in the Phala Cloud dashboard.
+</Warning>
+
+## GitHub Actions with CLI
+
+This is the simplest approach. The workflow builds your Docker image, pushes it to a registry, and deploys with `phala deploy`.
 
 ```yaml
 name: Deploy to Phala Cloud
@@ -52,11 +58,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_REGISTRY_USERNAME }}/my-app:${{ github.sha }}
 
       - name: Update compose with image tag
         run: |
-          sed -i "s|\${DOCKER_IMAGE}|${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}|g" docker-compose.yml
+          sed -i "s|\${DOCKER_IMAGE}|${{ secrets.DOCKER_REGISTRY_USERNAME }}/my-app:${{ github.sha }}|g" docker-compose.yml
 
       - name: Install Phala CLI
         run: npm install -g phala
@@ -64,7 +70,7 @@ jobs:
       - name: Deploy to Phala Cloud
         env:
           PHALA_CLOUD_API_KEY: ${{ secrets.PHALA_CLOUD_API_KEY }}
-        run: phala deploy -c docker-compose.yml -n ${{ secrets.APP_NAME }}
+        run: phala deploy -c docker-compose.yml -n my-tee-app --wait
 ```
 
 Your `docker-compose.yml` should reference the image variable:
@@ -77,32 +83,237 @@ services:
       - "80:80"
 ```
 
-## How It Works
+The CLI detects existing CVMs by name. If `my-tee-app` already exists, it updates in place. Otherwise, it creates a new one.
 
-1. **Push to main** triggers the workflow
-2. **Build** creates a Docker image tagged with the commit SHA
-3. **Push** uploads the image to your registry
-4. **Update** replaces the image variable in docker-compose.yml
-5. **Deploy** creates or updates the CVM with `phala deploy`
+## GitHub Actions with JS SDK
 
-The CLI automatically detects existing CVMs by name. If `my-tee-app` exists, it updates; otherwise, it creates a new one.
+If you need more control over the deployment (conditional logic, custom error handling, multi-step provisioning), use the SDK directly in a Node.js script.
+
+<Steps>
+<Step>
+### Create a deploy script
+
+Add `scripts/deploy.mjs` to your repository:
+
+```javascript
+import { createClient } from "@phala/cloud";
+
+const client = createClient({
+  apiKey: process.env.PHALA_CLOUD_API_KEY,
+});
+
+const imageTag = process.env.IMAGE_TAG;
+const appName = process.env.APP_NAME || "my-tee-app";
+
+const compose = `
+services:
+  app:
+    image: ${imageTag}
+    ports:
+      - "80:80"
+`;
+
+// Check if CVM already exists
+const cvms = await client.getCvmList();
+const existing = cvms.items.find((c) => c.name === appName);
+
+if (existing) {
+  // Update existing CVM
+  await client.updateDockerCompose({
+    id: existing.id,
+    dockerCompose: compose,
+  });
+  await client.restartCvm({ id: existing.id });
+  console.log(`Updated CVM: ${existing.id}`);
+} else {
+  // Provision new CVM
+  const provision = await client.provisionCvm({
+    name: appName,
+    composeFile: { dockerComposeFile: compose },
+    vcpu: 2,
+    memory: 4096,
+    diskSize: 20,
+  });
+
+  const cvm = await client.commitCvmProvision({
+    appId: provision.appId,
+    composeHash: provision.composeHash,
+    transactionHash: provision.transactionHash,
+  });
+  console.log(`Created CVM: ${cvm}`);
+}
+```
+</Step>
+
+<Step>
+### Create the workflow
+
+```yaml
+name: Deploy with SDK
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_REGISTRY_USERNAME }}/my-app:${{ github.sha }}
+
+      - name: Install dependencies
+        run: npm install @phala/cloud
+
+      - name: Deploy
+        env:
+          PHALA_CLOUD_API_KEY: ${{ secrets.PHALA_CLOUD_API_KEY }}
+          IMAGE_TAG: ${{ secrets.DOCKER_REGISTRY_USERNAME }}/my-app:${{ github.sha }}
+          APP_NAME: my-tee-app
+        run: node scripts/deploy.mjs
+```
+</Step>
+</Steps>
+
+## GitLab CI
+
+GitLab CI uses a similar pattern. Define a `.gitlab-ci.yml` in your repository root:
+
+```yaml
+stages:
+  - build
+  - deploy
+
+variables:
+  IMAGE_TAG: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$IMAGE_TAG" .
+    - docker push "$IMAGE_TAG"
+
+deploy:
+  stage: deploy
+  image: node:20
+  script:
+    - npm install -g phala
+    - sed -i "s|\${DOCKER_IMAGE}|$IMAGE_TAG|g" docker-compose.yml
+    - phala deploy -c docker-compose.yml -n my-tee-app --wait
+  variables:
+    PHALA_CLOUD_API_KEY: "$PHALA_CLOUD_API_KEY"
+  only:
+    - main
+```
+
+<Note>
+GitLab's built-in container registry works well here. The `$CI_REGISTRY_*` variables are available automatically in every pipeline.
+</Note>
+
+## Terraform in CI
+
+For infrastructure-as-code workflows, run Terraform in your pipeline. This is especially useful when you manage replicas, instance types, or environment variables declaratively.
+
+```yaml
+name: Deploy with Terraform
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./infra
+
+      - name: Terraform Apply
+        env:
+          PHALA_CLOUD_API_KEY: ${{ secrets.PHALA_CLOUD_API_KEY }}
+        run: terraform apply -auto-approve -var="image_tag=${{ github.sha }}"
+        working-directory: ./infra
+```
+
+Your `infra/main.tf` would look something like this:
+
+```hcl
+variable "image_tag" {
+  type = string
+}
+
+resource "phala_app" "web" {
+  name      = "my-tee-app"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  image     = "dstack-dev-0.5.7-9b6a5239"
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      app:
+        image: myregistry/my-app:${var.image_tag}
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+<Note>
+Store your Terraform state in a remote backend (S3, GCS, or Terraform Cloud) so that CI runs can access the same state file. Without remote state, each pipeline run would try to create a new CVM instead of updating the existing one.
+</Note>
 
 ## Verify Deployment
 
-After the workflow completes, check your [Phala Cloud Dashboard](https://cloud.phala.network/dashboard) to confirm the CVM is running. The endpoint URL appears in the CVM details.
-
-You can also verify from the command line:
+After your pipeline completes, confirm the CVM is running:
 
 ```bash
+# CLI
 phala cvms get my-tee-app
+
+# Or check the dashboard
+# https://cloud.phala.com/dashboard
 ```
 
 ## Troubleshooting
 
-**Authentication errors**: Verify `PHALA_CLOUD_API_KEY` is set correctly. Test locally with `phala status`.
+**Authentication errors:** Make sure `PHALA_CLOUD_API_KEY` is set correctly in your CI secrets. Test locally with `phala status` to verify the key works.
 
-**Build failures**: Ensure your Dockerfile builds locally with `docker build .`
+**Build failures:** Ensure your Dockerfile builds locally with `docker build .` before pushing to CI.
 
-**Deploy failures**: Check that `docker-compose.yml` is valid and the image path matches your registry. For API error codes like `ERR-01-xxx`, see the [Error Codes Reference](/phala-cloud/references/error-codes).
+**Deploy timeouts:** If `--wait` times out, the CVM may still be starting. Check the dashboard or run `phala cvms get` to see the current status. Increase the timeout with `--wait-timeout` if your app takes longer to boot.
 
-**Debug locally**: Use [act](https://github.com/nektos/act) to run GitHub Actions locally with a `.env` file containing your secrets.
+**Image pull errors:** Verify the image tag in your compose file matches what was pushed to the registry. For private registries, set `DSTACK_DOCKER_USERNAME` and `DSTACK_DOCKER_PASSWORD` as [encrypted secrets](/phala-cloud/cvm/set-secure-environment-variables) on the CVM.

@@ -316,3 +316,43 @@ Returns the user-level configuration for a CVM.
 | `id` | `string` | Yes | CVM identifier |
 
 **Returns:** `CvmUserConfig` — user configuration details.
+
+---
+
+## checkCvmIsAllowed
+
+`POST /cvms/{cvmId}/is-allowed`
+
+Checks whether a CVM's current deployment is allowed by its on-chain DStack App contract. This queries the blockchain to verify that the compose hash and device ID are registered. Useful for diagnosing on-chain KMS permission issues.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmId` | `string` | Yes | CVM identifier |
+| `compose_hash` | `string` | No | Override compose hash to check |
+| `node_id` | `number` | No | Override node ID (resolves device ID) |
+| `device_id` | `string` | No | Override device ID (hex) |
+
+**Returns:** `IsAllowedResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `app_contract_address` | `string` | Contract address |
+| `compose_hash` | `string` | Checked compose hash |
+| `device_id` | `string` | Checked device ID |
+| `compose_hash_allowed` | `boolean` | Whether compose hash is registered |
+| `allow_any_device` | `boolean` | Whether any device is allowed |
+| `device_id_allowed` | `boolean?` | Whether specific device is registered |
+| `is_allowed` | `boolean` | Overall allowance result |
+| `error` | `string?` | Error message if check failed |
+
+**Example:**
+
+```typescript
+const result = await client.checkCvmIsAllowed({ cvmId: "my-app" });
+if (!result.is_allowed) {
+  console.log(`Compose hash allowed: ${result.compose_hash_allowed}`);
+  console.log(`Device allowed: ${result.device_id_allowed}`);
+}
+```

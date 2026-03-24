@@ -1,0 +1,283 @@
+---
+title: Cloud Python SDK
+description: Python SDK for Phala Cloud API — sync and async clients with Pydantic validation, safe error handling, and REPL-friendly design.
+---
+
+The `phala-cloud` SDK gives you a Pythonic interface to the Phala Cloud API. It ships with both sync and async clients, Pydantic-validated responses, and a `safe_*` method pattern that lets you handle errors without try/except blocks.
+
+## Installation
+
+```bash
+pip install phala-cloud
+```
+
+```bash
+uv add phala-cloud
+```
+
+```bash
+poetry add phala-cloud
+```
+
+<Note>
+Requires Python 3.10 or later. The SDK depends on `httpx`, `pydantic`, and `dstack-sdk`.
+</Note>
+
+## Quick Start
+
+<CodeGroup>
+
+```python Sync
+from phala_cloud import create_client
+
+client = create_client(api_key="your-api-key")
+me = client.get_current_user()
+print(me.model_dump())
+```
+
+```python Async
+import asyncio
+from phala_cloud import create_async_client
+
+
+async def main():
+    client = create_async_client(api_key="your-api-key")
+    me = await client.get_current_user()
+    print(me.model_dump())
+    await client.aclose()
+
+
+asyncio.run(main())
+```
+
+</CodeGroup>
+
+## Client Creation
+
+### `create_client(**kwargs)` / `create_async_client(**kwargs)`
+
+Factory functions that return a `PhalaCloud` (sync) or `AsyncPhalaCloud` (async) instance. Both accept the same configuration options.
+
+```python
+from phala_cloud import create_client, create_async_client
+
+# Minimal — reads API key from PHALA_CLOUD_API_KEY env var
+client = create_client()
+
+# Explicit configuration
+client = create_client(
+    api_key="your-api-key",
+    base_url="https://cloud-api.phala.com/api/v1",
+    version="2026-01-21",
+    timeout=30.0,
+)
+```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `api_key` | `str` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
+| `base_url` | `str` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
+| `version` | `ApiVersion` | `"2026-01-21"` | API version to use |
+| `timeout` | `float` | `30.0` | Request timeout in seconds |
+| `use_cookie_auth` | `bool` | `False` | Use cookie-based auth instead of API key |
+| `headers` | `dict[str, str]` | `None` | Additional request headers |
+| `http_client` | `httpx.Client` / `httpx.AsyncClient` | `None` | Bring your own httpx client |
+
+### API Versions
+
+The SDK supports two API versions. The version affects response shapes for certain endpoints like `get_current_user()` and `get_cvm_list()`.
+
+```python
+from phala_cloud import SUPPORTED_API_VERSIONS, DEFAULT_API_VERSION
+
+print(SUPPORTED_API_VERSIONS)  # ("2025-10-28", "2026-01-21")
+print(DEFAULT_API_VERSION)     # "2026-01-21"
+```
+
+You can switch versions on an existing client without creating a new one from scratch:
+
+```python
+legacy_client = client.with_version("2025-10-28")
+```
+
+## Sync vs. Async
+
+Every method on the sync `PhalaCloud` client has an identical counterpart on `AsyncPhalaCloud`. The async version simply requires `await`.
+
+<CodeGroup>
+
+```python Sync
+client = create_client(api_key="your-api-key")
+cvms = client.get_cvm_list()
+client.close()
+```
+
+```python Async
+client = create_async_client(api_key="your-api-key")
+cvms = await client.get_cvm_list()
+await client.aclose()
+```
+
+</CodeGroup>
+
+Both clients support context managers for automatic cleanup:
+
+<CodeGroup>
+
+```python Sync
+with create_client(api_key="your-api-key") as client:
+    cvms = client.get_cvm_list()
+```
+
+```python Async
+async with create_async_client(api_key="your-api-key") as client:
+    cvms = await client.get_cvm_list()
+```
+
+</CodeGroup>
+
+## Safe Methods
+
+Every action method has a `safe_*` variant that returns a `SafeResult` instead of raising exceptions. This is useful when you want to handle errors as values rather than control flow.
+
+```python
+result = client.safe_get_cvm_info({"id": "my-app"})
+
+if result.ok:
+    print(result.data)
+else:
+    print(result.error)
+```
+
+Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling).
+
+## Available Actions
+
+### Authentication & User
+
+| Method | Description |
+|--------|-------------|
+| `get_current_user()` | Get current user, workspace, and credits info |
+
+### CVM Query
+
+| Method | Description |
+|--------|-------------|
+| `get_cvm_list(request?)` | List all CVMs (paginated) |
+| `get_cvm_info(request)` | Get single CVM details |
+| `get_cvm_state(request)` | Get CVM current state |
+| `get_cvm_stats(request)` | Get CVM system stats |
+| `get_cvm_network(request)` | Get CVM network info |
+| `get_cvm_docker_compose(request)` | Get Docker Compose YAML |
+| `get_cvm_compose_file(request)` | Get compose file content |
+| `get_cvm_containers_stats(request)` | Get container stats |
+| `get_cvm_attestation(request)` | Get TEE attestation |
+| `get_cvm_pre_launch_script(request)` | Get pre-launch script |
+| `get_cvm_user_config(request)` | Get user config |
+
+### CVM Lifecycle
+
+| Method | Description |
+|--------|-------------|
+| `provision_cvm(request)` | Create a new CVM |
+| `commit_cvm_provision(request)` | Commit a CVM provision |
+| `start_cvm(request)` | Start a CVM |
+| `stop_cvm(request)` | Stop a CVM |
+| `shutdown_cvm(request)` | Gracefully shut down a CVM |
+| `restart_cvm(request)` | Restart a CVM |
+| `delete_cvm(request)` | Delete a CVM |
+| `replicate_cvm(request)` | Create a replica of a CVM |
+
+### CVM Configuration
+
+| Method | Description |
+|--------|-------------|
+| `update_cvm_envs(request)` | Update environment variables |
+| `update_docker_compose(request)` | Update Docker Compose config |
+| `update_pre_launch_script(request)` | Update pre-launch script |
+| `update_cvm_resources(request)` | Update resource allocation |
+| `update_cvm_visibility(request)` | Update visibility settings |
+| `update_os_image(request)` | Update OS image |
+| `get_available_os_images(request)` | List available OS images |
+| `patch_cvm(request)` | Patch multiple CVM fields at once |
+
+### Apps
+
+| Method | Description |
+|--------|-------------|
+| `get_app_list(request?)` | List apps |
+| `get_app_info(request)` | Get app details |
+| `get_app_cvms(request)` | List CVMs for an app |
+| `get_app_revisions(request)` | List app revision history |
+| `get_app_revision_detail(request)` | Get revision details |
+| `get_app_filter_options()` | Get available filter options |
+| `get_app_attestation(request)` | Get app attestation |
+| `get_app_device_allowlist(request)` | Get device allowlist |
+
+### Workspaces
+
+| Method | Description |
+|--------|-------------|
+| `list_workspaces(request?)` | List workspaces |
+| `get_workspace(request)` | Get workspace details |
+| `get_workspace_nodes(request)` | List workspace nodes |
+| `get_workspace_quotas(request)` | Get workspace quotas |
+
+### KMS (Key Management)
+
+| Method | Description |
+|--------|-------------|
+| `get_kms_info(request)` | Get KMS info |
+| `get_kms_list(request?)` | List KMS instances |
+| `get_kms_on_chain_detail(request)` | Get on-chain KMS detail |
+| `get_app_env_encrypt_pub_key(request)` | Get env encryption public key |
+| `next_app_ids(request?)` | Get next available app IDs |
+
+### SSH Keys
+
+| Method | Description |
+|--------|-------------|
+| `list_ssh_keys()` | List SSH keys |
+| `create_ssh_key(request)` | Add an SSH key |
+| `delete_ssh_key(request)` | Remove an SSH key |
+| `import_github_profile_ssh_keys(request)` | Import SSH keys from GitHub profile |
+| `sync_github_ssh_keys()` | Sync SSH keys from GitHub |
+
+### Nodes & Instance Types
+
+| Method | Description |
+|--------|-------------|
+| `get_available_nodes()` | List available TEE nodes |
+| `list_all_instance_type_families()` | List all instance type families |
+| `list_family_instance_types(request)` | List instance types in a family |
+
+## Utility Functions
+
+The SDK also exports standalone utility functions for working with CVM configurations:
+
+```python
+from phala_cloud import (
+    encrypt_env_vars,
+    get_compose_hash,
+    parse_env,
+    parse_env_vars,
+    verify_env_encrypt_public_key,
+)
+```
+
+| Function | Description |
+|----------|-------------|
+| `encrypt_env_vars(...)` | Encrypt environment variables for secure deployment |
+| `get_compose_hash(...)` | Compute compose file hash for on-chain verification |
+| `verify_env_encrypt_public_key(...)` | Verify KMS encryption public key |
+| `parse_env(path)` | Parse a `.env` file into key-value pairs |
+| `parse_env_vars(content)` | Parse dotenv content string into key-value pairs |
+
+## Related
+
+- [Authentication](/phala-cloud/references/cloud-python-sdk/authentication) — API key configuration
+- [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — provisioning and managing CVMs
+- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — error classes and safe methods
+- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs

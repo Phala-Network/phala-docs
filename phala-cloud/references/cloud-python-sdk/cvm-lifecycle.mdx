@@ -1,0 +1,327 @@
+---
+title: CVM Lifecycle
+description: Provision, start, stop, restart, delete, and replicate CVMs using the Python SDK.
+icon: server
+---
+
+CVM lifecycle methods control the creation and state transitions of your Confidential Virtual Machines. Provisioning is a two-step process (provision then commit), while other operations are single calls.
+
+## CVM Identifiers
+
+Most lifecycle methods accept a CVM identifier. You can pass any of these fields — the SDK resolves them automatically:
+
+| Field | Description |
+|-------|-------------|
+| `id` | CVM ID (most common) |
+| `app_id` | App ID associated with the CVM |
+| `uuid` | CVM UUID |
+| `instance_id` | Instance ID |
+| `cvm_id` | Alias for `id` |
+
+```python
+# All equivalent
+client.get_cvm_info({"id": "my-app"})
+client.get_cvm_info({"app_id": "my-app"})
+client.get_cvm_info({"cvm_id": "my-app"})
+```
+
+---
+
+## provision_cvm
+
+`POST /cvms/provision`
+
+Creates a CVM provision request. This is step one of the two-step provisioning flow. The response includes a `compose_hash` that you use in `commit_cvm_provision`.
+
+**Parameters:**
+
+The request is a dictionary with the CVM configuration. The exact fields depend on your deployment, but typically include:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `str` | Yes | CVM display name |
+| `compose_file` | `dict` | Yes | Docker Compose configuration |
+| `vcpu` | `int` | No | Number of vCPUs |
+| `memory` | `int` | No | Memory in MB |
+| `disk_size` | `int` | No | Disk size in GB |
+| `teepod_id` | `int` | No | Target node ID |
+
+**Returns:** Provision response with `compose_hash` and `app_id`.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+result = client.provision_cvm({
+    "name": "my-cvm",
+    "compose_file": {
+        "docker_compose_file": "services:\n  app:\n    image: nginx:latest",
+    },
+    "vcpu": 2,
+    "memory": 2048,
+    "disk_size": 20,
+    "teepod_id": 3,
+})
+print(result.compose_hash)
+```
+
+```python Async
+result = await client.provision_cvm({
+    "name": "my-cvm",
+    "compose_file": {
+        "docker_compose_file": "services:\n  app:\n    image: nginx:latest",
+    },
+    "vcpu": 2,
+    "memory": 2048,
+    "disk_size": 20,
+    "teepod_id": 3,
+})
+print(result.compose_hash)
+```
+
+</CodeGroup>
+
+---
+
+## commit_cvm_provision
+
+`POST /cvms`
+
+Commits a provisioned CVM, creating the actual instance. This is step two of the provisioning flow. Pass the `compose_hash` from the provision step along with on-chain transaction details.
+
+This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again returns the existing CVM. A different `compose_hash` for the same `app_id` raises a `ResourceError` with error code `CVM_APP_ID_CONFLICT`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App ID from provision step |
+| `compose_hash` | `str` | Yes | Hash from provision step |
+| `transaction_hash` | `str` | Yes | On-chain transaction hash |
+
+**Returns:** Committed CVM details.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+cvm = client.commit_cvm_provision({
+    "app_id": "app-123",
+    "compose_hash": "0xabc...",
+    "transaction_hash": "0xdef...",
+})
+```
+
+```python Async
+cvm = await client.commit_cvm_provision({
+    "app_id": "app-123",
+    "compose_hash": "0xabc...",
+    "transaction_hash": "0xdef...",
+})
+```
+
+</CodeGroup>
+
+---
+
+## start_cvm
+
+`POST /cvms/{cvmId}/start`
+
+Starts a stopped CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** CVM action response with updated status.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+result = client.start_cvm({"id": "my-app"})
+print(result.status)  # "starting"
+```
+
+```python Async
+result = await client.start_cvm({"id": "my-app"})
+print(result.status)
+```
+
+</CodeGroup>
+
+---
+
+## stop_cvm
+
+`POST /cvms/{cvmId}/stop`
+
+Force-stops a CVM immediately.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** CVM action response with updated status.
+
+---
+
+## shutdown_cvm
+
+`POST /cvms/{cvmId}/shutdown`
+
+Gracefully shuts down a CVM, allowing containers to stop cleanly. Prefer this over `stop_cvm` unless you need an immediate halt.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** CVM action response with updated status.
+
+---
+
+## restart_cvm
+
+`POST /cvms/{cvmId}/restart`
+
+Restarts a CVM. Supports an optional `force` flag to skip graceful shutdown.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `force` | `bool` | No | Force restart without graceful shutdown (default: `False`) |
+
+**Returns:** CVM action response with updated status.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+client.restart_cvm({"id": "my-app", "force": True})
+```
+
+```python Async
+await client.restart_cvm({"id": "my-app", "force": True})
+```
+
+</CodeGroup>
+
+---
+
+## delete_cvm
+
+`DELETE /cvms/{cvmId}`
+
+Permanently deletes a CVM and all its data.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** `None`
+
+<Warning>
+This action is irreversible. All data associated with the CVM will be permanently deleted.
+</Warning>
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+client.delete_cvm({"id": "my-app"})
+```
+
+```python Async
+await client.delete_cvm({"id": "my-app"})
+```
+
+</CodeGroup>
+
+---
+
+## replicate_cvm
+
+`POST /cvms/{cvmId}/replicas`
+
+Creates a copy of an existing CVM. The replica shares the same compose configuration but runs as an independent instance.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | Source CVM identifier |
+| `node_id` | `int` | No | Target node for the replica |
+
+**Returns:** Replicated CVM details.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+replica = client.replicate_cvm({"id": "my-app", "node_id": 5})
+```
+
+```python Async
+replica = await client.replicate_cvm({"id": "my-app", "node_id": 5})
+```
+
+</CodeGroup>
+
+---
+
+## watch_cvm_state
+
+`GET /cvms/{cvmId}/state` (SSE)
+
+Polls the CVM state via Server-Sent Events until it reaches a target status. This is useful for waiting until a CVM finishes starting or stopping. Only available on the sync client.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `target` | `str` | Yes | Target state to wait for (e.g., `"Running"`) |
+| `interval` | `int` | No | Polling interval in seconds (default: `5`, range: 5-30) |
+| `timeout` | `int` | No | Server-side timeout in seconds (default: `300`, range: 10-600) |
+| `max_retries` | `int` | No | Maximum retry attempts |
+| `retry_delay` | `float` | No | Delay between retries in seconds (default: `5.0`) |
+
+**Returns:** CVM state object when the target state is reached.
+
+**Raises:** `TimeoutError` if max retries exceeded.
+
+**Example:**
+
+```python
+# Start a CVM and wait for it to be running
+client.start_cvm({"id": "my-app"})
+state = client.watch_cvm_state({
+    "id": "my-app",
+    "target": "Running",
+    "timeout": 120,
+    "max_retries": 3,
+})
+print(state.status)  # "Running"
+```
+
+## Related
+
+- [CVM Configuration](/phala-cloud/references/cloud-python-sdk/cvm-configuration) — updating compose files and resources
+- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — handling provisioning errors

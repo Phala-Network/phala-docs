@@ -1,0 +1,214 @@
+---
+title: Cloud Go SDK
+description: Go client for the Phala Cloud API — manage CVMs, deployments, and infrastructure programmatically.
+---
+
+The `phala` Go package provides a strongly-typed client for the Phala Cloud API. It handles authentication, automatic retries with exponential backoff, and structured error responses out of the box.
+
+## Installation
+
+Requires Go 1.25 or later.
+
+```bash
+go get github.com/Phala-Network/phala-cloud/sdks/go
+```
+
+## Quick Start
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	phala "github.com/Phala-Network/phala-cloud/sdks/go"
+)
+
+func main() {
+	client, err := phala.NewClient(
+		phala.WithAPIKey("your-api-key"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	user, err := client.GetCurrentUser(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Hello, %s!\n", user.User.Username)
+}
+```
+
+## Client Creation
+
+### `NewClient(opts ...Option) (*Client, error)`
+
+Creates a new Phala Cloud API client. The API key is resolved from options first, then falls back to the `PHALA_CLOUD_API_KEY` environment variable. Returns an error if no API key is available.
+
+```go
+// Minimal — reads API key from PHALA_CLOUD_API_KEY env var
+client, err := phala.NewClient()
+```
+
+```go
+// Explicit configuration
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithBaseURL("https://cloud-api.phala.com/api/v1"),
+	phala.WithTimeout(60 * time.Second),
+	phala.WithMaxRetries(10),
+)
+```
+
+## Configuration Options
+
+Every option is a function passed to `NewClient`. They follow Go's functional options pattern, so you can combine as many as you need.
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `WithAPIKey(key)` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
+| `WithBaseURL(url)` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
+| `WithAPIVersion(v)` | `"2026-01-21"` | API version header value |
+| `WithTimeout(d)` | no timeout | HTTP client timeout as `time.Duration` |
+| `WithMaxRetries(n)` | `30` | Maximum retries for retryable errors (409/429/503) |
+| `WithHTTPClient(hc)` | `&http.Client{}` | Custom `*http.Client` for full control |
+| `WithUserAgent(ua)` | `phala-cloud-sdk-go/0.1.0` | Custom User-Agent header |
+| `WithHeader(key, val)` | — | Add a custom header to all requests |
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PHALA_CLOUD_API_KEY` | API key for authentication |
+| `PHALA_CLOUD_API_PREFIX` | Override base URL |
+
+The client resolves environment variables automatically. If you pass an explicit option, it takes priority over the corresponding environment variable.
+
+## Pointer Helpers
+
+Many request structs use pointer fields for optional values. The SDK provides helper functions to make this ergonomic:
+
+```go
+phala.String("value")   // *string
+phala.Int(4)            // *int
+phala.Int64(100)        // *int64
+phala.Float64(3.14)     // *float64
+phala.Bool(true)        // *bool
+```
+
+These are especially useful when constructing request structs inline:
+
+```go
+&phala.PatchCVMRequest{
+	PublicSysinfo: phala.Bool(true),
+	VCPU:          phala.Int(4),
+	Memory:        phala.Int(8192),
+}
+```
+
+## CVM ID Resolution
+
+The SDK automatically normalizes CVM identifiers before sending them to the API. You can pass any of the following formats to any method that accepts a `cvmID` string:
+
+- **UUID** (with or without dashes) — dashes are stripped
+- **40-char hex app ID** — `app_` prefix is added
+- **Integer ID, hashed ID, or name** — used as-is
+
+This means you never need to worry about converting between ID formats yourself.
+
+## Available Methods
+
+### Authentication & User
+
+| Method | Description |
+|--------|-------------|
+| `GetCurrentUser(ctx)` | Get current user, workspace, and credits |
+
+### CVM Lifecycle
+
+| Method | Description |
+|--------|-------------|
+| `ProvisionCVM(ctx, req)` | Provision a new CVM |
+| `CommitCVMProvision(ctx, req)` | Commit a provisioned CVM |
+| `StartCVM(ctx, id)` | Start a stopped CVM |
+| `StopCVM(ctx, id)` | Force-stop a CVM |
+| `ShutdownCVM(ctx, id)` | Gracefully shut down a CVM |
+| `RestartCVM(ctx, id, opts)` | Restart a CVM |
+| `DeleteCVM(ctx, id)` | Permanently delete a CVM |
+| `ReplicateCVM(ctx, id, opts)` | Replicate a CVM to another node |
+
+### CVM Configuration
+
+| Method | Description |
+|--------|-------------|
+| `UpdateDockerCompose(ctx, id, yaml, opts)` | Update Docker Compose config |
+| `UpdatePreLaunchScript(ctx, id, script, opts)` | Update pre-launch script |
+| `UpdateCVMResources(ctx, id, req)` | Update resource allocation |
+| `UpdateCVMVisibility(ctx, id, req)` | Update visibility settings |
+| `UpdateCVMEnvs(ctx, id, req)` | Update encrypted env vars |
+| `UpdateOSImage(ctx, id, req)` | Update OS image |
+| `PatchCVM(ctx, id, req)` | Multi-field update |
+| `ConfirmCVMPatch(ctx, id, req)` | Confirm patch with on-chain hash |
+
+### CVM Query
+
+| Method | Description |
+|--------|-------------|
+| `GetCVMList(ctx, opts)` | List CVMs (paginated) |
+| `GetCVMInfo(ctx, id)` | Get CVM details |
+| `GetCVMState(ctx, id)` | Get CVM current state |
+| `GetCVMStats(ctx, id)` | Get CVM system stats |
+| `GetCVMNetwork(ctx, id)` | Get CVM network info |
+| `GetCVMContainersStats(ctx, id)` | Get container stats |
+| `GetCVMAttestation(ctx, id)` | Get TEE attestation |
+| `GetCVMUserConfig(ctx, id)` | Get user configuration |
+| `WatchCVMState(ctx, id, opts)` | Watch state changes via SSE |
+
+### Apps
+
+| Method | Description |
+|--------|-------------|
+| `GetAppList(ctx)` | List applications |
+| `GetAppInfo(ctx, appID)` | Get app details |
+| `GetAppCVMs(ctx, appID)` | List CVMs for an app |
+| `GetAppRevisions(ctx, appID, opts)` | List revision history |
+| `GetAppAttestation(ctx, appID)` | Get app attestation |
+| `GetAppDeviceAllowlist(ctx, appID)` | Get device allowlist |
+
+### Workspaces
+
+| Method | Description |
+|--------|-------------|
+| `ListWorkspaces(ctx)` | List workspaces |
+| `GetWorkspace(ctx, slug)` | Get workspace details |
+| `GetWorkspaceNodes(ctx, slug, opts)` | List workspace nodes |
+| `GetWorkspaceQuotas(ctx, slug)` | Get workspace quotas |
+
+### KMS
+
+| Method | Description |
+|--------|-------------|
+| `GetKMSList(ctx)` | List KMS servers |
+| `GetKMSInfo(ctx, kmsID)` | Get KMS details |
+| `GetAppEnvEncryptPubKey(ctx, kmsType, appID)` | Get env encryption public key |
+| `GetKMSOnChainDetail(ctx, chain)` | Get KMS on-chain detail |
+
+### SSH Keys
+
+| Method | Description |
+|--------|-------------|
+| `ListSSHKeys(ctx)` | List SSH keys |
+| `CreateSSHKey(ctx, req)` | Create an SSH key |
+| `DeleteSSHKey(ctx, keyID)` | Delete an SSH key |
+| `ImportGithubProfileSSHKeys(ctx, username)` | Import keys from GitHub profile |
+| `SyncGithubSSHKeys(ctx)` | Sync keys from GitHub |
+
+## Related
+
+- [Authentication](/phala-cloud/references/cloud-go-sdk/authentication) — API key setup and custom headers
+- [CVM Lifecycle](/phala-cloud/references/cloud-go-sdk/cvm-lifecycle) — provisioning, starting, stopping, deleting
+- [Error Handling](/phala-cloud/references/cloud-go-sdk/error-handling) — error types and retry logic
+- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs

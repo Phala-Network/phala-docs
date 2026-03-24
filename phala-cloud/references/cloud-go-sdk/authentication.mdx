@@ -1,0 +1,117 @@
+---
+title: Authentication
+description: Configure API key authentication, environment variables, and custom headers for the Go SDK.
+icon: key
+---
+
+Every request to the Phala Cloud API requires an API key. The Go SDK resolves the key from the option you pass to `NewClient`, or falls back to the `PHALA_CLOUD_API_KEY` environment variable. If neither is set, `NewClient` returns an error.
+
+## API Key via Option
+
+The most explicit way to authenticate is passing `WithAPIKey` when creating the client.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("phala_xxxxxxxxxxxxxxxxxxxxx"),
+)
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+## API Key via Environment Variable
+
+For production deployments, storing the key in an environment variable is the standard approach. The SDK reads `PHALA_CLOUD_API_KEY` automatically when no explicit key is provided.
+
+```bash
+export PHALA_CLOUD_API_KEY="phala_xxxxxxxxxxxxxxxxxxxxx"
+```
+
+```go
+// No WithAPIKey needed — reads from PHALA_CLOUD_API_KEY
+client, err := phala.NewClient()
+if err != nil {
+	log.Fatal(err) // Fails if env var is also unset
+}
+```
+
+<Note>
+If you pass `WithAPIKey` explicitly, it always takes priority over the environment variable.
+</Note>
+
+## Custom Base URL
+
+You can override the API endpoint with `WithBaseURL` or the `PHALA_CLOUD_API_PREFIX` environment variable. The SDK defaults to `https://cloud-api.phala.com/api/v1`.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithBaseURL("https://custom-api.example.com/api/v1"),
+)
+```
+
+The explicit option takes priority over the environment variable, just like the API key.
+
+## Custom Headers
+
+Use `WithHeader` to attach additional headers to every request. This is useful for tracing, correlation IDs, or internal routing.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithHeader("X-Request-ID", "trace-abc123"),
+	phala.WithHeader("X-Custom-Header", "my-value"),
+)
+```
+
+Each call to `WithHeader` adds one header. You can call it multiple times to set several headers.
+
+## API Versioning
+
+The SDK sends an API version header with every request. The default is `"2026-01-21"`. Override it if you need to target a different version.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIVersion("2026-01-21"),
+)
+```
+
+## Custom HTTP Client
+
+For advanced scenarios like custom TLS configuration, proxies, or instrumented transports, pass your own `*http.Client` with `WithHTTPClient`.
+
+```go
+transport := &http.Transport{
+	TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS13},
+}
+httpClient := &http.Client{Transport: transport}
+
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithHTTPClient(httpClient),
+)
+```
+
+<Warning>
+When using `WithHTTPClient`, the `WithTimeout` option modifies the timeout on your provided client. If you want full control, set the timeout on your `*http.Client` directly.
+</Warning>
+
+## User Agent
+
+The SDK sends a `User-Agent` header like `phala-cloud-sdk-go/0.1.0` by default. Override it to identify your application in server logs.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("your-api-key"),
+	phala.WithUserAgent("my-automation/2.0"),
+)
+```
+
+## Resolution Priority
+
+The client resolves configuration in this order (first match wins):
+
+1. Explicit option passed to `NewClient` (e.g., `WithAPIKey`, `WithBaseURL`)
+2. Environment variable (`PHALA_CLOUD_API_KEY`, `PHALA_CLOUD_API_PREFIX`)
+3. Built-in default (base URL: `https://cloud-api.phala.com/api/v1`)

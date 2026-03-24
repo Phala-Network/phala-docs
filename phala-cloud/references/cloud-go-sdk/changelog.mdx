@@ -1,0 +1,33 @@
+---
+title: Changelog
+description: Version history and release notes for the Phala Cloud Go SDK.
+icon: clock-rotate-left
+---
+
+## v0.1.0
+
+*Initial release*
+
+The first public release of the Phala Cloud Go SDK, providing full coverage of the Phala Cloud REST API.
+
+### Features
+
+- **Client initialization** with functional options pattern (`NewClient`, `WithAPIKey`, `WithBaseURL`, etc.)
+- **CVM lifecycle** — provision, commit, start, stop, shutdown, restart, delete, replicate
+- **CVM configuration** — update Docker Compose, pre-launch scripts, resources, visibility, env vars, OS images
+- **Multi-field patch** — `PatchCVM` and `ConfirmCVMPatch` for atomic multi-field updates with on-chain confirmation support
+- **Real-time state watching** — `WatchCVMState` via SSE with Go channels, automatic reconnection, and configurable retries
+- **App management** — list apps, get info, query CVMs, revisions, attestations, and device allowlists
+- **Workspace operations** — list workspaces, get details, query nodes and quotas
+- **KMS** — list servers, get info, fetch encryption public keys, query on-chain details
+- **SSH key management** — list, create, delete, import from GitHub profile, sync from linked GitHub account
+- **Automatic retries** — exponential backoff (1s base, 20s cap) for 409/429/503 responses
+- **Structured error handling** — `APIError` with classification methods, error codes, suggestions, and documentation links
+- **CVM ID resolution** — automatic normalization of UUIDs, app IDs, hashed IDs, and names
+- **Pointer helpers** — `String()`, `Int()`, `Int64()`, `Float64()`, `Bool()` for optional fields
+- **Environment variable fallbacks** — `PHALA_CLOUD_API_KEY` and `PHALA_CLOUD_API_PREFIX`
+
+### Requirements
+
+- Go 1.25 or later
+- API version: `2026-01-21`

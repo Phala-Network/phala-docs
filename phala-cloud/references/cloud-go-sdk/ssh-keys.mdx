@@ -1,0 +1,150 @@
+---
+title: SSH Keys
+description: Manage SSH keys for CVM access — list, create, delete, and import from GitHub.
+icon: terminal
+---
+
+SSH key methods manage the public keys authorized for SSH access to your CVMs. You can add keys manually, import them from a GitHub profile, or sync them from your linked GitHub account.
+
+## ListSSHKeys
+
+`GET /user/ssh-keys`
+
+Returns all SSH keys registered for the current user.
+
+```go
+func (c *Client) ListSSHKeys(ctx context.Context) ([]SSHKey, error)
+```
+
+**Returns:** `[]SSHKey` where each `SSHKey` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | `string` | Key identifier |
+| `Name` | `string` | Display name |
+| `PublicKey` | `string` | Public key content |
+| `Fingerprint` | `*string` | Key fingerprint |
+| `KeyType` | `*string` | Key type (e.g., `"ssh-ed25519"`) |
+| `Source` | `*string` | How the key was added (e.g., `"manual"`, `"github"`) |
+| `CreatedAt` | `*string` | Creation timestamp |
+
+```go
+keys, err := client.ListSSHKeys(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+for _, key := range keys {
+	fmt.Printf("%s — %s (%s)\n", key.Name, key.ID, *key.KeyType)
+}
+```
+
+---
+
+## CreateSSHKey
+
+`POST /user/ssh-keys`
+
+Registers a new SSH public key.
+
+```go
+func (c *Client) CreateSSHKey(ctx context.Context, req *CreateSSHKeyRequest) (*SSHKey, error)
+```
+
+**CreateSSHKeyRequest fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `Name` | `string` | Yes | Display name for the key |
+| `PublicKey` | `string` | Yes | SSH public key content |
+
+**Returns:** `*SSHKey` — the created key with its assigned ID and fingerprint.
+
+```go
+key, err := client.CreateSSHKey(ctx, &phala.CreateSSHKeyRequest{
+	Name:      "my-laptop",
+	PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample...",
+})
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Created key: %s (fingerprint: %s)\n", key.ID, *key.Fingerprint)
+```
+
+---
+
+## DeleteSSHKey
+
+`DELETE /user/ssh-keys/{keyId}`
+
+Removes an SSH key by its ID. Existing CVMs that were deployed with this key will retain access until they are restarted or updated.
+
+```go
+func (c *Client) DeleteSSHKey(ctx context.Context, keyID string) error
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `keyID` | `string` | Yes | SSH key identifier |
+
+**Returns:** `error` (no response body on success)
+
+```go
+err := client.DeleteSSHKey(ctx, "key-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+---
+
+## ImportGithubProfileSSHKeys
+
+`POST /user/ssh-keys/github-profile`
+
+Imports SSH public keys from any GitHub user's profile. This fetches the keys from `https://github.com/{username}.keys` and adds them to your account.
+
+```go
+func (c *Client) ImportGithubProfileSSHKeys(ctx context.Context, username string) (*ImportGithubResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `username` | `string` | Yes | GitHub username |
+
+**Returns:** `*ImportGithubResponse` (generic map with import details)
+
+```go
+imported, err := client.ImportGithubProfileSSHKeys(ctx, "octocat")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+<Note>
+This imports keys from any public GitHub profile. Use `SyncGithubSSHKeys` instead if you want to sync keys from your own linked GitHub account.
+</Note>
+
+---
+
+## SyncGithubSSHKeys
+
+`POST /user/ssh-keys/github-sync`
+
+Syncs SSH keys from the user's linked GitHub account. This requires that the user has connected their GitHub account to Phala Cloud.
+
+```go
+func (c *Client) SyncGithubSSHKeys(ctx context.Context) (*SyncGithubResponse, error)
+```
+
+**Returns:** `*SyncGithubResponse` (generic map with sync details)
+
+```go
+synced, err := client.SyncGithubSSHKeys(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+```

@@ -121,3 +121,151 @@ const filters = await client.getAppFilterOptions();
 console.log("Available statuses:", filters.statuses);
 console.log("Available regions:", filters.regions);
 ```
+
+---
+
+## getAppAttestation
+
+`GET /apps/{appId}/attestations`
+
+Returns TEE attestation details for all CVM instances under an app. This includes per-instance certificates, TCB measurements, and KMS metadata, giving you a single view of the app's attestation posture.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appId` | `string` | Yes | App identifier (hex) |
+
+**Returns:** `AppAttestationResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `app_id` | `string` | App identifier |
+| `contract_address` | `string` | App contract address |
+| `kms_info` | `object` | KMS details (contract address, chain, URL) |
+| `instances` | `array` | Per-instance attestation (vm_uuid, tcb_info, app_certificates, compose_file) |
+| `kms_guest_agent_info` | `object?` | KMS guest agent info |
+| `gateway_guest_agent_info` | `object?` | Gateway guest agent info |
+| `qemu_version` | `string?` | QEMU version |
+
+**Example:**
+
+```typescript
+const att = await client.getAppAttestation({ appId: "0x1234abcd" });
+att.instances.forEach(inst => {
+  console.log(inst.name, inst.status, inst.tcb_info?.app_compose);
+});
+```
+
+---
+
+## getAppDeviceAllowlist
+
+`GET /apps/{appId}/device-allowlist`
+
+Returns the device allowlist status for all CVMs under an app. For on-chain KMS apps, this queries the blockchain in real-time to check which devices are registered in the app contract. For offchain KMS apps, returns basic info with `is_onchain_kms: false`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appId` | `string` | Yes | App identifier (hex) |
+
+**Returns:** `DeviceAllowlistResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_onchain_kms` | `boolean` | Whether the app uses on-chain KMS |
+| `allow_any_device` | `boolean?` | On-chain `allowAnyDevice` flag |
+| `chain_id` | `number?` | Blockchain chain ID |
+| `app_contract_address` | `string?` | App contract address |
+| `devices` | `array` | Device entries with `device_id`, `node_name`, `cvm_ids`, `allowed_onchain`, `status` |
+
+**Example:**
+
+```typescript
+const allowlist = await client.getAppDeviceAllowlist({ appId: "0x1234abcd" });
+if (allowlist.is_onchain_kms) {
+  allowlist.devices.forEach(d => {
+    console.log(d.device_id, d.status, d.allowed_onchain);
+  });
+}
+```
+
+---
+
+## checkAppIsAllowed
+
+`POST /apps/{appId}/is-allowed`
+
+Checks whether a deployment is allowed by an on-chain DStack App contract. This queries the blockchain to verify that the compose hash and device are registered. You can use this for pre-flight checks before deploying or updating a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appId` | `string` | Yes | App contract address |
+| `compose_hash` | `string` | Yes | Compose hash to check |
+| `node_id` | `number` | No | Node ID (resolves device ID from DB) |
+| `device_id` | `string` | No | Device ID (hex, direct) |
+| `chain_id` | `number` | No | Chain ID for RPC URL resolution |
+
+**Returns:** `IsAllowedResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `app_contract_address` | `string` | Contract address |
+| `compose_hash` | `string` | Checked compose hash |
+| `device_id` | `string` | Device ID checked |
+| `compose_hash_allowed` | `boolean` | Whether compose hash is registered |
+| `allow_any_device` | `boolean` | Whether any device is allowed |
+| `device_id_allowed` | `boolean?` | Whether specific device is registered |
+| `is_allowed` | `boolean` | Overall allowance result |
+| `error` | `string?` | Error message if check failed |
+
+**Example:**
+
+```typescript
+const result = await client.checkAppIsAllowed({
+  appId: "0x1234abcd",
+  compose_hash: "0xaabb...",
+  device_id: "0xccdd...",
+});
+console.log(`Allowed: ${result.is_allowed}`);
+```
+
+---
+
+## checkAppCvmsIsAllowed
+
+`POST /apps/{appId}/cvms/is-allowed`
+
+Batch-checks on-chain deployment allowance for all CVMs under an app. For on-chain KMS apps, this queries the blockchain via multicall to check compose hash and device allowance for each CVM in a single operation. For offchain KMS apps, returns `is_onchain: false` with no results.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appId` | `string` | Yes | App identifier (hex) |
+
+**Returns:** `AppCvmsBatchIsAllowedResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `is_onchain` | `boolean` | Whether the app uses on-chain KMS |
+| `results` | `array` | Per-CVM allowance results (each with `cvm_id`, `is_allowed`, `compose_hash_allowed`, etc.) |
+| `total` | `number` | Total CVMs checked |
+| `allowed_count` | `number` | Number of allowed CVMs |
+| `denied_count` | `number` | Number of denied CVMs |
+| `error_count` | `number` | Number of errored checks |
+| `skipped_cvm_ids` | `number[]` | CVM IDs that were skipped |
+
+**Example:**
+
+```typescript
+const batch = await client.checkAppCvmsIsAllowed({ appId: "0x1234abcd" });
+console.log(`${batch.allowed_count}/${batch.total} CVMs allowed`);
+batch.results.forEach(r => {
+  console.log(`CVM ${r.cvm_id}: allowed=${r.is_allowed}`);
+});
+```

@@ -1,0 +1,264 @@
+---
+title: Data Sources
+description: Reference for all Phala Cloud Terraform data sources — discover account info, sizes, regions, images, nodes, and attestation data.
+icon: "database"
+---
+
+The Phala Cloud provider includes seven read-only data sources. Use them to discover valid configuration values (sizes, regions, images, nodes) and to inspect account or attestation state. Data sources are refreshed on every `terraform plan` and `terraform apply`.
+
+## phala_account
+
+Returns current account info including user profile, credits, and active workspace linkage.
+
+```hcl
+data "phala_account" "current" {}
+
+output "username" {
+  value = data.phala_account.current.username
+}
+
+output "credit_balance" {
+  value = data.phala_account.current.credit_balance
+}
+```
+
+### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Stable account identifier. |
+| `username` | String | Account username. |
+| `email` | String | Account email address. |
+| `email_verified` | Boolean | Whether the email is verified. |
+| `avatar` | String | Avatar URL. |
+| `role` | String | Account role. |
+| `has_password` | Boolean | Whether a password is set. |
+| `totp_enabled` | Boolean | Whether TOTP 2FA is enabled. |
+| `has_backup_codes` | Boolean | Whether backup codes exist. |
+| `credit_balance` | String | Current credit balance. |
+| `credit_granted_balance` | String | Granted credit balance. |
+| `credit_outstanding_amount` | String | Outstanding credit amount. |
+| `credit_is_post_paid` | Boolean | Whether the account is post-paid. |
+| `workspace_id` | String | Active workspace ID. |
+| `workspace_name` | String | Active workspace name. |
+| `workspace_slug` | String | Active workspace slug. |
+| `workspace_role` | String | Role in the active workspace. |
+| `workspace_tier` | String | Workspace tier (e.g. free, pro). |
+
+---
+
+## phala_workspace
+
+Returns metadata about the active workspace for the current API key.
+
+```hcl
+data "phala_workspace" "current" {}
+
+output "workspace_name" {
+  value = data.phala_workspace.current.name
+}
+
+output "workspace_tier" {
+  value = data.phala_workspace.current.tier
+}
+```
+
+### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Workspace ID (immutable). |
+| `name` | String | Workspace display name. |
+| `slug` | String | Workspace slug. |
+| `role` | String | Current user's role in this workspace. |
+| `tier` | String | Workspace tier. |
+| `avatar` | String | Workspace avatar URL. |
+
+---
+
+## phala_sizes
+
+Lists available CVM instance types. Use this to discover valid `size` slugs for `phala_app`.
+
+```hcl
+data "phala_sizes" "all" {}
+
+output "available_sizes" {
+  value = data.phala_sizes.all.sizes[*].slug
+}
+```
+
+### Input Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `family` | String | Optional filter by instance family (e.g. `cpu`, `gpu`, `tdx`). |
+
+### Output: `sizes` List
+
+Each entry in `sizes` contains:
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `slug` | String | Instance type slug (use this as the `size` value in `phala_app`). |
+| `name` | String | Display name. |
+| `description` | String | Human-readable description. |
+| `family` | String | Instance family. |
+| `vcpu` | Number | Number of virtual CPUs. |
+| `memory_mb` | Number | Memory in megabytes. |
+| `default_disk_size_gb` | Number | Default disk size in GB. |
+| `hourly_rate` | String | Hourly cost. |
+| `requires_gpu` | Boolean | Whether this size requires GPU nodes. |
+
+---
+
+## phala_regions
+
+Lists available deployment regions.
+
+```hcl
+data "phala_regions" "all" {}
+
+output "available_regions" {
+  value = data.phala_regions.all.regions[*].slug
+}
+```
+
+### Output: `regions` List
+
+Each entry in `regions` contains:
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `slug` | String | Region slug (use this as the `region` value in `phala_app`). |
+| `name` | String | Display name. |
+| `available` | Boolean | Whether the region currently accepts new deployments. |
+
+---
+
+## phala_images
+
+Lists available OS images for CVMs. Always use the exact `slug` from this data source when setting the `image` attribute on `phala_app`.
+
+```hcl
+data "phala_images" "west" {
+  region = "US-WEST-1"
+}
+
+output "image_slugs" {
+  value = data.phala_images.west.images[*].slug
+}
+```
+
+<Warning>
+Use the full image slug (e.g. `dstack-dev-0.5.7-9b6a5239`), not a shortened version like `dstack-dev` or `dstack-dev-0.5.7`. Shortened slugs are not accepted by the API.
+</Warning>
+
+### Input Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `region` | String | Optional region filter. Only returns images available in that region. |
+
+### Output: `images` List
+
+Each entry in `images` contains:
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `slug` | String | Image slug (use this as the `image` value in `phala_app`). |
+| `name` | String | Image name. |
+| `version` | String | Image version. |
+| `os_image_hash` | String | Image content hash. |
+| `is_dev` | Boolean | Whether this is a development image. |
+| `regions` | List of String | Regions where this image is available. |
+
+---
+
+## phala_nodes
+
+Lists available worker nodes (teepods) for CVM placement. Use this when you need to pin a deployment to a specific node with `node_id` on `phala_app`.
+
+```hcl
+data "phala_nodes" "west" {
+  region = "us-west"
+}
+
+output "node_ids" {
+  value = data.phala_nodes.west.nodes[*].node_id
+}
+```
+
+### Input Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `region` | String | Optional region filter. |
+| `support_onchain_kms` | Boolean | Optional filter for nodes that support on-chain KMS. |
+
+### Output: `nodes` List
+
+Each entry in `nodes` contains:
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `node_id` | Number | Node ID (use this as the `node_id` value in `phala_app`). |
+| `name` | String | Node display name. |
+| `region` | String | Node region. |
+| `device_id` | String | Hardware device identifier. |
+| `fmspc` | String | Intel FMSPC value for this node's TEE hardware. |
+| `listed` | Boolean | Whether the node is publicly listed. |
+| `support_onchain_kms` | Boolean | Whether the node supports on-chain KMS. |
+| `remaining_vcpu` | Number | Available vCPU capacity. |
+| `remaining_memory_mb` | Number | Available memory in MB. |
+| `remaining_cvm_slots` | Number | Available CVM slots. |
+| `resource_score` | Number | Computed resource availability score. |
+| `images` | List of String | Image slugs supported on this node. |
+
+---
+
+## phala_attestation
+
+Fetches TEE attestation data for a specific CVM on demand. This is a read-only verification data source, not a lifecycle resource.
+
+```hcl
+data "phala_attestation" "web" {
+  cvm_id = phala_app.web.primary_cvm_id
+}
+
+output "is_online" {
+  value = data.phala_attestation.web.is_online
+}
+
+output "tcb_info" {
+  value = data.phala_attestation.web.tcb_info_json
+}
+```
+
+### Input Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `cvm_id` | String | The CVM or app identifier to fetch attestation for. |
+
+### Output Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Stable state ID (same as `cvm_id`). |
+| `is_online` | Boolean | Whether the CVM is currently online. |
+| `is_public` | Boolean | Whether the CVM's attestation is publicly accessible. |
+| `error` | String | Error message if attestation fetch failed. |
+| `compose_file` | String | The compose file content from attestation. |
+| `tcb_info_json` | String | Raw TCB info object as JSON string. |
+| `app_certificates_json` | String | Raw app certificates array as JSON string. |
+| `raw_json` | String | Full attestation response as a JSON string. |
+
+<Note>
+Attestation data is fetched fresh on every plan/apply. The `raw_json` field contains the complete API response if you need fields beyond the top-level attributes.
+</Note>
+
+## Related
+
+- [phala_app Resource](/phala-cloud/references/terraform-provider/app-resource) — using data source outputs in deployments
+- [Examples](/phala-cloud/references/terraform-provider/examples) — discovery and deployment patterns

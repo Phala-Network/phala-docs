@@ -1,0 +1,112 @@
+---
+title: Changelog
+description: Version history for the Phala Cloud Terraform provider — new features, breaking changes, and bug fixes.
+icon: "clock-rotate-left"
+---
+
+All notable changes to the Phala Cloud Terraform provider are documented here. The provider is currently in **beta** maturity. See the [feature maturity matrix](#feature-maturity) at the bottom for per-resource status.
+
+## Unreleased
+
+### Removed
+
+- **`phala_cvm` resource removed.** Use `phala_app` with `replicas = 1` instead. `phala_app` is now the sole lifecycle resource for managing CVMs on Phala Cloud.
+
+### Changed
+
+- Stabilized data source IDs: `phala_account` uses a fixed `"current"` ID, and `phala_workspace` uses the immutable workspace ID. This prevents state churn on profile changes.
+- Delete polling now respects `wait_timeout_seconds` instead of a hardcoded 120s timeout.
+- Unified replica patch semantics: OS image and compose settings updates now use consistent 409-fallthrough across replicas.
+- Improved error messages for public key decoding and delete timeout failures.
+
+### Fixed
+
+- API key is no longer leaked in error response headers.
+- `encrypted_env` is now validated as valid hex before sending to the API.
+- Typed API client logs a warning on initialization failure instead of silently degrading.
+
+---
+
+## 0.2.0-beta.1 (2026-03-08)
+
+### Added
+
+- **New `phala_app` resource** with an app-first model:
+  - Shared compose and environment at app scope.
+  - Replica count management via `replicas`.
+  - App-level outputs: `app_id`, `cvm_ids`, `endpoint`.
+- **New `phala_nodes` data source** for node placement discovery (`node_id`) with optional region and on-chain KMS filters.
+- **New `phala_attestation` data source** for read-only TEE attestation fetch by `cvm_id`.
+- Release packaging script for cross-platform provider artifacts.
+- CI workflow for provider tests and build checks.
+- Manual GitHub release workflow for versioned artifacts.
+- Feature maturity and release process documentation.
+
+### Changed
+
+- `image` is now updatable in-place via `PATCH /cvms/{id}/os-image`.
+- Added create-time identity and placement inputs for `phala_app`:
+  - `kms` (currently `phala` only; `ethereum`/`base` planned)
+  - `custom_app_id` + `nonce` (PHALA deterministic identity flow)
+  - `node_id` (maps to provision `teepod_id`)
+- Added compose-file runtime settings to `phala_app`:
+  - `public_logs`, `public_sysinfo`, `public_tcbinfo`, `gateway_enabled`, `secure_time`
+  - Updates use compose provision/apply flow and trigger restart/redeploy.
+- `storage_fs` (`zfs`/`ext4`) is now explicit and immutable (replacement required on change).
+- `disk_size` updates are constrained to grow-only (shrink rejected by provider validation).
+
+---
+
+## 0.1.0 (2026-03-07)
+
+### Added
+
+- **Initial provider release** with:
+  - `phala_app` resource
+  - `phala_cvm_power` resource
+  - `phala_ssh_key` resource
+  - `phala_account` data source
+  - `phala_workspace` data source
+  - `phala_sizes` data source
+  - `phala_regions` data source
+  - `phala_images` data source
+- Workspace and account data sources with smoke-test example.
+- Env auto-encryption flow (`env` auto-derives `encrypted_env` + `env_keys`).
+
+---
+
+## Feature Maturity
+
+The provider is currently at **beta** maturity overall. Here is the per-component breakdown:
+
+| Component | Level | Notes |
+|-----------|-------|-------|
+| `phala_app` | beta | Full CRUD + replica scaling. Sole lifecycle resource. |
+| `phala_cvm_power` | beta | Running/stopped state management. Delete is state-only. |
+| `phala_ssh_key` | beta | Create/read/delete. Immutable fields. |
+| `phala_account` | beta | Read-only. Returns user/workspace linkage + credits. |
+| `phala_workspace` | beta | Read-only. Active workspace metadata. |
+| `phala_sizes` | beta | Read-only catalog. |
+| `phala_regions` | beta | Read-only catalog. |
+| `phala_images` | beta | Read-only catalog. |
+| `phala_nodes` | beta | Read-only. Node discovery with optional filters. |
+| `phala_attestation` | beta | Read-only. On-demand attestation fetch. |
+
+### Criteria to Reach GA
+
+- Workspace isolation end-to-end tests in CI.
+- Stable documentation for upgrade semantics across minor versions.
+- Explicit import guidance and lifecycle caveats for all resources.
+- Release automation with reproducible artifacts and checksums.
+- Two consecutive releases with no breaking schema or state regressions.
+
+## Roadmap
+
+- On-chain KMS create/update flows (BASE/ETHEREUM).
+- Richer filtering for data sources (`images`, `sizes`, `regions`).
+
+## Related
+
+- [Provider Overview](/phala-cloud/references/terraform-provider/overview)
+- [phala_app Resource](/phala-cloud/references/terraform-provider/app-resource)
+- [Examples](/phala-cloud/references/terraform-provider/examples)

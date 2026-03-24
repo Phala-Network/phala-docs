@@ -1,0 +1,344 @@
+---
+title: CVM Configuration
+description: Update Docker Compose files, environment variables, resources, visibility, and OS images on running CVMs.
+icon: gear
+---
+
+Configuration methods let you modify a CVM after it has been provisioned. You can update the Docker Compose file, environment variables, resource allocation, visibility settings, and OS image independently.
+
+## update_docker_compose
+
+`PATCH /cvms/{cvmId}/docker-compose`
+
+Updates the Docker Compose configuration for a CVM. If the CVM has on-chain hash verification enabled, you need to pass `compose_hash` and `transaction_hash`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `docker_compose_file` | `str` | Yes | Docker Compose YAML content |
+| `compose_hash` | `str` | No | On-chain compose hash (if required) |
+| `transaction_hash` | `str` | No | On-chain transaction hash (if required) |
+
+**Returns:** `InProgressResponse` on success, or `ComposeHashPreconditionResponse` if on-chain verification is needed.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+result = client.update_docker_compose({
+    "id": "my-app",
+    "docker_compose_file": """
+services:
+  app:
+    image: nginx:latest
+    ports:
+      - "80:80"
+""",
+})
+```
+
+```python Async
+result = await client.update_docker_compose({
+    "id": "my-app",
+    "docker_compose_file": """
+services:
+  app:
+    image: nginx:latest
+    ports:
+      - "80:80"
+""",
+})
+```
+
+</CodeGroup>
+
+---
+
+## update_cvm_envs
+
+`PATCH /cvms/{cvmId}/envs`
+
+Updates encrypted environment variables for a CVM. Environment variables must be encrypted using the KMS public key before being sent.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `encrypted_env` | `str` | Yes | Encrypted environment variable payload |
+| `env_keys` | `list[str]` | No | List of environment variable keys |
+| `compose_hash` | `str` | No | On-chain compose hash (if required) |
+| `transaction_hash` | `str` | No | On-chain transaction hash (if required) |
+
+**Returns:** `InProgressResponse` on success, or precondition response if on-chain verification is needed.
+
+**Example:**
+
+```python
+from phala_cloud import encrypt_env_vars
+
+# Encrypt env vars using KMS public key
+pubkey_resp = client.get_app_env_encrypt_pub_key({
+    "kms": "phala",
+    "app_id": "my-app-id",
+})
+
+encrypted = encrypt_env_vars(
+    env_vars=[{"key": "SECRET", "value": "my-secret"}],
+    public_key=pubkey_resp.app_env_encrypt_pubkey,
+)
+
+client.update_cvm_envs({
+    "id": "my-app",
+    "encrypted_env": encrypted,
+    "env_keys": ["SECRET"],
+})
+```
+
+---
+
+## update_pre_launch_script
+
+`PATCH /cvms/{cvmId}/pre-launch-script`
+
+Updates the pre-launch script that runs before Docker containers start.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `pre_launch_script` | `str` | Yes | Script content |
+| `compose_hash` | `str` | No | On-chain compose hash (if required) |
+| `transaction_hash` | `str` | No | On-chain transaction hash (if required) |
+
+**Returns:** `InProgressResponse` on success.
+
+---
+
+## get_cvm_docker_compose
+
+`GET /cvms/{cvmId}/docker-compose.yml`
+
+Retrieves the current Docker Compose YAML for a CVM as a raw string.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** `str` — Docker Compose YAML content.
+
+**Example:**
+
+```python
+yaml_content = client.get_cvm_docker_compose({"id": "my-app"})
+print(yaml_content)
+```
+
+---
+
+## get_cvm_compose_file
+
+`GET /cvms/{cvmId}/compose_file`
+
+Retrieves the compose file with metadata (including hash info and structure).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** Compose file response with metadata.
+
+---
+
+## update_cvm_resources
+
+`PATCH /cvms/{cvmId}/resources`
+
+Changes the resource allocation (CPU, memory, disk, instance type) for a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `vcpu` | `float` | No | Number of vCPUs |
+| `memory` | `float` | No | Memory in MB |
+| `disk_size` | `float` | No | Disk size in GB |
+| `instance_type` | `str` | No | Instance type name |
+| `allow_restart` | `bool` | No | Allow automatic restart if needed |
+
+**Returns:** `None`
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+client.update_cvm_resources({
+    "id": "my-app",
+    "vcpu": 4,
+    "memory": 4096,
+    "instance_type": "tdx.medium",
+})
+```
+
+```python Async
+await client.update_cvm_resources({
+    "id": "my-app",
+    "vcpu": 4,
+    "memory": 4096,
+    "instance_type": "tdx.medium",
+})
+```
+
+</CodeGroup>
+
+---
+
+## update_cvm_visibility
+
+`PATCH /cvms/{cvmId}/visibility`
+
+Controls which CVM information is publicly accessible.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `public_sysinfo` | `bool` | Yes | Whether system info is public |
+| `public_logs` | `bool` | Yes | Whether logs are public |
+| `public_tcbinfo` | `bool` | No | Whether TCB info is public |
+
+**Returns:** Visibility settings response.
+
+**Example:**
+
+```python
+client.update_cvm_visibility({
+    "id": "my-app",
+    "public_sysinfo": True,
+    "public_logs": False,
+})
+```
+
+---
+
+## update_os_image
+
+`PATCH /cvms/{cvmId}/os-image`
+
+Changes the OS image for a CVM.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `os_image_name` | `str` | Yes | Name of the target OS image |
+
+**Returns:** `None`
+
+**Example:**
+
+```python
+client.update_os_image({
+    "id": "my-app",
+    "os_image_name": "ubuntu-24.04-tee",
+})
+```
+
+---
+
+## get_available_os_images
+
+`GET /cvms/{cvmId}/available-os-images`
+
+Lists OS images available for a specific CVM. The available images depend on the CVM's node and configuration.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+
+**Returns:** List of available OS image objects.
+
+---
+
+## patch_cvm
+
+`PATCH /cvms/{cvmId}`
+
+A batch update method that can modify multiple CVM fields in a single request. This is useful when you need to change several settings atomically.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `str` | Yes | CVM identifier |
+| `docker_compose_file` | `str` | No | Docker Compose YAML |
+| `pre_launch_script` | `str` | No | Pre-launch script content |
+| `allowed_envs` | `list[str]` | No | Allowed environment variable keys |
+| `public_logs` | `bool` | No | Whether logs are public |
+| `public_sysinfo` | `bool` | No | Whether system info is public |
+| `encrypted_env` | `str` | No | Encrypted environment variables |
+| `vcpu` | `int` | No | Number of vCPUs |
+| `memory` | `int` | No | Memory in MB |
+| `disk_size` | `int` | No | Disk size in GB |
+| `image` | `str` | No | OS image name |
+
+**Returns:** A dict with `requires_on_chain_hash` (bool) and either `correlation_id` or on-chain hash details.
+
+<Note>
+If the patch changes compose-hash-relevant fields, the response may include `requires_on_chain_hash: True` with hash details that need on-chain verification. Use `confirm_cvm_patch` to complete the update.
+</Note>
+
+---
+
+## Compose File Update Flow
+
+For updates that require on-chain hash verification, the SDK provides a two-step flow similar to CVM provisioning:
+
+### provision_cvm_compose_file_update
+
+`POST /cvms/{cvmId}/compose_file/provision`
+
+Provisions a compose file update and returns the new compose hash.
+
+### commit_cvm_compose_file_update
+
+`PATCH /cvms/{cvmId}/compose_file`
+
+Commits the compose file update with the verified hash.
+
+```python
+# Step 1: Provision the update
+provision = client.provision_cvm_compose_file_update({
+    "id": "my-app",
+    "app_compose": {
+        "docker_compose_file": "services:\n  app:\n    image: nginx:latest",
+    },
+})
+
+# Step 2: After on-chain verification, commit the update
+client.commit_cvm_compose_file_update({
+    "id": "my-app",
+    "compose_hash": provision.compose_hash,
+    "encrypted_env": "...",
+    "env_keys": ["KEY1", "KEY2"],
+})
+```
+
+## Related
+
+- [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — provisioning and managing CVMs
+- [KMS](/phala-cloud/references/cloud-python-sdk/kms) — encryption keys for environment variables
