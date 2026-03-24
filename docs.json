@@ -209,6 +209,7 @@
                   "/phala-cloud/phala-cloud-cli/overview",
                   "/phala-cloud/phala-cloud-cli/start-from-cloud-cli",
                   "/phala-cloud/phala-cloud-cli/phala-toml",
+                  "/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline",
                   "/phala-cloud/phala-cloud-cli/changelog",
                   {
                     "group": "Deploy",
@@ -391,6 +392,7 @@
               {
                 "group": "API & SDK",
                 "pages": [
+                  "/phala-cloud/references/overview",
                   {
                     "group": "Phala Cloud API",
                     "pages": [
