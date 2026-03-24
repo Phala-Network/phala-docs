@@ -4,7 +4,7 @@ description: Deploy confidential applications with Phala Cloud's managed TEE inf
 title: FAQ
 ---
 
-## ❓ FAQs
+## Frequently Asked Questions
 
 ### What is Phala Cloud?
 
@@ -43,9 +43,11 @@ Yes, the data you write to the filesystem inside Docker will persist on the disk
 
 ### Can I deploy / manage / upgrade CVMs programmatically?
 
-Yes. Please check our Cloud API docs here: https://cloud-api.phala.network/docs\
-API examples: https://github.com/Leechael/phala-cloud-api-example/tree/main/js\
-Or set CI/CD pipeline for you instance: https://phala.com/phala-cloud/be-production-ready/ci-cd-automation/setup-a-ci-cd-pipeline
+Yes. Resources for programmatic management:
+
+- [Cloud API docs](https://cloud-api.phala.network/docs)
+- [API examples (JavaScript)](https://github.com/Leechael/phala-cloud-api-example/tree/main/js)
+- [CI/CD pipeline setup](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline)
 
 ### Does the “update” feature sync the latest Docker image?
 
@@ -55,23 +57,23 @@ No. By default, Docker does not proactively update the image unless the image re
 
 Yes, you can deploy multiple containers per CVM through the docker compose file.
 
-### Q: Does the cloud support firewall?
+### Does the cloud support a firewall?
 
-You can apply any firewall rules in your containers. For example, you can add a Nginx to apply IP address filters or WAF rules. There’s no cloud level firewall currently.
+You can apply firewall rules inside your containers. For example, add Nginx to apply IP address filters or WAF rules. There is no cloud-level firewall currently.
 
-### Q: Does it support Terraform deployment?
+### Does it support Terraform deployment?
 
-Current no. There’s a public tracking issue for Terraform: https://github.com/Phala-Network/phala-cloud-community/issues/15
+Yes! The Terraform provider is now available. See the [Terraform Provider documentation](/phala-cloud/references/terraform-provider/overview) for setup and usage.
 
-### Q: Can CVM accept arbitrary TCP / TLS connection?
+### Can CVM accept arbitrary TCP / TLS connections?
 
-The cloud CVM supports to expose both HTTP-over-TLS (Zero Trust HTTPS), and TCP-over-tls. You can check our example to expose ssh or other TCP ports here: https://github.com/Dstack-TEE/dstack-examples/tree/main/tcp-port-forwarding
+CVMs support both HTTP-over-TLS (Zero Trust HTTPS) and TCP-over-TLS. See the [TCP port forwarding example](https://github.com/Dstack-TEE/dstack-examples/tree/main/tcp-port-forwarding) for exposing SSH or other TCP ports.
 
 Under the hood, the TEE wraps the tcp ports you have exposed in docker with TLS. The gateway then routes the TLS traffic based on SNI, the domain name attached to every TLS connection. TLS is needed because it's the only way to multiplex the tcp traffic. When using the tcp-port-forwarding example, it automatically helps you set up the domain and TLS certificate securely in TEE (thus “Zero Trust”), and reverse-proxy the incoming traffic to your tcp port. You can also manually accept TLS traffic in your CVM and handle the certificate on the application level.
 
 ### Is there a simulator or free tier available for testing?
 
-We have built a Phala cloud cli so you don't need to touch the raw docker command. The doc is available here: https://phala.com/phala-cloud/references/tee-cloud-cli/phala/simulator.
+Yes. The Phala Cloud CLI includes a [simulator](/phala-cloud/phala-cloud-cli/simulator) for local testing. New accounts also receive free credits to deploy a small CVM.
 
 ### Is Phala Cloud based on serverless functions or traditional VMs? What are the startup and shutdown times?
 
@@ -122,7 +124,7 @@ To access logs for a specific instance, if you use Cloud UI, you can check the l
 
 ### Can I set my own TLS certificate for my CVM network access?
 
-Yes, you can. For example, after config the certs, you expose the `- 8080:443` in docker compose file. To access your service over TLS certs, you must use the public endpoint generated in network section and add the character 's' behind the port number. Like `<id>-<port>[s].<base_domain>`.
+Yes. After configuring your certificates, expose port `8080:443` in your Docker Compose file. To access the service over your TLS certificate, use the public endpoint from the Network section and append `s` to the port number — for example, `<id>-8080s.<base_domain>`.
 
 ### How does Phala Cloud ensure that the data in a CVM isn’t accessed by other programs running in the same machine?
 
@@ -130,8 +132,7 @@ Phala Cloud CVM uses a hardware root key unique to the TEE platform, from which 
 
 ### How can others verify that my application is running inside a TEE?
 
-Once the application is successfully launched, you can prove this by providing the RA Report, which can be exported through an endpoint by your Docker application. check [this\
-article](https://phala.com/posts/how-to-generate-attestation-repport-and-prove-your-application-runs-in-tee) for more details.
+Once the application is running, you can prove this by providing the RA Report, which is exported through an endpoint by your Docker application. See [How to Generate Attestation Reports](https://phala.com/posts/how-to-generate-attestation-repport-and-prove-your-application-runs-in-tee) for details.
 
 ### What’s the best approach to verify Phala Cloud Attestation Report in a smart contract?
 
@@ -227,8 +228,8 @@ You can also use the [Phala Cloud API](https://cloud-api.phala.network/docs) for
 **Phat Contract has been sunset.** DevPhase and Swanky are no longer supported.
 </Warning>
 
-The tech stack has moved to **dstack**-based infrastructure. See the [announcement](https://x.com/PhalaNetwork/status/1988085610649973070) for details.
+The tech stack has moved to **dstack**-based infrastructure.
 
 For new projects, use:
-- [Phala Cloud CVMs](/phala-cloud/what-is/phala-cloud-overview) for TEE deployments
-- [dstack](/dstack/overview/what-is-dstack) for the underlying TEE infrastructure
+- [Phala Cloud CVMs](/phala-cloud/what-is/what-is-phala-cloud) for TEE deployments
+- [dstack](/dstack/overview) for the underlying TEE infrastructure

@@ -60,7 +60,7 @@
         ]
       },
       {
-        "header": "Dstack",
+        "header": "dstack",
         "items": [
           {
             "href": "https://docs.phala.network/dstack/overview",
@@ -516,7 +516,7 @@
           "/dstack/media-kit",
           "/dstack/faqs"
         ],
-        "tab": "Dstack"
+        "tab": "dstack"
       },
       {
         "icon": "network",

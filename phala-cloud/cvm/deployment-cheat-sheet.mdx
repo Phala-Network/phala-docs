@@ -8,7 +8,7 @@ title: Deployment Cheat Sheet
 
 ### Build Docker Images on x86 Linux
 
-When developing on Mac ARM (M1/M2/M3), build your Docker images on an x86 machine before cloud deployment to prevent compatibility issues.
+When developing on Mac ARM (M1/M2/M3), build your Docker images for `linux/amd64` before deploying. Phala Cloud runs x86_64 — ARM images will fail to start.
 
 **Resources:**
 

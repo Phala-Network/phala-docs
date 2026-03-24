@@ -10,9 +10,9 @@ title: Overview
 
 ## Why Confidential AI?
 
-Traditional cloud AI deployments expose your models and data to the cloud provider. Confidential AI addresses this by running everything inside hardware-protected TEE. Your models stay private, your data stays secure, and you get cryptographic proof that execution happened in a trusted environment.
+Traditional cloud AI deployments expose your models and data to the cloud provider. Confidential AI runs inference, training, and fine-tuning inside GPU TEEs — the cloud provider cannot access your models or data. You get cryptographic proof that execution happened in a trusted environment.
 
-Phala Cloud offers two ways to run confidential AI workloads: pre-deployed **Models** (API or Dedicated) for quick integration, or **GPU TEE** for custom infrastructure. Explore our [Confidential AI Models](https://phala.com/confidential-ai-models) to see available pre-trained models, use cases, and deployment options.
+Phala Cloud offers two ways to run confidential AI workloads: pre-deployed **Models** (API or Dedicated) for quick integration, or **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
 
 <Columns cols={2}>
   <Card
@@ -71,7 +71,7 @@ Then you can [Verify Signature](./verify-signature) to confirm the integrity of 
 
 ### Benchmark
 
-Our performance [benchmark](/phala-cloud/confidential-ai/benchmark) shows TEE mode on H100/H200 GPUs runs up to 99% efficiency, nearly matching native performance. This means you get confidential computing with minimal performance penalty.
+Our [benchmark](/phala-cloud/confidential-ai/benchmark) shows GPU TEE mode achieves 99% of native performance on H100/H200 GPUs.
 
 ### FAQs
 
@@ -79,7 +79,7 @@ Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions a
 
 ## What makes Phala Cloud Confidential AI Different?
 
-- **Seamless integration**: Drop-in OpenAI API compatibility with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
+- **Drop-in compatibility**: OpenAI-compatible API with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
 - **Verifiable security**: Hardware-enforced privacy with cryptographic attestation proving execution in genuine TEE environments
 - **Flexible deployment**: Choose from API access (pay per request), dedicated models (hourly dedicated GPU), or GPU TEE (full infrastructure control)
 

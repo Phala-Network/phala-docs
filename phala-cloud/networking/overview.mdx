@@ -3,7 +3,7 @@ title: Overview
 description: Automatic HTTPS endpoints for your containers with zero configuration
 ---
 
-Phala Cloud gives you automatic HTTPS endpoints for your containers. Deploy your service and get a secure public URL - no configuration needed.
+Phala Cloud gives you automatic HTTPS endpoints for your containers. Deploy your service and get a secure public URL — no TLS or proxy configuration needed.
 
 ## What You Get
 
@@ -32,7 +32,7 @@ services:
       - "8000:80"
 ```
 
-Deploy it and you're done. No reverse proxy setup. No certificate management. No firewall rules. It just works.
+Deploy it and you're done. No reverse proxy setup needed. No certificate management required. No firewall rules to configure.
 
 ## Use Your Own Domain
 
@@ -44,7 +44,7 @@ Phala Cloud handles more than just web services:
 
 **Databases**: Expose PostgreSQL or MySQL with automatic TLS encryption. Your database connections are secure by default.
 
-**gRPC Services**: Full HTTP/2 support for modern microservices. Just add a 'g' to your URL suffix.
+**gRPC Services**: Full HTTP/2 support. Access gRPC endpoints by appending `g` to your URL (e.g., `appid-8080g.dstack-prod5.phala.network`).
 
 **TCP Services**: Any TCP protocol works - Redis, custom game servers, message queues. All get automatic TLS wrapping.
 

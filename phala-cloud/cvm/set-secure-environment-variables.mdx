@@ -16,8 +16,8 @@ same way as the variables defined in `.env` files. You should first define the e
 the Phala Cloud UI (or CLI), and then reference them in the docker compose file using the `${KEY}`
 syntax.
 
-A typical use case is pass secrets to your containers via environment variables, using the
-`environment:` docker compose directive.
+A typical use case is passing secrets to your containers via environment variables, using the
+`environment:` Docker Compose directive.
 
 <Warning>
 Updating encrypted secrets is a **full replacement** operation. You cannot update a single variable
@@ -48,9 +48,8 @@ Dashboard UI and the CLI.
 </Frame>
 
 <Note>
-The encrypted secrets don't have to be defined in the same name as the environment variables in the
-docker compose file. You can define them in the UI with any name you want, and then reference them
-in the docker compose file using the `${KEY}` syntax.
+Secret names don't need to match your Docker Compose environment variable names. You can name
+secrets anything in the UI, then reference them in Docker Compose using `${KEY}` syntax.
 
 Besides the environment variables, you can also reference the encrypted secrets in any other place
 like the `command:` docker compose directive. However, you should be careful to not leak the secret
@@ -230,7 +229,7 @@ include it in your Docker image.
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `DSTACK_ROOT_PASSWORD` | No | Linux root password for DStack OS. If not set, a random 32-character password is generated. |
+| `DSTACK_ROOT_PASSWORD` | No | Linux root password for dstack OS. If not set, a random 32-character password is generated. |
 | `DSTACK_ROOT_PUBLIC_KEY` | No | SSH public key added to `/home/root/.ssh/authorized_keys` |
 | `DSTACK_AUTHORIZED_KEYS` | No | SSH authorized keys for `/home/root/.ssh/authorized_keys`. Overwrites `DSTACK_ROOT_PUBLIC_KEY` if both are set. |
 

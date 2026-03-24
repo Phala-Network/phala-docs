@@ -1,6 +1,6 @@
 ---
 title: End-to-End Attestation Verification
-description: Practical guide to fetching, verifying, and integrating CVM attestation into your workflow
+description: Fetch, verify, and integrate CVM attestation into your workflow — end-to-end with working code
 ---
 
 Verify that your CVM runs unmodified code on genuine TEE hardware, from fetching the attestation quote to integrating verification into your CI/CD pipeline. This guide ties together the attestation workflow end-to-end with working code examples.
@@ -9,7 +9,7 @@ If you're new to attestation, start with the [Quickstart](/phala-cloud/attestati
 
 ## The verification flow
 
-Every CVM attestation verification follows three steps: get a quote from your running CVM, verify the quote's hardware signature, and check that the measurements match your expected application. The entire process takes seconds and can run from anywhere outside the CVM.
+Every CVM attestation verification follows three steps: get a quote from your running CVM, verify the quote's hardware signature, and check that the measurements match your expected application. The entire process runs in seconds from anywhere outside the CVM.
 
 ## Step 1: Get the attestation quote
 
@@ -155,7 +155,7 @@ cargo install dcap-qvl
 dcap-qvl verify --quote-hex "YOUR_QUOTE_HEX"
 ```
 
-You can also paste your quote into the [TEE Proof Explorer](https://proof.t16z.com/) for an interactive visual breakdown of all quote fields.
+You can also paste your quote into the [TEE Attestation Explorer](https://proof.t16z.com/) for an interactive visual breakdown of all quote fields.
 
 ## Step 3: Verify your application code
 
