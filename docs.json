@@ -329,10 +329,10 @@
                 "group": "Key Management",
                 "pages": [
                   "/phala-cloud/key-management/key-management-protocol",
-                  "/phala-cloud/key-management/get-a-key",
-                  "/phala-cloud/key-management/create-crypto-wallet",
                   "/phala-cloud/key-management/cloud-vs-onchain-kms",
-                  "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide"
+                  "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide",
+                  "/phala-cloud/key-management/get-a-key",
+                  "/phala-cloud/key-management/create-crypto-wallet"
                 ]
               },
               {
