@@ -32,7 +32,7 @@ Your containers use the `dstack` component to communicate with the underlying `t
 
 ## Verify If An Application is Running Inside a TEE
 
-When the application launches, dstack exports a Remote Attestation (RA) Report that cryptographically binds the application's runtime information — Docker image hash, startup arguments, and environment variables. The TEE hardware signs this report, and the application's own derived key co-signs it. Anyone can verify the report using standard TEE RA verification tools. For applications deployed on Phala Intel TDX workers, RA reports are exported and verified by default — use the [TEE Attestation Explorer](https://ra-quote-explorer.vercel.app/) to inspect them.
+When the application launches, dstack exports a Remote Attestation (RA) Report that cryptographically binds the application's runtime information — Docker image hash, startup arguments, and environment variables. The TEE hardware signs this report, and the application's own derived key co-signs it. Anyone can verify the report using standard TEE RA verification tools. For applications deployed on Phala Intel TDX workers, RA reports are exported and verified by default — use the [TEE Attestation Explorer](https://proof.t16z.com/) to inspect them.
 
 ## Conclusion
 

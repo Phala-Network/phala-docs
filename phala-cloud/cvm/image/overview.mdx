@@ -31,7 +31,7 @@ The container uses dstack API to communicate with the underlying `dstack-guest-a
 
 ## Verify If An Application is Running Inside a TEE
 
-When the application launched successfully, the RA Report can be exported with specific interfaces provide `dstack`. The RA Report is bound with the application runtime information, such as the docker image hash, the initial arguments passed to the container, and the environment variables. In addition to signature signed by the key hardcoded in the TEE hardware, the RA report will also be signed with a specific key that bond to the application. Anyone can verify the report with tools supports TEE RA report verification. For applications deployed on Phala Intel TDX workers, their RA report will default be exported and verified, a [TEE Attestation Explorer](https://ra-quote-explorer.vercel.app/) is provided for people to check.
+When the application launched successfully, the RA Report can be exported with specific interfaces provide `dstack`. The RA Report is bound with the application runtime information, such as the docker image hash, the initial arguments passed to the container, and the environment variables. In addition to signature signed by the key hardcoded in the TEE hardware, the RA report will also be signed with a specific key that bond to the application. Anyone can verify the report with tools supports TEE RA report verification. For applications deployed on Phala Intel TDX workers, their RA report will default be exported and verified, a [TEE Attestation Explorer](https://proof.t16z.com/) is provided for people to check.
 
 ## Conclusion
 
