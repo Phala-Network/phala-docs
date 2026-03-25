@@ -34,6 +34,18 @@ Deploy new CVM or update existing one
 | `--public-sysinfo, --no-public-sysinfo` | Make CVM system info publicly accessible (default: true) |
 | `--listed, --no-listed` | List CVM on the public Trust Center (default: false) |
 
+### Multisig / Two-Phase Options
+
+For on-chain KMS (Ethereum/Base) with multisig contract owners. See [Multisig Update Flow](#multisig-update-flow).
+
+| Option | Description |
+| ------ | ----------- |
+| `--prepare-only` | Prepare update without on-chain operations. Outputs compose hash and commit token for multisig approval. |
+| `--commit` | Commit a previously prepared update using a commit token. |
+| `--token <value>` | Commit token from `--prepare-only` output |
+| `--compose-hash <value>` | Compose hash (optional, auto-read from token) |
+| `--transaction-hash <value>` | Transaction hash proving on-chain registration (optional, defaults to state-only check) |
+
 ### Advanced Options
 
 | Option | Description |
@@ -148,4 +160,43 @@ phala deploy --listed
 ```bash
 phala deploy --cvm-id app_123 --no-public-logs
 ```
+
+### Multisig Update Flow
+
+When the on-chain KMS contract owner is a multisig wallet, the CLI cannot complete the on-chain transaction in a single operation. Use the two-phase flow:
+
+* **Phase 1**: Prepare the update (generate commit token)
+
+```bash
+phala deploy --cvm-id app_abc123 --prepare-only -c docker-compose.yml -e .env
+```
+
+This outputs the compose hash, on-chain status, and a commit token. The token is valid for 7 days.
+
+* **Phase 2**: After multisig approval and on-chain registration, commit the update
+
+```bash
+phala deploy --cvm-id app_abc123 \
+  --commit \
+  --token <commit-token>
+```
+
+If the compose hash is already registered on-chain, `--transaction-hash` can be omitted (defaults to state-only check).
+
+* With explicit transaction hash
+
+```bash
+phala deploy --cvm-id app_abc123 \
+  --commit \
+  --token <commit-token> \
+  --transaction-hash 0x...
+```
+
+* You can also commit via the API directly
+
+```bash
+curl -X POST 'https://cloud-api.phala.com/api/v1/cvms/<uuid>/commit-update?token=<commit-token>'
+```
+
+Or use the **Confirm Update** page in the dashboard (link provided in `--prepare-only` output).
 

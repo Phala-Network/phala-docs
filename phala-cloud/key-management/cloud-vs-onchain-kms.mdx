@@ -104,6 +104,54 @@ Phala Cloud supports Onchain KMS on both Ethereum and Base. Ethereum has higher 
   </Accordion>
 </AccordionGroup>
 
+## Updating CVMs with Onchain KMS
+
+When using Onchain KMS, any change that affects the compose hash (Docker Compose file, pre-launch script, env keys, visibility settings) requires on-chain registration before the update can proceed.
+
+### Standard Flow (Single Owner)
+
+If you own the private key of the DstackApp contract owner, the CLI handles the on-chain registration automatically:
+
+```bash
+phala deploy --cvm-id app_abc123 -c docker-compose.yml \
+  --kms base --private-key <key> --rpc-url <url>
+```
+
+### Multisig Flow (Two-Phase)
+
+When the contract owner is a multisig wallet (e.g., Gnosis Safe), the on-chain transaction requires multiple signatures. The CLI supports a two-phase flow:
+
+**Phase 1 — Prepare:**
+
+```bash
+phala deploy --cvm-id app_abc123 --prepare-only -c docker-compose.yml -e .env
+```
+
+This outputs:
+- The new compose hash (with `0x` prefix for direct use)
+- On-chain status (whether device and compose hash are already registered)
+- A commit token (valid 7 days)
+- A web UI link for manual confirmation
+- An API commit URL for programmatic use
+
+**Multisig approval** — use the compose hash to call `addComposeHash(bytes32)` on the DstackApp contract through your multisig wallet.
+
+**Phase 2 — Commit:**
+
+```bash
+phala deploy --cvm-id app_abc123 --commit --token <commit-token>
+```
+
+Or commit via the dashboard link, or directly via the API:
+
+```bash
+curl -X POST 'https://cloud-api.phala.com/api/v1/cvms/<uuid>/commit-update?token=<token>'
+```
+
+### Webhook Notifications
+
+You can configure [webhooks](/phala-cloud/references/webhooks) to receive `cvm.update.pending_approval` events. The webhook payload includes the compose hash, commit token, and commit URL — useful for integrating with CI/CD pipelines or notification systems like Slack.
+
 ## Security
 
 Both use identical dstack-kms security for TEE operations: attestation-based key provisioning, key rotation, forward/backward secrecy.
