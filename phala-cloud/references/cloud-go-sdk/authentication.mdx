@@ -1,7 +1,6 @@
 ---
 title: Authentication
 description: Configure API key authentication, environment variables, and custom headers for the Go SDK.
-icon: key
 ---
 
 Every request to the Phala Cloud API requires an API key. The Go SDK resolves the key from the option you pass to `NewClient`, or falls back to the `PHALA_CLOUD_API_KEY` environment variable. If neither is set, `NewClient` returns an error.
