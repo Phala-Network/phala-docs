@@ -72,6 +72,52 @@ Each webhook has a signing secret (starts with `whsec_`). Use it to verify reque
 
 The signature is: `sha256=HMAC-SHA256(secret, "{timestamp}.{raw_body}")`
 
+### Using SDKs (Recommended)
+
+<CodeGroup>
+```typescript JavaScript / TypeScript (@phala/cloud)
+import { verifyWebhookSignature, parseWebhookEvent } from "@phala/cloud";
+
+// Option 1: Verify signature manually
+const isValid = verifyWebhookSignature({
+  secret: "whsec_your_secret",
+  timestamp: request.headers["x-webhook-timestamp"],
+  body: rawBody,
+  signature: request.headers["x-webhook-signature"],
+});
+
+// Option 2: Parse and verify in one step
+try {
+  const event = parseWebhookEvent({
+    headers: request.headers,
+    body: rawBody,
+    secret: "whsec_your_secret",
+  });
+  console.log(event.event, event.data);
+} catch (err) {
+  // Invalid signature or expired timestamp
+}
+```
+
+```go Go (phala-cloud-sdk-go)
+import phala "github.com/Phala-Network/phala-cloud-sdk-go"
+
+// Option 1: Verify signature
+ok := phala.VerifyWebhookSignature(secret, timestamp, body, signature)
+
+// Option 2: Parse and verify
+event, err := phala.ParseWebhookEvent(r.Header, bodyBytes, secret)
+if err != nil {
+    // Invalid signature or expired
+}
+fmt.Println(event.Event, string(event.Data))
+```
+</CodeGroup>
+
+<Accordion title="Manual Verification (Python / Node.js)">
+
+If you prefer to verify signatures without an SDK, you can compute the HMAC-SHA256 directly:
+
 <CodeGroup>
 ```python Python
 import hmac
@@ -99,6 +145,8 @@ function verifyWebhook(secret, timestamp, body, signature) {
 }
 ```
 </CodeGroup>
+
+</Accordion>
 
 **Replay protection:** reject events where `X-Webhook-Timestamp` is older than 5 minutes.
 
@@ -155,6 +203,67 @@ GET /api/v1/workspace/webhooks/{id}/stats
 # Resend
 POST /api/v1/workspace/webhooks/{id}/deliveries/{event_id}/resend
 ```
+
+### Reveal Webhook Secret
+
+Reveals the full webhook signing secret. Requires two-factor authentication.
+
+**Endpoint:** `POST /api/v1/workspace/webhooks/{webhook_id}/reveal-secret`
+
+**Requirements:**
+- Workspace API key or session authentication
+- Account must have 2FA enabled (returns 403 if not)
+- Recent 2FA step-up verification required (returns 428 if not verified)
+
+**Response:**
+```json
+{
+  "secret": "whsec_abc123..."
+}
+```
+
+### Rotate Webhook Secret
+
+Generates a new signing secret, invalidating the previous one. Requires two-factor authentication.
+
+**Endpoint:** `POST /api/v1/workspace/webhooks/{webhook_id}/rotate-secret`
+
+**Requirements:** Same as Reveal Webhook Secret.
+
+**Response:**
+```json
+{
+  "secret": "whsec_new_secret..."
+}
+```
+
+<Warning>
+After rotation, update your webhook consumer with the new secret immediately. Events signed with the old secret will fail verification.
+</Warning>
+
+## Secret Management
+
+Webhook signing secrets follow a strict access model to prevent unauthorized exposure:
+
+- **Creation:** The full secret is shown only once when the webhook is first created. Copy and store it securely at that time.
+- **Subsequent access:** API responses return a masked secret (e.g., `whsec_****...xxxx`). The full value is not included.
+- **Revealing the secret:** Use the [Reveal Webhook Secret](#reveal-webhook-secret) endpoint. This requires 2FA to be enabled and recently verified on your account.
+- **Rotating the secret:** Use the [Rotate Webhook Secret](#rotate-webhook-secret) endpoint to generate a new secret and invalidate the old one. This also requires 2FA.
+
+This design ensures that even if a workspace API key is compromised, the attacker cannot retrieve or change webhook secrets without passing the 2FA challenge.
+
+## URL Requirements
+
+Webhook endpoint URLs must meet the following criteria:
+
+- **HTTPS required** — Only `https://` URLs are accepted. Plain HTTP is rejected.
+- **No private/internal IPs** — URLs that resolve to private or reserved IP ranges are blocked:
+  - `127.0.0.0/8` (loopback)
+  - `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (private networks)
+  - `169.254.169.254` (cloud metadata endpoints)
+- **No local domains** — `localhost` and `.local` domains are not allowed.
+
+These restrictions prevent server-side request forgery (SSRF) and ensure webhook deliveries only reach publicly accessible endpoints.
 
 ## Best Practices
 
