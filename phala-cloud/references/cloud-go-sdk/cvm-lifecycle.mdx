@@ -43,9 +43,7 @@ provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
 	Name:         "my-app",
 	InstanceType: "tdx.small",
 	ComposeFile: &phala.ComposeFile{
-		Name:              "my-app",
 		DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
-		GatewayEnabled:    phala.Bool(true),
 	},
 })
 if err != nil {
@@ -86,9 +84,7 @@ provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
 	Name:         "my-app",
 	InstanceType: "tdx.small",
 	ComposeFile: &phala.ComposeFile{
-		Name:              "my-app",
 		DockerComposeFile: composeYAML,
-		GatewayEnabled:    phala.Bool(true),
 	},
 })
 if err != nil {

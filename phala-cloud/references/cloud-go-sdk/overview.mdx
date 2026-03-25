@@ -3,6 +3,10 @@ title: Cloud Go SDK
 description: Go client for the Phala Cloud API — manage CVMs, deployments, and infrastructure programmatically.
 ---
 
+<Note>
+The Go SDK is currently in **beta**. The API surface may change between releases.
+</Note>
+
 The `phala` Go package provides a strongly-typed client for the Phala Cloud API. It handles authentication, automatic retries with exponential backoff, and structured error responses out of the box.
 
 ## Installation
@@ -28,7 +32,7 @@ import (
 
 func main() {
 	client, err := phala.NewClient(
-		phala.WithAPIKey("your-api-key"),
+		phala.WithAPIKey("phak_your_api_key"),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +60,7 @@ client, err := phala.NewClient()
 ```go
 // Explicit configuration
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithBaseURL("https://cloud-api.phala.com/api/v1"),
 	phala.WithTimeout(60 * time.Second),
 	phala.WithMaxRetries(10),
@@ -211,4 +215,4 @@ This means you never need to worry about converting between ID formats yourself.
 - [Authentication](/phala-cloud/references/cloud-go-sdk/authentication) — API key setup and custom headers
 - [CVM Lifecycle](/phala-cloud/references/cloud-go-sdk/cvm-lifecycle) — provisioning, starting, stopping, deleting
 - [Error Handling](/phala-cloud/references/cloud-go-sdk/error-handling) — error types and retry logic
-- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs
+- [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

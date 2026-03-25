@@ -3,6 +3,10 @@ title: Cloud Python SDK
 description: Python SDK for Phala Cloud API — sync and async clients with Pydantic validation, safe error handling, and REPL-friendly design.
 ---
 
+<Note>
+The Python SDK is currently in **beta**. The API surface may change between releases.
+</Note>
+
 The `phala-cloud` SDK gives you a Pythonic interface to the Phala Cloud API. It ships with both sync and async clients, Pydantic-validated responses, and a `safe_*` method pattern that lets you handle errors without try/except blocks.
 
 ## Installation
@@ -30,7 +34,7 @@ Requires Python 3.10 or later. The SDK depends on `httpx`, `pydantic`, and `dsta
 ```python Sync
 from phala_cloud import create_client
 
-client = create_client(api_key="your-api-key")
+client = create_client(api_key="phak_your_api_key")
 me = client.get_current_user()
 print(me.model_dump())
 ```
@@ -41,7 +45,7 @@ from phala_cloud import create_async_client
 
 
 async def main():
-    client = create_async_client(api_key="your-api-key")
+    client = create_async_client(api_key="phak_your_api_key")
     me = await client.get_current_user()
     print(me.model_dump())
     await client.aclose()
@@ -66,7 +70,7 @@ client = create_client()
 
 # Explicit configuration
 client = create_client(
-    api_key="your-api-key",
+    api_key="phak_your_api_key",
     base_url="https://cloud-api.phala.com/api/v1",
     version="2026-01-21",
     timeout=30.0,
@@ -109,13 +113,13 @@ Every method on the sync `PhalaCloud` client has an identical counterpart on `As
 <CodeGroup>
 
 ```python Sync
-client = create_client(api_key="your-api-key")
+client = create_client(api_key="phak_your_api_key")
 cvms = client.get_cvm_list()
 client.close()
 ```
 
 ```python Async
-client = create_async_client(api_key="your-api-key")
+client = create_async_client(api_key="phak_your_api_key")
 cvms = await client.get_cvm_list()
 await client.aclose()
 ```
@@ -127,12 +131,12 @@ Both clients support context managers for automatic cleanup:
 <CodeGroup>
 
 ```python Sync
-with create_client(api_key="your-api-key") as client:
+with create_client(api_key="phak_your_api_key") as client:
     cvms = client.get_cvm_list()
 ```
 
 ```python Async
-async with create_async_client(api_key="your-api-key") as client:
+async with create_async_client(api_key="phak_your_api_key") as client:
     cvms = await client.get_cvm_list()
 ```
 
@@ -280,4 +284,4 @@ from phala_cloud import (
 - [Authentication](/phala-cloud/references/cloud-python-sdk/authentication) — API key configuration
 - [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — provisioning and managing CVMs
 - [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — error classes and safe methods
-- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs
+- [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

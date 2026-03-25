@@ -24,7 +24,7 @@ yarn add @phala/cloud
 ```typescript
 import { createClient } from "@phala/cloud";
 
-const client = createClient({ apiKey: "your-api-key" });
+const client = createClient({ apiKey: "phak_your_api_key" });
 
 // Get current user info
 const user = await client.getCurrentUser();
@@ -51,7 +51,7 @@ const client = createClient();
 ```typescript
 // Explicit configuration
 const client = createClient({
-  apiKey: "your-api-key",
+  apiKey: "phak_your_api_key",
   baseURL: "https://cloud-api.phala.com/api/v1",
   version: "2026-01-21",
   timeout: 30000,
@@ -77,7 +77,7 @@ For smaller bundles, use `createBaseClient` with individual action imports:
 ```typescript
 import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
 
-const client = createBaseClient({ apiKey: "your-api-key" });
+const client = createBaseClient({ apiKey: "phak_your_api_key" });
 
 // Call actions as standalone functions
 const user = await getCurrentUser(client);
@@ -91,7 +91,7 @@ const cvms = await getCvmList(client);
 ```typescript
 import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
 
-const client = createBaseClient({ apiKey: "your-api-key" }).extend({
+const client = createBaseClient({ apiKey: "phak_your_api_key" }).extend({
   getCurrentUser,
   getCvmList,
 });
@@ -314,4 +314,4 @@ DEBUG=phala::api-client node your-script.js
 - [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) — version management and migration
 - [Schema Reference](/phala-cloud/references/cloud-js-sdk/schema-reference) — response schema details per version
 - [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling) — error classes and safe methods
-- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs
+- [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

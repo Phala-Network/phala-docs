@@ -112,9 +112,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-oauth-google-authorize"
         }
       }
     },
@@ -178,9 +175,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-oauth-google-callback"
         }
       }
     },
@@ -291,9 +285,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-oauth-github-authorize"
         }
       }
     },
@@ -396,9 +387,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-oauth-github-callback"
         }
       }
     },
@@ -433,10 +421,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-me"
-        }
+        ]
       }
     },
     "/api/v1/auth/authenticated": {
@@ -464,10 +449,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-authenticated"
-        }
+        ]
       }
     },
     "/api/v1/auth/register": {
@@ -510,9 +492,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-register"
         }
       }
     },
@@ -559,9 +538,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-token"
         }
       }
     },
@@ -608,9 +584,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-login"
         }
       }
     },
@@ -657,9 +630,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-login-with-2fa"
         }
       }
     },
@@ -688,10 +658,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-logout"
-        }
+        ]
       }
     },
     "/api/v1/auth/forgot-password": {
@@ -731,9 +698,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-forgot-password"
         }
       }
     },
@@ -782,9 +746,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-validate-reset-token"
         }
       }
     },
@@ -832,9 +793,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/put-auth-reset-password"
         }
       }
     },
@@ -891,10 +849,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-password"
-        }
+        ]
       }
     },
     "/api/v1/auth/username": {
@@ -948,10 +903,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/put-auth-username"
-        }
+        ]
       }
     },
     "/api/v1/auth/request-email-verification": {
@@ -1005,10 +957,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-request-email-verification"
-        }
+        ]
       }
     },
     "/api/v1/auth/change-email": {
@@ -1062,10 +1011,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-change-email"
-        }
+        ]
       }
     },
     "/api/v1/auth/verify-email-token": {
@@ -1114,9 +1060,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-verify-email-token"
         }
       }
     },
@@ -1151,10 +1094,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-2fa-status"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/setup": {
@@ -1207,10 +1147,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-setup"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/confirm": {
@@ -1264,10 +1201,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-confirm"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/disable": {
@@ -1321,10 +1255,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-disable"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/regenerate-backup-codes": {
@@ -1378,10 +1309,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-regenerate-backup-codes"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/verify": {
@@ -1435,10 +1363,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-verify"
-        }
+        ]
       }
     },
     "/api/v1/auth/2fa/verify-and-set-cookie": {
@@ -1492,10 +1417,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-2fa-verify-and-set-cookie"
-        }
+        ]
       }
     },
     "/api/v1/auth/step-up/verify": {
@@ -1549,10 +1471,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-step-up-verify"
-        }
+        ]
       }
     },
     "/api/v1/auth/sessions": {
@@ -1616,9 +1535,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-sessions"
         }
       },
       "delete": {
@@ -1692,9 +1608,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/delete-auth-sessions"
         }
       }
     },
@@ -1772,9 +1685,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/delete-auth-sessions-jti"
         }
       }
     },
@@ -1835,9 +1745,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/get-auth-decode-link-token"
         }
       }
     },
@@ -1890,9 +1797,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/authentication/post-auth-verify-and-link-oauth"
         }
       }
     },
@@ -1943,10 +1847,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-pubkey-from_cvm_configuration"
-        }
+        ]
       }
     },
     "/api/v1/cvms/from_cvm_configuration": {
@@ -1998,10 +1899,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-from_cvm_configuration"
-        }
+        ]
       }
     },
     "/api/v1/cvms/provision/eliza": {
@@ -2047,9 +1945,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-provision-eliza"
         }
       }
     },
@@ -2089,9 +1984,6 @@
           "422": {
             "description": "Validation error"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-provision"
         }
       }
     },
@@ -2151,10 +2043,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-workload"
-        }
+        ]
       }
     },
     "/api/v1/cvms": {
@@ -2195,9 +2084,6 @@
           "422": {
             "description": "Provision data not found"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms"
         }
       },
       "get": {
@@ -2302,9 +2188,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms"
         }
       }
     },
@@ -2346,9 +2229,6 @@
           "422": {
             "description": "Provision data not found or expired"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-eliza"
         }
       }
     },
@@ -2418,9 +2298,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-compose_file"
         }
       },
       "patch": {
@@ -2485,9 +2362,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-compose_file"
         }
       },
       "post": {
@@ -2546,9 +2420,6 @@
           "503": {
             "description": "Node under maintenance"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-compose_file"
         }
       }
     },
@@ -2608,9 +2479,6 @@
           "422": {
             "description": "Invalid Docker Compose syntax"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-compose_file-provision"
         }
       }
     },
@@ -2655,9 +2523,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-compose"
         }
       },
       "put": {
@@ -2711,9 +2576,6 @@
           "503": {
             "description": "Node under maintenance"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/put-cvms-cvm_id-compose"
         }
       },
       "patch": {
@@ -2776,9 +2638,6 @@
           "503": {
             "description": "Node under maintenance or offline"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-compose"
         }
       }
     },
@@ -2855,9 +2714,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-replicas"
         }
       }
     },
@@ -3001,9 +2857,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-operations"
         }
       }
     },
@@ -3057,9 +2910,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-docker-compose.yml"
         }
       }
     },
@@ -3113,9 +2963,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-pre-launch-script"
         }
       },
       "patch": {
@@ -3230,9 +3077,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-pre-launch-script"
         }
       }
     },
@@ -3289,9 +3133,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-available-os-images"
         }
       }
     },
@@ -3358,9 +3199,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-os-image"
         }
       }
     },
@@ -3439,9 +3277,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-envs"
         }
       }
     },
@@ -3558,9 +3393,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-docker-compose"
         }
       }
     },
@@ -3644,9 +3476,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-revisions-revision_id-redeploy"
         }
       }
     },
@@ -3689,9 +3518,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-instance-ids"
         }
       }
     },
@@ -3819,9 +3645,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-paginated"
         }
       }
     },
@@ -3878,9 +3701,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-instance-id"
         }
       }
     },
@@ -3949,9 +3769,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id"
         }
       },
       "delete": {
@@ -3995,9 +3812,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/delete-cvms-cvm_id"
         }
       },
       "patch": {
@@ -4128,9 +3942,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id"
         }
       }
     },
@@ -4200,9 +4011,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-visibility"
         }
       }
     },
@@ -4255,9 +4063,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-stats"
         }
       }
     },
@@ -4302,9 +4107,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-composition"
         }
       }
     },
@@ -4357,9 +4159,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-attestation"
         }
       }
     },
@@ -4412,9 +4211,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-network"
         }
       }
     },
@@ -4476,9 +4272,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-start"
         }
       }
     },
@@ -4534,9 +4327,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-shutdown"
         }
       }
     },
@@ -4589,9 +4379,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-stop"
         }
       }
     },
@@ -4659,9 +4446,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-restart"
         }
       }
     },
@@ -4712,9 +4496,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-operation-status"
         }
       }
     },
@@ -4779,9 +4560,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-resources"
         }
       }
     },
@@ -4828,9 +4606,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-name"
         }
       }
     },
@@ -4883,9 +4658,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-listed"
         }
       }
     },
@@ -4938,9 +4710,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/patch-cvms-cvm_id-scheduled-delete"
         }
       }
     },
@@ -4989,9 +4758,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-batch-stop"
         }
       }
     },
@@ -5046,10 +4812,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-status-batch"
-        }
+        ]
       }
     },
     "/api/v1/cvms/{cvm_id}/state": {
@@ -5136,9 +4899,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-state"
         }
       }
     },
@@ -5189,9 +4949,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-commit-update"
         }
       },
       "post": {
@@ -5263,9 +5020,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-commit-update"
         }
       }
     },
@@ -5331,9 +5085,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/post-cvms-cvm_id-customize-domain-diagnose"
         }
       }
     },
@@ -5389,9 +5140,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/cvms/get-cvms-cvm_id-user_config"
         }
       }
     },
@@ -5471,9 +5219,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms"
         }
       }
     },
@@ -5522,9 +5267,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms-kms_id"
         }
       }
     },
@@ -5588,9 +5330,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms-kms_id-pubkey-app_id"
         }
       }
     },
@@ -5649,9 +5388,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms-phala-next_app_id"
         }
       }
     },
@@ -5695,9 +5431,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms-kms_id-info"
         }
       }
     },
@@ -5744,9 +5477,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/kms/get-kms-on-chain-chain"
         }
       }
     },
@@ -5984,9 +5714,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps"
         }
       }
     },
@@ -6012,9 +5739,6 @@
           "401": {
             "description": "Not authenticated"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-filter-options"
         }
       }
     },
@@ -6083,9 +5807,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id"
         }
       }
     },
@@ -6162,9 +5883,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-cvms"
         }
       }
     },
@@ -6253,9 +5971,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/post-apps-app_id-cvms-vm_uuid-replicas"
         }
       }
     },
@@ -6307,9 +6022,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-device-allowlist"
         }
       }
     },
@@ -6356,9 +6068,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-attestations"
         }
       }
     },
@@ -6440,9 +6149,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-revisions"
         }
       }
     },
@@ -6518,9 +6224,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-revisions-revision_id"
         }
       }
     },
@@ -6624,9 +6327,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/post-apps-app_id-revisions-revision_id-redeploy"
         }
       }
     },
@@ -6786,9 +6486,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-events"
         }
       }
     },
@@ -6917,9 +6614,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/get-apps-app_id-usage"
         }
       }
     },
@@ -6972,9 +6666,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/post-apps-app_id-is-allowed"
         }
       }
     },
@@ -7017,9 +6708,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/apps/post-apps-app_id-cvms-is-allowed"
         }
       }
     },
@@ -7077,9 +6765,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/tokens/get-tokens"
         }
       },
       "post": {
@@ -7132,9 +6817,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/tokens/post-tokens"
         }
       }
     },
@@ -7183,9 +6865,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/tokens/delete-tokens-token_id"
         }
       }
     },
@@ -7248,9 +6927,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/tokens/post-tokens-token_id-refresh"
         }
       }
     },
@@ -7298,9 +6974,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-charge"
         }
       }
     },
@@ -7434,9 +7107,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-orders"
         }
       }
     },
@@ -7457,9 +7127,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-debt"
         }
       }
     },
@@ -7486,9 +7153,6 @@
           "500": {
             "description": "Unexpected settlement state"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-debt-settlement"
         }
       }
     },
@@ -7509,9 +7173,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-card"
         }
       }
     },
@@ -7558,9 +7219,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/delete-card-payment_method_id"
         }
       }
     },
@@ -7586,9 +7244,6 @@
           "404": {
             "description": "User has no credit account"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-credits"
         }
       }
     },
@@ -7614,9 +7269,6 @@
           "404": {
             "description": "Workspace has no credit account"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-balance"
         }
       }
     },
@@ -7709,9 +7361,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-credits-transactions"
         }
       }
     },
@@ -7805,9 +7454,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-credits-redeem"
         }
       }
     },
@@ -7892,9 +7538,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing"
         }
       }
     },
@@ -8021,9 +7664,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-billing_items"
         }
       }
     },
@@ -8106,9 +7746,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-billing_items-cvm_id"
         }
       }
     },
@@ -8188,9 +7825,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-invoices"
         }
       }
     },
@@ -8245,9 +7879,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-invoices-invoice_id"
         }
       }
     },
@@ -8306,9 +7937,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-invoices-invoice_id-items"
         }
       }
     },
@@ -8373,9 +8001,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-billing-invoices-invoice_id-pay"
         }
       }
     },
@@ -8398,9 +8023,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-billing-settings"
         }
       },
       "patch": {
@@ -8441,9 +8063,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/patch-billing-settings"
         }
       }
     },
@@ -8470,9 +8089,6 @@
           "500": {
             "description": "Failed to create Stripe customer or customer ID missing"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-setup-billing-create-intent"
         }
       }
     },
@@ -8519,9 +8135,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/post-setup-billing-save-intent"
         }
       }
     },
@@ -8568,9 +8181,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/billing/get-setup-billing-check"
         }
       }
     },
@@ -8596,9 +8206,6 @@
           "500": {
             "description": "Database error"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/instance-types/get-instance-types"
         }
       }
     },
@@ -8650,9 +8257,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/instance-types/get-instance-types-family"
         }
       }
     },
@@ -8697,9 +8301,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/post-attestations-verify"
         }
       }
     },
@@ -8759,9 +8360,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-recent"
         }
       }
     },
@@ -8808,9 +8406,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-view-checksum"
         }
       }
     },
@@ -8860,9 +8455,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-collateral-checksum"
         }
       }
     },
@@ -8910,9 +8502,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-raw-checksum"
         }
       },
       "head": {
@@ -8957,9 +8546,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/head-attestations-raw-checksum"
         }
       }
     },
@@ -8980,9 +8566,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-ppids"
         }
       }
     },
@@ -9003,9 +8586,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-device_ids"
         }
       }
     },
@@ -9032,9 +8612,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/attestations/get-attestations-nodes"
         }
       }
     },
@@ -9060,9 +8637,6 @@
           "401": {
             "description": "Authentication required"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces"
         }
       }
     },
@@ -9115,9 +8689,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces-team_slug"
         }
       }
     },
@@ -9184,9 +8755,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces-team_slug-nodes"
         }
       }
     },
@@ -9230,9 +8798,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces-team_slug-quotas"
         }
       }
     },
@@ -9278,9 +8843,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/post-workspaces-check-slug"
         }
       }
     },
@@ -9356,9 +8918,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/post-workspaces-workspace_slug-invitations"
         }
       },
       "get": {
@@ -9449,9 +9008,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces-workspace_slug-invitations"
         }
       }
     },
@@ -9517,9 +9073,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/post-workspaces-workspace_slug-invitations-shareable"
         }
       }
     },
@@ -9598,9 +9151,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/delete-workspaces-workspace_slug-invitations-invitation_id"
         }
       }
     },
@@ -9690,9 +9240,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/get-workspaces-workspace_slug-members"
         }
       }
     },
@@ -9767,9 +9314,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/delete-workspaces-workspace_slug-members-user_id"
         }
       },
       "patch": {
@@ -9852,9 +9396,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/patch-workspaces-workspace_slug-members-user_id"
         }
       }
     },
@@ -9918,9 +9459,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/workspace/post-workspaces-workspace_slug-leave"
         }
       }
     },
@@ -9950,9 +9488,6 @@
           "401": {
             "description": "Not authenticated"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/ssh-keys/get-user-ssh-keys"
         }
       },
       "post": {
@@ -9999,9 +9534,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/ssh-keys/post-user-ssh-keys"
         }
       }
     },
@@ -10049,9 +9581,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/ssh-keys/delete-user-ssh-keys-key_id"
         }
       }
     },
@@ -10100,9 +9629,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/ssh-keys/post-user-ssh-keys-github-profile"
         }
       }
     },
@@ -10131,9 +9657,6 @@
           "401": {
             "description": "Not authenticated"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/ssh-keys/post-user-ssh-keys-github-sync"
         }
       }
     },
@@ -10175,10 +9698,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/get-profiles-me"
-        }
+        ]
       },
       "put": {
         "tags": [
@@ -10232,10 +9752,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/put-profiles-me"
-        }
+        ]
       }
     },
     "/api/v1/profiles/me/avatar": {
@@ -10297,10 +9814,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/put-profiles-me-avatar"
-        }
+        ]
       },
       "delete": {
         "tags": [
@@ -10331,10 +9845,7 @@
           {
             "APIKeyHeader": []
           }
-        ],
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/delete-profiles-me-avatar"
-        }
+        ]
       }
     },
     "/api/v1/profiles/{entity_type}/{entity_id}": {
@@ -10406,9 +9917,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/get-profiles-entity_type-entity_id"
         }
       },
       "put": {
@@ -10495,9 +10003,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/put-profiles-entity_type-entity_id"
         }
       },
       "delete": {
@@ -10575,9 +10080,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/delete-profiles-entity_type-entity_id"
         }
       }
     },
@@ -10672,9 +10174,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/put-profiles-entity_type-entity_id-avatar"
         }
       },
       "delete": {
@@ -10751,9 +10250,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/profiles/delete-profiles-entity_type-entity_id-avatar"
         }
       }
     },
@@ -10779,9 +10275,6 @@
           "401": {
             "description": "Authentication required"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/usage/get-usage-current"
         }
       }
     },
@@ -10879,9 +10372,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/usage/get-usage-data"
         }
       }
     },
@@ -10997,9 +10487,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/usage/get-usage-export"
         }
       }
     },
@@ -11025,9 +10512,6 @@
           "401": {
             "description": "Authentication required"
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/gpus/get-gpus-reserved"
         }
       }
     },
@@ -11088,9 +10572,6 @@
               }
             }
           }
-        },
-        "x-mint": {
-          "href": "https://cloud.phala.network/api-reference/gpus/post-gpus-switch-mode"
         }
       }
     }

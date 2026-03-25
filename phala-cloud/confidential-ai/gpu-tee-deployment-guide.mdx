@@ -194,7 +194,7 @@ Your GPU TEE instance runs on genuine Intel TDX + NVIDIA confidential compute ha
     curl https://<your-instance-url>/attestation -o attestation.json
 
     # Verify through Phala's API
-    curl -X POST https://cloud-api.phala.network/api/v1/attestations/verify \
+    curl -X POST https://cloud-api.phala.com/api/v1/attestations/verify \
       -H "Content-Type: application/json" \
       -d @attestation.json
     ```

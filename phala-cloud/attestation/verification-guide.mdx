@@ -105,7 +105,7 @@ The fastest approach. Sends your quote to Phala's service which checks it agains
 <CodeGroup>
 ```typescript TypeScript
 const verifyResponse = await fetch(
-  'https://cloud-api.phala.network/api/v1/attestations/verify',
+  'https://cloud-api.phala.com/api/v1/attestations/verify',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -125,7 +125,7 @@ console.log('TDX version:', result.quote.body.tee_tcb_svn);
 
 ```python Python
 verify_response = requests.post(
-    "https://cloud-api.phala.network/api/v1/attestations/verify",
+    "https://cloud-api.phala.com/api/v1/attestations/verify",
     json={"hex": attest_data["quote"]}
 )
 result = verify_response.json()
@@ -137,7 +137,7 @@ print(f"TDX version: {result['quote']['body']['tee_tcb_svn']}")
 ```
 
 ```bash curl
-curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
   -H "Content-Type: application/json" \
   -d '{"hex": "YOUR_QUOTE_HEX"}'
 ```
@@ -254,7 +254,7 @@ async function verifyCVM(cvmUrl: string): Promise<boolean> {
 
   // 3. Verify hardware signature
   const verifyRes = await fetch(
-    'https://cloud-api.phala.network/api/v1/attestations/verify',
+    'https://cloud-api.phala.com/api/v1/attestations/verify',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -312,7 +312,7 @@ def verify_cvm(cvm_url: str) -> bool:
 
     # 3. Verify hardware signature
     verify_result = requests.post(
-        "https://cloud-api.phala.network/api/v1/attestations/verify",
+        "https://cloud-api.phala.com/api/v1/attestations/verify",
         json={"hex": attest_data["quote"]},
     ).json()
     if not verify_result["quote"]["verified"]:

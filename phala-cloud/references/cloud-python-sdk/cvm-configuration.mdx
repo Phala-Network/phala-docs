@@ -6,6 +6,12 @@ icon: gear
 
 Configuration methods let you modify a CVM after it has been provisioned. You can update the Docker Compose file, environment variables, resource allocation, visibility settings, and OS image independently.
 
+<Warning>
+**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+</Warning>
+
+Each `update_*` method targets a single aspect of the CVM and calls a dedicated API endpoint. `patch_cvm` is the unified method that can update multiple fields in a single request. Use `patch_cvm` when you need to change several settings atomically; use the individual `update_*` methods when you only need to change one thing.
+
 ## update_docker_compose
 
 `PATCH /cvms/{cvmId}/docker-compose`

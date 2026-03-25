@@ -45,7 +45,7 @@ Yes, the data you write to the filesystem inside Docker will persist on the disk
 
 Yes. Resources for programmatic management:
 
-- [Cloud API docs](https://cloud-api.phala.network/docs)
+- [Cloud API docs](/phala-cloud/phala-cloud-api/overview)
 - [API examples (JavaScript)](https://github.com/Phala-Network/phala-cloud)
 - [CI/CD pipeline setup](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline)
 
@@ -120,7 +120,7 @@ This reduces overhead (e.g., from multiple OS instances) and can lower costs. Ph
 
 ### What endpoint do I use to view logs for a specific instance?
 
-To access logs for a specific instance, if you use Cloud UI, you can check the log on the container page. If you use the Cloud API, you can use the endpoint GET /api/v1/cvms/app\_\<app\_id>/composition. This returns details about all containers within the Compute VM (CVM), including the log endpoint for each. Replace \<app\_id> with your instance’s unique identifier. Find the full API specification at https://cloud-api.phala.network/docs. Ensure you authenticate with your API key in the x-api-key header.
+To access logs for a specific instance, if you use Cloud UI, you can check the log on the container page. If you use the Cloud API, you can use the endpoint GET /api/v1/cvms/app\_\<app\_id>/composition. This returns details about all containers within the Compute VM (CVM), including the log endpoint for each. Replace \<app\_id> with your instance’s unique identifier. Find the full API specification at /phala-cloud/phala-cloud-api/overview. Ensure you authenticate with your API key in the x-api-key header.
 
 ### Can I set my own TLS certificate for my CVM network access?
 
@@ -220,7 +220,7 @@ See the [CI/CD Pipeline Guide](/phala-cloud/phala-cloud-cli/ci-cd-automation/set
 - Configuring the deployment workflow
 - Using the `phala-deploy-action`
 
-You can also use the [Phala Cloud API](https://cloud-api.phala.network/docs) for custom automation.
+You can also use the [Phala Cloud API](/phala-cloud/phala-cloud-api/overview) for custom automation.
 
 ### Is Phat Contract / DevPhase / Swanky still supported?
 

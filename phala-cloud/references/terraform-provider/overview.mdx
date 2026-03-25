@@ -3,6 +3,10 @@ title: Terraform Provider
 description: Deploy confidential apps on Phala Cloud with Terraform — install, configure, and deploy your first CVM in minutes.
 ---
 
+<Note>
+The Terraform Provider is currently in **beta**. The resource schema may change between releases.
+</Note>
+
 The Phala Cloud Terraform provider lets you manage confidential virtual machines (CVMs) using standard Terraform workflows. It follows an app-first model where `phala_app` is the primary resource, managing one application identity with shared Docker Compose configuration, shared environment variables, and one or more CVM replicas.
 
 If you have used providers like DigitalOcean or AWS, the patterns here will feel familiar: catalog data sources for discovery, declarative compute resources, explicit power control, and SSH key management.

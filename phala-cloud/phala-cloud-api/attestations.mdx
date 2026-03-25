@@ -37,19 +37,19 @@ Upload and verify an SGX or TDX attestation quote.
 <CodeGroup>
 
 ```bash File Upload
-curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
   -H "Content-Type: multipart/form-data" \
   -F "file=@quote.bin"
 ```
 
 ```bash JSON Hex
-curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
   -H "Content-Type: application/json" \
   -d '{"hex": "0x48656c6c6f..."}'
 ```
 
 ```bash Form Hex
-curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "hex=48656c6c6f..."
 ```
@@ -59,7 +59,7 @@ curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
 const formData = new FormData();
 formData.append('file', fileInput.files[0]);
 
-const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+const response = await fetch('https://cloud-api.phala.com/api/v1/attestations/verify', {
   method: 'POST',
   body: formData
 });
@@ -75,7 +75,7 @@ import requests
 # File upload
 with open('quote.bin', 'rb') as f:
     response = requests.post(
-        'https://cloud-api.phala.network/api/v1/attestations/verify',
+        'https://cloud-api.phala.com/api/v1/attestations/verify',
         files={'file': f}
     )
 
@@ -157,11 +157,11 @@ Retrieve complete quote details including header, body, and verification status.
 <CodeGroup>
 
 ```bash cURL
-curl "https://cloud-api.phala.network/api/v1/attestations/view/{checksum}"
+curl "https://cloud-api.phala.com/api/v1/attestations/view/{checksum}"
 ```
 
 ```javascript JavaScript
-const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/view/${checksum}`);
+const response = await fetch(`https://cloud-api.phala.com/api/v1/attestations/view/${checksum}`);
 const quote = await response.json();
 console.log('TEE Type:', quote.header.tee_type);
 console.log('MRTD:', quote.body.mrtd);
@@ -169,7 +169,7 @@ console.log('Verified:', quote.verified);
 ```
 
 ```python Python
-response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/view/{checksum}')
+response = requests.get(f'https://cloud-api.phala.com/api/v1/attestations/view/{checksum}')
 quote = response.json()
 print(f"TEE Type: {quote['header']['tee_type']}")
 print(f"MRTD: {quote['body']['mrtd']}")
@@ -221,11 +221,11 @@ Get cryptographic collateral (certificates, CRLs, TCB info) used for verificatio
 <CodeGroup>
 
 ```bash cURL
-curl "https://cloud-api.phala.network/api/v1/attestations/collateral/{checksum}"
+curl "https://cloud-api.phala.com/api/v1/attestations/collateral/{checksum}"
 ```
 
 ```javascript JavaScript
-const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/collateral/${checksum}`);
+const response = await fetch(`https://cloud-api.phala.com/api/v1/attestations/collateral/${checksum}`);
 const collateral = await response.json();
 
 // Parse nested JSON fields
@@ -239,7 +239,7 @@ console.log('QE Identity Version:', qeIdentity.version);
 
 ```python Python
 import json
-response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/collateral/{checksum}')
+response = requests.get(f'https://cloud-api.phala.com/api/v1/attestations/collateral/{checksum}')
 collateral = response.json()
 tcb_info = json.loads(collateral['tcb_info'])
 qe_identity = json.loads(collateral['qe_identity'])
@@ -277,17 +277,17 @@ Download original binary quote data.
 <CodeGroup>
 
 ```bash cURL
-curl "https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}" \
+curl "https://cloud-api.phala.com/api/v1/attestations/raw/{checksum}" \
   --output quote.bin
 ```
 
 ```javascript JavaScript
-const response = await fetch(`https://cloud-api.phala.network/api/v1/attestations/raw/${checksum}`);
+const response = await fetch(`https://cloud-api.phala.com/api/v1/attestations/raw/${checksum}`);
 const blob = await response.blob();
 ```
 
 ```python Python
-response = requests.get(f'https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}')
+response = requests.get(f'https://cloud-api.phala.com/api/v1/attestations/raw/{checksum}')
 with open(f'{checksum}.bin', 'wb') as f:
     f.write(response.content)
 print(f'Downloaded {len(response.content)} bytes')
@@ -304,12 +304,12 @@ Check quote existence and size without downloading.
 <CodeGroup>
 
 ```bash cURL
-curl -I "https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}"
+curl -I "https://cloud-api.phala.com/api/v1/attestations/raw/{checksum}"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  `https://cloud-api.phala.network/api/v1/attestations/raw/${checksum}`,
+  `https://cloud-api.phala.com/api/v1/attestations/raw/${checksum}`,
   { method: 'HEAD' }
 );
 const size = response.headers.get('Content-Length');
@@ -317,7 +317,7 @@ console.log(`Quote size: ${size} bytes`);
 ```
 
 ```python Python
-response = requests.head(f'https://cloud-api.phala.network/api/v1/attestations/raw/{checksum}')
+response = requests.head(f'https://cloud-api.phala.com/api/v1/attestations/raw/{checksum}')
 size = response.headers.get('Content-Length')
 print(f'Quote size: {size} bytes')
 ```
@@ -337,17 +337,17 @@ List recently uploaded quotes with pagination.
 <CodeGroup>
 
 ```bash cURL
-curl "https://cloud-api.phala.network/api/v1/attestations/recent?limit=10"
+curl "https://cloud-api.phala.com/api/v1/attestations/recent?limit=10"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://cloud-api.phala.network/api/v1/attestations/recent?limit=10');
+const response = await fetch('https://cloud-api.phala.com/api/v1/attestations/recent?limit=10');
 const quotes = await response.json();
 quotes.forEach(q => console.log(`${q.checksum}: ${q.verified ? 'verified' : 'failed'}`));
 ```
 
 ```python Python
-response = requests.get('https://cloud-api.phala.network/api/v1/attestations/recent', 
+response = requests.get('https://cloud-api.phala.com/api/v1/attestations/recent', 
                        params={'limit': 10})
 for quote in response.json():
     status = 'verified' if quote['verified'] else 'failed'

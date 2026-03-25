@@ -13,7 +13,7 @@ The Python SDK authenticates requests using an API key sent via the `X-API-Key` 
 Set `PHALA_CLOUD_API_KEY` in your environment and the SDK picks it up automatically:
 
 ```bash
-export PHALA_CLOUD_API_KEY="your-api-key"
+export PHALA_CLOUD_API_KEY="phak_your_api_key"
 ```
 
 ```python
@@ -33,7 +33,7 @@ Pass the key directly when creating the client:
 ```python
 from phala_cloud import create_client
 
-client = create_client(api_key="your-api-key")
+client = create_client(api_key="phak_your_api_key")
 ```
 
 The explicit `api_key` parameter takes precedence over the environment variable.
@@ -65,7 +65,7 @@ You can add extra headers to every request. This is useful for tracing, debuggin
 
 ```python
 client = create_client(
-    api_key="your-api-key",
+    api_key="phak_your_api_key",
     headers={"X-Request-Source": "my-automation"},
 )
 ```
@@ -115,7 +115,7 @@ http = httpx.Client(
     proxies="http://proxy.internal:8080",
 )
 
-client = create_client(api_key="your-api-key", http_client=http)
+client = create_client(api_key="phak_your_api_key", http_client=http)
 ```
 
 <Warning>

@@ -4,7 +4,15 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 icon: gear
 ---
 
-CVM configuration methods let you modify a running or stopped CVM without recreating it. Most updates trigger a restart or require an on-chain confirmation for CVMs using on-chain KMS.
+CVM configuration methods let you modify a running or stopped CVM without recreating it.
+
+<Warning>
+**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+</Warning>
+
+Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.) and calls a dedicated API endpoint. `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
+
+For CVMs using on-chain KMS, updates that affect the compose hash require an additional on-chain confirmation step.
 
 ## UpdateDockerCompose
 
@@ -215,7 +223,6 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `PublicSysinfo` | `*bool` | Make system info public |
 | `PublicLogs` | `*bool` | Make logs public |
 | `PublicTcbinfo` | `*bool` | Make TCB info public |
-| `GatewayEnabled` | `*bool` | Enable/disable gateway |
 | `SecureTime` | `*bool` | Enable/disable secure time |
 | `Listed` | `*bool` | Publicly listed |
 | `VCPU` | `*int` | Number of vCPUs |
@@ -303,9 +310,7 @@ func (c *Client) CommitCVMComposeFileUpdate(ctx context.Context, cvmID string, r
 ```go
 // Step 1: Provision the update
 provision, err := client.ProvisionCVMComposeFileUpdate(ctx, "my-app", &phala.ProvisionComposeUpdateRequest{
-	Name:              "my-app",
 	DockerComposeFile: newComposeYAML,
-	GatewayEnabled:    phala.Bool(true),
 })
 if err != nil {
 	log.Fatal(err)

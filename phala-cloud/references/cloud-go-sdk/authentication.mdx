@@ -12,7 +12,7 @@ The most explicit way to authenticate is passing `WithAPIKey` when creating the 
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phala_xxxxxxxxxxxxxxxxxxxxx"),
+	phala.WithAPIKey("phak_your_api_key"),
 )
 if err != nil {
 	log.Fatal(err)
@@ -24,7 +24,7 @@ if err != nil {
 For production deployments, storing the key in an environment variable is the standard approach. The SDK reads `PHALA_CLOUD_API_KEY` automatically when no explicit key is provided.
 
 ```bash
-export PHALA_CLOUD_API_KEY="phala_xxxxxxxxxxxxxxxxxxxxx"
+export PHALA_CLOUD_API_KEY="phak_your_api_key"
 ```
 
 ```go
@@ -45,7 +45,7 @@ You can override the API endpoint with `WithBaseURL` or the `PHALA_CLOUD_API_PRE
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithBaseURL("https://custom-api.example.com/api/v1"),
 )
 ```
@@ -58,7 +58,7 @@ Use `WithHeader` to attach additional headers to every request. This is useful f
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithHeader("X-Request-ID", "trace-abc123"),
 	phala.WithHeader("X-Custom-Header", "my-value"),
 )
@@ -72,7 +72,7 @@ The SDK sends an API version header with every request. The default is `"2026-01
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithAPIVersion("2026-01-21"),
 )
 ```
@@ -88,7 +88,7 @@ transport := &http.Transport{
 httpClient := &http.Client{Transport: transport}
 
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithHTTPClient(httpClient),
 )
 ```
@@ -103,7 +103,7 @@ The SDK sends a `User-Agent` header like `phala-cloud-sdk-go/0.1.0` by default. 
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("your-api-key"),
+	phala.WithAPIKey("phak_your_api_key"),
 	phala.WithUserAgent("my-automation/2.0"),
 )
 ```
