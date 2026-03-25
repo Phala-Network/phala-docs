@@ -74,49 +74,55 @@ The signature is: `sha256=HMAC-SHA256(secret, "{timestamp}.{raw_body}")`
 
 ### Using SDKs (Recommended)
 
+The Phala Cloud SDKs provide built-in verification with timestamp tolerance checks and constant-time comparison.
+
 <CodeGroup>
-```typescript JavaScript / TypeScript (@phala/cloud)
-import { verifyWebhookSignature, parseWebhookEvent } from "@phala/cloud";
+
+```typescript JavaScript / TypeScript
+import { verifyWebhookSignature, parseWebhookEvent } from "@phala/cloud/webhook";
 
 // Option 1: Verify signature manually
 const isValid = verifyWebhookSignature({
-  secret: "whsec_your_secret",
-  timestamp: request.headers["x-webhook-timestamp"],
+  secret: "whsec_...",
+  timestamp: req.headers["x-webhook-timestamp"],
   body: rawBody,
-  signature: request.headers["x-webhook-signature"],
+  signature: req.headers["x-webhook-signature"],
 });
 
-// Option 2: Parse and verify in one step
+// Option 2: Parse and verify in one step (throws on failure)
 try {
   const event = parseWebhookEvent({
-    headers: request.headers,
+    headers: req.headers,
     body: rawBody,
-    secret: "whsec_your_secret",
+    secret: "whsec_...",
   });
   console.log(event.event, event.data);
 } catch (err) {
   // Invalid signature or expired timestamp
+  res.status(401).send("Invalid signature");
 }
 ```
 
-```go Go (phala-cloud-sdk-go)
+```go Go
 import phala "github.com/Phala-Network/phala-cloud-sdk-go"
 
 // Option 1: Verify signature
-ok := phala.VerifyWebhookSignature(secret, timestamp, body, signature)
+ok := phala.VerifyWebhookSignature(secret, timestamp, string(body), signature)
 
-// Option 2: Parse and verify
-event, err := phala.ParseWebhookEvent(r.Header, bodyBytes, secret)
+// Option 2: Parse and verify (returns error on failure)
+event, err := phala.ParseWebhookEvent(r.Header, body, secret)
 if err != nil {
-    // Invalid signature or expired
+    http.Error(w, "Invalid signature", http.StatusUnauthorized)
+    return
 }
 fmt.Println(event.Event, string(event.Data))
 ```
+
 </CodeGroup>
 
-<Accordion title="Manual Verification (Python / Node.js)">
+Both SDKs automatically check that the timestamp is within 5 minutes (configurable) and use constant-time comparison to prevent timing attacks.
 
-If you prefer to verify signatures without an SDK, you can compute the HMAC-SHA256 directly:
+<Accordion title="Manual Verification (Python / Node.js)">
 
 <CodeGroup>
 ```python Python
@@ -139,16 +145,16 @@ function verifyWebhook(secret, timestamp, body, signature) {
   const expected = "sha256=" +
     crypto.createHmac("sha256", secret).update(message).digest("hex");
   const expectedBuf = Buffer.from(expected);
-  const signatureBuf = Buffer.from(signature);
-  if (expectedBuf.length !== signatureBuf.length) return false;
-  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
+  const actualBuf = Buffer.from(signature);
+  if (expectedBuf.length !== actualBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, actualBuf);
 }
 ```
 </CodeGroup>
 
-</Accordion>
-
 **Replay protection:** reject events where `X-Webhook-Timestamp` is older than 5 minutes.
+
+</Accordion>
 
 ## Delivery Behavior
 
@@ -161,6 +167,50 @@ function verifyWebhook(secret, timestamp, body, signature) {
 | **Retries** | Up to 3 retries: 1 min → 10 min → 1 hour |
 | **Total attempts** | 4 (1 initial + 3 retries) |
 | **Recording** | One delivery record per event (final result only) |
+
+## Secret Management
+
+Webhook signing secrets follow a strict security model:
+
+- **Shown once at creation** — the full secret is returned only in the `POST /workspace/webhooks` response
+- **Masked afterward** — subsequent `GET`/`LIST` responses return a masked value (e.g. `whsec_****...xxxx`)
+- **Reveal requires 2FA** — to view the full secret again, your account must have two-factor authentication enabled and recently verified
+- **Rotation requires 2FA** — generating a new secret also requires 2FA verification
+
+### Reveal Secret
+
+```
+POST /api/v1/workspace/webhooks/{id}/reveal-secret
+```
+
+Returns the full signing secret. Requires:
+- Account with 2FA enabled (returns `403` if not)
+- Recent 2FA step-up verification (returns `428` if not verified)
+
+### Rotate Secret
+
+```
+POST /api/v1/workspace/webhooks/{id}/rotate-secret
+```
+
+Generates a new signing secret and invalidates the previous one. Same 2FA requirements as reveal.
+
+<Warning>
+After rotation, update your webhook consumer with the new secret immediately. Events signed with the old secret will fail verification.
+</Warning>
+
+## URL Requirements
+
+Webhook URLs must meet the following requirements:
+
+- **HTTPS only** — HTTP URLs are rejected
+- **Public addresses only** — URLs resolving to private or reserved IP ranges are blocked:
+  - `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (private)
+  - `169.254.0.0/16` including `169.254.169.254` (cloud metadata)
+  - `::1`, `fc00::/7`, `fe80::/10` (IPv6 private/loopback)
+- **No localhost** — `localhost` and `.local` domains are not allowed
+
+These restrictions apply both at webhook creation and at delivery time to prevent DNS rebinding attacks.
 
 ## Managing Webhooks
 
@@ -203,67 +253,6 @@ GET /api/v1/workspace/webhooks/{id}/stats
 # Resend
 POST /api/v1/workspace/webhooks/{id}/deliveries/{event_id}/resend
 ```
-
-### Reveal Webhook Secret
-
-Reveals the full webhook signing secret. Requires two-factor authentication.
-
-**Endpoint:** `POST /api/v1/workspace/webhooks/{webhook_id}/reveal-secret`
-
-**Requirements:**
-- Workspace API key or session authentication
-- Account must have 2FA enabled (returns 403 if not)
-- Recent 2FA step-up verification required (returns 428 if not verified)
-
-**Response:**
-```json
-{
-  "secret": "whsec_abc123..."
-}
-```
-
-### Rotate Webhook Secret
-
-Generates a new signing secret, invalidating the previous one. Requires two-factor authentication.
-
-**Endpoint:** `POST /api/v1/workspace/webhooks/{webhook_id}/rotate-secret`
-
-**Requirements:** Same as Reveal Webhook Secret.
-
-**Response:**
-```json
-{
-  "secret": "whsec_new_secret..."
-}
-```
-
-<Warning>
-After rotation, update your webhook consumer with the new secret immediately. Events signed with the old secret will fail verification.
-</Warning>
-
-## Secret Management
-
-Webhook signing secrets follow a strict access model to prevent unauthorized exposure:
-
-- **Creation:** The full secret is shown only once when the webhook is first created. Copy and store it securely at that time.
-- **Subsequent access:** API responses return a masked secret (e.g., `whsec_****...xxxx`). The full value is not included.
-- **Revealing the secret:** Use the [Reveal Webhook Secret](#reveal-webhook-secret) endpoint. This requires 2FA to be enabled and recently verified on your account.
-- **Rotating the secret:** Use the [Rotate Webhook Secret](#rotate-webhook-secret) endpoint to generate a new secret and invalidate the old one. This also requires 2FA.
-
-This design ensures that even if a workspace API key is compromised, the attacker cannot retrieve or change webhook secrets without passing the 2FA challenge.
-
-## URL Requirements
-
-Webhook endpoint URLs must meet the following criteria:
-
-- **HTTPS required** — Only `https://` URLs are accepted. Plain HTTP is rejected.
-- **No private/internal IPs** — URLs that resolve to private or reserved IP ranges are blocked:
-  - `127.0.0.0/8` (loopback)
-  - `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (private networks)
-  - `169.254.169.254` (cloud metadata endpoints)
-- **No local domains** — `localhost` and `.local` domains are not allowed.
-
-These restrictions prevent server-side request forgery (SSRF) and ensure webhook deliveries only reach publicly accessible endpoints.
 
 ## Best Practices
 
