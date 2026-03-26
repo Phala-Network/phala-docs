@@ -26,7 +26,26 @@ The required parameters differ based on the KMS type:
 | `contract_address` | `string` | No | AppAuth contract address (on-chain KMS only) |
 | `deployer_address` | `string` | No | Deployer wallet address (on-chain KMS only) |
 
-**Returns:** `CommitCvmProvision` — full CVM details with metadata.
+**Returns:** `CommitCvmProvision`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `number` | CVM ID |
+| `name` | `string` | CVM name |
+| `status` | `string` | Initial status (typically `"starting"`) |
+| `app_id` | `string?` | App ID |
+| `app_url` | `string?` | Public URL for the CVM |
+| `vm_uuid` | `string?` | VM unique identifier |
+| `instance_id` | `string?` | Instance identifier |
+| `vcpu` | `number` | Allocated vCPUs |
+| `memory` | `number` | Allocated memory (MB) |
+| `disk_size` | `number` | Disk size (GB) |
+| `created_at` | `string` | ISO 8601 creation timestamp |
+| `encrypted_env_pubkey` | `string?` | Public key for encrypting environment variables |
+| `app_auth_contract_address` | `string?` | AppAuth contract address (on-chain KMS only) |
+| `deployer_address` | `string?` | Deployer wallet address (on-chain KMS only) |
+
+After a successful commit, the CVM begins booting. Track progress with [`watchCvmState`](/phala-cloud/references/cloud-js-sdk/watch-cvm-state) or subscribe to [`cvm.created`](/phala-cloud/references/webhooks) / [`cvm.create_failed`](/phala-cloud/references/webhooks) webhook events.
 
 **Example — PHALA KMS:**
 

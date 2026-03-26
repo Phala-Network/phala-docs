@@ -144,7 +144,7 @@ fmt.Println(event.Event, string(event.Data))
 
 </CodeGroup>
 
-All three SDKs automatically check that the timestamp is within 5 minutes (configurable) and use constant-time comparison to prevent timing attacks.
+All three SDKs automatically reject timestamps older than 5 minutes (configurable via `toleranceSeconds`) and use constant-time comparison to prevent timing attacks.
 
 <Accordion title="Manual Verification (Python / Node.js)">
 
@@ -280,8 +280,7 @@ POST /api/v1/workspace/webhooks/{id}/deliveries/{event_id}/resend
 
 ## Best Practices
 
-1. **Verify signatures** — always check `X-Webhook-Signature` before processing
-2. **Respond fast** — return `200` immediately, process asynchronously (10s timeout)
-3. **Be idempotent** — use `id` field to deduplicate in case of retries
-4. **Check timestamps** — reject events older than 5 minutes
-5. **Use HTTPS** — always use HTTPS for webhook URLs
+- **Verify signatures** — always check `X-Webhook-Signature` before processing
+- **Respond fast** — return `200` immediately, process asynchronously (10s timeout)
+- **Be idempotent** — use the `id` field to deduplicate retries
+- **Check timestamps** — reject events older than 5 minutes
