@@ -103,6 +103,30 @@ try {
 }
 ```
 
+```python Python
+from phala_cloud import verify_webhook_signature, parse_webhook_event
+
+# Option 1: Verify signature manually
+is_valid = verify_webhook_signature(
+    secret="whsec_...",
+    timestamp=request.headers["X-Webhook-Timestamp"],
+    body=request.body.decode(),
+    signature=request.headers["X-Webhook-Signature"],
+)
+
+# Option 2: Parse and verify in one step (raises on failure)
+try:
+    event = parse_webhook_event(
+        headers=dict(request.headers),
+        body=request.body.decode(),
+        secret="whsec_...",
+    )
+    print(event.event, event.data)
+except ValueError:
+    # Invalid signature or expired timestamp
+    return Response(status_code=401)
+```
+
 ```go Go
 import phala "github.com/Phala-Network/phala-cloud-sdk-go"
 
@@ -120,7 +144,7 @@ fmt.Println(event.Event, string(event.Data))
 
 </CodeGroup>
 
-Both SDKs automatically check that the timestamp is within 5 minutes (configurable) and use constant-time comparison to prevent timing attacks.
+All three SDKs automatically check that the timestamp is within 5 minutes (configurable) and use constant-time comparison to prevent timing attacks.
 
 <Accordion title="Manual Verification (Python / Node.js)">
 

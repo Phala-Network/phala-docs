@@ -278,10 +278,29 @@ from phala_cloud import (
 | `verify_env_encrypt_public_key(...)` | Verify KMS encryption public key |
 | `parse_env(path)` | Parse a `.env` file into key-value pairs |
 | `parse_env_vars(content)` | Parse dotenv content string into key-value pairs |
+| `verify_webhook_signature(...)` | Verify HMAC-SHA256 webhook signature with timestamp tolerance |
+| `parse_webhook_event(...)` | Verify signature and parse webhook event in one step |
+
+### Webhook Verification Example
+
+```python
+from phala_cloud import verify_webhook_signature, parse_webhook_event
+
+# Verify and parse a webhook request
+event = parse_webhook_event(
+    headers=dict(request.headers),
+    body=request.body.decode(),
+    secret="whsec_...",
+)
+print(event.event, event.data)
+```
+
+See [Webhooks](/phala-cloud/references/webhooks) for full payload format and delivery behavior.
 
 ## Related
 
 - [Authentication](/phala-cloud/references/cloud-python-sdk/authentication) — API key configuration
 - [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — provisioning and managing CVMs
 - [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — error classes and safe methods
+- [Webhooks](/phala-cloud/references/webhooks) — webhook events, signatures, and delivery
 - [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

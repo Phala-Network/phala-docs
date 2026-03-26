@@ -210,9 +210,28 @@ This means you never need to worry about converting between ID formats yourself.
 | `ImportGithubProfileSSHKeys(ctx, username)` | Import keys from GitHub profile |
 | `SyncGithubSSHKeys(ctx)` | Sync keys from GitHub |
 
+### Webhook Verification
+
+| Function | Description |
+|----------|-------------|
+| `VerifyWebhookSignature(secret, timestamp, body, signature)` | Verify HMAC-SHA256 webhook signature |
+| `ParseWebhookEvent(headers, body, secret, tolerance...)` | Verify signature and parse webhook event |
+
+```go
+event, err := phala.ParseWebhookEvent(r.Header, body, secret)
+if err != nil {
+    http.Error(w, "Invalid signature", http.StatusUnauthorized)
+    return
+}
+fmt.Println(event.Event, string(event.Data))
+```
+
+See [Webhooks](/phala-cloud/references/webhooks) for full payload format and delivery behavior.
+
 ## Related
 
 - [Authentication](/phala-cloud/references/cloud-go-sdk/authentication) — API key setup and custom headers
 - [CVM Lifecycle](/phala-cloud/references/cloud-go-sdk/cvm-lifecycle) — provisioning, starting, stopping, deleting
 - [Error Handling](/phala-cloud/references/cloud-go-sdk/error-handling) — error types and retry logic
+- [Webhooks](/phala-cloud/references/webhooks) — webhook events, signatures, and delivery
 - [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

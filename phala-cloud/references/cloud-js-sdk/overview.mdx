@@ -309,9 +309,35 @@ DEBUG=phala::api-client node your-script.js
 | `PHALA_CLOUD_API_KEY` | API key for authentication |
 | `PHALA_CLOUD_API_PREFIX` | Base URL for the API |
 
+## Webhook Signature Verification
+
+The SDK provides utilities for verifying webhook signatures, exported from a separate subpath to avoid bundling `node:crypto` into browser builds:
+
+```typescript
+import { verifyWebhookSignature, parseWebhookEvent } from "@phala/cloud/webhook";
+
+// Verify a single signature
+const isValid = verifyWebhookSignature({
+  secret: "whsec_...",
+  timestamp: req.headers["x-webhook-timestamp"],
+  body: rawBody,
+  signature: req.headers["x-webhook-signature"],
+});
+
+// Or parse and verify in one step
+const event = parseWebhookEvent({
+  headers: req.headers,
+  body: rawBody,
+  secret: "whsec_...",
+});
+```
+
+See [Webhooks](/phala-cloud/references/webhooks) for full payload format and delivery behavior.
+
 ## Related
 
 - [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) — version management and migration
 - [Schema Reference](/phala-cloud/references/cloud-js-sdk/schema-reference) — response schema details per version
 - [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling) — error classes and safe methods
+- [Webhooks](/phala-cloud/references/webhooks) — webhook events, signatures, and delivery
 - [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs
