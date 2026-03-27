@@ -1,90 +1,108 @@
 ---
-title: "phala ssh"
-description: "Connect to a CVM via SSH through the Phala Cloud gateway."
+title: "ssh"
+description: "Connect to a CVM via SSH"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala ssh`
+
+### Syntax
 
 ```
-phala ssh [cvm-id] [options] [-- ssh-options]
+phala ssh [options] [<cvm_id>] [--] [...]
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `cvm-id` | No | CVM ID, UUID, or name (uses linked CVM if omitted) |
+Connect to a CVM via SSH
 
-## Options
+### Arguments
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--port <port>` | `-p` | 443 | Gateway port (priority: CLI > phala.toml > 443) |
-| `--gateway <domain>` | `-g` | | Gateway domain (priority: CLI > phala.toml > API) |
-| `--timeout <seconds>` | `-t` | 30 | Connection timeout |
-| `--verbose` | `-v` | false | Show verbose connection details |
-| `--dry-run` | | false | Print SSH command without executing |
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
 
-## Pass-through Options
+### Options
 
-All arguments after `--` are passed directly to ssh. Trailing arguments are executed as remote commands.
+| Option | Description |
+| ------ | ----------- |
+| `-i, --interactive` | Enable interactive mode |
+| `-p, --port <value>` | Gateway port (priority: CLI > phala.toml > 443) |
+| `-g, --gateway <value>` | Gateway domain (priority: CLI > phala.toml > API) |
+| `-t, --timeout <value>` | Connection timeout in seconds (default: 30) |
+| `-v, --verbose` | Show verbose connection details |
+| `--dry-run` | Print SSH command without executing |
 
-Common pass-through options:
-- `-i` — SSH identity file
-- `-L` — Local port forwarding
-- `-R` — Remote port forwarding
-- `-D` — SOCKS proxy
-- `-N` — No command (useful with port forwarding)
-- `-v` — SSH verbose mode
+### Global Options
 
-Note: `-o ProxyCommand` is blocked for security reasons.
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `--version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-## Examples
+### Pass-through Arguments
 
-Connect to linked CVM:
+All arguments after -- are passed directly to ssh. Common options: -i (identity file), -L (local forward), -R (remote forward), -D (SOCKS proxy), -N (no command), -v (ssh verbose). Any trailing arguments are executed as remote command. Note: -o ProxyCommand is blocked.
 
-```
-$ phala ssh
-```
+### Examples
 
-Connect to specific CVM:
+* Connect from phala.toml
 
-```
-$ phala ssh app_abc123
-```
-
-Forward local port 8080 to remote port 80:
-
-```
-$ phala ssh -- -L 8080:localhost:80
+```bash
+phala ssh
 ```
 
-Execute remote command:
+* Connect to CVM
 
-```
-$ phala ssh -- ls /app
-```
-
-Print SSH command without executing:
-
-```
-$ phala ssh --dry-run
+```bash
+phala ssh app_123
 ```
 
-Connect with verbose details:
+* Offline mode
 
-```
-$ phala ssh --verbose
-```
-
-Use custom SSH identity:
-
-```
-$ phala ssh -- -i ~/.ssh/custom_key
+```bash
+phala ssh app_123 -g dstack-pha-prod7.phala.network -p 16185
 ```
 
-Set up SOCKS proxy on port 1080:
+* Connect with custom SSH key
 
+```bash
+phala ssh app_123 -- -i ~/.ssh/custom_key
 ```
-$ phala ssh -- -D 1080 -N
+
+* Forward local port 8080 to remote port 80
+
+```bash
+phala ssh app_123 -- -L 8080:localhost:80
 ```
+
+* SOCKS proxy without remote command
+
+```bash
+phala ssh app_123 -- -D 1080 -N
+```
+
+* Execute remote command
+
+```bash
+phala ssh app_123 -- ls -la /app
+```
+
+* Connect with verbose output for debugging
+
+```bash
+phala ssh app_123 -v
+```
+
+* Print the SSH command without executing
+
+```bash
+phala ssh app_123 --dry-run -- -L 8080:localhost:80
+```
+

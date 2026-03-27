@@ -1,0 +1,127 @@
+---
+title: Authentication
+description: Configure API key authentication for the Phala Cloud Python SDK.
+---
+
+The Python SDK authenticates requests using an API key sent via the `X-API-Key` header. You can provide the key directly or through an environment variable.
+
+## API Key
+
+### Environment Variable (Recommended)
+
+Set `PHALA_CLOUD_API_KEY` in your environment and the SDK picks it up automatically:
+
+```bash
+export PHALA_CLOUD_API_KEY="phak_your_api_key"
+```
+
+```python
+from phala_cloud import create_client
+
+# No api_key argument needed
+client = create_client()
+me = client.get_current_user()
+```
+
+This is the recommended approach for production deployments and CI/CD pipelines. It keeps credentials out of your source code.
+
+### Explicit API Key
+
+Pass the key directly when creating the client:
+
+```python
+from phala_cloud import create_client
+
+client = create_client(api_key="phak_your_api_key")
+```
+
+The explicit `api_key` parameter takes precedence over the environment variable.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PHALA_CLOUD_API_KEY` | API key for authentication |
+| `PHALA_CLOUD_API_PREFIX` | Base URL override (defaults to `https://cloud-api.phala.com/api/v1`) |
+
+Both variables are read at client creation time. Changing them after the client is created has no effect.
+
+## Cookie-Based Auth
+
+For browser-like environments, the SDK supports cookie-based authentication instead of API keys. When enabled, the `X-API-Key` header is not sent, and authentication relies on cookies managed by the HTTP client.
+
+```python
+client = create_client(use_cookie_auth=True)
+```
+
+<Note>
+Cookie-based auth is primarily for internal use. Most users should stick with API key authentication.
+</Note>
+
+## Custom Headers
+
+You can add extra headers to every request. This is useful for tracing, debugging, or passing custom metadata.
+
+```python
+client = create_client(
+    api_key="phak_your_api_key",
+    headers={"X-Request-Source": "my-automation"},
+)
+```
+
+## Verifying Authentication
+
+Call `get_current_user()` to verify your credentials are valid:
+
+<CodeGroup>
+
+```python Sync
+from phala_cloud import create_client, AuthError
+
+client = create_client()
+
+try:
+    user = client.get_current_user()
+    print(f"Authenticated as {user.model_dump()}")
+except AuthError as e:
+    print(f"Auth failed: {e}")
+```
+
+```python Async
+from phala_cloud import create_async_client, AuthError
+
+client = create_async_client()
+
+try:
+    user = await client.get_current_user()
+    print(f"Authenticated as {user.model_dump()}")
+except AuthError as e:
+    print(f"Auth failed: {e}")
+```
+
+</CodeGroup>
+
+## Bring Your Own HTTP Client
+
+If you need full control over transport settings (proxies, certificates, connection pooling), pass a pre-configured `httpx` client:
+
+```python
+import httpx
+from phala_cloud import create_client
+
+http = httpx.Client(
+    verify="/path/to/ca-bundle.crt",
+    proxies="http://proxy.internal:8080",
+)
+
+client = create_client(api_key="phak_your_api_key", http_client=http)
+```
+
+<Warning>
+When you provide your own `http_client`, the SDK does not close it automatically. You are responsible for calling `http.close()` when done.
+</Warning>
+
+## Related
+
+- [SDK Overview](/phala-cloud/references/cloud-python-sdk/overview) — installation and quick start
+- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — handling `AuthError`

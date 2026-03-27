@@ -130,7 +130,7 @@ Verify the TDX quote was signed by genuine Intel hardware. This uses Phala Cloud
 ```javascript TypeScript
 import assert from 'assert';
 
-const verifyResponse = await fetch('https://cloud-api.phala.network/api/v1/attestations/verify', {
+const verifyResponse = await fetch('https://cloud-api.phala.com/api/v1/attestations/verify', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ hex: quote })
@@ -144,7 +144,7 @@ assert(result.quote.verified, 'Hardware verification failed');
 import requests
 
 verify_response = requests.post(
-    'https://cloud-api.phala.network/api/v1/attestations/verify',
+    'https://cloud-api.phala.com/api/v1/attestations/verify',
     json={'hex': quote}
 )
 

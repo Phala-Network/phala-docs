@@ -75,3 +75,38 @@ Returns instance types for a specific family (e.g., `cpu`, `gpu`).
 ```typescript
 const cpuTypes = await client.listFamilyInstanceTypes({ family: "cpu" });
 ```
+
+---
+
+## getOsImages
+
+`GET /os-images`
+
+Returns a paginated list of publicly available OS images. Each image includes metadata like the image hash, GPU requirement flag, and whether it is a dev image. Use this when you need the full catalog of images with pagination support.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `page` | `number` | No | Page number (default: 1) |
+| `page_size` | `number` | No | Items per page |
+| `is_dev` | `boolean` | No | Filter for dev images only |
+
+**Returns:** `GetOsImagesResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `items` | `array` | OS images with `name`, `slug`, `version`, `os_image_hash`, `is_dev`, `requires_gpu` |
+| `total` | `number` | Total number of images |
+| `page` | `number` | Current page |
+| `page_size` | `number` | Items per page |
+| `pages` | `number` | Total pages |
+
+**Example:**
+
+```typescript
+const images = await client.getOsImages({ page: 1, page_size: 10 });
+images.items.forEach(img => {
+  console.log(`${img.name} v${img.version} (hash: ${img.os_image_hash})`);
+});
+```

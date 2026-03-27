@@ -1,77 +1,63 @@
 ---
-title: "phala instance-types"
-description: "List available instance types for CVM deployment."
+title: "instance-types"
+description: "List available instance types"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
 
-```bash
-phala instance-types [family] [options]
+## Command: `phala instance-types`
+
+### Syntax
+
+```
+phala instance-types [options] [<family>]
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `family` | No | Instance type family to filter by (cpu, gpu) |
+List available instance types
 
-## Options
+### Arguments
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--json` | `-j` | false | Output in JSON format |
+| Argument | Description |
+| -------- | ----------- |
+| `<family>?` | Instance type family (cpu, gpu) |
 
-## Examples
+### Global Options
 
-### List all instance types
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-```bash
-$ phala instance-types
-Instance Types:
+### Examples
 
-CPU Instances:
-  tdx.small    2 vCPU   4GB RAM    $0.10/hour
-  tdx.medium   4 vCPU   8GB RAM    $0.20/hour
-  tdx.large    8 vCPU   16GB RAM   $0.40/hour
-  tdx.xlarge   16 vCPU  32GB RAM   $0.80/hour
-
-GPU Instances:
-  tdx.gpu.small   4 vCPU   8GB RAM   NVIDIA T4      $0.50/hour
-  tdx.gpu.medium  8 vCPU   16GB RAM  NVIDIA A10     $1.00/hour
-```
-
-### List only CPU instance types
+* List all instance type families
 
 ```bash
-$ phala instance-types cpu
+phala instance-types
 ```
 
-### List only GPU instance types
+* List CPU instance types
 
 ```bash
-$ phala instance-types gpu
+phala instance-types cpu
 ```
 
-### JSON output
+* List GPU instance types
 
 ```bash
-$ phala instance-types --json
-[
-  {
-    "name": "tdx.small",
-    "vcpu": 2,
-    "memory_gb": 4,
-    "family": "cpu",
-    "price_per_hour": 0.10,
-    "regions": ["us-west", "us-east", "eu-central"]
-  }
-]
+phala instance-types gpu
 ```
 
-## Instance Type Naming Convention
+* Output as JSON
 
-Instance types follow the pattern: `tdx.<family>.<size>`
+```bash
+phala instance-types --json
+```
 
-- `tdx` - TEE technology (Intel TDX)
-- `family` - Instance family (cpu, gpu)
-- `size` - Size tier (small, medium, large, xlarge, etc.)

@@ -1,0 +1,46 @@
+---
+title: "kms"
+description: "Manage on-chain KMS contracts"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala kms`
+
+### Syntax
+
+```
+phala kms <command> [options]
+```
+
+### Description
+
+Manage on-chain KMS contracts
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Subcommands
+
+| Command | Description |
+| ------- | ----------- |
+| `list` | (ls)         List on-chain KMS contracts |
+| `ethereum` | Show on-chain KMS details for ethereum |
+| `base` | Show on-chain KMS details for base |
+
+### Examples
+
+* Display help:
+
+```bash
+phala kms --help
+```

@@ -35,16 +35,20 @@ const DEPRECATED_REDIRECTS = {
  * Execute a command and return its output
  */
 function runCommand(args) {
-  try {
-    const command = `npx phala ${args.join(" ")} --help 2>&1`;
-    return execSync(command, { encoding: "utf-8", timeout: 30000 });
-  } catch (error) {
-    if (error.stdout) {
-      return error.stdout;
+  // Try global `phala` first, fall back to `npx phala`
+  const binaries = ["phala", "npx phala"];
+  for (const bin of binaries) {
+    try {
+      const command = `${bin} ${args.join(" ")} --help 2>&1`;
+      return execSync(command, { encoding: "utf-8", timeout: 30000 });
+    } catch (error) {
+      if (error.stdout) {
+        return error.stdout;
+      }
     }
-    console.error(`Failed to run: phala ${args.join(" ")} --help`);
-    return "";
   }
+  console.error(`Failed to run: phala ${args.join(" ")} --help`);
+  return "";
 }
 
 /**
@@ -58,6 +62,7 @@ function parseHelpOutput(output, commandPath) {
     description: "",
     usage: "",
     options: [],
+    optionGroups: {}, // { groupName: [option, ...] }
     subcommands: [],
     examples: [],
     arguments: [],
@@ -67,6 +72,7 @@ function parseHelpOutput(output, commandPath) {
   };
 
   let section = "";
+  let currentOptionGroup = "";
   let currentExample = "";
 
   for (let i = 0; i < lines.length; i++) {
@@ -107,16 +113,55 @@ function parseHelpOutput(output, commandPath) {
     }
 
     // Detect section headers
+    // Match both "Available commands:" and grouped headers like "Deploy:", "Manage:", etc.
     if (trimmedLine === "Available commands:") {
+      section = "commands";
+      continue;
+    }
+    if (
+      section !== "options" &&
+      section !== "arguments" &&
+      section !== "examples" &&
+      section !== "passthrough" &&
+      /^[A-Z][a-zA-Z /]+:$/.test(trimmedLine) &&
+      !trimmedLine.startsWith("Usage:") &&
+      !trimmedLine.startsWith("Options:") &&
+      !trimmedLine.startsWith("Global") &&
+      !trimmedLine.startsWith("Arguments:") &&
+      !trimmedLine.startsWith("Examples:") &&
+      !trimmedLine.startsWith("Pass-through")
+    ) {
+      // Command group header (e.g., "Deploy:", "Manage:", "CVM operations:")
       section = "commands";
       continue;
     }
     if (
       trimmedLine === "Options:" ||
       trimmedLine === "Global options:" ||
-      trimmedLine === "Global Options:"
+      trimmedLine === "Global Options:" ||
+      trimmedLine === "Basic options:" ||
+      trimmedLine === "Basic Options:" ||
+      trimmedLine === "Advanced options:" ||
+      trimmedLine === "Advanced Options:" ||
+      trimmedLine === "Deprecated options:" ||
+      trimmedLine === "Deprecated Options:"
     ) {
       section = "options";
+      // Map help group names to MDX section names
+      if (trimmedLine.toLowerCase().startsWith("global")) {
+        currentOptionGroup = "Global Options";
+      } else if (trimmedLine.toLowerCase().startsWith("advanced")) {
+        currentOptionGroup = "Advanced Options";
+      } else if (trimmedLine.toLowerCase().startsWith("deprecated")) {
+        currentOptionGroup = "Deprecated Options";
+      } else if (trimmedLine.toLowerCase().startsWith("basic")) {
+        currentOptionGroup = "Options";
+      } else {
+        currentOptionGroup = "Options";
+      }
+      if (!command.optionGroups[currentOptionGroup]) {
+        command.optionGroups[currentOptionGroup] = [];
+      }
       continue;
     }
     if (trimmedLine === "Arguments:") {
@@ -200,11 +245,15 @@ function parseHelpOutput(output, commandPath) {
           defaultValue = defaultMatch[1];
         }
 
-        command.options.push({
+        const opt = {
           flags: cleanFlags,
           description,
           defaultValue,
-        });
+        };
+        command.options.push(opt);
+        if (currentOptionGroup && command.optionGroups[currentOptionGroup]) {
+          command.optionGroups[currentOptionGroup].push(opt);
+        }
       }
     }
 
@@ -315,16 +364,39 @@ This command is marked as unstable and may change in future releases.
     mdx += "\n";
   }
 
-  // Options table
+  // Options tables (grouped)
   if (command.options.length > 0) {
-    mdx += `### Options\n\n`;
-    mdx += `| Option | Description |\n`;
-    mdx += `| ------ | ----------- |\n`;
-    for (const opt of command.options) {
-      const desc = opt.description;
-      mdx += `| \`${opt.flags}\` | ${escapeForTable(desc)} |\n`;
+    const groupNames = Object.keys(command.optionGroups);
+    const hasNonGlobalGroups = groupNames.some(g => g !== "Global Options");
+
+    if (hasNonGlobalGroups) {
+      // Render groups in order: Options, Advanced Options, Deprecated Options, Global Options
+      const groupOrder = ["Options", "Advanced Options", "Deprecated Options", "Global Options"];
+      for (const groupName of groupOrder) {
+        const groupOpts = command.optionGroups[groupName];
+        if (groupOpts && groupOpts.length > 0) {
+          mdx += `### ${groupName}\n\n`;
+          mdx += `| Option | Description |\n`;
+          mdx += `| ------ | ----------- |\n`;
+          for (const opt of groupOpts) {
+            mdx += `| \`${opt.flags}\` | ${escapeForTable(opt.description)} |\n`;
+          }
+          mdx += "\n";
+        }
+      }
+    } else {
+      // Only global options — just render as "Global Options"
+      const globalOpts = command.optionGroups["Global Options"];
+      if (globalOpts && globalOpts.length > 0) {
+        mdx += `### Global Options\n\n`;
+        mdx += `| Option | Description |\n`;
+        mdx += `| ------ | ----------- |\n`;
+        for (const opt of globalOpts) {
+          mdx += `| \`${opt.flags}\` | ${escapeForTable(opt.description)} |\n`;
+        }
+        mdx += "\n";
+      }
     }
-    mdx += "\n";
   }
 
   // Subcommands tables (separate active from deprecated)

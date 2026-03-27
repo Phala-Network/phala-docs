@@ -1,43 +1,44 @@
 ---
-title: "phala self"
-description: "CLI self-management commands including update."
+title: "self"
+description: "CLI self-management"
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala self`
+
+### Syntax
 
 ```
-phala self <subcommand> [options]
+phala self <command> [options]
 ```
 
-## Subcommands
+### Description
 
-### self update
+CLI self-management
 
-Update the Phala CLI to the latest version.
+### Global Options
 
-#### Options
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--json` | `-j` | false | Output result in JSON format |
-| `--yes` | `-y` | false | Skip confirmation prompt |
-| `--dry-run` | | false | Print update command without executing |
-| `--package-manager` | | auto-detect | Override package manager (npm, pnpm, yarn, bun) |
-| `--channel` | | latest | Release channel/dist-tag (e.g. latest, beta, next) |
+### Subcommands
 
-#### Environment Variables
+| Command | Description |
+| ------- | ----------- |
+| `update` | Update the Phala CLI |
 
-| Variable | Description |
-|----------|-------------|
-| `PHALA_UPDATE_CHANNEL` | Set the release channel (alternative to --channel flag) |
+### Examples
 
-#### Examples
+* Display help:
 
 ```bash
-$ phala self update
-$ phala self update --yes
-$ phala self update --channel beta
-$ phala self update --dry-run
-$ phala self update --package-manager pnpm
-$ PHALA_UPDATE_CHANNEL=beta phala self update
+phala self --help
 ```

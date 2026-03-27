@@ -88,7 +88,7 @@ For Intel CPUs, you'll verify the TDX quote using Phala's verification service. 
 ```python
 # Verify Intel TDX quote
 response = requests.post(
-    "https://cloud-api.phala.network/api/v1/attestations/verify",
+    "https://cloud-api.phala.com/api/v1/attestations/verify",
     json={"hex": report["intel_quote"]}
 )
 intel_result = response.json()

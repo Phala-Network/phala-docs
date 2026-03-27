@@ -1,0 +1,219 @@
+---
+title: KMS
+description: Query Key Management Service info, list KMS instances, get on-chain details, and retrieve encryption public keys.
+---
+
+KMS (Key Management Service) methods let you interact with the Phala Cloud key management infrastructure. You use these to retrieve encryption keys for securing environment variables and to get on-chain KMS details for compose hash verification.
+
+## get_kms_info
+
+`GET /kms/{kmsId}`
+
+Retrieves information about a specific KMS instance.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kms_id` | `str` | Yes | KMS identifier (e.g., `"phala"`) |
+
+**Returns:** KMS info object.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+kms = client.get_kms_info({"kms_id": "phala"})
+print(kms.model_dump())
+```
+
+```python Async
+kms = await client.get_kms_info({"kms_id": "phala"})
+print(kms.model_dump())
+```
+
+</CodeGroup>
+
+---
+
+## get_kms_list
+
+`GET /kms`
+
+Lists all available KMS instances. Supports optional filtering.
+
+**Parameters:** Optional dictionary of query parameters.
+
+**Returns:** `GetKmsListResponse` with a list of KMS instances.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+kms_list = client.get_kms_list()
+for kms in kms_list.items:
+    print(kms.id, kms.name)
+```
+
+```python Async
+kms_list = await client.get_kms_list()
+for kms in kms_list.items:
+    print(kms.id, kms.name)
+```
+
+</CodeGroup>
+
+---
+
+## get_kms_on_chain_detail
+
+`GET /kms/on-chain/{chain}`
+
+Retrieves the on-chain KMS details for a specific blockchain. This is needed for compose hash verification during CVM provisioning and updates.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | `str` | Yes | Blockchain identifier (e.g., `"phala"`) |
+
+**Returns:** On-chain KMS detail response.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+detail = client.get_kms_on_chain_detail({"chain": "phala"})
+print(detail.model_dump())
+```
+
+```python Async
+detail = await client.get_kms_on_chain_detail({"chain": "phala"})
+print(detail.model_dump())
+```
+
+</CodeGroup>
+
+---
+
+## get_app_env_encrypt_pub_key
+
+`GET /kms/{kms}/pubkey/{appId}`
+
+Retrieves the public key used to encrypt environment variables for a specific app. You need this key before calling `encrypt_env_vars()`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kms` | `str` | Yes | KMS identifier (e.g., `"phala"`) |
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** Response containing the `app_env_encrypt_pubkey` field.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+pubkey = client.get_app_env_encrypt_pub_key({
+    "kms": "phala",
+    "app_id": "my-app-id",
+})
+print(pubkey.app_env_encrypt_pubkey)
+```
+
+```python Async
+pubkey = await client.get_app_env_encrypt_pub_key({
+    "kms": "phala",
+    "app_id": "my-app-id",
+})
+print(pubkey.app_env_encrypt_pubkey)
+```
+
+</CodeGroup>
+
+---
+
+## next_app_ids
+
+`GET /kms/phala/next_app_id`
+
+Reserves the next available app IDs from the Phala KMS. Useful when you need to know the app ID before provisioning.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `counts` | `int` | No | Number of IDs to reserve (default: `1`, max: `20`) |
+
+**Returns:** Response with the reserved app IDs.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+ids = client.next_app_ids({"counts": 3})
+print(ids.model_dump())
+```
+
+```python Async
+ids = await client.next_app_ids({"counts": 3})
+print(ids.model_dump())
+```
+
+</CodeGroup>
+
+---
+
+## Encrypting Environment Variables
+
+The SDK provides utility functions for encrypting environment variables using the KMS public key. Here is the typical workflow:
+
+```python
+from phala_cloud import (
+    create_client,
+    encrypt_env_vars,
+    verify_env_encrypt_public_key,
+)
+
+client = create_client()
+
+# 1. Get the encryption public key
+pubkey_resp = client.get_app_env_encrypt_pub_key({
+    "kms": "phala",
+    "app_id": "my-app-id",
+})
+
+# 2. Optionally verify the public key
+verify_env_encrypt_public_key(pubkey_resp.app_env_encrypt_pubkey)
+
+# 3. Encrypt your environment variables
+encrypted = encrypt_env_vars(
+    env_vars=[
+        {"key": "DATABASE_URL", "value": "postgres://..."},
+        {"key": "API_SECRET", "value": "s3cr3t"},
+    ],
+    public_key=pubkey_resp.app_env_encrypt_pubkey,
+)
+
+# 4. Update the CVM with encrypted env vars
+client.update_cvm_envs({
+    "id": "my-app",
+    "encrypted_env": encrypted,
+    "env_keys": ["DATABASE_URL", "API_SECRET"],
+})
+```
+
+<Note>
+The `encrypt_env_vars`, `get_compose_hash`, and `verify_env_encrypt_public_key` functions require the `dstack-sdk` package, which is included as a dependency of `phala-cloud`.
+</Note>
+
+## Related
+
+- [CVM Configuration](/phala-cloud/references/cloud-python-sdk/cvm-configuration) — updating CVM settings
+- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — handling KMS errors

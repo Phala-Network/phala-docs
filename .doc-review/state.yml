@@ -1,0 +1,230 @@
+# Documentation review state — tracks audit progress and terminology decisions.
+# Managed by /doc-review skill. Committed to version control.
+version: 1
+last_run: 2026-03-26T12:00:00Z
+docs_root: .
+phase: 3
+documents:
+  index.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 2
+  phala-cloud/getting-started/overview.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/getting-started/deploy-first-cvm.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/getting-started/sign-up-for-cloud-account.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/getting-started/core-concepts-refresher.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 0
+  phala-cloud/getting-started/start-from-cloud-ui.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/getting-started/attestation.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/what-is/what-is-phala-cloud.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/what-is/what-is-tee.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/cvm/overview.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/cvm/create-with-docker-compose.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/cvm/create-with-private-docker-image.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/cvm/deployment-cheat-sheet.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/cvm/set-secure-environment-variables.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/cvm/multi-replica-scaling.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/networking/overview.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/networking/expose-http-service.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/networking/setup-custom-domain.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/references/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 3
+  phala-cloud/references/webhooks.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-26T12:00:00Z
+    copy: 2026-03-26T12:00:00Z
+    consistency: 2026-03-26T12:00:00Z
+    issues: 2
+    deferred:
+      - "CVM not introduced on first use (acceptable for reference page)"
+      - "Replay protection buried in accordion"
+  phala-cloud/references/error-codes.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 4
+  phala-cloud/references/cloud-js-sdk/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 3
+  phala-cloud/references/cloud-python-sdk/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 5
+  phala-cloud/references/cloud-go-sdk/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 4
+  phala-cloud/references/terraform-provider/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 3
+  phala-cloud/phala-cloud-cli/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 7
+  phala-cloud/phala-cloud-api/overview.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 2
+  phala-cloud/attestation/overview.mdx:
+    phase: 0
+    baseline: 2026-03-24T16:00:00Z
+    issues: 0
+  phala-cloud/attestation/quickstart.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/attestation/trust-center-verification.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 0
+  phala-cloud/attestation/verification-guide.mdx:
+    phase: 3
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    consistency: 2026-03-24T19:00:00Z
+    issues: 0
+  phala-cloud/attestation/chain-of-trust.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/security-and-privacy/security-architecture.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 0
+  phala-cloud/security-and-privacy/compliance.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/confidential-ai/overview.mdx:
+    phase: 2
+    baseline: 2026-03-24T16:00:00Z
+    copy: 2026-03-24T18:00:00Z
+    issues: 0
+  phala-cloud/faqs.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 3
+  dstack/overview.mdx:
+    phase: 1
+    baseline: 2026-03-24T16:00:00Z
+    structure: 2026-03-24T17:00:00Z
+    issues: 0
+  phala-cloud/references/cloud-js-sdk/provision-cvm.mdx:
+    phase: 3
+    baseline: 2026-03-26T12:00:00Z
+    structure: 2026-03-26T12:00:00Z
+    copy: 2026-03-26T12:00:00Z
+    consistency: 2026-03-26T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/references/cloud-js-sdk/commit-cvm-provision.mdx:
+    phase: 3
+    baseline: 2026-03-26T12:00:00Z
+    structure: 2026-03-26T12:00:00Z
+    copy: 2026-03-26T12:00:00Z
+    consistency: 2026-03-26T12:00:00Z
+    issues: 0
+    deferred: []
+terminology:
+  preferred:
+    "Phala Cloud": []
+    "CVM": ["Confidential VM"]
+    "TEE": ["Trusted Execution Environment"]
+    "dstack": []
+    "TEE Attestation Explorer": []
+  rejected:
+    "phala cloud": "use Phala Cloud (title case)"
+    "cvm": "use CVM (uppercase)"
+    "Dstack": "use dstack (lowercase) — except in GitHub org name Dstack-TEE"
+    "DStack": "use dstack (lowercase) — except in demo strings like 'Hello DStack!'"
+    "dStack": "use dstack (lowercase)"
+    "TEE Proof Explorer": "use TEE Attestation Explorer"
+audience:
+  primary: "developers deploying confidential applications on TEE infrastructure"
+  prerequisites:
+    - Docker and Docker Compose basics
+    - Cloud deployment concepts
+    - Basic understanding of security/cryptography

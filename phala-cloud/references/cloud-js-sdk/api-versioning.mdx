@@ -20,13 +20,13 @@ The Phala Cloud API uses **header-based versioning**. Each request includes an `
 import { createClient } from "@phala/cloud";
 
 // Uses default version (2026-01-21)
-const client = createClient({ apiKey: "your-api-key" });
+const client = createClient({ apiKey: "phak_your_api_key" });
 ```
 
 ```typescript
 // Explicitly select a version
 const client = createClient({
-  apiKey: "your-api-key",
+  apiKey: "phak_your_api_key",
   version: "2026-01-21",
 });
 ```
@@ -34,7 +34,7 @@ const client = createClient({
 ```typescript
 // Use legacy version
 const legacyClient = createClient({
-  apiKey: "your-api-key",
+  apiKey: "phak_your_api_key",
   version: "2025-10-28",
 });
 ```
@@ -44,7 +44,7 @@ const legacyClient = createClient({
 Use `.withVersion()` to create a new client with a different API version without re-authenticating:
 
 ```typescript
-const client = createClient({ apiKey: "your-api-key" }); // 2026-01-21
+const client = createClient({ apiKey: "phak_your_api_key" }); // 2026-01-21
 const legacyClient = client.withVersion("2025-10-28");
 
 // Each client returns version-specific types

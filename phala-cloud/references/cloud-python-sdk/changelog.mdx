@@ -1,0 +1,37 @@
+---
+title: Changelog
+description: Version history for the Phala Cloud Python SDK.
+---
+
+## 0.1.1
+
+Current release.
+
+- Added `patch_cvm` and `confirm_cvm_patch` for batch CVM updates with on-chain hash support
+- Added `replicate_cvm` for creating CVM replicas
+- Added `check_cvm_is_allowed`, `check_app_is_allowed`, and `check_app_cvms_is_allowed` for device allowlist checks
+- Added `refresh_cvm_instance_id` and `refresh_cvm_instance_ids` for instance ID management
+- Added `get_os_images` for listing all available OS images
+- Added `get_app_device_allowlist` for querying device allowlists
+- Added `watch_cvm_state` for polling CVM state transitions via SSE
+
+## 0.1.0
+
+Initial release.
+
+- Sync (`PhalaCloud`) and async (`AsyncPhalaCloud`) clients
+- Full CVM lifecycle: `provision_cvm`, `commit_cvm_provision`, `start_cvm`, `stop_cvm`, `shutdown_cvm`, `restart_cvm`, `delete_cvm`
+- CVM configuration: `update_docker_compose`, `update_cvm_envs`, `update_pre_launch_script`, `update_cvm_resources`, `update_cvm_visibility`, `update_os_image`
+- Compose file update flow: `provision_cvm_compose_file_update`, `commit_cvm_compose_file_update`
+- App queries: `get_app_list`, `get_app_info`, `get_app_cvms`, `get_app_revisions`, `get_app_revision_detail`, `get_app_attestation`, `get_app_filter_options`
+- Workspace queries: `list_workspaces`, `get_workspace`, `get_workspace_nodes`, `get_workspace_quotas`
+- KMS operations: `get_kms_info`, `get_kms_list`, `get_kms_on_chain_detail`, `get_app_env_encrypt_pub_key`, `next_app_ids`
+- SSH key management: `list_ssh_keys`, `create_ssh_key`, `delete_ssh_key`, `import_github_profile_ssh_keys`, `sync_github_ssh_keys`
+- Node and instance types: `get_available_nodes`, `list_all_instance_type_families`, `list_family_instance_types`
+- Utility functions: `encrypt_env_vars`, `get_compose_hash`, `verify_env_encrypt_public_key`, `parse_env`, `parse_env_vars`
+- Blockchain helpers: `add_compose_hash`, `deploy_app_auth`
+- `safe_*` variants for all action methods returning `SafeResult`
+- Pydantic-validated responses
+- API versioning support (`2025-10-28`, `2026-01-21`)
+- Structured error hierarchy with `error_codes` module
+- Python 3.10+ support

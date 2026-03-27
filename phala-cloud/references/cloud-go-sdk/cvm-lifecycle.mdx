@@ -1,0 +1,275 @@
+---
+title: CVM Lifecycle
+description: Provision, start, stop, restart, delete, and replicate CVMs with the Go SDK.
+---
+
+CVM lifecycle methods manage the full journey of a Confidential Virtual Machine, from initial provisioning through daily operations to deletion. All methods accept a `context.Context` as the first parameter and return Go-idiomatic `(result, error)` pairs.
+
+## ProvisionCVM
+
+`POST /cvms/provision`
+
+Provisions a new CVM by reserving resources and generating a compose hash. This is the first step of the two-phase deployment flow. The returned `AppID` and `ComposeHash` are needed to commit the provision.
+
+```go
+func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*ProvisionCVMResponse, error)
+```
+
+**ProvisionCVMRequest fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `Name` | `string` | Yes | Name for the CVM |
+| `InstanceType` | `string` | Yes | Instance type (e.g., `"tdx.small"`) |
+| `ComposeFile` | `*ComposeFile` | No | Docker Compose configuration |
+| `VCPU` | `*int` | No | Number of vCPUs |
+| `Memory` | `*int` | No | Memory in MB |
+| `DiskSize` | `*int` | No | Disk size in GB |
+| `TeepodID` | `*int` | No | Target teepod ID |
+| `Image` | `*string` | No | OS image name |
+| `Region` | `*string` | No | Target region |
+| `KMSType` | `*string` | No | KMS type (e.g., `"phala"`) |
+| `Listed` | `*bool` | No | Whether the CVM is publicly listed |
+| `SecureTime` | `*bool` | No | Enable secure time |
+| `SSHAuthorizedKeys` | `[]string` | No | SSH public keys to authorize |
+
+**Returns:** `*ProvisionCVMResponse` with `AppID`, `ComposeHash`, `AppEnvEncryptPubkey`, and other provisioning details.
+
+**Example:**
+
+```go
+provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
+	Name:         "my-app",
+	InstanceType: "tdx.small",
+	ComposeFile: &phala.ComposeFile{
+		DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
+	},
+})
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("App ID: %s, Compose Hash: %s\n", provision.AppID, provision.ComposeHash)
+```
+
+---
+
+## CommitCVMProvision
+
+`POST /cvms`
+
+Commits a provisioned CVM, triggering the actual deployment. You must pass the `AppID` and `ComposeHash` from the provision step.
+
+```go
+func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvisionRequest) (*CommitCVMProvisionResponse, error)
+```
+
+**CommitCVMProvisionRequest fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `AppID` | `string` | Yes | App ID from provision response |
+| `ComposeHash` | `string` | Yes | Compose hash from provision response |
+| `TransactionHash` | `*string` | No | On-chain transaction hash (for on-chain KMS) |
+| `EncryptedEnv` | `*string` | No | Encrypted environment variables |
+| `EnvKeys` | `[]string` | No | Environment variable key names |
+
+**Returns:** `*CommitCVMProvisionResponse` with `ID`, `Name`, and `Status`. Use the `CvmID()` helper method to get the ID as a string.
+
+**Example — full two-phase deploy:**
+
+```go
+// Step 1: Provision
+provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
+	Name:         "my-app",
+	InstanceType: "tdx.small",
+	ComposeFile: &phala.ComposeFile{
+		DockerComposeFile: composeYAML,
+	},
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+// Step 2: Commit
+cvm, err := client.CommitCVMProvision(ctx, &phala.CommitCVMProvisionRequest{
+	AppID:       provision.AppID,
+	ComposeHash: provision.ComposeHash,
+})
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("CVM deployed: %s (status: %s)\n", cvm.CvmID(), cvm.Status)
+```
+
+---
+
+## StartCVM
+
+`POST /cvms/{cvmId}/start`
+
+Starts a stopped CVM. This method retries automatically on transient errors.
+
+```go
+func (c *Client) StartCVM(ctx context.Context, cvmID string) (*CVMActionResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier (any format) |
+
+**Returns:** `*CVMActionResponse` with `ID`, `Name`, and `Status`.
+
+```go
+result, err := client.StartCVM(ctx, "my-app")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Status: %s\n", result.Status)
+```
+
+---
+
+## StopCVM
+
+`POST /cvms/{cvmId}/stop`
+
+Force-stops a CVM immediately. Use `ShutdownCVM` if you need a graceful stop.
+
+```go
+func (c *Client) StopCVM(ctx context.Context, cvmID string) (*CVMActionResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier |
+
+**Returns:** `*CVMActionResponse`
+
+---
+
+## ShutdownCVM
+
+`POST /cvms/{cvmId}/shutdown`
+
+Gracefully shuts down a CVM, allowing containers to stop cleanly before powering off.
+
+```go
+func (c *Client) ShutdownCVM(ctx context.Context, cvmID string) (*CVMActionResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier |
+
+**Returns:** `*CVMActionResponse`
+
+```go
+_, err := client.ShutdownCVM(ctx, "my-app")
+```
+
+---
+
+## RestartCVM
+
+`POST /cvms/{cvmId}/restart`
+
+Restarts a CVM. By default, the restart is graceful. Set `Force: true` to skip the graceful shutdown phase.
+
+```go
+func (c *Client) RestartCVM(ctx context.Context, cvmID string, opts *RestartCVMOptions) (*CVMActionResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier |
+| `opts` | `*RestartCVMOptions` | No | Pass `nil` for a graceful restart |
+
+**RestartCVMOptions fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Force` | `bool` | `false` | Force restart without graceful shutdown |
+
+```go
+// Graceful restart
+_, err := client.RestartCVM(ctx, "my-app", nil)
+
+// Force restart
+_, err = client.RestartCVM(ctx, "my-app", &phala.RestartCVMOptions{Force: true})
+```
+
+---
+
+## DeleteCVM
+
+`DELETE /cvms/{cvmId}`
+
+Permanently deletes a CVM and all its data. Returns only an error (no response body).
+
+```go
+func (c *Client) DeleteCVM(ctx context.Context, cvmID string) error
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | CVM identifier |
+
+<Warning>
+This action is irreversible. All data associated with the CVM will be permanently deleted.
+</Warning>
+
+```go
+err := client.DeleteCVM(ctx, "my-app")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+---
+
+## ReplicateCVM
+
+`POST /cvms/{cvmId}/replicas`
+
+Creates a replica of an existing CVM. You can optionally target a specific node. The new CVM inherits the source's configuration.
+
+```go
+func (c *Client) ReplicateCVM(ctx context.Context, cvmID string, opts *ReplicateCVMOptions) (*CVMActionResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cvmID` | `string` | Yes | Source CVM identifier |
+| `opts` | `*ReplicateCVMOptions` | No | Replication options |
+
+**ReplicateCVMOptions fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `NodeID` | `*int` | Target node ID for the replica |
+
+```go
+replica, err := client.ReplicateCVM(ctx, "my-app", &phala.ReplicateCVMOptions{
+	NodeID: phala.Int(42),
+})
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Replica status: %s\n", replica.Status)
+```
+
+<Note>
+You can also replicate a CVM within an app context using `ReplicateAppCVM(ctx, appID, vmUUID, opts)`, which ensures the replica is associated with the correct application.
+</Note>

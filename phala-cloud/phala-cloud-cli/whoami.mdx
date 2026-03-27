@@ -1,56 +1,41 @@
 ---
-title: "phala whoami"
-description: "Print the current authenticated user."
+title: "whoami"
+description: "Print the current user"
 ---
 
-## Usage
+## Command: `phala whoami`
 
-```bash
+### Syntax
+
+```
 phala whoami [options]
 ```
 
-## Options
+### Description
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--json` | `-j` | false | Output in JSON format |
-| `--api-token <token>` | | | Override API token for this command |
+Print the current user
 
-## Examples
+### Global Options
 
-### Print current user
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-```bash
-$ phala whoami
-user@example.com
-```
+### Examples
 
-### JSON output
-
-```bash
-$ phala whoami --json
-{
-  "username": "user@example.com",
-  "email": "user@example.com"
-}
-```
-
-### Use in scripts
+* Show current user
 
 ```bash
-$ CURRENT_USER=$(phala whoami)
-$ echo "Deploying as $CURRENT_USER"
-Deploying as user@example.com
+phala whoami
 ```
 
-### Override API token
+* JSON output
 
 ```bash
-$ phala whoami --api-token phak_abc123...
-other@example.com
+phala whoami --json
 ```
 
-## Exit Codes
-
-- `0` - Successfully retrieved user information
-- `1` - Not authenticated or error occurred

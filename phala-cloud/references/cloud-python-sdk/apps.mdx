@@ -1,0 +1,247 @@
+---
+title: Apps
+description: List apps, retrieve app details, query revision history, and manage device allowlists.
+---
+
+App methods let you query and inspect applications deployed on Phala Cloud. An app is the logical grouping that contains one or more CVMs running the same compose configuration.
+
+## get_app_list
+
+`GET /apps`
+
+Lists all apps visible to the authenticated user. Supports optional filtering via query parameters.
+
+**Parameters:** Optional dictionary of filter parameters (passed as query params).
+
+**Returns:** App list response.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+apps = client.get_app_list()
+for app in apps.items:
+    print(app.app_id, app.name)
+```
+
+```python Async
+apps = await client.get_app_list()
+for app in apps.items:
+    print(app.app_id, app.name)
+```
+
+</CodeGroup>
+
+---
+
+## get_app_info
+
+`GET /apps/{appId}`
+
+Retrieves detailed information about a specific app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** App info response with full details.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+app = client.get_app_info({"app_id": "app-123"})
+print(app.name, app.status)
+```
+
+```python Async
+app = await client.get_app_info({"app_id": "app-123"})
+print(app.name, app.status)
+```
+
+</CodeGroup>
+
+---
+
+## get_app_cvms
+
+`GET /apps/{appId}/cvms`
+
+Lists all CVMs that belong to a specific app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** List of CVM objects.
+
+**Example:**
+
+```python
+cvms = client.get_app_cvms({"app_id": "app-123"})
+for cvm in cvms:
+    print(cvm.id, cvm.status)
+```
+
+---
+
+## get_app_revisions
+
+`GET /apps/{appId}/revisions`
+
+Lists the revision history for an app. Each revision represents a configuration change (compose file update, env change, etc.). Supports pagination.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+| `page` | `int` | No | Page number (1-based) |
+| `page_size` | `int` | No | Items per page |
+
+**Returns:** Paginated list of revision summaries.
+
+**Example:**
+
+```python
+revisions = client.get_app_revisions({
+    "app_id": "app-123",
+    "page": 1,
+    "page_size": 10,
+})
+for rev in revisions.items:
+    print(rev.revision_id, rev.created_at)
+```
+
+---
+
+## get_app_revision_detail
+
+`GET /apps/{appId}/revisions/{revisionId}`
+
+Retrieves the full details of a specific revision, optionally including the raw compose file.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+| `revision_id` | `str` | Yes | Revision identifier |
+| `raw_compose_file` | `bool` | No | Include raw compose file content |
+
+**Returns:** Revision detail response.
+
+**Example:**
+
+```python
+detail = client.get_app_revision_detail({
+    "app_id": "app-123",
+    "revision_id": "rev-456",
+    "raw_compose_file": True,
+})
+```
+
+---
+
+## get_app_attestation
+
+`GET /apps/{appId}/attestations`
+
+Retrieves TEE attestation information for an app. This includes the attestation report that proves the app is running inside a genuine TEE environment.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** App attestation response.
+
+**Example:**
+
+```python
+attestation = client.get_app_attestation({"app_id": "app-123"})
+```
+
+---
+
+## get_app_device_allowlist
+
+`GET /apps/{appId}/device-allowlist`
+
+Retrieves the device allowlist for an app. The allowlist controls which TEE devices are permitted to run the app.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** Device allowlist response.
+
+**Example:**
+
+```python
+allowlist = client.get_app_device_allowlist({"app_id": "app-123"})
+```
+
+---
+
+## get_app_filter_options
+
+`GET /apps/filter-options`
+
+Returns the available filter options for the app list endpoint. Useful for building UI filters.
+
+**Parameters:** None.
+
+**Returns:** Filter options response with available values.
+
+**Example:**
+
+```python
+options = client.get_app_filter_options()
+```
+
+---
+
+## check_app_is_allowed
+
+`POST /apps/{appId}/is-allowed`
+
+Checks whether an app is allowed to run based on device allowlist constraints.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** Allowance check response.
+
+---
+
+## check_app_cvms_is_allowed
+
+`POST /apps/{appId}/cvms/is-allowed`
+
+Batch-checks whether all CVMs under an app are allowed to run.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App identifier |
+
+**Returns:** Batch allowance check response.
+
+## Related
+
+- [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — managing individual CVMs
+- [Workspaces](/phala-cloud/references/cloud-python-sdk/workspaces) — workspace-level operations

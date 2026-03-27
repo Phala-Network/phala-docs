@@ -1,0 +1,45 @@
+---
+title: "CVM Deployment via API"
+description: "Overview of deploying Confidential Virtual Machines programmatically using the Phala Cloud REST API or SDKs."
+---
+
+Deploy CVMs programmatically using the Phala Cloud API. The API exposes the same backend used by the Phala Cloud dashboard, so anything you can do in the UI you can automate via API.
+
+## Authentication
+
+All API requests require an API key passed in the `X-API-Key` header. Generate your key at **Settings → API Keys** in the [Phala Cloud dashboard](https://cloud.phala.com).
+
+## Deployment Flow
+
+CVM deployment follows a two-phase **provision → commit** workflow:
+
+1. **Provision** — reserve resources and receive a `compose_hash` and `app_env_encrypt_pubkey`
+2. **Commit** — finalize the deployment with the provisioned values
+
+Browse the interactive [API reference](/phala-cloud/phala-cloud-api/overview) for full request/response details on each endpoint.
+
+## KMS Types
+
+| Feature | Built-in KMS | On-chain KMS |
+|---------|-------------|--------------|
+| Setup | Automatic | Requires smart contract deployment |
+| App ID | Derived from compose hash | Contract address |
+| Best for | Development and standard production | Decentralized access control |
+
+For on-chain KMS details, see the [On-chain KMS guide](/phala-cloud/key-management/cloud-vs-onchain-kms).
+
+## Using SDKs
+
+For a simpler experience, use one of the official SDKs instead of raw API calls:
+
+<CardGroup cols={3}>
+<Card title="JavaScript SDK" icon="js" href="/phala-cloud/references/cloud-js-sdk/provision-cvm">
+  `@phala/cloud` — provision, deploy, and manage CVMs
+</Card>
+<Card title="Python SDK" icon="python" href="/phala-cloud/references/cloud-python-sdk/overview">
+  `phala-cloud` — sync and async client
+</Card>
+<Card title="Go SDK" icon="golang" href="/phala-cloud/references/cloud-go-sdk/overview">
+  `github.com/Phala-Network/phala-cloud/sdks/go`
+</Card>
+</CardGroup>

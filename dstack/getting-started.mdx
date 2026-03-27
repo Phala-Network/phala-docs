@@ -1,7 +1,6 @@
 ---
-description: Set up and deploy your first confidential application using Dstack TEE
+description: Set up and deploy your first confidential application using dstack TEE
   infrastructure.
-icon: bot
 title: Getting Started
 ---
 
@@ -9,16 +8,16 @@ title: Getting Started
 <Note type="warning">
 **WARNING**
 
-**This tutorial assumes your have access to a compatible Intel TDX Server ready to be configured with Dstack. Check the** [**Hardware Requirements**](/dstack/hardware-requirements) **for more information or skip setting everything up from scratch and** [**Sign-up for Phala Cloud Account**](/phala-cloud/getting-started/sign-up-for-cloud-account)**.**
+**This tutorial assumes your have access to a compatible Intel TDX Server ready to be configured with dstack. Check the** [**Hardware Requirements**](/dstack/hardware-requirements) **for more information or skip setting everything up from scratch and** [**Sign-up for Phala Cloud Account**](/phala-cloud/getting-started/sign-up-for-cloud-account)**.**
 </Note>
 
 <Note type="info">
-For the latest information, please refer to the [Dstack README](https://github.com/Dstack-TEE/dstack/blob/master/README.mdx).
+For the latest information, please refer to the [dstack README](https://github.com/Dstack-TEE/dstack/blob/master/README.mdx).
 </Note>
 
-## Dstack
+## dstack
 
-Dstack is a **developer friendly** and **security first** SDK to simplify the deployment of arbitrary Docker-based apps into TEE.
+dstack is a **developer friendly** and **security first** SDK to simplify the deployment of arbitrary Docker-based apps into TEE.
 
 Main features:
 
@@ -27,11 +26,11 @@ Main features:
 * 🔑 Safely manage secrets and sensitive data
 * 📡 Expose services via built-in TLS termination
 
-Dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Nethermind](https://github.com/NethermindEth/nethermind) and [many others](#contributors).
+dstack is community driven. Open sourced and built by [Kevin Wang](https://github.com/kvinwang) and many others from [Phala Network](https://github.com/Phala-Network), inspired by [Andrew Miller](https://github.com/amiller) (Flashbots & Teleport), and contributed by [Nethermind](https://github.com/NethermindEth/nethermind) and [many others](#contributors).
 
 ## Overview
 
-Components in Dstack:
+Components in dstack:
 
 * `dstack-vmm`: A service running in bare TDX host to manage CVMs
 * `dstack-gateway`: A reverse proxy to forward TLS connections to CVMs
@@ -388,7 +387,7 @@ Then try building again. For more information about this restriction, see the [U
 
 ## Contributors
 
-Dstack is proudly built by open source and Pi-rateship contributors:
+dstack is proudly built by open source and Pi-rateship contributors:
 
 * Phala Network: [Kevin Wang](https://github.com/kvinwang), [Shelven Zhou](https://github.com/shelvenzhou), [Leechael](https://github.com/leechael)
 * Teleport: [Andrew Miller](https://github.com/amiller), [Sxy Sun](https://github.com/sxysun)

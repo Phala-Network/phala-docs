@@ -1,0 +1,371 @@
+---
+title: Examples
+description: Common Terraform patterns for Phala Cloud — basic deployments, multi-replica, cross-app wiring, GPU, SSH access, and power management.
+---
+
+This page collects practical Terraform examples for common Phala Cloud deployment scenarios. Each example is self-contained and can be adapted to your use case.
+
+## Basic Deployment
+
+The simplest deployment: one app, one replica, public endpoint.
+
+```hcl
+terraform {
+  required_providers {
+    phala = {
+      source  = "phala-network/phala"
+      version = "0.2.0-beta.1"
+    }
+  }
+}
+
+provider "phala" {}
+
+resource "phala_app" "hello" {
+  name      = "hello-phala"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  image     = "dstack-dev-0.5.7-9b6a5239"
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+output "app_id" {
+  value = phala_app.hello.app_id
+}
+
+output "endpoint" {
+  value = phala_app.hello.endpoint
+}
+```
+
+## Dynamic Discovery
+
+Instead of hardcoding sizes, regions, and images, use data sources to discover valid values at plan time.
+
+```hcl
+data "phala_sizes" "all" {}
+data "phala_regions" "all" {}
+data "phala_images" "all" {}
+
+resource "phala_app" "web" {
+  name      = "dynamic-app"
+  size      = data.phala_sizes.all.sizes[0].slug
+  region    = data.phala_regions.all.regions[0].slug
+  image     = data.phala_images.all.images[0].slug
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## Multi-Replica Deployment
+
+Scale an application horizontally by setting `replicas`. All replicas share the same compose file and environment.
+
+```hcl
+resource "phala_app" "api" {
+  name      = "api-service"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  replicas  = 3
+
+  env = {
+    LOG_LEVEL = "info"
+  }
+
+  docker_compose = <<-YAML
+    services:
+      api:
+        image: myregistry/api:latest
+        ports:
+          - "8080:8080"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+output "all_cvm_ids" {
+  value = phala_app.api.cvm_ids
+}
+```
+
+## Cross-App Wiring
+
+Deploy one app and pass its outputs (app ID, endpoint) as environment variables to a second app. Terraform handles the dependency ordering automatically.
+
+```hcl
+data "phala_sizes" "all" {}
+data "phala_regions" "all" {}
+
+resource "phala_app" "api" {
+  name     = "api-app"
+  size     = data.phala_sizes.all.sizes[0].slug
+  region   = data.phala_regions.all.regions[0].slug
+  replicas = 2
+
+  docker_compose = <<-YAML
+    services:
+      api:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+resource "phala_app" "consumer" {
+  name     = "consumer-app"
+  size     = data.phala_sizes.all.sizes[0].slug
+  region   = data.phala_regions.all.regions[0].slug
+  replicas = 1
+
+  env = {
+    UPSTREAM_APP_ID   = phala_app.api.app_id
+    UPSTREAM_ENDPOINT = phala_app.api.endpoint
+  }
+
+  docker_compose = <<-YAML
+    services:
+      app:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## SSH Access
+
+Inject SSH keys at deploy time for direct access into CVM instances. You can also manage account-level SSH keys separately with `phala_ssh_key`.
+
+```hcl
+resource "phala_ssh_key" "laptop" {
+  name       = "laptop"
+  public_key = file("~/.ssh/id_ed25519.pub")
+}
+
+resource "phala_app" "web" {
+  name     = "ssh-enabled-app"
+  size     = "tdx.medium"
+  region   = "US-WEST-1"
+  replicas = 1
+
+  ssh_authorized_keys = [
+    file("~/.ssh/id_ed25519.pub"),
+  ]
+
+  env = {
+    APP_SECRET = "replace-me"
+  }
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+<Note>
+The `ssh_authorized_keys` attribute is force-new. Changing the key list after initial deployment requires recreating the app. For keys you want to manage independently, use `phala_ssh_key` at the account level.
+</Note>
+
+## GPU Deployment
+
+For GPU workloads, use a size from the GPU family. Discover available GPU sizes with the `family` filter.
+
+```hcl
+data "phala_sizes" "gpu" {
+  family = "gpu"
+}
+
+output "gpu_sizes" {
+  value = data.phala_sizes.gpu.sizes[*].slug
+}
+
+resource "phala_app" "ml" {
+  name     = "ml-inference"
+  size     = data.phala_sizes.gpu.sizes[0].slug
+  region   = "US-WEST-1"
+  replicas = 1
+
+  docker_compose = <<-YAML
+    services:
+      inference:
+        image: myregistry/ml-model:latest
+        ports:
+          - "8000:8000"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## Node Pinning
+
+Pin a deployment to a specific worker node when you need deterministic hardware placement.
+
+```hcl
+data "phala_nodes" "west" {
+  region = "us-west"
+}
+
+resource "phala_app" "pinned" {
+  name    = "pinned-app"
+  size    = "tdx.medium"
+  node_id = data.phala_nodes.west.nodes[0].node_id
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## Power Management
+
+Use `phala_cvm_power` to stop and start CVMs independently of the app lifecycle. This is useful for cost control or scheduled maintenance.
+
+```hcl
+resource "phala_app" "web" {
+  name      = "power-managed-app"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+# Stop the CVM after deployment
+resource "phala_cvm_power" "web" {
+  cvm_id = phala_app.web.primary_cvm_id
+  state  = "stopped"
+
+  wait_for_state       = true
+  wait_timeout_seconds = 900
+}
+```
+
+To restart, change `state` to `"running"` and run `terraform apply`.
+
+## Attestation Verification
+
+After deployment, fetch TEE attestation data to verify the CVM's integrity.
+
+```hcl
+resource "phala_app" "secure" {
+  name     = "secure-app"
+  size     = "tdx.medium"
+  region   = "US-WEST-1"
+  replicas = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+
+data "phala_attestation" "secure" {
+  cvm_id = phala_app.secure.primary_cvm_id
+}
+
+output "is_online" {
+  value = data.phala_attestation.secure.is_online
+}
+
+output "tcb_info" {
+  value = data.phala_attestation.secure.tcb_info_json
+}
+```
+
+## Compose Runtime Settings
+
+Control visibility and behavior flags at the compose level. Changing these triggers a compose update and CVM restart.
+
+```hcl
+resource "phala_app" "monitored" {
+  name     = "monitored-app"
+  size     = "tdx.medium"
+  region   = "US-WEST-1"
+  replicas = 1
+
+  public_logs     = true
+  public_sysinfo  = true
+  public_tcbinfo  = true
+  gateway_enabled = true
+  secure_time     = true
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## Related
+
+- [Provider Overview](/phala-cloud/references/terraform-provider/overview) — installation and configuration
+- [phala_app Resource](/phala-cloud/references/terraform-provider/app-resource) — full attribute reference
+- [Data Sources](/phala-cloud/references/terraform-provider/data-sources) — discovery data sources

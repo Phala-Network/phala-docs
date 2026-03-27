@@ -1,0 +1,227 @@
+---
+title: Deploy Your First CVM
+description: Go from zero to a running Confidential VM on Phala Cloud using the Dashboard, CLI, or SDK.
+---
+
+You can deploy a CVM on Phala Cloud in under five minutes. This guide walks you through the full flow — sign up, write a compose file, deploy, and verify — using whichever tool you prefer.
+
+We'll deploy an nginx web server as the example app. The same steps apply to any Docker image.
+
+## Prerequisites
+
+- A [Phala Cloud account](/phala-cloud/getting-started/sign-up-for-cloud-account)
+- For CLI/SDK: an [API key](/phala-cloud/references/api-key) from **Settings > API Keys** in the dashboard
+
+## Choose an Instance Type
+
+Phala Cloud offers several instance sizes. For a simple web server, `tdx.small` is plenty.
+
+| Instance Type | vCPU | RAM | Good For |
+|---------------|------|-----|----------|
+| `tdx.small` | 2 | 4 GB | Lightweight services, testing |
+| `tdx.medium` | 4 | 8 GB | Production APIs, small databases |
+| `tdx.large` | 8 | 16 GB | Multi-container apps, ML inference |
+
+See all options with [`phala instance-types`](/phala-cloud/phala-cloud-cli/instance-types).
+
+## Write Your Docker Compose File
+
+Create a `docker-compose.yml` that defines your services. Here's a minimal nginx example:
+
+```yaml
+services:
+  web:
+    image: nginx:stable
+    ports:
+      - "80:80"
+```
+
+Every service in the compose file runs inside the same CVM, so containers can communicate over `localhost`.
+
+## Deploy
+
+Pick the method that fits your workflow. All three produce the same result: a running CVM with a public HTTPS endpoint.
+
+### Option A — Dashboard UI
+
+<Steps>
+<Step>
+### Open the Deploy page
+
+Navigate to your workspace and click **Deploy** in the top-right corner of the CVMs page.
+</Step>
+
+<Step>
+### Configure the CVM
+
+Enter a name (e.g. `my-nginx`), paste your `docker-compose.yml` into the editor, select **Phala** as the KMS provider, pick a region, and choose **tdx.small** as the instance type.
+</Step>
+
+<Step>
+### Click Deploy
+
+You'll be redirected to the CVMs page. The status changes from **starting** to **running** in about one to two minutes.
+</Step>
+</Steps>
+
+### Option B — CLI
+
+<Steps>
+<Step>
+### Install the CLI
+
+```bash
+npm install -g phala
+```
+</Step>
+
+<Step>
+### Deploy
+
+Run `phala deploy` from the directory containing your `docker-compose.yml`. The CLI auto-selects a region and instance type if you don't specify them.
+
+```bash
+export PHALA_CLOUD_API_KEY="phak_your_key"
+
+phala deploy -n my-nginx -t tdx.small --wait
+```
+
+The `--wait` flag blocks until the CVM is fully running.
+</Step>
+</Steps>
+
+### Option C — SDK
+
+<CodeGroup>
+
+```typescript JavaScript
+import { createClient } from "@phala/cloud";
+
+const client = createClient({ apiKey: process.env.PHALA_CLOUD_API_KEY });
+
+const provision = await client.provisionCvm({
+  name: "my-nginx",
+  vcpu: 2,
+  memory: 4096,
+  diskSize: 20,
+  composeFile: {
+    dockerComposeFile: `
+services:
+  web:
+    image: nginx:stable
+    ports:
+      - "80:80"
+`,
+  },
+});
+
+const cvm = await client.commitCvmProvision({
+  appId: provision.appId,
+  composeHash: provision.composeHash,
+  transactionHash: provision.transactionHash,
+});
+
+console.log("CVM deployed:", cvm);
+```
+
+```python Python
+from phala_cloud import create_client
+
+client = create_client()  # reads PHALA_CLOUD_API_KEY from env
+
+result = client.provision_cvm({
+    "name": "my-nginx",
+    "compose_file": {
+        "docker_compose_file": "services:\n  web:\n    image: nginx:stable\n    ports:\n      - '80:80'",
+    },
+    "vcpu": 2,
+    "memory": 4096,
+    "disk_size": 20,
+})
+
+cvm = client.commit_cvm_provision({
+    "app_id": result.app_id,
+    "compose_hash": result.compose_hash,
+    "transaction_hash": result.transaction_hash,
+})
+
+print("CVM deployed:", cvm)
+```
+
+```go Go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	phala "github.com/Phala-Network/phala-cloud/sdks/go"
+)
+
+func main() {
+	client, err := phala.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result, err := client.ProvisionCVM(context.Background(), &phala.ProvisionCVMRequest{
+		Name: "my-nginx",
+		ComposeFile: &phala.ComposeFile{
+			DockerComposeFile: "services:\n  web:\n    image: nginx:stable\n    ports:\n      - \"80:80\"",
+		},
+		VCPU:     phala.Int(2),
+		Memory:   phala.Int(4096),
+		DiskSize: phala.Int(20),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cvm, err := client.CommitCVMProvision(context.Background(), &phala.CommitCVMProvisionRequest{
+		AppID:           result.AppID,
+		ComposeHash:     result.ComposeHash,
+		TransactionHash: result.TransactionHash,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("CVM deployed: %+v\n", cvm)
+}
+```
+
+</CodeGroup>
+
+## Verify Your Deployment
+
+Once the status shows **running**, your CVM has a public endpoint. The URL follows this pattern:
+
+```
+https://<app-id>-<port>.dstack-pha-<node>.phala.network
+```
+
+You can find the exact URL in the dashboard under **CVM > Home > INGRESS**, or query it from the CLI:
+
+```bash
+phala cvms get my-nginx
+```
+
+Open the endpoint in your browser. You should see the nginx welcome page.
+
+<Note>
+Endpoints may take 30 to 60 seconds to become reachable after the CVM enters the running state.
+</Note>
+
+## Verify TEE Attestation
+
+Every CVM generates a Remote Attestation report proving it runs inside a genuine TEE. Navigate to **Attestations** in the CVM sidebar and click **Check Attestation** to verify it in the [TEE Attestation Explorer](https://proof.t16z.com/).
+
+For details, see [Get Attestation and Verify](/phala-cloud/getting-started/attestation).
+
+## Next Steps
+
+- [Environment Variables](/phala-cloud/cvm/set-secure-environment-variables) — pass secrets securely to your CVM
+- [Docker Compose Configuration](/phala-cloud/cvm/create-with-docker-compose) — multi-service setups and private registries
+- [Set Up CI/CD](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline) — automate deployments on every push
+- [Scale with Replicas](/phala-cloud/cvm/multi-replica-scaling) — run multiple copies of your app

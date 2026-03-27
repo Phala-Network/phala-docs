@@ -1,109 +1,113 @@
 ---
-title: "phala api"
-description: "Make authenticated HTTP requests to the Phala Cloud API with automatic credential handling."
+title: "api"
+description: "Make an authenticated HTTP request to Phala Cloud API."
 ---
 
-## Usage
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala api`
+
+### Syntax
 
 ```
-phala api <endpoint> [options]
+phala api [options] <endpoint>
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `endpoint` | Yes | API endpoint path (e.g., `/api/v1/cvms`) |
+Make an authenticated HTTP request to Phala Cloud API.
 
-## Options
+### Arguments
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--method <method>` | `-X` | GET | HTTP method (GET, POST, PUT, DELETE, PATCH, etc.) |
-| `--field <field>` | `-f` | | String parameter `key=value` (use `key=@file` for file). Repeatable |
-| `--raw-field <field>` | `-F` | | Typed JSON parameter `key:=value` (use `key:=@file` for JSON file). Repeatable |
-| `--header <header>` | `-H` | | HTTP header `key:value`. Repeatable |
-| `--data <data>` | `-d` | | Request body (cURL-style). Repeatable |
-| `--input <file>` | | | Read body from file (use `-` for stdin) |
-| `--include` | `-i` | false | Print response headers |
-| `--jq <expression>` | `-q` | | Filter output with jq expression |
-| `--silent` | | false | Suppress response body |
-| `--api-token <token>` | | | Override API token |
+| Argument | Description |
+| -------- | ----------- |
+| `<endpoint>` | API endpoint path |
 
-## Environment Variables
+### Options
 
-- `PHALA_CLOUD_API_KEY`: Override API key
-- `PHALA_CLOUD_API_PREFIX`: Override API base URL
+| Option | Description |
+| ------ | ----------- |
+| `-X, --method <value>` | HTTP method (default: GET) |
+| `-f, --query <value>` | Query parameter: key=value (use key=@file to read from file) |
+| `-F, --field <value>` | Body field: key=value (string) or key:=value (typed JSON). Supports @file |
+| `-H, --header <value>` | HTTP header: key:value |
+| `-d, --data <value>` | Request body data (cURL-style) |
+| `--input <value>` | Read body from file (use "-" for stdin) |
+| `-i, --include` | Print response headers |
+| `-q, --jq <value>` | Filter output with jq expression |
+| `--silent` | Don't print response body |
 
-## Examples
+### Global Options
 
-List CVMs:
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-```
-$ phala api /api/v1/cvms
-```
+### Examples
 
-Extract CVM names with jq:
+* List CVMs
 
-```
-$ phala api /api/v1/cvms -q '.[].name'
-```
-
-Create CVM with string field:
-
-```
-$ phala api /api/v1/cvms -X POST -f name=my-app
+```bash
+phala api /cvms
 ```
 
-Create CVM with typed JSON fields:
+* Get CVM by app ID
 
-```
-$ phala api /api/v1/cvms -X POST -F vcpu:=2 -F memory:=4096
-```
-
-Delete CVM:
-
-```
-$ phala api /api/v1/cvms/123 -X DELETE
+```bash
+phala api /cvms/app_xxx
 ```
 
-Include response headers:
+* Filter with jq
 
-```
-$ phala api /api/v1/status -i
-```
-
-Send JSON body from stdin:
-
-```
-$ echo '{"name":"test"}' | phala api /api/v1/cvms -X POST --input -
+```bash
+phala api /cvms -q '.items[].name'
 ```
 
-Send JSON body from file:
+* GET with query params
 
-```
-$ phala api /api/v1/cvms -X POST --input request.json
-```
-
-Add custom headers:
-
-```
-$ phala api /api/v1/cvms -H "X-Custom-Header:value" -H "X-Another:test"
+```bash
+phala api /endpoint -f status=active -f page=2
 ```
 
-Complex query with multiple fields:
+* POST with body fields
 
-```
-$ phala api /api/v1/cvms -X POST \
-    -f name=my-app \
-    -f region=us-west \
-    -F vcpu:=4 \
-    -F memory:=8192 \
-    -F env:='{"KEY":"value"}'
+```bash
+phala api /endpoint -X POST -F name=foo -F count:=10
 ```
 
-Filter nested JSON with jq:
+* POST with cURL-style -d
 
+```bash
+phala api /endpoint -X POST -d '{"foo":"bar"}'
 ```
-$ phala api /api/v1/cvms -q '.[].status | select(.state == "running")'
+
+* POST from file
+
+```bash
+phala api /endpoint -X POST --input data.json
 ```
+
+* Query params + body combined
+
+```bash
+phala api /endpoint -X POST -f page=1 -F name=foo
+```
+
+* Body field from file
+
+```bash
+phala api /endpoint -X POST -F config:=@settings.json
+```
+
+* Show response headers
+
+```bash
+phala api /cvms -i
+```
+

@@ -1,0 +1,162 @@
+---
+title: KMS
+description: Query KMS servers, encryption public keys, and on-chain KMS details.
+---
+
+KMS (Key Management Service) methods let you query the key management infrastructure used to encrypt CVM environment variables and manage on-chain app contracts. Most applications use the default `"phala"` KMS type, but the SDK supports querying any available KMS.
+
+## GetKMSList
+
+`GET /kms`
+
+Returns a paginated list of all available KMS servers.
+
+```go
+func (c *Client) GetKMSList(ctx context.Context) (*GetKMSListResponse, error)
+```
+
+**Returns:** `*GetKMSListResponse` — a `Paginated[KMSInfo]` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Items` | `[]KMSInfo` | List of KMS servers |
+| `Total` | `int` | Total count |
+| `Page` | `int` | Current page |
+| `PageSize` | `int` | Items per page |
+| `Pages` | `int` | Total pages |
+
+Each `KMSInfo` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | `string` | KMS identifier |
+| `Slug` | `*string` | URL-friendly slug |
+| `URL` | `string` | KMS server URL |
+| `Version` | `string` | KMS version |
+| `ChainID` | `*int` | Blockchain chain ID (for on-chain KMS) |
+| `KMSContractAddress` | `*string` | On-chain KMS contract address |
+
+```go
+kmsList, err := client.GetKMSList(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+for _, kms := range kmsList.Items {
+	fmt.Printf("KMS: %s (version: %s)\n", kms.ID, kms.Version)
+}
+```
+
+---
+
+## GetKMSInfo
+
+`GET /kms/{kmsId}`
+
+Returns detailed information about a specific KMS server.
+
+```go
+func (c *Client) GetKMSInfo(ctx context.Context, kmsID string) (*KMSInfo, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kmsID` | `string` | Yes | KMS identifier |
+
+**Returns:** `*KMSInfo`
+
+```go
+kms, err := client.GetKMSInfo(ctx, "phala")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("KMS URL: %s\n", kms.URL)
+```
+
+---
+
+## GetAppEnvEncryptPubKey
+
+`GET /kms/{kmsType}/pubkey/{appId}`
+
+Returns the public key used to encrypt environment variables for a specific app. You need this key to encrypt env vars before passing them to `UpdateCVMEnvs` or `CommitCVMProvision`.
+
+```go
+func (c *Client) GetAppEnvEncryptPubKey(ctx context.Context, kmsType, appID string) (*AppEnvPubKeyResponse, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `kmsType` | `string` | Yes | KMS type (e.g., `"phala"`) |
+| `appID` | `string` | Yes | Application identifier |
+
+**Returns:** `*AppEnvPubKeyResponse` (generic map containing the public key)
+
+```go
+pubkey, err := client.GetAppEnvEncryptPubKey(ctx, "phala", "app-abc123")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+<Note>
+The encryption public key is specific to each app and KMS combination. Always fetch a fresh key before encrypting environment variables.
+</Note>
+
+---
+
+## GetKMSOnChainDetail
+
+`GET /kms/on-chain/{chain}`
+
+Returns on-chain details for a KMS on a specific blockchain, including contract addresses, registered devices, and OS images.
+
+```go
+func (c *Client) GetKMSOnChainDetail(ctx context.Context, chain string) (*KMSOnChainDetail, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | `string` | Yes | Chain name (e.g., `"base"`) |
+
+**Returns:** `*KMSOnChainDetail` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ChainName` | `string` | Blockchain name |
+| `ChainID` | `int` | Blockchain chain ID |
+| `Contracts` | `[]OnChainKMSContract` | List of KMS contracts with devices and OS images |
+
+```go
+detail, err := client.GetKMSOnChainDetail(ctx, "base")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Chain: %s (ID: %d), Contracts: %d\n", detail.ChainName, detail.ChainID, len(detail.Contracts))
+```
+
+---
+
+## NextAppIDs
+
+`GET /kms/phala/next_app_id`
+
+Returns the next available app IDs for provisioning. Useful when you need to reserve an app ID before deployment.
+
+```go
+func (c *Client) NextAppIDs(ctx context.Context) (*NextAppIDsResponse, error)
+```
+
+**Returns:** `*NextAppIDsResponse` (generic map)
+
+```go
+nextIDs, err := client.NextAppIDs(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+```

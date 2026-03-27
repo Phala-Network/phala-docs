@@ -1,0 +1,89 @@
+---
+title: phala_cvm_power Resource
+description: Reference for the phala_cvm_power resource — manage CVM power state (running/stopped) without recreating the parent app.
+---
+
+`phala_cvm_power` lets you start or stop an existing CVM without recreating or modifying the parent `phala_app` resource. This is useful for cost management, maintenance windows, or controlled rollouts where you want to decouple power state from deployment lifecycle.
+
+## Example Usage
+
+```hcl
+resource "phala_app" "web" {
+  name      = "power-demo"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  image     = "dstack-dev-0.5.7-9b6a5239"
+  disk_size = 40
+  replicas  = 1
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+}
+
+resource "phala_cvm_power" "web" {
+  cvm_id = phala_app.web.primary_cvm_id
+  state  = "stopped"
+
+  wait_for_state       = true
+  wait_timeout_seconds = 900
+}
+```
+
+In this example, the app is created in a running state by default, then `phala_cvm_power` converges it to `stopped`. Changing `state` back to `"running"` on the next apply starts it again.
+
+## Required Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `cvm_id` | String | The target CVM ID. Typically sourced from `phala_app.<name>.primary_cvm_id`. |
+| `state` | String | Desired power state: `"running"` or `"stopped"`. |
+
+## Optional Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `wait_for_state` | Boolean | Wait until the CVM reaches the target state before Terraform returns. |
+| `wait_timeout_seconds` | Number | Timeout in seconds for the state wait. |
+
+<Note>
+Setting `wait_for_state = true` is recommended. Without it, Terraform marks the resource as converged immediately after issuing the start/stop API call, even if the CVM has not finished transitioning.
+</Note>
+
+## Read-Only (Computed) Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Resource ID (same as `cvm_id`). |
+| `status` | String | Current CVM status as reported by the API. |
+
+## Behavior
+
+### Drift Detection
+
+On every `terraform plan`, the provider reads the current CVM status from the API. If the actual power state does not match the declared `state`, Terraform shows a diff and the next `apply` issues the appropriate start or stop call.
+
+### Delete Semantics
+
+Destroying a `phala_cvm_power` resource only removes it from Terraform state. It does **not** stop or delete the CVM. The CVM continues running (or stays stopped) in whatever state it was last set to. To actually delete the CVM, destroy the parent `phala_app` resource.
+
+<Warning>
+`phala_cvm_power` is a state-convergence resource, not a lifecycle resource. Removing it from your configuration leaves the CVM in its current state — it does not revert to any previous power state.
+</Warning>
+
+### API Backing
+
+The resource uses these Phala Cloud API endpoints:
+
+- `POST /cvms/{id}/start` — to transition to `running`
+- `POST /cvms/{id}/stop` — to transition to `stopped`
+- `GET /cvms/{id}` — for read and drift detection
+
+## Related
+
+- [phala_app Resource](/phala-cloud/references/terraform-provider/app-resource) — the parent lifecycle resource
+- [Examples](/phala-cloud/references/terraform-provider/examples) — power management patterns

@@ -1,64 +1,47 @@
 ---
-title: "phala status"
-description: "Check authentication status and display current user information."
+title: "status"
+description: "Check authentication status"
 ---
 
-## Usage
+## Command: `phala status`
 
-```bash
+### Syntax
+
+```
 phala status [options]
 ```
 
-## Options
+### Description
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--json` | `-j` | false | Output in JSON format |
-| `--debug` | `-d` | false | Enable debug output |
-| `--api-token <token>` | | | Override API token for this command |
+Check authentication status
 
-## Examples
+### Options
 
-### Check authentication status
+| Option | Description |
+| ------ | ----------- |
+| `-d, --debug` | Enable debug output |
 
-```bash
-$ phala status
-✓ Authenticated as user@example.com
-Workspace: my-workspace
-Profile: default
-```
+### Global Options
 
-### JSON output
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-```bash
-$ phala status --json
-{
-  "authenticated": true,
-  "username": "user@example.com",
-  "workspace": "my-workspace",
-  "profile": "default"
-}
-```
+### Examples
 
-### Check authentication in scripts
+* Show login status
 
 ```bash
-$ phala status --json | jq -e '.authenticated' > /dev/null
-$ if [ $? -eq 0 ]; then
-    echo "Authenticated"
-  else
-    echo "Not authenticated"
-  fi
+phala status
 ```
 
-### Override API token
+* Get status as JSON
 
 ```bash
-$ phala status --api-token phak_abc123...
-✓ Authenticated as other@example.com
+phala status --json
 ```
 
-## Exit Codes
-
-- `0` - Authenticated successfully
-- `1` - Not authenticated or error occurred

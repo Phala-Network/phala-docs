@@ -1,0 +1,171 @@
+---
+title: SSH Keys
+description: List, create, delete SSH keys and import them from GitHub.
+---
+
+SSH key methods manage the public keys associated with your Phala Cloud account. These keys are injected into CVMs at boot time, giving you SSH access to your running instances.
+
+## list_ssh_keys
+
+`GET /user/ssh-keys`
+
+Lists all SSH keys registered to your account.
+
+**Parameters:** None.
+
+**Returns:** List of SSH key objects.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+keys = client.list_ssh_keys()
+for key in keys:
+    print(key.id, key.name, key.fingerprint)
+```
+
+```python Async
+keys = await client.list_ssh_keys()
+for key in keys:
+    print(key.id, key.name, key.fingerprint)
+```
+
+</CodeGroup>
+
+---
+
+## create_ssh_key
+
+`POST /user/ssh-keys`
+
+Adds a new SSH public key to your account.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `str` | Yes | Display name for the key |
+| `public_key` | `str` | Yes | SSH public key content (e.g., `ssh-ed25519 AAAA...`) |
+
+**Returns:** The created SSH key object.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+key = client.create_ssh_key({
+    "name": "my-laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+})
+print(key.id)
+```
+
+```python Async
+key = await client.create_ssh_key({
+    "name": "my-laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+})
+print(key.id)
+```
+
+</CodeGroup>
+
+---
+
+## delete_ssh_key
+
+`DELETE /user/ssh-keys/{keyId}`
+
+Removes an SSH key from your account. Existing CVMs that were provisioned with this key will retain it until they are restarted.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `key_id` | `str` | Yes | SSH key identifier |
+
+**Returns:** `None`
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+client.delete_ssh_key({"key_id": "key-abc123"})
+```
+
+```python Async
+await client.delete_ssh_key({"key_id": "key-abc123"})
+```
+
+</CodeGroup>
+
+---
+
+## import_github_profile_ssh_keys
+
+`POST /user/ssh-keys/github-profile`
+
+Imports SSH public keys from a GitHub user profile. This fetches the keys listed at `https://github.com/{username}.keys` and adds them to your account.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `github_username` | `str` | Yes | GitHub username to import keys from |
+
+**Returns:** Import response with the number of keys imported.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+result = client.import_github_profile_ssh_keys({
+    "github_username": "octocat",
+})
+print(result.model_dump())
+```
+
+```python Async
+result = await client.import_github_profile_ssh_keys({
+    "github_username": "octocat",
+})
+```
+
+</CodeGroup>
+
+---
+
+## sync_github_ssh_keys
+
+`POST /user/ssh-keys/github-sync`
+
+Syncs SSH keys from your connected GitHub account. This requires that your Phala Cloud account is linked to GitHub via OAuth. Unlike `import_github_profile_ssh_keys`, this uses your authenticated GitHub connection and keeps keys in sync.
+
+**Parameters:** None.
+
+**Returns:** Sync response with details of added/removed keys.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+result = client.sync_github_ssh_keys()
+print(result.model_dump())
+```
+
+```python Async
+result = await client.sync_github_ssh_keys()
+print(result.model_dump())
+```
+
+</CodeGroup>
+
+## Related
+
+- [Authentication](/phala-cloud/references/cloud-python-sdk/authentication) — account setup
+- [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — provisioning CVMs with SSH access

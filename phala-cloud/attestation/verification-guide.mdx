@@ -1,0 +1,467 @@
+---
+title: End-to-End Attestation Verification
+description: Fetch, verify, and integrate CVM attestation into your workflow — end-to-end with working code
+---
+
+Verify that your CVM runs unmodified code on genuine TEE hardware, from fetching the attestation quote to integrating verification into your CI/CD pipeline. This guide ties together the attestation workflow end-to-end with working code examples.
+
+If you're new to attestation, start with the [Quickstart](/phala-cloud/attestation/quickstart) to understand the basics through the dashboard. This guide assumes you want programmatic verification.
+
+## The verification flow
+
+Every CVM attestation verification follows three steps: get a quote from your running CVM, verify the quote's hardware signature, and check that the measurements match your expected application. The entire process runs in seconds from anywhere outside the CVM.
+
+## Step 1: Get the attestation quote
+
+Your CVM must expose attestation endpoints. If you haven't set this up yet, see [Get Attestation](/phala-cloud/attestation/get-attestation) for the dstack SDK setup.
+
+Fetch the quote with a fresh challenge nonce to prevent replay attacks.
+
+<CodeGroup>
+```typescript TypeScript
+import crypto from 'crypto';
+
+const CVM_URL = 'https://your-app.example.com';
+
+// Generate a fresh 32-byte nonce
+const nonce = crypto.randomBytes(32).toString('hex');
+
+// Fetch attestation with nonce as reportData
+const attestResponse = await fetch(`${CVM_URL}/attestation?reportData=${nonce}`);
+const attestData = await attestResponse.json();
+
+// Fetch application info for compose verification
+const infoResponse = await fetch(`${CVM_URL}/info`);
+const appInfo = await infoResponse.json();
+
+console.log('Quote length:', attestData.quote.length);
+console.log('Event log events:', JSON.parse(attestData.event_log).length);
+```
+
+```python Python
+import secrets
+import requests
+
+CVM_URL = "https://your-app.example.com"
+
+# Generate a fresh 32-byte nonce
+nonce = secrets.token_hex(32)
+
+# Fetch attestation with nonce as reportData
+attest_response = requests.get(f"{CVM_URL}/attestation?reportData={nonce}")
+attest_data = attest_response.json()
+
+# Fetch application info for compose verification
+info_response = requests.get(f"{CVM_URL}/info")
+app_info = info_response.json()
+
+print(f"Quote length: {len(attest_data['quote'])}")
+```
+
+```go Go
+package main
+
+import (
+    "crypto/rand"
+    "encoding/hex"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+)
+
+func main() {
+    cvmURL := "https://your-app.example.com"
+
+    // Generate a fresh 32-byte nonce
+    nonceBytes := make([]byte, 32)
+    rand.Read(nonceBytes)
+    nonce := hex.EncodeToString(nonceBytes)
+
+    // Fetch attestation
+    resp, _ := http.Get(fmt.Sprintf("%s/attestation?reportData=%s", cvmURL, nonce))
+    body, _ := io.ReadAll(resp.Body)
+
+    var attestData map[string]interface{}
+    json.Unmarshal(body, &attestData)
+
+    fmt.Printf("Quote length: %d\n", len(attestData["quote"].(string)))
+}
+```
+</CodeGroup>
+
+<Note>
+Always generate a fresh nonce per verification request. Without it, an attacker could replay an old valid quote from compromised hardware.
+</Note>
+
+## Step 2: Verify the hardware signature
+
+The TDX quote is signed by Intel hardware. Verify this signature to confirm the quote came from a genuine TEE. You have two options: use Phala's verification API for convenience, or verify locally for trustless verification.
+
+### Option A: Phala Cloud verification API
+
+The fastest approach. Sends your quote to Phala's service which checks it against Intel's root certificates.
+
+<CodeGroup>
+```typescript TypeScript
+const verifyResponse = await fetch(
+  'https://cloud-api.phala.com/api/v1/attestations/verify',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ hex: attestData.quote }),
+  }
+);
+
+const result = await verifyResponse.json();
+
+if (!result.quote.verified) {
+  throw new Error('Hardware verification failed');
+}
+
+console.log('Hardware signature: valid');
+console.log('TDX version:', result.quote.body.tee_tcb_svn);
+```
+
+```python Python
+verify_response = requests.post(
+    "https://cloud-api.phala.com/api/v1/attestations/verify",
+    json={"hex": attest_data["quote"]}
+)
+result = verify_response.json()
+
+assert result["quote"]["verified"], "Hardware verification failed"
+
+print(f"Hardware signature: valid")
+print(f"TDX version: {result['quote']['body']['tee_tcb_svn']}")
+```
+
+```bash curl
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"hex": "YOUR_QUOTE_HEX"}'
+```
+</CodeGroup>
+
+### Option B: Local verification with dcap-qvl
+
+For trustless verification without relying on Phala's API, use the open-source [dcap-qvl](https://github.com/Phala-Network/dcap-qvl) verifier. This checks Intel's signature chain locally.
+
+```bash
+# Install dcap-qvl
+cargo install dcap-qvl
+
+# Verify a quote locally
+dcap-qvl verify --quote-hex "YOUR_QUOTE_HEX"
+```
+
+You can also paste your quote into the [TEE Attestation Explorer](https://proof.t16z.com/) for an interactive visual breakdown of all quote fields.
+
+## Step 3: Verify your application code
+
+Hardware verification proves the TEE is genuine. Now verify that your specific application is running inside it. The compose-hash in RTMR3 is a SHA256 hash of your entire Docker Compose configuration.
+
+<CodeGroup>
+```typescript TypeScript
+import { createHash } from 'crypto';
+
+// Calculate the compose hash from the app info
+const appCompose = appInfo.tcb_info.app_compose;
+const calculatedHash = createHash('sha256')
+  .update(appCompose)
+  .digest('hex');
+
+// Extract the attested hash from the RTMR3 event log
+const events = JSON.parse(attestData.event_log);
+const composeEvent = events.find(
+  (e: { event: string }) => e.event === 'compose-hash'
+);
+const attestedHash = composeEvent.event_payload;
+
+if (calculatedHash !== attestedHash) {
+  throw new Error(
+    `Compose hash mismatch: expected ${calculatedHash}, got ${attestedHash}`
+  );
+}
+
+console.log('Application code: verified');
+console.log('Compose hash:', calculatedHash);
+```
+
+```python Python
+import hashlib
+import json
+
+# Calculate the compose hash from the app info
+app_compose = app_info["tcb_info"]["app_compose"]
+calculated_hash = hashlib.sha256(app_compose.encode()).hexdigest()
+
+# Extract the attested hash from the RTMR3 event log
+events = json.loads(attest_data["event_log"])
+compose_event = next(e for e in events if e["event"] == "compose-hash")
+attested_hash = compose_event["event_payload"]
+
+assert calculated_hash == attested_hash, (
+    f"Compose hash mismatch: expected {calculated_hash}, got {attested_hash}"
+)
+
+print(f"Application code: verified")
+print(f"Compose hash: {calculated_hash}")
+```
+</CodeGroup>
+
+## Step 4: Verify the nonce binding
+
+Confirm that the quote contains your original nonce. This proves the attestation was freshly generated for your request.
+
+<CodeGroup>
+```typescript TypeScript
+// The reportData field in the quote should start with your nonce
+const reportData = attestData.report_data;
+if (!reportData.startsWith(nonce)) {
+  throw new Error('Nonce mismatch: possible replay attack');
+}
+console.log('Freshness: verified');
+```
+
+```python Python
+report_data = attest_data["report_data"]
+assert report_data.startswith(nonce), "Nonce mismatch: possible replay attack"
+print("Freshness: verified")
+```
+</CodeGroup>
+
+## Complete verification script
+
+Here's everything combined into a single script you can drop into your project.
+
+<CodeGroup>
+```typescript TypeScript
+import crypto from 'crypto';
+import { createHash } from 'crypto';
+
+async function verifyCVM(cvmUrl: string): Promise<boolean> {
+  // 1. Generate fresh nonce
+  const nonce = crypto.randomBytes(32).toString('hex');
+
+  // 2. Fetch attestation and app info
+  const [attestRes, infoRes] = await Promise.all([
+    fetch(`${cvmUrl}/attestation?reportData=${nonce}`),
+    fetch(`${cvmUrl}/info`),
+  ]);
+  const attestData = await attestRes.json();
+  const appInfo = await infoRes.json();
+
+  // 3. Verify hardware signature
+  const verifyRes = await fetch(
+    'https://cloud-api.phala.com/api/v1/attestations/verify',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hex: attestData.quote }),
+    }
+  );
+  const verifyResult = await verifyRes.json();
+  if (!verifyResult.quote.verified) {
+    console.error('Hardware verification failed');
+    return false;
+  }
+
+  // 4. Verify compose hash
+  const appCompose = appInfo.tcb_info.app_compose;
+  const calculatedHash = createHash('sha256').update(appCompose).digest('hex');
+  const events = JSON.parse(attestData.event_log);
+  const composeEvent = events.find(
+    (e: { event: string }) => e.event === 'compose-hash'
+  );
+  if (calculatedHash !== composeEvent.event_payload) {
+    console.error('Compose hash mismatch');
+    return false;
+  }
+
+  // 5. Verify nonce freshness
+  if (!attestData.report_data.startsWith(nonce)) {
+    console.error('Nonce mismatch');
+    return false;
+  }
+
+  console.log('All checks passed');
+  return true;
+}
+
+// Usage
+verifyCVM('https://your-app.example.com').then(console.log);
+```
+
+```python Python
+import hashlib
+import json
+import secrets
+import requests
+
+
+def verify_cvm(cvm_url: str) -> bool:
+    # 1. Generate fresh nonce
+    nonce = secrets.token_hex(32)
+
+    # 2. Fetch attestation and app info
+    attest_data = requests.get(
+        f"{cvm_url}/attestation?reportData={nonce}"
+    ).json()
+    app_info = requests.get(f"{cvm_url}/info").json()
+
+    # 3. Verify hardware signature
+    verify_result = requests.post(
+        "https://cloud-api.phala.com/api/v1/attestations/verify",
+        json={"hex": attest_data["quote"]},
+    ).json()
+    if not verify_result["quote"]["verified"]:
+        print("Hardware verification failed")
+        return False
+
+    # 4. Verify compose hash
+    app_compose = app_info["tcb_info"]["app_compose"]
+    calculated_hash = hashlib.sha256(app_compose.encode()).hexdigest()
+    events = json.loads(attest_data["event_log"])
+    compose_event = next(e for e in events if e["event"] == "compose-hash")
+    if calculated_hash != compose_event["event_payload"]:
+        print("Compose hash mismatch")
+        return False
+
+    # 5. Verify nonce freshness
+    if not attest_data["report_data"].startswith(nonce):
+        print("Nonce mismatch")
+        return False
+
+    print("All checks passed")
+    return True
+
+
+if __name__ == "__main__":
+    verify_cvm("https://your-app.example.com")
+```
+</CodeGroup>
+
+## Integrate verification into CI/CD
+
+Attestation verification fits naturally into deployment pipelines. Run it after every deployment to confirm your CVM booted correctly with the expected code.
+
+### GitHub Actions example
+
+```yaml
+name: Verify CVM Attestation
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Verify attestation
+        env:
+          CVM_URL: ${{ secrets.CVM_URL }}
+        run: python scripts/verify_attestation.py "$CVM_URL"
+
+      - name: Alert on failure
+        if: failure()
+        run: |
+          curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+            -d '{"text": "CVM attestation verification failed!"}'
+```
+
+### Continuous monitoring
+
+For production systems, run verification checks on a schedule. Here's a lightweight monitoring approach:
+
+```python
+import time
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("attestation-monitor")
+
+CVM_URLS = [
+    "https://app1.example.com",
+    "https://app2.example.com",
+]
+
+CHECK_INTERVAL = 3600  # 1 hour
+
+while True:
+    for url in CVM_URLS:
+        try:
+            result = verify_cvm(url)
+            if result:
+                logger.info(f"PASS: {url}")
+            else:
+                logger.error(f"FAIL: {url}")
+                # Send alert to your monitoring system
+        except Exception as e:
+            logger.error(f"ERROR: {url} - {e}")
+
+    time.sleep(CHECK_INTERVAL)
+```
+
+<Warning>
+Attestation verification must always run **outside** the CVM. Verification running inside the CVM provides no security guarantees because a compromised CVM could fake its own results.
+</Warning>
+
+## What each check proves
+
+Here's a quick reference for what you're verifying at each step and what attack it prevents.
+
+| Check | What it proves | Attack prevented |
+|-------|---------------|-----------------|
+| Hardware signature | Quote came from genuine Intel TDX | Fake TEE simulation |
+| Compose hash | Your exact Docker images are running | Code substitution |
+| Nonce freshness | Quote was generated for this request | Replay of old quotes |
+| reportData binding | Custom data is attested by hardware | Data tampering |
+
+For advanced verification including RTMR3 event log replay, Docker digest pinning, on-chain governance, and source code provenance, see the [Complete Chain of Trust](/phala-cloud/attestation/chain-of-trust).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    icon="code"
+    href="/phala-cloud/attestation/verify-your-application"
+    title="Verify Your Application"
+    arrow="true"
+  >
+    Advanced verification including RTMR3 replay and image digest checks
+  </Card>
+
+  <Card
+    icon="server"
+    href="/phala-cloud/attestation/verify-the-platform"
+    title="Verify the Platform"
+    arrow="true"
+  >
+    Verify OS, KMS, and infrastructure without trust assumptions
+  </Card>
+
+  <Card
+    icon="book"
+    href="/phala-cloud/attestation/attestation-fields"
+    title="Field Reference"
+    arrow="true"
+  >
+    Understand every field in the attestation quote
+  </Card>
+
+  <Card
+    icon="shield-check"
+    href="/phala-cloud/confidential-ai/verify/verify-attestation"
+    title="GPU TEE Attestation"
+    arrow="true"
+  >
+    Verify GPU-specific attestation for Confidential AI workloads
+  </Card>
+</CardGroup>

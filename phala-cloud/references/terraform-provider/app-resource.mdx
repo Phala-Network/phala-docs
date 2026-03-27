@@ -1,0 +1,211 @@
+---
+title: phala_app Resource
+description: Reference for the phala_app resource — deploy and manage Phala Cloud apps with Docker Compose, environment variables, replicas, and CVM lifecycle.
+---
+
+`phala_app` is the primary lifecycle resource in the Phala Cloud Terraform provider. It manages a single application identity (`app_id`) with shared Docker Compose configuration, shared environment variables, and one or more CVM replicas. This is the resource you use for every deployment.
+
+## Example Usage
+
+```hcl
+resource "phala_app" "web" {
+  name      = "web-app"
+  size      = "tdx.medium"
+  region    = "US-WEST-1"
+  image     = "dstack-dev-0.5.7-9b6a5239"
+  disk_size = 40
+  replicas  = 2
+
+  env = {
+    APP_SECRET = "replace-me"
+  }
+
+  public_logs     = false
+  public_sysinfo  = false
+  public_tcbinfo  = false
+  gateway_enabled = true
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+
+  wait_for_ready       = true
+  wait_timeout_seconds = 900
+}
+```
+
+## Required Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | Application name. **Force-new** — changing this destroys and recreates the resource. |
+| `docker_compose` | String | Docker Compose YAML content defining your services. |
+| `size` | String | Instance type slug (e.g. `tdx.small`, `tdx.medium`). Discover valid values with `data.phala_sizes`. |
+
+## Optional Attributes
+
+### Placement and Identity
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `region` | String | Preferred region slug (e.g. `US-WEST-1`). **Force-new.** Discover values with `data.phala_regions`. |
+| `image` | String | OS image slug. Updatable in-place. Use exact slugs from `data.phala_images`. |
+| `node_id` | Number | Pin placement to a specific worker node. **Force-new.** Discover nodes with `data.phala_nodes`. |
+| `kms` | String | KMS type for provisioning: `phala` (default), `ethereum`, or `base`. **Force-new.** |
+| `custom_app_id` | String | Custom app ID for deterministic identity flow (PHALA KMS). **Force-new.** |
+| `nonce` | Number | Nonce paired with `custom_app_id` for deterministic identity. **Force-new.** |
+| `listed` | Boolean | Whether the app is publicly listed. **Force-new.** |
+
+### Infrastructure
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `disk_size` | Number | Disk size in GB. Can only grow — shrink attempts are rejected by the provider. |
+| `replicas` | Number | Desired replica count. All replicas share the same compose, env, and settings. |
+| `storage_fs` | String | Storage filesystem: `zfs` or `ext4`. **Immutable after create** — changing forces replacement. |
+| `ssh_authorized_keys` | List of String | SSH public keys injected at launch. **Force-new** — runtime mutation is not supported. |
+| `pre_launch_script` | String | Optional script content run before the CVM starts. |
+
+### Compose Runtime Settings
+
+These attributes control compose-level runtime behavior. Changing any of them triggers a compose update and CVM restart.
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `public_logs` | Boolean | `false` | Expose container logs publicly. |
+| `public_sysinfo` | Boolean | `false` | Expose system info publicly. |
+| `public_tcbinfo` | Boolean | `false` | Expose TCB attestation info publicly. |
+| `gateway_enabled` | Boolean | — | Enable public gateway routing. |
+| `secure_time` | Boolean | — | Enable secure time mode. |
+
+### Environment Variables
+
+The provider offers two modes for managing environment variables. You must pick one — they cannot be combined in the same resource.
+
+**Auto-encryption mode (recommended):**
+
+```hcl
+resource "phala_app" "web" {
+  # ...
+  env = {
+    DATABASE_URL = "postgres://..."
+    API_SECRET   = "s3cr3t"
+  }
+}
+```
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `env` | Map of String, Sensitive | Plaintext env vars. The provider auto-derives `env_keys` and encrypts values before sending to the API. |
+
+<Warning>
+Even in auto-encryption mode, plaintext values are stored in your Terraform state file. If you cannot tolerate plaintext in state storage, use manual encrypted mode instead.
+</Warning>
+
+**Manual encrypted mode:**
+
+```hcl
+resource "phala_app" "web" {
+  # ...
+  encrypted_env = var.pre_encrypted_hex_blob
+  env_keys      = ["DATABASE_URL", "API_SECRET"]
+}
+```
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `encrypted_env` | String, Sensitive | Hex-encoded encrypted env payload. Must be valid hex. |
+| `env_keys` | List of String | Allowed environment variable keys for the encrypted payload. |
+
+**On-chain KMS fields (advanced):**
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `env_compose_hash` | String | Compose hash for phase-2 env update flow with contract-owned KMS. |
+| `env_transaction_hash` | String | On-chain transaction hash for phase-2 env update flow. |
+
+### Wait Behavior
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `wait_for_ready` | Boolean | Wait until the app reports running replicas before Terraform returns. |
+| `wait_timeout_seconds` | Number | Timeout in seconds for the readiness wait. |
+
+<Note>
+Setting `wait_for_ready = true` is recommended for production workflows. Without it, Terraform returns immediately after the API call, and subsequent resources that depend on the endpoint may see incomplete values.
+</Note>
+
+## Read-Only (Computed) Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `app_id` | String | The Phala app identifier. |
+| `id` | String | Terraform resource ID (same as `app_id`). |
+| `primary_cvm_id` | String | Primary CVM identifier, used for patch operations and as input to `phala_cvm_power`. |
+| `cvm_ids` | List of String | All CVM identifiers attached to this app. |
+| `endpoint` | String | Primary public endpoint URL. |
+| `status` | String | Current CVM status from the API. |
+
+## Lifecycle Behavior
+
+### Force-New Fields
+
+Changing any of these attributes destroys the existing resource and creates a new one:
+
+- `name`
+- `region`
+- `listed`
+- `ssh_authorized_keys`
+- `storage_fs`
+- `kms`
+- `custom_app_id`
+- `nonce`
+- `node_id`
+
+### In-Place Updates
+
+These attributes can be updated without replacement:
+
+- `size` (CPU/RAM changes)
+- `disk_size` (grow only)
+- `image` (OS image swap via API patch)
+- `docker_compose`
+- `pre_launch_script`
+- `replicas`
+- `env` / `encrypted_env`
+- Compose runtime settings (`public_logs`, `public_sysinfo`, `public_tcbinfo`, `gateway_enabled`, `secure_time`)
+
+### Replica Scaling
+
+Set `replicas` to scale your app horizontally. All replicas share the same compose file, environment, and settings. The provider manages replica creation and deletion to match your desired count.
+
+```hcl
+resource "phala_app" "api" {
+  name     = "api-service"
+  size     = "tdx.medium"
+  region   = "US-WEST-1"
+  replicas = 3
+
+  docker_compose = <<-YAML
+    services:
+      api:
+        image: myregistry/api:latest
+        ports:
+          - "8080:8080"
+  YAML
+}
+```
+
+### Create Flow
+
+The provider follows Phala's two-step API: first `POST /cvms/provision` to allocate resources, then `POST /cvms` to commit the deployment. This happens automatically during `terraform apply`.
+
+## Related
+
+- [CVM Power Control](/phala-cloud/references/terraform-provider/cvm-power)
+- [Data Sources](/phala-cloud/references/terraform-provider/data-sources)
+- [Examples](/phala-cloud/references/terraform-provider/examples)

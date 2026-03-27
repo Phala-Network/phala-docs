@@ -1,50 +1,66 @@
 ---
-title: "phala ps"
-description: "List containers running in a CVM."
+title: "ps"
+description: "List containers of a CVM"
 ---
 
-## Usage
+## Command: `phala ps`
+
+### Syntax
 
 ```
-phala ps [cvm-id] [options]
+phala ps [options] [<cvm_id>]
 ```
 
-## Arguments
+### Description
 
-| Name | Required | Description |
-|------|----------|-------------|
-| `cvm-id` | No | CVM ID, UUID, or name (uses linked CVM if omitted) |
+List containers of a CVM
 
-## Options
+### Arguments
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--cvm-id <id>` | | | Override CVM ID |
-| `--json` | `-j` | false | JSON output |
-| `--interactive` | `-i` | false | Interactive mode |
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
 
-## Examples
+### Options
 
-List containers from linked CVM:
+| Option | Description |
+| ------ | ----------- |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `-i, --interactive` | Enable interactive mode |
 
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* List containers interactively
+
+```bash
+phala ps
 ```
-$ phala ps
+
+* List containers by app_id
+
+```bash
+phala ps app_abc123
 ```
 
-List containers from specific CVM:
+* List containers by name
 
-```
-$ phala ps app_abc123
-```
-
-List containers with JSON output:
-
-```
-$ phala ps --json
+```bash
+phala ps my-app
 ```
 
-List containers with interactive CVM selection:
+* Output as JSON
 
+```bash
+phala ps app_abc123 --json
 ```
-$ phala ps --interactive
-```
+

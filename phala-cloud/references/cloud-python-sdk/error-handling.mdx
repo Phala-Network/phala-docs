@@ -1,0 +1,240 @@
+---
+title: Error Handling
+description: Error hierarchy, safe methods, and structured error codes in the Phala Cloud Python SDK.
+---
+
+The Python SDK provides a structured error hierarchy and two error handling patterns: exceptions (default) and safe results. Every method that can fail has a `safe_*` variant that returns a result object instead of raising.
+
+This page covers how to catch and handle errors in the SDK. For the full list of `ERR-xxxx` error codes returned by the API, see the [Error Codes Reference](/phala-cloud/references/error-codes).
+
+## Error Hierarchy
+
+All SDK exceptions inherit from `PhalaCloudError`:
+
+```
+PhalaCloudError (base)
+├── RequestError          — Network/transport failures (httpx errors)
+├── ValidationError       — Response validation failures (Pydantic)
+└── ApiError              — HTTP errors from the API
+    ├── AuthError         — 401/403 authentication errors
+    ├── ServerError       — 500+ server errors
+    └── BusinessError     — 400/409 business logic errors
+        ├── ConflictError — 409 conflicts (transient, may be retryable)
+        └── ResourceError — Structured errors with ERR-xxxx codes
+```
+
+## Catching Errors
+
+### Basic Exception Handling
+
+```python
+from phala_cloud import (
+    PhalaCloudError,
+    AuthError,
+    BusinessError,
+    ResourceError,
+    ServerError,
+    RequestError,
+)
+
+try:
+    client.provision_cvm(payload)
+except ResourceError as e:
+    # Structured error with error code and suggestions
+    print(f"Error [{e.error_code}]: {e}")
+    if e.suggestions:
+        for s in e.suggestions:
+            print(f"  Suggestion: {s}")
+except AuthError as e:
+    print(f"Authentication failed: {e}")
+except BusinessError as e:
+    print(f"Business error ({e.status_code}): {e}")
+except ServerError as e:
+    print(f"Server error ({e.status_code}): {e}")
+except RequestError as e:
+    print(f"Network error: {e}")
+except PhalaCloudError as e:
+    print(f"Unexpected SDK error: {e}")
+```
+
+<Note>
+Order matters when catching exceptions. Catch more specific subclasses first — `ResourceError` before `BusinessError`, and `BusinessError` before `ApiError`.
+</Note>
+
+## Error Classes
+
+### PhalaCloudError
+
+Base class for all SDK exceptions. Catches everything.
+
+### RequestError
+
+Raised when the HTTP request itself fails (DNS resolution, connection timeout, TLS errors). This wraps `httpx.HTTPError`.
+
+### ApiError
+
+Base class for all HTTP error responses from the API.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `status_code` | `int` | HTTP status code |
+| `code` | `str \| None` | Error code string from response |
+| `detail` | `Any` | Raw error detail from API response |
+
+### AuthError
+
+Raised on HTTP 401 or 403. Usually means the API key is invalid or expired.
+
+### BusinessError
+
+Raised on HTTP 400, 409, and other 4xx client errors that are not auth-related.
+
+### ConflictError
+
+Subclass of `BusinessError`. Raised on HTTP 409 when there is no structured error code. These conflicts are typically transient — for example, another operation is already in progress on the same CVM. Retrying after a short delay often resolves the issue.
+
+### ResourceError
+
+Subclass of `BusinessError`. Raised when the API returns a structured error with an `error_code` field. These are deterministic business errors with additional context.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `error_code` | `str \| None` | Structured code (e.g., `"ERR-01-001"`) |
+| `structured_details` | `list[dict] \| None` | Field-level error details |
+| `suggestions` | `list[str] \| None` | Suggested fixes |
+| `links` | `list[dict] \| None` | Links to documentation |
+
+### ServerError
+
+Raised on HTTP 500+. Indicates a problem on the Phala Cloud side.
+
+### ValidationError
+
+Raised when a response passes HTTP validation but fails Pydantic model validation. This is rare and usually indicates an API response format change.
+
+## Safe Methods
+
+Every action method has a `safe_*` counterpart that wraps the result in a `SafeResult` dataclass instead of raising exceptions.
+
+```python
+result = client.safe_get_cvm_info({"id": "my-app"})
+
+if result.ok:
+    print(result.data.status)
+else:
+    print(f"Error: {result.error}")
+```
+
+### SafeResult
+
+```python
+@dataclass
+class SafeResult(Generic[T]):
+    ok: bool
+    data: T | None = None
+    error: Exception | None = None
+
+    def unwrap(self) -> T:
+        """Return data if ok, otherwise re-raise the error."""
+```
+
+The `unwrap()` method gives you a quick escape hatch when you want safe handling in most cases but still want to raise in unexpected situations:
+
+```python
+# Returns data if ok, raises the original exception if not
+cvm = client.safe_get_cvm_info({"id": "my-app"}).unwrap()
+```
+
+Safe methods catch `PhalaCloudError` and Pydantic `ValidationError`. Other exceptions (like `KeyboardInterrupt`) still propagate normally.
+
+### Async Safe Methods
+
+The async client works identically:
+
+```python
+result = await client.safe_get_cvm_info({"id": "my-app"})
+
+if result.ok:
+    print(result.data)
+```
+
+## Error Codes
+
+The `phala_cloud.error_codes` module provides constants for all structured error codes. Use these to match specific errors in your error handling logic.
+
+```python
+from phala_cloud import ResourceError
+from phala_cloud.error_codes import (
+    CVM_APP_ID_CONFLICT,
+    INSUFFICIENT_BALANCE,
+    NODE_NOT_FOUND,
+    QUOTA_EXCEEDED,
+)
+
+try:
+    client.commit_cvm_provision(payload)
+except ResourceError as e:
+    if e.error_code == CVM_APP_ID_CONFLICT:
+        print("App ID already in use with a different compose hash")
+    elif e.error_code == INSUFFICIENT_BALANCE:
+        print("Add credits to your workspace")
+    elif e.error_code == QUOTA_EXCEEDED:
+        print("Workspace quota exceeded")
+    elif e.error_code == NODE_NOT_FOUND:
+        print("The specified node doesn't exist")
+    else:
+        raise
+```
+
+### Available Error Code Modules
+
+| Module | Prefix | Category |
+|--------|--------|----------|
+| 01 | `ERR-01-xxx` | CVM preflight and compose hash |
+| 02 | `ERR-02-xxx` | Inventory and resource allocation |
+| 03 | `ERR-03-xxx` | CVM operations |
+| 04 | `ERR-04-xxx` | Workspace and billing |
+| 05 | `ERR-05-xxx` | Credentials and tokens |
+| 06 | `ERR-06-xxx` | Authentication and OAuth |
+
+## Practical Patterns
+
+### Retry on Conflict
+
+`ConflictError` (409 without structured code) is often transient. A simple retry loop handles it:
+
+```python
+import time
+from phala_cloud import ConflictError
+
+for attempt in range(3):
+    try:
+        client.restart_cvm({"id": "my-app"})
+        break
+    except ConflictError:
+        if attempt < 2:
+            time.sleep(2 ** attempt)
+        else:
+            raise
+```
+
+### Combining Safe + Exception Handling
+
+Use safe methods for expected failures and exceptions for unexpected ones:
+
+```python
+result = client.safe_provision_cvm(payload)
+
+if result.ok:
+    print("Provisioned:", result.data)
+elif isinstance(result.error, ResourceError):
+    print(f"Known issue [{result.error.error_code}]: {result.error}")
+else:
+    # Re-raise unexpected errors
+    result.unwrap()
+```
+
+## Related
+
+- [SDK Overview](/phala-cloud/references/cloud-python-sdk/overview) — getting started
+- [Error Codes Reference](/phala-cloud/references/error-codes) — full list of `ERR-xxxx` codes

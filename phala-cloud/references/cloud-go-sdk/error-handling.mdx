@@ -1,0 +1,212 @@
+---
+title: Error Handling
+description: APIError struct, error classification methods, retry logic, and structured error codes in the Go SDK.
+---
+
+The Go SDK returns all API errors as `*phala.APIError`, which implements the `error` interface. This gives you a single type to handle, with helper methods to classify the error and decide what to do next.
+
+This page covers how to catch and handle errors from the SDK. For the full list of `ERR-xxxx` error codes returned by the API, see the [Error Codes Reference](/phala-cloud/references/error-codes).
+
+## The APIError Type
+
+Every non-2xx response from the API is wrapped in an `*APIError`. Use `errors.As` to extract it from the returned error.
+
+```go
+import "errors"
+
+info, err := client.GetCVMInfo(ctx, "nonexistent")
+if err != nil {
+	var apiErr *phala.APIError
+	if errors.As(err, &apiErr) {
+		fmt.Printf("Status: %d\n", apiErr.StatusCode)
+		fmt.Printf("Message: %s\n", apiErr.Message)
+	}
+}
+```
+
+### APIError Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `StatusCode` | `int` | HTTP status code |
+| `Message` | `string` | Human-readable error message |
+| `ErrorCode` | `string` | Structured error code (e.g., `"ERR-01-001"`) |
+| `Detail` | `any` | Raw error detail from API |
+| `Body` | `string` | Raw response body |
+| `Headers` | `http.Header` | Response headers |
+| `Details` | `[]ErrorDetail` | Field-level validation errors |
+| `Suggestions` | `[]string` | Suggested fixes |
+| `Links` | `[]ErrorLink` | Documentation links |
+
+## Error Classification
+
+`APIError` provides boolean methods to classify errors by category. These make it easy to write switch-style error handling without checking status codes directly.
+
+```go
+var apiErr *phala.APIError
+if errors.As(err, &apiErr) {
+	switch {
+	case apiErr.IsAuth():
+		// 401 or 403 — invalid or expired API key
+		fmt.Println("Authentication failed:", apiErr.Message)
+
+	case apiErr.IsValidation():
+		// 422 — request body failed validation
+		for _, d := range apiErr.Details {
+			fmt.Printf("  Field %s: %s\n", d.Field, d.Message)
+		}
+
+	case apiErr.IsBusiness():
+		// 4xx (non-auth, non-validation) — business logic error
+		fmt.Println("Business error:", apiErr.Message)
+
+	case apiErr.IsServer():
+		// 5xx — server-side failure
+		fmt.Println("Server error:", apiErr.Message)
+	}
+}
+```
+
+### Classification Methods
+
+| Method | Status Codes | Description |
+|--------|-------------|-------------|
+| `IsAuth()` | 401, 403 | Authentication or authorization failure |
+| `IsValidation()` | 422 | Request validation failure (field-level details in `Details`) |
+| `IsBusiness()` | 4xx (not auth/validation) | Business logic error |
+| `IsServer()` | 500+ | Server-side error |
+| `IsRetryable()` | 409, 429, 503 | Transient error worth retrying |
+| `IsConflict()` | 409 | Resource conflict |
+| `IsComposePrecondition()` | 465 | Compose hash precondition failure (requires on-chain confirmation) |
+| `IsStructured()` | any | Has a structured `ErrorCode` |
+
+<Note>
+A 409 Conflict with a structured `ErrorCode` is treated as a deterministic business error and is **not** retryable. Only bare 409 responses (without an error code) are retried automatically.
+</Note>
+
+## Structured Errors
+
+Some API errors include a structured `ErrorCode` (like `ERR-01-001`) along with detailed suggestions and documentation links. Check for these with `IsStructured()` or `HasErrorCode()`.
+
+```go
+if apiErr.IsStructured() {
+	fmt.Printf("Error code: %s\n", apiErr.ErrorCode)
+	for _, s := range apiErr.Suggestions {
+		fmt.Printf("  Suggestion: %s\n", s)
+	}
+	for _, l := range apiErr.Links {
+		fmt.Printf("  See: %s (%s)\n", l.URL, l.Label)
+	}
+}
+```
+
+### HasErrorCode
+
+Check for a specific error code:
+
+```go
+if apiErr.HasErrorCode("ERR-01-001") {
+	// Handle specific error
+}
+```
+
+## FormatError
+
+The `FormatError` method produces a human-readable string that includes the error code, message, field-level details, suggestions, and reference links.
+
+```go
+if apiErr.IsStructured() {
+	fmt.Println(apiErr.FormatError())
+}
+// Output:
+// [ERR-01-001] The requested instance type does not exist
+//
+// Details:
+//   - Instance type 'invalid' is not recognized (field: instance_type, value: invalid)
+//
+// Suggestions:
+//   - Use a valid instance type: tdx.small, tdx.medium, or tdx.large
+//
+// References:
+//   - View available instance types: https://cloud.phala.com/instances
+```
+
+## Retry-After Header
+
+When the API returns a 429 (Too Many Requests) or 503 (Service Unavailable), it may include a `Retry-After` header. The `RetryAfter()` method parses this into a `time.Duration`.
+
+```go
+if apiErr.IsRetryable() {
+	if wait := apiErr.RetryAfter(); wait > 0 {
+		time.Sleep(wait)
+		// Retry the request
+	}
+}
+```
+
+The method handles both numeric seconds and HTTP date formats. Returns `0` if the header is absent or unparseable.
+
+## Automatic Retries
+
+The SDK automatically retries requests that fail with retryable status codes (409, 429, 503). Retries use exponential backoff starting at 1 second with a 20-second cap. Configure the maximum number of retries when creating the client.
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("phak_your_api_key"),
+	phala.WithMaxRetries(10), // Default is 30
+)
+```
+
+<Warning>
+Not all methods use automatic retries. Read-only `GET` requests and non-idempotent operations like `CommitCVMProvision` do not retry automatically. Lifecycle operations (`StartCVM`, `StopCVM`, `RestartCVM`, etc.) and configuration updates do retry.
+</Warning>
+
+## Validation Error Details
+
+When `IsValidation()` is true, the `Details` field contains field-level error information.
+
+```go
+type ErrorDetail struct {
+	Field   string `json:"field"`
+	Value   any    `json:"value"`
+	Message string `json:"message"`
+}
+```
+
+```go
+if apiErr.IsValidation() {
+	for _, d := range apiErr.Details {
+		fmt.Printf("Field '%s': %s\n", d.Field, d.Message)
+	}
+}
+```
+
+## Complete Example
+
+Here is a comprehensive error handling pattern for a CVM provisioning flow:
+
+```go
+provision, err := client.ProvisionCVM(ctx, req)
+if err != nil {
+	var apiErr *phala.APIError
+	if errors.As(err, &apiErr) {
+		switch {
+		case apiErr.IsAuth():
+			return fmt.Errorf("invalid API key: %s", apiErr.Message)
+		case apiErr.IsValidation():
+			for _, d := range apiErr.Details {
+				log.Printf("validation: %s — %s", d.Field, d.Message)
+			}
+			return fmt.Errorf("invalid request")
+		case apiErr.IsStructured():
+			log.Println(apiErr.FormatError())
+			return fmt.Errorf("provisioning failed: %s", apiErr.ErrorCode)
+		case apiErr.IsServer():
+			return fmt.Errorf("server error (try again later): %s", apiErr.Message)
+		default:
+			return fmt.Errorf("API error %d: %s", apiErr.StatusCode, apiErr.Message)
+		}
+	}
+	return fmt.Errorf("unexpected error: %w", err)
+}
+```

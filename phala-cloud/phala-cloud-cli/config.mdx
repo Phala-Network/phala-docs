@@ -1,71 +1,46 @@
 ---
-title: "phala config (Deprecated)"
-description: "Manage local CLI configuration values."
+title: "config (Deprecated)"
+description: "Manage local CLI state"
 ---
 
 <Warning>
-`phala config` is deprecated. The CLI now uses profile-based credentials stored in `~/.phala-cloud/credentials.json`. See [`profiles`](/phala-cloud/phala-cloud-cli/profiles) and [`switch`](/phala-cloud/phala-cloud-cli/switch).
+This command is deprecated. See the newer alternatives.
 </Warning>
 
-## Usage
+## Command: `phala config`
+
+### Syntax
 
 ```
-phala config <subcommand> [args] [options]
+phala config <command> [options]
 ```
 
-## Subcommands
+### Description
 
-### config get
+Manage local CLI state
 
-Get a configuration value.
+### Global Options
 
-#### Arguments
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `key` | Yes | Configuration key to retrieve |
+### Subcommands
 
-#### Examples
+| Command | Description |
+| ------- | ----------- |
+| `get` | Get a configuration value |
+| `list` | (ls)         List config values |
+| `set` | Set a configuration value |
+
+### Examples
+
+* Display help:
 
 ```bash
-$ phala config get api_prefix
-$ phala config get default_region
-```
-
-### config set
-
-Set a configuration value.
-
-#### Arguments
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `key` | Yes | Configuration key to set |
-| `value` | Yes | Value to assign to the key |
-
-#### Examples
-
-```bash
-$ phala config set api_prefix https://custom-api.example.com
-$ phala config set default_region us-west-2
-```
-
-### config list
-
-List all configuration values.
-
-Aliases: `config ls`
-
-#### Options
-
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--json` | `-j` | false | Output in JSON format |
-
-#### Examples
-
-```bash
-$ phala config list
-$ phala config ls
-$ phala config ls --json
+phala config --help
 ```

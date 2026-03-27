@@ -3,6 +3,12 @@ title: CVM Configuration
 description: Functions for updating CVM resources, visibility, OS images, and compose files
 ---
 
+<Warning>
+**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+</Warning>
+
+Each `updateXxxx` method targets a single aspect of the CVM and calls a dedicated API endpoint. `patchCvm` is the unified method that can update multiple fields in a single request. Use `patchCvm` when you need to change several settings atomically; use the individual `updateXxxx` methods when you only need to change one thing.
+
 ## updateCvmResources
 
 `PATCH /cvms/{cvmId}/resources`
@@ -199,3 +205,176 @@ Commits a compose file update — the second phase. For on-chain KMS, the `compo
 | `transaction_hash` | `string` | No | On-chain transaction hash |
 
 **Returns:** `CommitCvmComposeFileUpdate` — update details.
+
+---
+
+## patchCvm
+
+`PATCH /cvms/{cvmId}`
+
+Applies partial updates to a CVM via the unified PATCH endpoint. Only fields present in the request body are applied, giving you true PATCH semantics. You can update compose files, environment variables, resources, visibility, and OS images all in a single call.
+
+For CVMs with on-chain KMS (ETHEREUM/BASE), any change that affects the compose hash triggers a two-phase flow. The first call returns `{ requiresOnChainHash: true, composeHash, ... }` with the hash you need to register on-chain. After registration, call [`confirmCvmPatch`](#confirmcvmpatch) with the transaction proof.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `docker_compose_file` | `string` | No | New Docker Compose YAML |
+| `pre_launch_script` | `string` | No | New pre-launch script |
+| `allowed_envs` | `string[]` | No | Allowed env variable keys |
+| `public_logs` | `boolean` | No | Make logs publicly accessible |
+| `public_sysinfo` | `boolean` | No | Make system info public |
+| `public_tcbinfo` | `boolean` | No | Make TCB info public |
+| `encrypted_env` | `string` | No | Hex-encoded encrypted env vars |
+| `user_config` | `string` | No | User configuration string |
+| `gpus` | `object` | No | GPU config: `{ count, product_name? }` |
+| `vcpu` | `number` | No | Number of vCPUs |
+| `memory` | `number` | No | Memory in MB |
+| `disk_size` | `number` | No | Disk size in GB |
+| `image` | `string` | No | OS image name |
+| `shutdown_timeout` | `number` | No | Shutdown timeout in seconds |
+| `allow_force_stop` | `boolean` | No | Allow force stop on timeout |
+| `prepareOnly` | `boolean` | No | Prepare-only mode for multisig workflows |
+
+**Returns:** Discriminated union on `requiresOnChainHash`:
+
+**Accepted (`requiresOnChainHash: false`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `requiresOnChainHash` | `false` | Update accepted directly |
+| `correlationId` | `string` | Tracking ID |
+
+**Hash required (`requiresOnChainHash: true`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `requiresOnChainHash` | `true` | On-chain registration needed |
+| `composeHash` | `string` | Hash to register on-chain |
+| `appId` | `string` | App ID for contract interaction |
+| `deviceId` | `string` | Device ID |
+| `kmsInfo` | `KmsInfo` | KMS details for chain interaction |
+| `commitToken` | `string?` | One-time token for multisig commit |
+| `commitUrl` | `string?` | Commit URL |
+| `onchainStatus` | `object?` | Current on-chain allowance status |
+
+**Example — simple update (PHALA KMS):**
+
+```typescript
+const result = await client.patchCvm({
+  id: "my-app",
+  vcpu: 4,
+  memory: 8192,
+});
+console.log(result.correlationId);
+```
+
+**Example — on-chain KMS compose update (two-phase):**
+
+```typescript
+import { addComposeHash } from "@phala/cloud";
+
+const result = await client.patchCvm({
+  id: "my-app",
+  docker_compose_file: newComposeYaml,
+});
+
+if (result.requiresOnChainHash) {
+  const tx = await addComposeHash({
+    chain: result.kmsInfo.chain,
+    kmsContractAddress: result.kmsInfo.kms_contract_address,
+    appId: result.appId as `0x${string}`,
+    composeHash: result.composeHash,
+    privateKey: privateKey,
+  });
+
+  await client.confirmCvmPatch({
+    id: "my-app",
+    composeHash: result.composeHash,
+    transactionHash: tx.transactionHash,
+  });
+}
+```
+
+---
+
+## confirmCvmPatch
+
+`PATCH /cvms/{cvmId}` (with `X-Compose-Hash` and `X-Transaction-Hash` headers)
+
+Completes the second phase of an on-chain KMS CVM update. Call this after `patchCvm` returns `{ requiresOnChainHash: true }` and you have registered the compose hash on-chain via [`addComposeHash`](/phala-cloud/references/cloud-js-sdk/add-compose-hash).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `composeHash` | `string` | Yes | Compose hash from `patchCvm` Phase 1 response |
+| `transactionHash` | `string` | Yes | Transaction hash proving on-chain registration |
+
+**Returns:** `ConfirmCvmPatchResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `correlationId` | `string` | Tracking ID |
+
+**Example:**
+
+```typescript
+const confirmed = await client.confirmCvmPatch({
+  id: "my-app",
+  composeHash: patchResult.composeHash,
+  transactionHash: txReceipt.transactionHash,
+});
+console.log(`Update started: ${confirmed.correlationId}`);
+```
+
+---
+
+## commitCvmUpdate
+
+`POST /cvms/{cvmId}/commit-update`
+
+Completes a two-phase CVM update using a one-time commit token. This enables multisig workflows where the on-chain signer is different from the original API caller. The token is generated when you call `patchCvm` with `prepareOnly: true`.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | CVM identifier |
+| `token` | `string` | Yes | One-time commit token from prepare-only flow |
+| `composeHash` | `string` | Yes | Compose hash from Phase 1 response |
+| `transactionHash` | `string` | Yes | Transaction hash proving on-chain registration |
+
+**Returns:** `CommitCvmUpdateResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `correlationId` | `string` | Tracking ID |
+| `status` | `string` | Update status |
+
+**Example:**
+
+```typescript
+// Phase 1: prepare-only
+const result = await client.patchCvm({
+  id: "my-app",
+  docker_compose_file: newComposeYaml,
+  prepareOnly: true,
+});
+
+if (result.requiresOnChainHash && result.commitToken) {
+  // ... multisig approval and on-chain registration happen externally ...
+
+  // Phase 2: commit with token
+  const committed = await client.commitCvmUpdate({
+    id: "my-app",
+    token: result.commitToken,
+    composeHash: result.composeHash,
+    transactionHash: "0x...",
+  });
+  console.log(`Update started: ${committed.correlationId}`);
+}
+```

@@ -84,15 +84,36 @@ await client.commitCvmProvision({
 **Example — On-chain KMS (ETHEREUM/BASE):**
 
 ```typescript
+import { deployAppAuth } from "@phala/cloud";
+
+// Step 1: Provision — reserves the CVM but does not start it
 const provision = await client.provisionCvm({
   name: "my-app",
   compose_file: { docker_compose_file: composeYaml },
   kms: "ETHEREUM",
 });
 
-// On-chain KMS does NOT return app_id — deploy a contract to get one
-// See the on-chain KMS guide for the full flow
+// Step 2: Deploy an AppAuth contract to obtain an app_id
+const deployed = await deployAppAuth({
+  chain: provision.kms_info!.chain,
+  rpcUrl: "https://...",
+  kmsContractAddress: provision.kms_info!.kms_contract_address,
+  privateKey: "0x...",
+  deviceId: provision.device_id,
+  composeHash: provision.compose_hash,
+});
+
+// Step 3: Commit — finalizes the deployment and starts the CVM
+await client.commitCvmProvision({
+  app_id: deployed.appId,
+  compose_hash: provision.compose_hash,
+  kms_id: provision.kms_id!,
+  contract_address: deployed.appAuthAddress,
+  deployer_address: deployed.deployer,
+});
 ```
+
+For the full on-chain KMS flow including environment encryption and wallet setup, see the [On-chain KMS Guide](/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide).
 
 <Note>
 The combined size of `docker_compose_file` and `pre_launch_script` must not exceed 200KB.

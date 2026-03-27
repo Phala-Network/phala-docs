@@ -90,3 +90,44 @@ reserved.app_ids.forEach(({ app_id, nonce }) => {
   console.log(`Reserved: ${app_id} (nonce: ${nonce})`);
 });
 ```
+
+---
+
+## getKmsOnChainDetail
+
+`GET /kms/on-chain/{chain}`
+
+Returns on-chain KMS details for a specific blockchain, including all registered contracts with their devices and OS images. This is useful for inspecting the on-chain state of KMS infrastructure across a chain.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | `string` | Yes | Chain name (e.g., `"base"`, `"ethereum"`) |
+
+**Returns:** `GetKmsOnChainDetailResponse`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chain_name` | `string` | Blockchain name |
+| `chain_id` | `number` | Blockchain chain ID |
+| `contracts` | `array` | KMS contracts with `contract_address`, `chain_id`, `chain_name`, `devices`, `os_images` |
+
+Each contract includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `contract_address` | `string` | KMS contract address |
+| `devices` | `array` | Registered devices with `device_id`, `node_name`, `on_chain_allowed` |
+| `os_images` | `array` | OS images with `name`, `version`, `os_image_hash`, `on_chain_allowed` |
+
+**Example:**
+
+```typescript
+const detail = await client.getKmsOnChainDetail({ chain: "base" });
+console.log(`Chain: ${detail.chain_name} (${detail.chain_id})`);
+detail.contracts.forEach(c => {
+  console.log(`Contract: ${c.contract_address}`);
+  c.devices.forEach(d => console.log(`  Device: ${d.device_id} allowed=${d.on_chain_allowed}`));
+});
+```

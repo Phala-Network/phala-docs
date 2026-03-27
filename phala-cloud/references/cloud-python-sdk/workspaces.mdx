@@ -1,0 +1,151 @@
+---
+title: Workspaces
+description: List workspaces, get workspace details, query nodes, and check quotas.
+---
+
+Workspace methods let you query the workspaces (teams) you belong to, inspect their nodes, and check resource quotas. Every CVM belongs to a workspace, and quotas are enforced at the workspace level.
+
+## list_workspaces
+
+`GET /workspaces`
+
+Lists all workspaces the authenticated user has access to.
+
+**Parameters:** Optional dictionary of query parameters.
+
+**Returns:** List of workspace summaries.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+workspaces = client.list_workspaces()
+for ws in workspaces.items:
+    print(ws.slug, ws.name)
+```
+
+```python Async
+workspaces = await client.list_workspaces()
+for ws in workspaces.items:
+    print(ws.slug, ws.name)
+```
+
+</CodeGroup>
+
+---
+
+## get_workspace
+
+`GET /workspaces/{teamSlug}`
+
+Retrieves detailed information about a specific workspace. You can pass the team slug as a plain string or as a dictionary.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `team_slug` | `str` | Yes | Workspace slug identifier |
+
+**Returns:** Workspace detail response.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+# Pass slug directly as a string
+ws = client.get_workspace("my-team")
+
+# Or pass as a dict
+ws = client.get_workspace({"team_slug": "my-team"})
+print(ws.name)
+```
+
+```python Async
+ws = await client.get_workspace("my-team")
+print(ws.name)
+```
+
+</CodeGroup>
+
+---
+
+## get_workspace_nodes
+
+`GET /workspaces/{teamSlug}/nodes`
+
+Lists the TEE nodes available to a workspace. Supports pagination.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `team_slug` | `str` | Yes | Workspace slug identifier |
+| `page` | `int` | No | Page number (1-based) |
+| `page_size` | `int` | No | Items per page |
+
+**Returns:** Paginated list of workspace nodes.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+nodes = client.get_workspace_nodes({
+    "team_slug": "my-team",
+    "page": 1,
+    "page_size": 20,
+})
+for node in nodes.items:
+    print(node.id, node.name)
+```
+
+```python Async
+nodes = await client.get_workspace_nodes({
+    "team_slug": "my-team",
+    "page": 1,
+    "page_size": 20,
+})
+```
+
+</CodeGroup>
+
+---
+
+## get_workspace_quotas
+
+`GET /workspaces/{teamSlug}/quotas`
+
+Returns the resource quotas and current usage for a workspace. This includes limits on CVMs, vCPUs, memory, and other resources.
+
+Like `get_workspace`, you can pass the team slug as a string or dictionary.
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `team_slug` | `str` | Yes | Workspace slug identifier |
+
+**Returns:** Workspace quotas response with limits and current usage.
+
+**Example:**
+
+<CodeGroup>
+
+```python Sync
+quotas = client.get_workspace_quotas("my-team")
+print(quotas.model_dump())
+```
+
+```python Async
+quotas = await client.get_workspace_quotas("my-team")
+print(quotas.model_dump())
+```
+
+</CodeGroup>
+
+## Related
+
+- [Apps](/phala-cloud/references/cloud-python-sdk/apps) — app-level operations
+- [SDK Overview](/phala-cloud/references/cloud-python-sdk/overview) — full method listing

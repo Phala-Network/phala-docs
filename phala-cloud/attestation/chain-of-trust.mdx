@@ -3,7 +3,7 @@ description: Complete security checklist ensuring no verification gaps exist.
 title: Complete Chain of Trust
 ---
 
-Complete security checklist ensuring no verification gaps exist. This guide proves why each verification item is necessary and why together they're sufficient for trustless execution.
+Hardware attestation alone isn't enough — anyone in the supply chain can still compromise your security. This guide covers every verification item needed for trustless execution and proves they're sufficient together.
 
 ## Why Complete Verification Matters
 
@@ -46,7 +46,7 @@ flowchart TB
     Q --> V[Verification: Compare measurements against expected values]
 ```
 
-Six trust chains feed into one cryptographically signed attestation quote. Verification confirms each measurement matches your expected values.
+Six independent trust chains are recorded in one cryptographically signed attestation quote. Verification confirms each measurement matches your expected values.
 
 ## Application Verification Checklist
 
@@ -165,7 +165,7 @@ These items prove Phala's infrastructure is secure:
 **How to verify:** Use Phala Cloud API (verifies Intel signature automatically) or see [Verify the Platform: Hardware & Firmware](/phala-cloud/attestation/verify-the-platform#1-hardware--firmware-verification)
 
 ```bash
-curl -X POST "https://cloud-api.phala.network/api/v1/attestations/verify" \
+curl -X POST "https://cloud-api.phala.com/api/v1/attestations/verify" \
   -H "Content-Type: application/json" \
   -d '{"hex": "YOUR_QUOTE_HEX"}'
 ```

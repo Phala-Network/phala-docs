@@ -1,0 +1,92 @@
+---
+title: phala_ssh_key Resource
+description: Reference for the phala_ssh_key resource — manage account-level SSH keys on Phala Cloud.
+---
+
+`phala_ssh_key` manages SSH public keys at the account level in Phala Cloud. These keys can be referenced or injected into CVM deployments for SSH access.
+
+## Example Usage
+
+```hcl
+resource "phala_ssh_key" "laptop" {
+  name       = "laptop"
+  public_key = file("~/.ssh/id_ed25519.pub")
+}
+```
+
+You can also inline the key directly:
+
+```hcl
+resource "phala_ssh_key" "ci" {
+  name       = "ci-deploy"
+  public_key = "ssh-ed25519 AAAA... ci@example.com"
+}
+```
+
+## Required Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | Display name for the SSH key. **Immutable** — changing forces replacement. |
+| `public_key` | String | SSH public key content (e.g. the contents of `~/.ssh/id_ed25519.pub`). **Immutable** — changing forces replacement. |
+
+## Read-Only (Computed) Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | SSH key identifier assigned by the API. |
+| `fingerprint` | String | Computed key fingerprint. |
+| `key_type` | String | Key type (e.g. `ssh-ed25519`, `ssh-rsa`). |
+| `created_at` | String | Creation timestamp. |
+| `updated_at` | String | Last update timestamp. |
+| `source` | String | Key source metadata reported by the API. |
+
+## Behavior
+
+### Immutable Fields
+
+Both `name` and `public_key` are immutable. If you change either one, Terraform destroys the old key and creates a new one. This mirrors the DigitalOcean SSH key pattern where keys are treated as immutable identities.
+
+### SSH Keys vs. ssh_authorized_keys
+
+There are two ways to get SSH access into a CVM:
+
+1. **`phala_ssh_key` resource** — manages account-level keys in the Phala Cloud API. These persist across deployments.
+2. **`ssh_authorized_keys` on `phala_app`** — injects keys directly into a specific deployment at launch time. These are per-deployment and force-new.
+
+You can use both approaches together. The `ssh_authorized_keys` attribute on `phala_app` accepts raw public key strings, not references to `phala_ssh_key` resources.
+
+```hcl
+resource "phala_ssh_key" "laptop" {
+  name       = "laptop"
+  public_key = file("~/.ssh/id_ed25519.pub")
+}
+
+resource "phala_app" "web" {
+  name = "web-app"
+  size = "tdx.medium"
+  # Inject the key at deploy time
+  ssh_authorized_keys = [file("~/.ssh/id_ed25519.pub")]
+
+  docker_compose = <<-YAML
+    services:
+      web:
+        image: nginx:stable
+        ports:
+          - "80:80"
+  YAML
+}
+```
+
+### API Backing
+
+The resource uses these Phala Cloud API endpoints:
+
+- `POST /user/ssh-keys` — create
+- `GET /user/ssh-keys` — read
+- `DELETE /user/ssh-keys/{id}` — delete
+
+## Related
+
+- [phala_app Resource](/phala-cloud/references/terraform-provider/app-resource) — deploying apps with SSH access
+- [Examples](/phala-cloud/references/terraform-provider/examples) — SSH access patterns

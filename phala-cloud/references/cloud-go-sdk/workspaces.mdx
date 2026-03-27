@@ -1,0 +1,119 @@
+---
+title: Workspaces
+description: List workspaces, get workspace details, nodes, and quotas.
+---
+
+Workspace methods let you query your team workspaces and their associated resources. A workspace is a shared environment where team members collaborate on CVM deployments. Each workspace has its own nodes, quotas, and billing.
+
+## ListWorkspaces
+
+`GET /workspaces`
+
+Returns all workspaces accessible to the authenticated user.
+
+```go
+func (c *Client) ListWorkspaces(ctx context.Context) (*ListWorkspacesResponse, error)
+```
+
+**Returns:** `*ListWorkspacesResponse` (generic map containing workspace data)
+
+```go
+workspaces, err := client.ListWorkspaces(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+---
+
+## GetWorkspace
+
+`GET /workspaces/{slug}`
+
+Returns detailed information about a specific workspace, identified by its slug.
+
+```go
+func (c *Client) GetWorkspace(ctx context.Context, slug string) (*Workspace, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `slug` | `string` | Yes | Workspace slug (e.g., `"my-team"`) |
+
+**Returns:** `*Workspace` containing:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | `string` | Workspace ID |
+| `Name` | `string` | Display name |
+| `Slug` | `*string` | URL-friendly slug |
+| `Tier` | `string` | Subscription tier |
+| `Avatar` | `*string` | Avatar URL |
+
+```go
+ws, err := client.GetWorkspace(ctx, "my-team")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Workspace: %s (tier: %s)\n", ws.Name, ws.Tier)
+```
+
+---
+
+## GetWorkspaceNodes
+
+`GET /workspaces/{slug}/nodes`
+
+Returns TEE nodes available to a workspace, with optional pagination.
+
+```go
+func (c *Client) GetWorkspaceNodes(ctx context.Context, slug string, opts *PaginationOptions) (*WorkspaceNodes, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `slug` | `string` | Yes | Workspace slug |
+| `opts` | `*PaginationOptions` | No | Pagination (pass `nil` for defaults) |
+
+**Returns:** `*WorkspaceNodes` (generic map)
+
+```go
+nodes, err := client.GetWorkspaceNodes(ctx, "my-team", &phala.PaginationOptions{
+	Page:     phala.Int(1),
+	PageSize: phala.Int(20),
+})
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+---
+
+## GetWorkspaceQuotas
+
+`GET /workspaces/{slug}/quotas`
+
+Returns resource quotas and current usage for a workspace. Use this to check how much capacity is available before provisioning new CVMs.
+
+```go
+func (c *Client) GetWorkspaceQuotas(ctx context.Context, slug string) (*WorkspaceQuotas, error)
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `slug` | `string` | Yes | Workspace slug |
+
+**Returns:** `*WorkspaceQuotas` (generic map)
+
+```go
+quotas, err := client.GetWorkspaceQuotas(ctx, "my-team")
+if err != nil {
+	log.Fatal(err)
+}
+```

@@ -24,7 +24,7 @@ yarn add @phala/cloud
 ```typescript
 import { createClient } from "@phala/cloud";
 
-const client = createClient({ apiKey: "your-api-key" });
+const client = createClient({ apiKey: "phak_your_api_key" });
 
 // Get current user info
 const user = await client.getCurrentUser();
@@ -51,7 +51,7 @@ const client = createClient();
 ```typescript
 // Explicit configuration
 const client = createClient({
-  apiKey: "your-api-key",
+  apiKey: "phak_your_api_key",
   baseURL: "https://cloud-api.phala.com/api/v1",
   version: "2026-01-21",
   timeout: 30000,
@@ -77,7 +77,7 @@ For smaller bundles, use `createBaseClient` with individual action imports:
 ```typescript
 import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
 
-const client = createBaseClient({ apiKey: "your-api-key" });
+const client = createBaseClient({ apiKey: "phak_your_api_key" });
 
 // Call actions as standalone functions
 const user = await getCurrentUser(client);
@@ -91,7 +91,7 @@ const cvms = await getCvmList(client);
 ```typescript
 import { createBaseClient, getCurrentUser, getCvmList } from "@phala/cloud";
 
-const client = createBaseClient({ apiKey: "your-api-key" }).extend({
+const client = createBaseClient({ apiKey: "phak_your_api_key" }).extend({
   getCurrentUser,
   getCvmList,
 });
@@ -124,6 +124,9 @@ Actions marked with **V** return different response types depending on the clien
 | `getCvmContainersStats(request)` | Get container stats |
 | `getCvmAttestation(request)` | Get TEE attestation |
 | `getCvmPreLaunchScript(request)` | Get pre-launch script |
+| `getCvmStatusBatch(request)` | Get status of multiple CVMs |
+| `getCvmUserConfig(request)` | Get user-level CVM config |
+| `checkCvmIsAllowed(request)` | Check on-chain deployment allowance |
 
 ### CVM Lifecycle
 
@@ -136,6 +139,8 @@ Actions marked with **V** return different response types depending on the clien
 | `shutdownCvm(request)` | Shutdown a CVM |
 | `restartCvm(request)` | Restart a CVM |
 | `deleteCvm(request)` | Delete a CVM |
+| `replicateCvm(request)` | Create a copy of a CVM |
+| `watchCvmState(request)` | Watch CVM state changes via SSE |
 
 ### CVM Configuration
 
@@ -150,6 +155,11 @@ Actions marked with **V** return different response types depending on the clien
 | `getAvailableOsImages(request?)` | List available OS images |
 | `provisionCvmComposeFileUpdate(request)` | Provision a compose file update |
 | `commitCvmComposeFileUpdate(request)` | Commit a compose file update |
+| `patchCvm(request)` | Unified partial CVM update |
+| `confirmCvmPatch(request)` | Confirm on-chain KMS patch (Phase 2) |
+| `commitCvmUpdate(request)` | Commit update with token (multisig) |
+| `refreshCvmInstanceId(request)` | Refresh a CVM instance ID |
+| `refreshCvmInstanceIds(request)` | Batch refresh CVM instance IDs |
 
 ### Apps
 
@@ -159,7 +169,12 @@ Actions marked with **V** return different response types depending on the clien
 | `getAppInfo(request)` **V** | Get app details |
 | `getAppCvms(request)` **V** | List CVMs for an app |
 | `getAppRevisions(request)` | List app revision history |
+| `getAppRevisionDetail(request)` | Get app revision details |
 | `getAppFilterOptions()` | Get available filter options for app list |
+| `getAppAttestation(request)` | Get app TEE attestation |
+| `getAppDeviceAllowlist(request)` | Get app device allowlist status |
+| `checkAppIsAllowed(request)` | Check on-chain app allowance |
+| `checkAppCvmsIsAllowed(request)` | Batch check app CVMs allowance |
 
 ### Workspace
 
@@ -167,14 +182,17 @@ Actions marked with **V** return different response types depending on the clien
 |--------|-------------|
 | `listWorkspaces(request?)` | List workspaces |
 | `getWorkspace(request)` | Get workspace details |
+| `getWorkspaceNodes(request)` | Get workspace nodes |
+| `getWorkspaceQuotas(request)` | Get workspace resource quotas |
 
-### Nodes & Instance Types
+### Nodes, Instance Types & OS Images
 
 | Method | Description |
 |--------|-------------|
 | `getAvailableNodes()` | List available TEE nodes |
 | `listAllInstanceTypeFamilies()` | List all instance type families |
 | `listFamilyInstanceTypes(request)` | List instance types in a family |
+| `getOsImages(request?)` | List public OS images (paginated) |
 
 ### KMS (Key Management)
 
@@ -182,6 +200,7 @@ Actions marked with **V** return different response types depending on the clien
 |--------|-------------|
 | `getKmsInfo(request)` | Get KMS info |
 | `getKmsList(request?)` | List KMS instances |
+| `getKmsOnChainDetail(request)` | Get on-chain KMS details |
 | `getAppEnvEncryptPubKey(request)` | Get env encryption public key |
 | `nextAppIds(request?)` | Get next available app IDs |
 
@@ -194,6 +213,22 @@ Actions marked with **V** return different response types depending on the clien
 | `deleteSshKey(request)` | Remove an SSH key |
 | `importGithubProfileSshKeys(request)` | Import SSH keys from GitHub profile |
 | `syncGithubSshKeys()` | Sync SSH keys from GitHub |
+
+### On-Chain Contract Actions
+
+These functions interact directly with the blockchain, not the Phala Cloud API. They require ETH for gas (write operations) or a public client (read operations).
+
+| Method | Description |
+|--------|-------------|
+| `deployAppAuth(request)` | Deploy an AppAuth smart contract |
+| `addComposeHash(request)` | Register a compose hash on-chain |
+| `addDevice(request)` | Add a device to the on-chain allowlist |
+| `removeDevice(request)` | Remove a device from the on-chain allowlist |
+| `setAllowAnyDevice(request)` | Toggle the allow-any-device flag |
+| `getAllowedDevices(request)` | Query the on-chain device allowlist |
+| `checkDeviceAllowed(request)` | Check if a device is allowed on-chain |
+| `checkComposeHashAllowed(request)` | Check if a compose hash is allowed on-chain |
+| `checkOnChainPrerequisites(request)` | Batch check all on-chain prerequisites |
 
 ## Safe Methods
 
@@ -274,9 +309,35 @@ DEBUG=phala::api-client node your-script.js
 | `PHALA_CLOUD_API_KEY` | API key for authentication |
 | `PHALA_CLOUD_API_PREFIX` | Base URL for the API |
 
+## Webhook Signature Verification
+
+The SDK provides utilities for verifying webhook signatures, exported from a separate subpath to avoid bundling `node:crypto` into browser builds:
+
+```typescript
+import { verifyWebhookSignature, parseWebhookEvent } from "@phala/cloud/webhook";
+
+// Verify a single signature
+const isValid = verifyWebhookSignature({
+  secret: "whsec_...",
+  timestamp: req.headers["x-webhook-timestamp"],
+  body: rawBody,
+  signature: req.headers["x-webhook-signature"],
+});
+
+// Or parse and verify in one step
+const event = parseWebhookEvent({
+  headers: req.headers,
+  body: rawBody,
+  secret: "whsec_...",
+});
+```
+
+See [Webhooks](/phala-cloud/references/webhooks) for full payload format and delivery behavior.
+
 ## Related
 
 - [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) — version management and migration
 - [Schema Reference](/phala-cloud/references/cloud-js-sdk/schema-reference) — response schema details per version
 - [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling) — error classes and safe methods
-- [Cloud API Reference](https://cloud-api.phala.com/docs) — full REST API docs
+- [Webhooks](/phala-cloud/references/webhooks) — webhook events, signatures, and delivery
+- [Cloud API Reference](/phala-cloud/phala-cloud-api/overview) — full REST API docs

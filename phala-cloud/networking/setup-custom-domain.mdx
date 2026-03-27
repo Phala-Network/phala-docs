@@ -69,7 +69,7 @@ volumes:
   cert-data:  # Persistent storage for SSL certificates
 ```
 
-You will need to set `DOMAIN` and `TARGET_ENDPOINT` based on your deployment. The `DOMAIN` variable defines the domain name to expose the web service. The `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
+Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal endpoint. `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
 
 - `http://app:80` - Forward to service named "app" on port 80
 - `http://api:3000` - Forward to service named "api" on port 3000
@@ -100,7 +100,7 @@ In the Phala Cloud dashboard, add these encrypted secrets:
 
 ## Step 4: Deploy
 
-Deploy your updated docker-compose.yml through the dashboard. The first deployment takes a few minutes as it:
+Deploy your updated docker-compose.yml through the dashboard. The first deployment typically takes 3–5 minutes as it:
 
 1. Configures DNS records
 2. Requests SSL certificate from Let's Encrypt
@@ -208,7 +208,7 @@ Next renewal check in 12 hours
 
 ### Certbot Error: "too many certificates (5) already issued for this exact set of identifiers"
 
-You may forget to attached the data volume.
+You may have forgotten to attach the data volume.
 
 ### Other Common Issues
 
