@@ -3,6 +3,62 @@ title: Changelog
 description: Release history for the Phala Cloud CLI
 ---
 
+## [1.1.14](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.13...cli-v1.1.14) (2026-03-27)
+
+### feat
+
+* **cli:** add --prepare-only and --commit flags for multisig CVM updates ([99edfc0](https://github.com/Phala-Network/phala-cloud/commit/99edfc0f0a472bc8c92dc81dc1bebe26ac174ae0))
+* **cli:** show chain ID and block explorer URL in --prepare-only output ([6de7e4a](https://github.com/Phala-Network/phala-cloud/commit/6de7e4aec4a8e0be258ff1db4638f2bd4e961441))
+* display on-chain status in --prepare-only output ([f98f614](https://github.com/Phala-Network/phala-cloud/commit/f98f6149f13b9452099e23409964dcedbfb82ff7))
+* **js,cli:** add on-chain prerequisite checks and improve update flow ([d3209e1](https://github.com/Phala-Network/phala-cloud/commit/d3209e1fd2b0be61455f5ec69de64a7919b1b7e2))
+* **js:** add patchCvm and confirmCvmPatch for unified PATCH /cvms/{id} ([30cabaf](https://github.com/Phala-Network/phala-cloud/commit/30cabaf7084e72dbda656504d9f4359db95e2a16))
+
+### fix
+
+* **cli:** --commit mode no longer requires API key ([39bdd7a](https://github.com/Phala-Network/phala-cloud/commit/39bdd7ae98cfb39579a471e0abda3ba86cd56fb4))
+* **cli:** 0x prefix on explorer URL, expired token hint ([4cb7398](https://github.com/Phala-Network/phala-cloud/commit/4cb73980850cab2a9f95f08ba0d1433c39a1faab))
+* **cli:** add 0x prefix to compose hash in --prepare-only output ([62e4122](https://github.com/Phala-Network/phala-cloud/commit/62e4122486c281b82de0b538839ae3cff2ca6671))
+* **cli:** add missing return after --prepare-only warning on non-on-chain CVM ([6a4abb8](https://github.com/Phala-Network/phala-cloud/commit/6a4abb8fc27fadcd90f3dc27f3cc5dc9b0a5755b))
+* **cli:** fix --prepare-only output formatting for shell continuation ([732cbb8](https://github.com/Phala-Network/phala-cloud/commit/732cbb82787b04479db04d0d29f760bae78ca895))
+* **cli:** fix --prepare-only output indentation, make --transaction-hash optional ([79e695f](https://github.com/Phala-Network/phala-cloud/commit/79e695f3402e38ba0c7233c30a517c63472157b2))
+* **cli:** warn when --prepare-only used on non-on-chain KMS CVM ([f874b65](https://github.com/Phala-Network/phala-cloud/commit/f874b6526bcfe130e2078e5ecf4a7a64a429869c))
+* **js,cli:** add missing files and fix compose hash tx verification ([7656a45](https://github.com/Phala-Network/phala-cloud/commit/7656a459ced2843a03146d6757fd019ede2f1f53))
+
+## [1.1.13](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.12...cli-v1.1.13) (2026-03-14)
+
+### feat
+
+* add device management blockchain actions to SDK and CLI ([290ca2a](https://github.com/Phala-Network/phala-cloud/commit/290ca2a8d4b246b8d9d4b87281132bf573128989))
+* add os-images listing, kms on-chain detail to SDK and CLI ([9fe5c9a](https://github.com/Phala-Network/phala-cloud/commit/9fe5c9a845ca6c46d3c8777eeb8eec50476a396b))
+* add phala cvms device-allowlist CLI command ([6d7b48f](https://github.com/Phala-Network/phala-cloud/commit/6d7b48f58198e85e17bc48aef56948a61f4e84dd))
+* **cli,sdk:** add --fs option to deploy command for filesystem selection ([716723d](https://github.com/Phala-Network/phala-cloud/commit/716723d5e6a4ca3f443ee073dc8f74c44af162d6))
+* **cli:** add --wait RPC verification for device allowlist ops ([97447f0](https://github.com/Phala-Network/phala-cloud/commit/97447f01a25a8642d50f8658ca3b005ec9cda6de))
+* **cli:** add `phala envs encrypt` and `phala envs update` commands ([ddd4cfc](https://github.com/Phala-Network/phala-cloud/commit/ddd4cfc4a8c56970685d0c0478b8a5e807e99fe0))
+* **cli:** add disallow-any and toggle-allow-any commands ([dbff4e5](https://github.com/Phala-Network/phala-cloud/commit/dbff4e5007d4241dad40270bfe62875011af0581))
+* **cli:** add interactive multi-select for devices add/remove ([4f0f2d4](https://github.com/Phala-Network/phala-cloud/commit/4f0f2d4560cdbfd944a784fae09d4de12ab1c002))
+* **cli:** add pagination flags to os-images command ([1ef6cd9](https://github.com/Phala-Network/phala-cloud/commit/1ef6cd941d88a9818e4ce196e145a9159427348b))
+* **cli:** move device allowlist to top-level `phala allow-devices` ([430cd9c](https://github.com/Phala-Network/phala-cloud/commit/430cd9cd7a6e44a9f89ed0f6301e82128bae06a0))
+* **kms:** simplify CLI output and include device node names ([e48019c](https://github.com/Phala-Network/phala-cloud/commit/e48019cb972c96c049aadc2e285f4b3a06de0c14))
+* query and display contract owner in allow-devices list ([37fe2e1](https://github.com/Phala-Network/phala-cloud/commit/37fe2e124880f59b3e9bb0087cafb71b350781f5))
+
+### fix
+
+* **cli:** add viem as direct dependency for CI type-check ([bcc4df3](https://github.com/Phala-Network/phala-cloud/commit/bcc4df3bebea07e564743e17ccf0456e35734a3e))
+* **cli:** address Sentry review issues in allow-devices commands ([a205282](https://github.com/Phala-Network/phala-cloud/commit/a2052828f9f5ce8324b1dbefed4df3109720c7b1))
+* **cli:** ensure timeout floor of 5000ms for small command groups ([370eb98](https://github.com/Phala-Network/phala-cloud/commit/370eb985abc7a1e7b18a1de8339688ff2f7dc7eb))
+* **cli:** exclude already-allowed devices from add interactive list ([f0a6b53](https://github.com/Phala-Network/phala-cloud/commit/f0a6b53ce52af6ad6d34624a707096e699a3d71d))
+* **cli:** fix node name matching and separate chain line in ls ([b7a4ce3](https://github.com/Phala-Network/phala-cloud/commit/b7a4ce3ba68b5cb3713c95421bfbb5ef1ee9595e))
+* **cli:** increase timeout for command existence compat tests ([a9889be](https://github.com/Phala-Network/phala-cloud/commit/a9889befdc562c4d02f38a40ad7090ab101cf7dd))
+* **cli:** query chain directly for allow-devices list ([b40d8e3](https://github.com/Phala-Network/phala-cloud/commit/b40d8e39220c9a7f6491456ea2133faa3087a626))
+* **cli:** remove redundant status column from devices list ([b49744d](https://github.com/Phala-Network/phala-cloud/commit/b49744df0407cd66b98dcfd0769b6fea644ad461))
+* **cli:** use shared walletClient with nonceManager for batch tx ([ef93049](https://github.com/Phala-Network/phala-cloud/commit/ef93049ccf2293bfa3ecf8440fc70cccc6fa9be7))
+* guard against null app_id in device-allowlist command ([0b8bdd8](https://github.com/Phala-Network/phala-cloud/commit/0b8bdd802c4d93bf8d41f1f6a77e603bdf0b506c))
+* replace event scanning with readContract for device allowlist ([fb2a4b2](https://github.com/Phala-Network/phala-cloud/commit/fb2a4b275912d4bd2931c1b12d3b5b1368a26458))
+
+### perf
+
+* **cli:** skip prerequisite checks in batch add/remove ([e814237](https://github.com/Phala-Network/phala-cloud/commit/e814237bbf9259a9d7a397a9bfb7adec2f0d29c8))
+
 ## [1.1.12](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.12-beta.1...cli-v1.1.12) (2026-03-04)
 
 ### feat

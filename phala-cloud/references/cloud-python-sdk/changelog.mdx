@@ -3,9 +3,23 @@ title: Changelog
 description: Version history for the Phala Cloud Python SDK.
 ---
 
-## 0.1.1
+## 0.1.2
 
-Current release.
+### feat
+
+* add webhook signature verification utilities ([45df4da](https://github.com/Phala-Network/phala-cloud/commit/45df4da))
+* add is-allowed API to JS, Python, and Go SDKs ([1fa61f0](https://github.com/Phala-Network/phala-cloud/commit/1fa61f0581ce111213f721f1c2d2f4744c3c2f00))
+* add structured error codes and idempotency support across all SDKs ([2dd6d0b](https://github.com/Phala-Network/phala-cloud/commit/2dd6d0bae4d5fd7acdef551c3c9bf507ac1b0e4e))
+* add `patch_cvm` and `confirm_cvm_patch` for unified PATCH endpoint ([7e167e2](https://github.com/Phala-Network/phala-cloud/commit/7e167e2))
+
+### fix
+
+* use AliasModel for request types with field aliases ([b4e8ac0](https://github.com/Phala-Network/phala-cloud/commit/b4e8ac0))
+* dispatch error subclasses in `_to_api_error` ([b36b7f2](https://github.com/Phala-Network/phala-cloud/commit/b36b7f2))
+* fix Pydantic alias models and CI format issues ([8814d7f](https://github.com/Phala-Network/phala-cloud/commit/8814d7f))
+* fix SDK bugs found by e2e tests and rewrite e2e test suite ([04a4638](https://github.com/Phala-Network/phala-cloud/commit/04a4638))
+
+## 0.1.1
 
 - Added `patch_cvm` and `confirm_cvm_patch` for batch CVM updates with on-chain hash support
 - Added `replicate_cvm` for creating CVM replicas
