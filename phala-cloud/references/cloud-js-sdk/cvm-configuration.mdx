@@ -171,11 +171,21 @@ Provisions a compose file update — the first phase of a two-phase compose file
 | `id` | `string` | Yes | CVM identifier (also accepts `uuid`) |
 | `app_compose` | `object` | Yes | Updated compose file object |
 
-**Returns:** `ProvisionCvmComposeFileUpdateResult` with `compose_hash`.
+**Returns:** `ProvisionCvmComposeFileUpdateResult`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `compose_hash` | `string` | Hash of the provisioned compose file. Pass it to `commitCvmComposeFileUpdate`. |
+| `compose_hash_registered` | `boolean` | On-chain KMS only: `true` if the hash is already registered on the AppAuth contract. When `true`, skip [`addComposeHash`](/phala-cloud/references/cloud-js-sdk/add-compose-hash) and call `commitCvmComposeFileUpdate` directly. |
+| `app_id` | `string \| null` | App identifier of the target CVM. |
+| `device_id` | `string \| null` | Device identifier of the target CVM. |
+| `kms_info` | `object \| null` | KMS metadata for the target CVM. Present for on-chain KMS CVMs. |
 
 **Example:**
 
 ```typescript
+import { addComposeHash } from "@phala/cloud";
+
 const compose = await client.getCvmComposeFile({ id: "my-app" });
 compose.docker_compose_file = newYaml;
 
@@ -183,7 +193,23 @@ const provision = await client.provisionCvmComposeFileUpdate({
   uuid: "my-app",
   app_compose: compose,
 });
-console.log(provision.compose_hash);
+
+if (provision.kms_info && !provision.compose_hash_registered) {
+  // On-chain KMS: register the new hash before commit.
+  // See addComposeHash docs for the full parameter set.
+  await addComposeHash({
+    chain: provision.kms_info.chain,
+    kmsContractAddress: provision.kms_info.kms_contract_address,
+    appId: provision.app_id as `0x${string}`,
+    composeHash: provision.compose_hash,
+    privateKey: process.env.ETH_PRIVATE_KEY as `0x${string}`,
+  });
+}
+
+await client.commitCvmComposeFileUpdate({
+  id: "my-app",
+  compose_hash: provision.compose_hash,
+});
 ```
 
 ---

@@ -1,6 +1,6 @@
 ---
 title: "allow-devices"
-description: "Manage on-chain device allowlist for a CVM's app contract"
+description: "Manage on-chain device allowlist for an app contract"
 ---
 
 <Note>
@@ -17,7 +17,7 @@ phala allow-devices <command> [options]
 
 ### Description
 
-Manage on-chain device allowlist for a CVM's app contract
+Manage on-chain device allowlist for an app contract
 
 ### Global Options
 
@@ -25,19 +25,22 @@ Manage on-chain device allowlist for a CVM's app contract
 | ------ | ----------- |
 | `-h, --help` | Show help information for the current command |
 | `-v, --version` | Show CLI version |
-| `--api-token TOKEN, --api-key TOKEN` | API token used for authentication |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
 | `-j, --json, --no-json` | Output in JSON format |
+| `--interactive` | Enable interactive mode for commands that support it |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
 ### Subcommands
 
 | Command | Description |
 | ------- | ----------- |
-| `list` | (ls)         List allowed devices from the on-chain contract |
-| `add` | Add device(s) to the on-chain allowlist |
-| `remove` | (rm)       Remove device(s) from the on-chain allowlist |
-| `allow-any` | Set allow-any-device flag on the contract |
-| `disallow-any` | Disable allow-any-device on the contract |
+| `list` | List allowed devices from the on-chain contract |
+| `add` | Add devices to the on-chain allowlist |
+| `remove` | Remove devices from the on-chain allowlist |
+| `allow-any` | Set the allow-any-device flag on the contract. Requires --enable or --disable. |
+| `disallow-any` | Disable allow-any-device on the contract. Equivalent to `allow-any --disable`. |
 | `toggle-allow-any` | Toggle allow-any-device on the contract (or force via --enable/--disable) |
 
 ### Examples

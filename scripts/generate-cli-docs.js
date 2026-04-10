@@ -114,7 +114,7 @@ function parseHelpOutput(output, commandPath) {
 
     // Detect section headers
     // Match both "Available commands:" and grouped headers like "Deploy:", "Manage:", etc.
-    if (trimmedLine === "Available commands:") {
+    if (trimmedLine === "Available commands:" || trimmedLine === "Subcommands:") {
       section = "commands";
       continue;
     }
@@ -131,6 +131,12 @@ function parseHelpOutput(output, commandPath) {
       !trimmedLine.startsWith("Examples:") &&
       !trimmedLine.startsWith("Pass-through")
     ) {
+      // "Help topics:" lists bundled help topics (e.g., `phala help envs`),
+      // not real commands — skip the whole section.
+      if (trimmedLine === "Help topics:") {
+        section = "helpTopics";
+        continue;
+      }
       // Command group header (e.g., "Deploy:", "Manage:", "CVM operations:")
       section = "commands";
       continue;
@@ -180,14 +186,25 @@ function parseHelpOutput(output, commandPath) {
 
     // Parse sections
     if (section === "commands" && trimmedLine) {
+      // Subcommand entries are always indented. Lines at column 0
+      // (e.g. trailing prose like `Use "phala help <topic>" to read a topic.`)
+      // are not commands.
+      if (!/^\s{2,}/.test(line)) {
+        continue;
+      }
       // Format: "  command-name    Description [DEPRECATED]"
+      // Also handles "  command (alias)    Description" by stripping the
+      // "(alias)" marker from the description after matching.
       const match = trimmedLine.match(
         /^(\S+)\s+(.+?)(?:\s+\[(DEPRECATED|UNSTABLE)\])?(?:\s+\[(DEPRECATED|UNSTABLE)\])?$/
       );
       if (match) {
+        let description = match[2].trim();
+        // Strip leading alias markers like "(list)" from descriptions
+        description = description.replace(/^\([^)]+\)\s+/, "");
         const subCmd = {
           name: match[1],
-          description: match[2].trim(),
+          description,
           deprecated: false,
           unstable: false,
         };
