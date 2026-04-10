@@ -1,6 +1,5 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "openapi": "openapi.json",
   "colors": {
     "dark": "#9FDC00",
     "light": "#E8FF7A",
@@ -195,6 +194,7 @@
                   "/phala-cloud/cvm/set-secure-environment-variables",
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/multi-replica-scaling",
+                  "/phala-cloud/cvm/replicating-cvms",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
                   "/phala-cloud/cvm/image/overview",
                   "/phala-cloud/storage/access-database",
@@ -326,13 +326,22 @@
                 ]
               },
               {
-                "group": "Key Management",
+                "group": "Onchain KMS",
                 "pages": [
                   "/phala-cloud/key-management/key-management-protocol",
                   "/phala-cloud/key-management/cloud-vs-onchain-kms",
-                  "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide",
-                  "/phala-cloud/key-management/get-a-key",
-                  "/phala-cloud/key-management/create-crypto-wallet"
+                  "/phala-cloud/key-management/understanding-onchain-kms",
+                  "/phala-cloud/key-management/deploying-with-onchain-kms",
+                  "/phala-cloud/key-management/updating-with-onchain-kms",
+                  "/phala-cloud/key-management/device-management",
+                  "/phala-cloud/key-management/multisig-governance",
+                  {
+                    "group": "Derived Keys",
+                    "pages": [
+                      "/phala-cloud/key-management/get-a-key",
+                      "/phala-cloud/key-management/create-crypto-wallet"
+                    ]
+                  }
                 ]
               },
               {
@@ -781,7 +790,12 @@
       }
     ]
   },
+  "openapi": "openapi.json",
   "redirects": [
+    {
+      "destination": "/phala-cloud/key-management/deploying-with-onchain-kms",
+      "source": "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide"
+    },
     {
       "destination": "/phala-cloud/phala-cloud-cli/login",
       "source": "/phala-cloud/references/phala-cloud-cli/phala/auth"
