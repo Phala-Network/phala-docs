@@ -16,6 +16,8 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 - **Module 02** - Inventory
 - **Module 03** - CVM Operations
 - **Module 04** - Workspace
+- **Module 05** - Credentials
+- **Module 06** - Authentication (OAuth redirect errors — not returned as JSON API responses)
 
 ---
 
@@ -28,10 +30,10 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-01-002` | `ComposeFileRequiredError` | The request contains invalid parameters<br/>*Raised when compose_file is required but not provided* |
 | `ERR-01-003` | `InvalidComposeFileError` | The Docker Compose file contains errors<br/>*Raised when Docker Compose file is invalid* |
 | `ERR-01-004` | `DuplicateCvmNameError` | (dynamic: A CVM with name '...)<br/>*Raised when a CVM name already exists in the workspace (HTTP 409)* |
-| `ERR-01-005` | `HashRegistrationRequired` | Compose hash registration required on-chain<br/>*Raised when compose hash needs to be registered on-chain (HTTP 465)* |
-| `ERR-01-006` | `HashInvalidOrExpired` | The provided compose hash is invalid or has expired<br/>*Raised when compose hash is invalid or expired (HTTP 466)* |
-| `ERR-01-007` | `TxVerificationFailed` | Transaction verification failed<br/>*Raised when transaction verification fails (HTTP 467)* |
-| `ERR-01-008` | `HashNotAllowed` | The compose hash is not allowed by the on-chain contract<br/>*Raised when compose hash is not allowed by the contract (HTTP 468)* |
+| `ERR-01-005` | `HashRegistrationRequired` | Compose hash registration required on-chain<br/>*Raised by an onchain KMS compose update when the new compose hash is not yet on DstackApp.allowedComposeHashes; the response carries commit_token, commit_url, and the on-chain action needed to complete the prepare-approve-commit flow (HTTP 465)* |
+| `ERR-01-006` | `HashInvalidOrExpired` | The provided compose hash is invalid or has expired<br/>*Raised at commit time when the commit token is unknown, has expired (14-day TTL), has been superseded by a newer prepare for the same CVM, or the compose hash bound to the token no longer matches the compose file currently saved for this CVM — re-run prepare to recover (HTTP 466)* |
+| `ERR-01-007` | `TxVerificationFailed` | Transaction verification failed<br/>*Raised at commit time when the supplied transaction_hash cannot be verified against the expected addComposeHash state change — the receipt is missing, the transaction reverted, or it did not target the expected DstackApp contract (HTTP 467)* |
+| `ERR-01-008` | `HashNotAllowed` | The compose hash is not allowed by the on-chain contract<br/>*Raised at commit time when DstackApp.allowedComposeHashes(bytes32) returns false for the target hash — typically because the Phase 2 approval transaction has not actually landed on the expected contract, or landed on the wrong contract (HTTP 468)* |
 
 
 ## Module 02: Inventory
@@ -54,6 +56,7 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-02-013` | `OsImageNotCompatibleError` | The requested operating system image is not available<br/>*Raised when no compatible OS image is found.* |
 | `ERR-02-014` | `NodeCapacityNotConfiguredError` | The requested node is not available<br/>*Raised when node capacity is not properly configured.* |
 | `ERR-02-015` | `QuotaExceededError` | Your account has reached its resource quota<br/>*Raised when team resource quota would be exceeded.* |
+| `ERR-02-016` | `GpuDeviceInUseError` | GPUs are available but currently occupied at device level<br/>*Raised when GPUs are available in database but occupied at device level.* |
 
 
 ## Module 03: CVM Operations
@@ -61,9 +64,16 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 
 | Error Code | Exception Class | Message |
 |------------|----------------|---------|
-| `ERR-03-001` | `CvmNotFoundError` | The requested CVM was not found<br/>*Raised when a CVM is not found by the given identifier.* |
+| `ERR-03-001` | `CvmNotFoundError` | The requested CVM was not found<br/>*Raised when a CVM is not found by the given identifier (HTTP 404).* |
 | `ERR-03-002` | `MultipleCvmsWithSameNameError` | Multiple CVMs have the same name in this workspace<br/>*Raised when multiple CVMs share the same name in a workspace.* |
-| `ERR-03-005` | `CvmAccessDeniedError` | The requested CVM was not found<br/>*Raised when user lacks permission for CVM operation.* |
+| `ERR-03-003` | `CvmNotInWorkspaceError` | No CVM found in this workspace<br/>*Raised in admin contexts when a CVM exists but belongs to a different workspace — reveals the workspace mismatch (HTTP 404).* |
+| `ERR-03-004` | `CvmNotInWorkspaceError` | The requested CVM was not found<br/>*Raised in non-admin contexts when a CVM belongs to a different workspace — message matches ERR-03-001 to avoid leaking CVM existence (HTTP 404).* |
+| `ERR-03-005` | `CvmAccessDeniedError` | The requested CVM was not found<br/>*Raised when user lacks permission for a CVM operation — message intentionally matches ERR-03-001 to avoid revealing whether the CVM exists (HTTP 404).* |
+| `ERR-03-006` | `ReplicaImageNotAvailableError` | The source CVM's OS image is not available on the target node<br/>*Raised when the source CVM's OS image is not available on the target node.* |
+| `ERR-03-007` | `CvmAppIdConflictError` | This app_id already has an active CVM with a different configuration. Provision again to get a new app_id, or use the existing CVM.<br/>*Raised when app_id is already used by a different configuration in the same workspace (HTTP 409).* |
+| `ERR-03-008` | `ReplicaSourceInstanceNotAccessibleError` | The source CVM instance was not found in this workspace or access is denied<br/>*Raised when the replica source CVM instance is not visible in the current workspace (HTTP 404).* |
+| `ERR-03-009` | `ReplicaComposeHashRequiredError` | This app has multiple live CVM instances. Please specify compose_hash to choose which revision to replicate.<br/>*Raised when replicate needs an explicit compose_hash due to multiple live instances.* |
+| `ERR-03-010` | `MultipleCvmsForIdentifierError` | Multiple CVMs match this identifier in the workspace<br/>*Raised when an identifier (e.g. app_id) matches multiple CVMs in a workspace.* |
 
 
 ## Module 04: Workspace
@@ -71,9 +81,18 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 
 | Error Code | Exception Class | Message |
 |------------|----------------|---------|
-| `ERR-04-001` | `InsufficientBalanceError` | Your account balance is too low to create new resources<br/>*Raised when account balance is too low* |
+| `ERR-04-001` | `InsufficientBalanceError` | You need to top up your account before launching a CVM.<br/>*Raised when account balance is too low* |
 | `ERR-04-002` | `MaxCvmLimitError` | Your account has reached the maximum number of instances<br/>*Raised when VM count limit is reached* |
 | `ERR-04-003` | `ResourceLimitExceededError` | The requested resources exceed your account limits<br/>*Raised when resource limits are exceeded* |
+
+
+## Module 05: Credentials
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-05-001` | `TokenLimitExceededError` | (dynamic: You have reached the maximum of ...)<br/>*Raised when workspace token limit is exceeded* |
+| `ERR-05-002` | `TokenRateLimitError` | (dynamic: Rate limit exceeded: maximum ...)<br/>*Raised when token creation rate limit is exceeded* |
 
 
 ---
