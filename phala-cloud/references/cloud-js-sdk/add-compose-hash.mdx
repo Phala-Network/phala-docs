@@ -9,7 +9,14 @@ Registers a new compose hash on the AppAuth smart contract. This is required whe
 
 This function interacts directly with the blockchain (not the Phala Cloud API).
 
-**When to use:** Call this function when [`updateDockerCompose`](/phala-cloud/references/cloud-js-sdk/update-docker-compose), [`updateCvmEnvs`](/phala-cloud/references/cloud-js-sdk/update-cvm-envs), or [`updatePreLaunchScript`](/phala-cloud/references/cloud-js-sdk/cvm-configuration) returns `{ status: "precondition_required" }`.
+**When to use.** Call this function in either of these cases:
+
+- [`updateDockerCompose`](/phala-cloud/references/cloud-js-sdk/update-docker-compose), [`updateCvmEnvs`](/phala-cloud/references/cloud-js-sdk/update-cvm-envs), or [`updatePreLaunchScript`](/phala-cloud/references/cloud-js-sdk/cvm-configuration) returns `{ status: "precondition_required" }`.
+- [`provisionCvmComposeFileUpdate`](/phala-cloud/references/cloud-js-sdk/cvm-configuration#provisioncvmcomposefileupdate) returns `compose_hash_registered: false`, and you need to register the hash before calling `commitCvmComposeFileUpdate`.
+
+<Note>
+**Contract owner pre-check.** Before submitting the transaction, the function reads `owner()` from the AppAuth contract and throws if the sender address does not match. This fails fast so you don't waste gas on a transaction that would revert on-chain. Sign with the contract owner's private key, or pass a wallet client whose account is the contract owner.
+</Note>
 
 **Parameters:**
 

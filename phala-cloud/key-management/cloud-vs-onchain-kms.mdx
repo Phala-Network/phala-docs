@@ -82,12 +82,11 @@ Phala Cloud supports Onchain KMS on both Ethereum and Base. Ethereum has higher 
 <AccordionGroup>
   <Accordion title="Ethereum">
 
-    Parameters of the Ethereum KMS 
+    Parameters of the Ethereum KMS
 
     | | |
     | ----- | ----- |
     | Contract Address | [0xd343a3f5593b93D8056aB5D60c433622d7D65a80](https://etherscan.io/address/0xd343a3f5593b93D8056aB5D60c433622d7D65a80#code) |
-    | RPC | https://kms.dstack-eth-prod5.phala.network <br/> https://kms.dstack-eth-prod7.phala.network <br/> https://kms.dstack-eth-prod9.phala.network |
     | Gateway Address | [0xd343a3f5593b93D8056aB5D60c433622d7D65a80](https://etherscan.io/address/0xd343a3f5593b93D8056aB5D60c433622d7D65a80#code) |
 
   </Accordion>
@@ -98,7 +97,6 @@ Phala Cloud supports Onchain KMS on both Ethereum and Base. Ethereum has higher 
     | | |
     | ----- | ----- |
     | Contract Address | [0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C](https://basescan.org/address/0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C#code) |
-    | RPC | https://kms.dstack-base-prod5.phala.network <br/> https://kms.dstack-base-prod7.phala.network <br/> https://kms.dstack-base-prod9.phala.network |
     | Gateway Address | [0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C](https://basescan.org/address/0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C#code) |
 
   </Accordion>
@@ -106,9 +104,7 @@ Phala Cloud supports Onchain KMS on both Ethereum and Base. Ethereum has higher 
 
 ## Updating CVMs with Onchain KMS
 
-Any change that affects the compose hash requires on-chain registration. The CLI handles this automatically when you have the private key, or supports a two-phase flow for multisig wallets.
-
-See the [On-Chain KMS Guide](/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide) for detailed CLI and SDK workflows.
+Any change that affects the compose hash requires on-chain registration. When you hold the DstackApp owner key as an EOA, [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms) walks through the single-command flow. When the owner is a Safe, timelock, or DAO contract, [Multisig and Governance](/phala-cloud/key-management/multisig-governance) covers the prepare-and-commit flow plus webhook automation for approvers.
 
 ## Security
 

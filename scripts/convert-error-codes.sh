@@ -1,12 +1,12 @@
 #!/bin/bash
-# Convert error-codes.md from phala-cloud-monorepo to MDX format
+# Convert error-codes.md from the teehouse monorepo to MDX format
 # Usage: ./scripts/convert-error-codes.sh
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-SOURCE_FILE="$REPO_ROOT/../phala-cloud-monorepo/docs/error-codes.md"
+SOURCE_FILE="$REPO_ROOT/../../docs/error-codes.md"
 OUTPUT_FILE="$REPO_ROOT/phala-cloud/references/error-codes.mdx"
 
 if [ ! -f "$SOURCE_FILE" ]; then
@@ -32,7 +32,13 @@ FRONTMATTER
     # 2. Remove "Adding New Errors" section and everything after
     # 3. Remove teehouse module path references (internal implementation details)
     # 4. Remove -000 errors (base class exceptions, not user-facing)
-    sed -n '1,/^## Adding New Errors/{ /^## Adding New Errors/d; /^\*\*Source:\*\*/d; p }' "$SOURCE_FILE" \
+    # Using awk for portability (BSD sed on macOS does not support the
+    # multi-command range form used previously).
+    awk '
+        /^## Adding New Errors/ { exit }
+        /^\*\*Source:\*\*/      { next }
+                                { print }
+    ' "$SOURCE_FILE" \
         | sed 's/ (`teehouse[^`]*`)//g' \
         | grep -v 'ERR-[0-9][0-9]-000'
 

@@ -1,70 +1,59 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
+description: Landing page for CVM creation and management on Phala Cloud. Links to deployment methods, scaling, and lifecycle operations.
 title: CVM Overview
 ---
 
-## Choose Your Preferred Method
+## Choose Your Deployment Method
 
-Phala Cloud offers multiple ways to create and deploy your Confidential Virtual Machine (CVM). Learn about [Confidential Virtual Machine technology](https://phala.com/confidential-vm) and its enterprise applications.
+Phala Cloud offers multiple ways to create and deploy a Confidential Virtual Machine (CVM). Learn about [Confidential Virtual Machine technology](https://phala.com/confidential-vm) and its enterprise applications.
 
-### Option 1: Using the Phala Cloud UI (Recommended for Beginners)
+### Option 1: Phala Cloud dashboard
 
-The Phala Cloud UI walks you through CVM creation with a visual interface:
+The dashboard walks you through CVM creation with a visual interface. Use it if you are new to Phala Cloud, prefer graphical tooling, or want to deploy without touching the command line.
 
 [**Create with Docker Compose →**](/phala-cloud/cvm/create-with-docker-compose)
 
-Use the Phala Cloud UI if you:
+### Option 2: `phala` CLI
 
-* Are new to Phala Cloud
-* Prefer graphical interfaces
-* Want quick deployments without command-line knowledge
-
-### Option 2: Using the Command Line Interface (CLI)
-
-For developers who prefer terminal-based workflows or need to automate deployments:
+The CLI is the right tool for automated deployments, CI/CD pipelines, and scriptable infrastructure. Use it if you are comfortable in a terminal and want reproducible deployments.
 
 [**Follow the CLI Guide →**](/phala-cloud/phala-cloud-cli/start-from-cloud-cli)
 
-Use the CLI if you:
-
-* Need automated deployments
-* Work with CI/CD pipelines
-* Prefer terminal-based workflows
-* Want scriptable infrastructure
-
 ## CVM Management Features
 
-After deployment, you can monitor, upgrade, and resize your CVMs from the dashboard or API.
+After deployment, manage your CVMs from the dashboard or the API.
 
 ### Monitoring
 
-* **CVM Status**: Track the health and status of your CVMs
-* **Resource Usage**: Monitor CPU, memory, and storage consumption
-* **Logs**: View application logs and system messages
+- **CVM status** — track the health and status of your CVMs
+- **Resource usage** — monitor CPU, memory, and storage consumption
+- **Logs** — view application logs and system messages
 
 ### Upgrades
 
-* **Environment Variables**: Update your application's environment variables
-* **Docker Images**: Upgrade your application's Docker image
-* **Resource Allocation**: Adjust your CVM's CPU, memory, and storage
+- **Environment variables** — update your application's encrypted secrets
+- **Docker images** — upgrade your application's Docker image
+- **Resource allocation** — adjust CPU, memory, and storage
 
-### Resizing
+### Scaling
 
-* **Resource Scaling**: Dynamically adjust your CVM's CPU, memory, and storage
-* **Cost Optimization**: Reduce your cloud spending by downsizing your CVM
+- **Horizontal scaling** — run multiple replicas of the same CVM for availability and regional distribution. See [Scale with Multiple Replicas](/phala-cloud/cvm/multi-replica-scaling) for concepts and [Replicating CVMs](/phala-cloud/cvm/replicating-cvms) for concrete steps.
+- **Vertical scaling** — [resize a single CVM's CPU, memory, or disk](/phala-cloud/update/resize-resource) to handle more load per instance.
 
 ### Security
 
-* **Data Protection**: E2E encrypt your sensitive data at rest
-* **Access Control**: Restrict access to your CVMs and logs
+- **Data protection** — end-to-end encryption of sensitive data at rest
+- **Access control** — restrict who can reach your CVMs and their logs
 
 ## CVM Management API
 
-Phala Cloud provides an [API](/phala-cloud/phala-cloud-api/overview) for managing your CVMs, allowing you to automate your CVM management tasks.
+Phala Cloud provides an [API](/phala-cloud/phala-cloud-api/overview) for managing CVMs programmatically.
 
 ## Next Steps
 
-After creating your CVM, you'll want to:
+After creating your CVM, you probably want to:
 
-* [Access your applications](/phala-cloud/networking/expose-http-service)
-* [Set up monitoring](/phala-cloud/monitoring/public-logs)
+- [Set secure environment variables](/phala-cloud/cvm/set-secure-environment-variables)
+- [Expose an HTTP service](/phala-cloud/networking/expose-http-service)
+- [Set up monitoring](/phala-cloud/monitoring/public-logs)
+- [Replicate the CVM for scale or availability](/phala-cloud/cvm/replicating-cvms)

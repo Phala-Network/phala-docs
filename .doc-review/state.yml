@@ -1,7 +1,7 @@
 # Documentation review state — tracks audit progress and terminology decisions.
 # Managed by /doc-review skill. Committed to version control.
 version: 1
-last_run: 2026-03-26T12:00:00Z
+last_run: 2026-04-10T14:00:00Z
 docs_root: .
 phase: 3
 documents:
@@ -114,9 +114,14 @@ documents:
       - "CVM not introduced on first use (acceptable for reference page)"
       - "Replay protection buried in accordion"
   phala-cloud/references/error-codes.mdx:
-    phase: 0
+    phase: 3
     baseline: 2026-03-24T16:00:00Z
-    issues: 4
+    structure: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
+    consistency: 2026-04-10T12:00:00Z
+    issues: 0
+    deferred:
+      - "HTTP status codes not shown as separate column — embedded in descriptions for non-standard codes only (400 is default for unlisted errors)"
   phala-cloud/references/cloud-js-sdk/overview.mdx:
     phase: 0
     baseline: 2026-03-24T16:00:00Z
@@ -206,6 +211,39 @@ documents:
     structure: 2026-03-26T12:00:00Z
     copy: 2026-03-26T12:00:00Z
     consistency: 2026-03-26T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/references/cloud-js-sdk/add-compose-hash.mdx:
+    phase: 4
+    baseline: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/references/cloud-js-sdk/cvm-configuration.mdx:
+    phase: 4
+    baseline: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/key-management/deploying-with-onchain-kms.mdx:
+    phase: 2
+    baseline: 2026-04-10T12:00:00Z
+    structure: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/key-management/device-management.mdx:
+    phase: 2
+    baseline: 2026-04-10T12:00:00Z
+    structure: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
+    issues: 0
+    deferred: []
+  phala-cloud/key-management/multisig-governance.mdx:
+    phase: 2
+    baseline: 2026-04-10T12:00:00Z
+    structure: 2026-04-10T12:00:00Z
+    copy: 2026-04-10T12:00:00Z
     issues: 0
     deferred: []
 terminology:

@@ -1,0 +1,104 @@
+---
+title: Understanding Onchain KMS
+description: The mental model behind Onchain KMS — which contracts exist, who signs what, and how the KMS verifies your CVM at boot time.
+---
+
+Onchain KMS puts a smart contract in the critical path between your CVM and the keys it needs to run. The contract decides which code is allowed, which hardware is allowed, and who can change either list. Phala Cloud can read the contract, but it cannot write to it — every authorization change originates from your wallet.
+
+This page is the conceptual reference. Read it once before your first deploy so the rest of the Onchain KMS docs click into place. If you already have the mental model and want to ship, go straight to [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms).
+
+For the higher-level "should I use Cloud KMS or Onchain KMS?" comparison, see [Cloud vs Onchain KMS](/phala-cloud/key-management/cloud-vs-onchain-kms). For the underlying protocol and threat model, see [What is KMS](/phala-cloud/key-management/key-management-protocol).
+
+## Two Contracts
+
+Two contracts cooperate to authorize your CVM.
+
+**KmsAuth** is a shared contract that Phala operates, one per chain. There is a single KmsAuth deployment on Ethereum and a separate one on Base. It knows the identity of the KMS nodes running inside TEE, keeps a list of approved dstack OS images, and exposes a factory method that mints a new per-application contract. You interact with KmsAuth exactly once per application, when you deploy a new app.
+
+**DstackApp** is a per-application contract that you deploy through the KmsAuth factory. Each CVM is bound to one DstackApp. It stores three things that matter for the rest of these docs:
+
+- `owner` — the address that can add or remove allowlisted code and devices. Initially this is the wallet that deployed the DstackApp. You can transfer it to a Safe, a timelock, or any contract.
+- `allowedComposeHashes` — the set of compose hashes that are allowed to run under this application identity. Detailed in [What the compose hash is](#what-the-compose-hash-is) below.
+- `allowedDeviceIds` — the set of TDX device identities that are allowed to host this application. Detailed in [Device Management](/phala-cloud/key-management/device-management).
+
+The critical property is that **Phala Cloud's backend does not send any transaction on your behalf.** Deploying the DstackApp, adding a compose hash, and adding a device are all writes initiated by either the CLI (which signs with `--private-key`) or a browser wallet connected through the dashboard. The backend only reads the chain afterwards to verify that the state it expects is actually there.
+
+Contract addresses for each chain are listed under the `Ethereum` and `Base` accordions in [Cloud vs Onchain KMS](/phala-cloud/key-management/cloud-vs-onchain-kms#ethereum-vs-base).
+
+## Who Writes What, and When
+
+It helps to keep a mental table of who signs which transaction:
+
+| Operation | Contract | Who signs |
+| --- | --- | --- |
+| First deploy (creates DstackApp + registers first compose hash + first device) | `KmsAuth.deployAndRegisterApp` | Your wallet (CLI `--private-key` or browser wallet) |
+| Add a new compose hash (update the running code) | `DstackApp.addComposeHash` | The DstackApp owner |
+| Add a new device (allow a new node to host the CVM) | `DstackApp.addDevice` | The DstackApp owner |
+| Transfer ownership to a Safe / timelock / DAO | `DstackApp.transferOwnership` | The current DstackApp owner |
+
+Phala Cloud's backend appears nowhere in that table. It offers to compute `compose_hash` and `device_id` for you during provisioning, but neither value is a secret — both are deterministic functions of inputs you control, so you can compute and verify them yourself if you want. The backend never writes to the chain.
+
+## What the Compose Hash Is
+
+The `compose_hash` is the SHA-256 of a canonicalized JSON document called **`app-compose.json`**, not a hash of `docker-compose.yml` by itself. `app-compose.json` is the dstack manifest for your application and includes all of the following fields — any one of which, if changed, changes the hash:
+
+- `manifest_version`
+- `name`
+- `runner` — `docker-compose`, `bash`, etc.
+- `docker_compose_file` — the full compose file contents embedded as a string (for `runner: docker-compose`)
+- `bash_script` — the script contents (for `runner: bash`)
+- `pre_launch_script` — optional
+- `kms_enabled`, `gateway_enabled`, `local_key_provider_enabled`, `key_provider`, `key_provider_id`
+- `allowed_envs` — whitelist of environment variable names your workload may read
+- `public_logs`, `public_sysinfo`, `public_tcbinfo`
+- `no_instance_id`, `secure_time`, `storage_fs`, `swap_size`
+
+See the [`AppCompose` definition in dstack-types](https://github.com/Dstack-TEE/dstack/blob/master/dstack-types/src/lib.rs) for the authoritative list of fields.
+
+Canonicalization sorts the object keys alphabetically and serializes with a specific JSON variant so that the hash is deterministic regardless of which tool produced it. The CLI exports [`getComposeHash()`](https://github.com/Phala-Network/phala-cloud/blob/main/js/src/utils/get_compose_hash.ts) from `@phala/cloud` if you want to compute the hash in your own code and compare it against what the backend or the contract reports.
+
+Two consequences worth keeping in mind:
+
+- **Any change to `app-compose.json` — not just the compose file inside it, but any field — produces a new compose hash.** Toggling `public_logs`, adding an entry to `allowed_envs`, or bumping the `runner` all change the hash. Each change requires a new on-chain `addComposeHash` call before the CVM can start.
+- **Bumping a Docker image tag inside `docker_compose_file` changes the embedded string, which changes the compose hash.** You cannot sneak a new image under an old allowlisted hash.
+
+## What the Device ID Is
+
+The `device_id` is a derivation of the TDX platform identifier (PPID) for the node where the CVM is scheduled. If the scheduler places your CVM on a new node, the device ID will be different, and the DstackApp has to allowlist it before the KMS will release keys on that node. [Device Management](/phala-cloud/key-management/device-management) covers the derivation, drift, and recovery scenarios in detail. For the rest of these onchain KMS guides, you only need to know that the CLI and dashboard add the current node's device ID to the allowlist for you during the first deploy.
+
+## Boot-Time Verification Flow
+
+When a CVM starts and asks the KMS for keys, the sequence is:
+
+```
+CVM boots inside TDX
+    |
+    v
+Worker generates a TDX quote bound to the running compose hash + device ID
+    |
+    v
+KMS verifies the TDX quote against Intel's attestation roots
+    |
+    v
+KMS reads the DstackApp contract:
+    - DstackApp.allowedComposeHashes(composeHash) == true ?
+    - DstackApp.allowedDeviceIds(deviceId) == true
+      (or DstackApp.allowAnyDevice() == true)
+    |
+    v
+Both checks pass
+    |
+    v
+KMS releases derived application keys over an attested channel
+```
+
+Every gate in this flow is either a hardware attestation check or a contract read. There is no Phala-operated allowlist in the middle. If the DstackApp rejects the CVM, the CVM never sees its keys, regardless of what the Phala Cloud backend believes. That is the chain of trust Onchain KMS buys you: the policy enforcement lives in code that thousands of blockchain nodes agree on, not on a server you have to trust.
+
+The implication for threat modeling is concrete. If Phala Cloud's backend were compromised and an attacker tried to push a new compose hash to your CVM without your consent, they could not do it — the KMS would check the DstackApp, see that the new hash is not in `allowedComposeHashes`, and refuse to release keys. The only way to get a new compose hash past the KMS is to convince your wallet (or your Safe, or your DAO) to sign `addComposeHash`. See [What is KMS](/phala-cloud/key-management/key-management-protocol) for the full threat model, including why "every operation involving key authorization changes must be initiated onchain" is a design principle.
+
+## Next Steps
+
+- [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms) — the first-deploy walkthrough via the dashboard or the CLI, with a worked example and verification steps.
+- [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms) — how to roll a new compose file when the DstackApp owner is a plain wallet you control.
+- [Device Management](/phala-cloud/key-management/device-management) — PPID, device_id derivation, HA allowlist patterns, and recovering from hardware drift.
+- [Multisig and Governance](/phala-cloud/key-management/multisig-governance) — the prepare-and-commit flow when the DstackApp owner is a Safe, timelock, or DAO contract.

@@ -13,7 +13,7 @@ CVM's TEE can decrypt them at boot time.
 
 Encrypted secrets are a list of key-value pairs that are passed into the docker compose file in the
 same way as the variables defined in `.env` files. You should first define the encrypted secrets in
-the Phala Cloud UI (or CLI), and then reference them in the docker compose file using the `${KEY}`
+the dashboard (or CLI), and then reference them in the docker compose file using the `${KEY}`
 syntax.
 
 A typical use case is passing secrets to your containers via environment variables, using the
@@ -22,7 +22,7 @@ A typical use case is passing secrets to your containers via environment variabl
 <Warning>
 Updating encrypted secrets is a **full replacement** operation. You cannot update a single variable
 — every update requires submitting the complete set of all variables. This applies to both the
-Dashboard UI and the CLI.
+dashboard and the CLI.
 </Warning>
 
 1.  **Declare Environment Variables in Docker Compose**
@@ -41,7 +41,7 @@ Dashboard UI and the CLI.
     > ❌ `OPENAI_API_KEY="${OPENAI_API_KEY_IN_ENV}"`
 2.  **Set Values in Encrypted Secrets**
 
-    Configure the actual values in the **Encrypted Secrets** section of the Phala Cloud UI.
+    Configure the actual values in the **Encrypted Secrets** section of the dashboard.
 
 <Frame caption="Encrypted Secrets configuration interface">
     <img src="/images/cloud-set-env.png" alt="Setting environment variables in Encrypted Secrets" />
@@ -62,7 +62,7 @@ We recommend using **Text** type for environment variables if you have many vari
 
 ## Set Secrets via CLI
 
-The CLI encrypts variables locally before sending them, just like the Dashboard does.
+The CLI encrypts variables locally before sending them, just like the dashboard does.
 
 ```bash
 # Pass individual variables
@@ -174,7 +174,7 @@ Even in auto-encryption mode, plaintext values are stored in your Terraform stat
 
 **Use a `.env` file locally for development.** Keep a `.env.example` in your repo with placeholder values and add `.env` to `.gitignore`. This makes it easy for teammates to set up their own credentials.
 
-**Rotate secrets by redeploying.** When you update encrypted secrets, the CVM restarts to pick up the new values. Plan for brief downtime or use replicas to maintain availability during rotation.
+**Rotate secrets by redeploying.** When you update encrypted secrets, the CVM restarts to pick up the new values. Plan for brief downtime, or run [multiple replicas](/phala-cloud/cvm/replicating-cvms) and rotate them one at a time to maintain availability.
 
 **Keep secret names consistent.** Use the same key names in your compose file and encrypted secrets to avoid confusion. While Phala Cloud allows different names, matching them makes your configuration easier to audit.
 

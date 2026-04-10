@@ -1,0 +1,306 @@
+---
+title: Device Management
+description: Manage which physical nodes can run your Onchain KMS app by controlling the on-chain device allowlist.
+---
+
+When you use Onchain KMS, your `DstackApp` contract keeps a list of the physical nodes that are allowed to run your application. If a node is not on that list, the KMS will refuse to hand it keys — and your CVM cannot boot there.
+
+This page is for operators of an already-deployed Onchain KMS app. It covers how device identity works, how to view the allowlist, how to add and remove nodes from the CLI and the dashboard, and how to recover when a node's identity changes after a hardware upgrade.
+
+If you have not deployed an Onchain KMS app yet, start with [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms). For the conceptual model behind `compose_hash` and `device_id`, see [Understanding Onchain KMS](/phala-cloud/key-management/understanding-onchain-kms).
+
+## Why Device Identity Matters
+
+Onchain KMS decides whether to release keys based on three things: the TEE attestation quote, the code that is running (`compose_hash`), and the physical node the code is running on (`device_id`). All three must match values that your `DstackApp` contract considers valid.
+
+The device check is the one most operators overlook. When your CVM is created on node A, the deployment flow registers node A's `device_id` in the allowlist for you. But if you later replicate the CVM to node B for high availability, migrate it to node C after a hardware failure, or the same node's underlying identity changes after a BIOS update, the KMS will look up the new `device_id` on-chain, find it missing, and deny the key request. The CVM will fail to boot and you will see a device-not-allowed rejection in the boot log.
+
+Managing the allowlist is therefore a routine operational task whenever you change where your app runs. It is also the main knob for auditability: the allowlist, together with the on-chain events emitted when it changes, gives you a cryptographic record of exactly which machines were ever authorized to run your code.
+
+## What a `device_id` Is
+
+Every Intel TDX host exposes a **Platform Provisioning ID** (PPID) — a hardware-level identifier derived from the CPU and the platform's provisioning keys. Two different machines have different PPIDs. The same machine, under normal operation, keeps the same PPID across reboots.
+
+Phala Cloud surfaces each node's PPID to the workspaces that are allowed to deploy to it. PPID is not a global public directory — you can see the PPID and `device_id` of the nodes listed in your own workspace's deployable node list (for example, in the node picker inside the create-CVM wizard). Nodes you cannot deploy to are not exposed.
+
+Phala Cloud and the `DstackApp` contract never store the raw PPID on-chain. Instead they store the SHA-256 hash of the PPID bytes — `device_id = sha256(ppid)`. This derivation is implemented in dstack's attestation library ([`dstack-attest/src/attestation.rs`](https://github.com/Dstack-TEE/dstack/blob/master/dstack-attest/src/attestation.rs)) and is the same value that Phala Cloud surfaces in the node list, writes to the `DstackApp.allowedDeviceIds` mapping, and checks at boot time.
+
+This derivation gives you:
+
+- A fixed-length 32-byte value, represented as a 64-character hex string off-chain and as `bytes32` on-chain.
+- A stable one-to-one mapping: one physical node corresponds to one `device_id` under normal operation.
+- No reversibility: the on-chain value does not leak the PPID to third parties.
+
+### When `device_id` Changes
+
+The PPID is not completely immutable. It can change when the platform's provisioning state changes — most commonly after:
+
+- A BIOS firmware update
+- A CPU microcode update
+- Some motherboard replacements or TDX re-provisioning events
+
+When the PPID changes, `sha256(new_ppid)` changes too, so the node presents a new `device_id` the next time it asks KMS for keys. Phala Cloud keeps an internal history of per-node device identity changes so operators can audit when a node's identity changed, but the on-chain contract does not know about the old-to-new mapping. Any CVMs whose allowlist still points at the stale `device_id` will need the new one added before they can boot again.
+
+<Note>
+  A `device_id` change is not a security incident on its own — it is an expected consequence of firmware maintenance. It only becomes a problem because an allowlist entry that used to match the node no longer matches it.
+</Note>
+
+## The On-Chain Allowlist Model
+
+The `DstackApp` contract stores two pieces of state that control device access:
+
+- `allowedDeviceIds(bytes32) → bool` — a mapping from `device_id` to whether that device is allowed.
+- `allowAnyDevice() → bool` — a bypass flag. When `true`, the per-device mapping is ignored and any node in the KMS's scope is allowed.
+
+All writes are gated by the contract's `owner`. The following functions all revert if called by anyone other than the owner:
+
+```solidity
+function addDevice(bytes32 deviceId) external;
+function removeDevice(bytes32 deviceId) external;
+function setAllowAnyDevice(bool _allowAnyDevice) external;
+```
+
+And the contract emits one event per change:
+
+```solidity
+event DeviceAdded(bytes32 deviceId);
+event DeviceRemoved(bytes32 deviceId);
+event AllowAnyDeviceSet(bool allowAny);
+```
+
+Those events are what auditors and monitoring tools should watch. They give you an immutable, timestamped log of every allowlist mutation on your app.
+
+## Viewing the Current Allowlist
+
+You have three independent ways to look at the state of the allowlist. They should always agree; if they do not, trust the on-chain view.
+
+### Dashboard
+
+Open your app in the Phala Cloud dashboard at `https://cloud.phala.com/<workspace>/apps/<app-address>` and scroll the app overview page to the **Device Allowlist** section in the right sidebar.
+
+![Device Allowlist section with Allow any device toggle and device rows](/images/cloud/device-allowlist.jpg)
+
+Every time you open this page, the dashboard reads the current on-chain allowlist **and** cross-checks it against the `device_id` of every node your CVMs are actually running on. If any deployed node is missing from the allowlist — including the common case where a BIOS or microcode update silently drifted a node's PPID — a warning banner appears at the top of the section, and the offending rows are highlighted so you can act on them without having to hunt for the mismatch.
+
+The panel shows:
+
+- An **Allow any device** row at the top. When on, the contract's `allowAnyDevice` flag is `true` and the per-device toggles below are effectively ignored.
+- One row per known device. The list is merged from two sources — devices your CVMs are currently running on (whether or not they are allowed) and devices on nodes your workspace can deploy to. Each row shows the 32-byte `device_id` (click to copy), the node name with a region flag where available, and a status icon: green check for allowed, amber triangle for deployed-but-not-allowed, grey X for known-but-not-deployed.
+
+If your connected wallet is the contract owner, each row has a toggle that sends the matching on-chain transaction through your wallet — that is how you remediate a PPID drift without leaving the dashboard. If the owner is not an EOA you control, the toggles are hidden; see the [Non-EOA Owner](#non-eoa-owner) callout below.
+
+### CLI
+
+```bash
+phala allow-devices list <cvm_or_app_id>
+```
+
+`<cvm_or_app_id>` can be a CVM UUID, a CVM name, an `instance_id`, or an `app_id` (raw hex or `app_` prefixed). The command resolves it to the underlying `DstackApp` contract and queries the chain directly.
+
+Example output:
+
+```
+Contract: 0x1234…abcd
+Chain:    Base
+Owner:    0xabcd…1234
+Allow Any Device: no
+DEVICE_ID                                                            NODE
+0xaabbccdd…                                                          prod6
+0x11223344…                                                          use2
+```
+
+<Tip>
+  To discover the `device_id` of every node your workspace can deploy to, run `phala nodes ls`. The output includes `ID`, `NAME`, `REGION`, `PPID`, `DEVICE_ID`, and `VERSION` columns, so you can pick the node name or paste its `device_id` directly into the write commands below.
+</Tip>
+
+When `allowAnyDevice` is on, the per-device table is not printed (the underlying read would just echo every queried ID back without meaning).
+
+You can pass `--rpc-url <URL>` (or set `ETH_RPC_URL`) to use a specific RPC endpoint. `list` never signs anything, so `--private-key` is not required.
+
+For machine-readable output, pass `--json`.
+
+### On-Chain (Independent Verification)
+
+Because the contract is public, anyone can read the allowlist directly without going through Phala Cloud. On Basescan or Etherscan, open your app contract, switch to **Contract → Read Contract**, and call:
+
+- `allowAnyDevice()` — returns `true` or `false`.
+- `allowedDeviceIds(bytes32)` — paste the 32-byte `device_id` (with the `0x` prefix) and read the boolean result.
+
+This is the most trustworthy view. If the dashboard or the CLI ever disagrees with the contract, the contract is right.
+
+## Adding and Removing Devices from the CLI
+
+All write commands need two things:
+
+- A signing key with enough gas on the target chain. Pass `--private-key 0x…` or set `PRIVATE_KEY` in your environment.
+- An RPC URL for the chain. Pass `--rpc-url <URL>` or set `ETH_RPC_URL`. If omitted, the CLI falls back to the chain's public default RPC, which is frequently rate-limited; use a dedicated RPC for anything beyond a quick experiment.
+
+Every write command accepts an optional `--wait` flag. Without `--wait`, the command returns as soon as the transaction is submitted. With `--wait`, it polls the RPC until the on-chain state reflects the change (or times out after roughly one minute).
+
+<Warning>
+  The signing wallet you pass with `--private-key` must be the `DstackApp` contract owner. If ownership has been transferred to a Safe, a timelock, or any other contract, the transaction will revert and the CLI will report a failure. See the [Non-EOA Owner](#non-eoa-owner) section.
+</Warning>
+
+### Add a Device
+
+```bash
+phala allow-devices add <cvm_or_app_id> <device> \
+  --private-key 0x...
+```
+
+`<device>` can be either a node name (as shown by `phala nodes ls`, for example `prod6` or `use2`) or a 32-byte hex string (with or without `0x`). When you pass a node name, the CLI looks it up against your workspace's deployable-node list and resolves it to the node's current `device_id`. Ambiguous names are rejected rather than guessed.
+
+```bash
+# By node name (recommended — survives device_id drift if you rerun it)
+phala allow-devices add my-cvm prod6 --private-key 0x...
+
+# By raw device_id
+phala allow-devices add my-cvm 0xaabbccdd... --private-key 0x...
+```
+
+Interactive mode selects from nodes you have access to but which are not yet on the allowlist:
+
+```bash
+phala allow-devices add <cvm_or_app_id> -i --private-key 0x...
+```
+
+The CLI prints a checkbox list of candidate nodes (`<name>  <device_id>`), lets you multi-select, then submits one `addDevice(bytes32)` transaction per selection.
+
+Successful output looks like:
+
+```
+Submitting add-device transaction for 0xaabbccdd...
+RPC URL: https://base-mainnet.example.com
+Add-device transaction for 0xaabbccdd... submitted: 0xdeadbeef...
+Explorer:    https://basescan.org/tx/0xdeadbeef...
+Waiting for 1 confirmation...
+Added 0xaabbccdd...
+Transaction: 0xdeadbeef...
+Explorer:    https://basescan.org/tx/0xdeadbeef...
+Backend allowlist API may lag behind chain. Use --wait to verify via RPC.
+```
+
+Underlying contract call: `addDevice(bytes32 deviceId)`. The contract emits `DeviceAdded(deviceId)` on success.
+
+### Remove a Device
+
+```bash
+phala allow-devices remove <cvm_or_app_id> <device_id> \
+  --private-key 0x... \
+  --rpc-url https://base-mainnet.example.com
+```
+
+Interactive removal lists the devices currently marked `allowed` by the backend:
+
+```bash
+phala allow-devices remove <cvm_or_app_id> -i --private-key 0x...
+```
+
+Underlying contract call: `removeDevice(bytes32 deviceId)`. The contract emits `DeviceRemoved(deviceId)`.
+
+<Note>
+  Removing a device while `allowAnyDevice` is `true` has no practical effect — the bypass flag still lets the node boot. The CLI warns about this when you use `--wait`:
+
+  ```
+  Warning: allowAnyDevice is enabled — removed devices still appear as allowed. Disable allow-any-device first if you want per-device enforcement.
+  ```
+</Note>
+
+### Enable or Disable the "Allow Any Device" Bypass
+
+```bash
+phala allow-devices allow-any <cvm_or_app_id> --enable --private-key 0x...
+phala allow-devices allow-any <cvm_or_app_id> --disable --private-key 0x...
+```
+
+You must pass exactly one of `--enable` or `--disable`; the command refuses to run otherwise. Underlying call: `setAllowAnyDevice(bool)`. The contract emits `AllowAnyDeviceSet(allowAny)`.
+
+`disallow-any` is a shortcut that only turns the flag off:
+
+```bash
+phala allow-devices disallow-any <cvm_or_app_id> --private-key 0x...
+```
+
+It is equivalent to `allow-any --disable`. Use whichever reads better in your runbooks.
+
+`toggle-allow-any` flips the current state (or forces it with `--enable` / `--disable`):
+
+```bash
+phala allow-devices toggle-allow-any <cvm_or_app_id> --private-key 0x...
+```
+
+Without any flag, it reads the current `allowAnyDevice` value from the backend and sends a transaction to set the opposite. Pass `--enable` or `--disable` if you want to assert a specific end state instead of toggling.
+
+## Multi-Replica and HA Patterns
+
+When an app runs on more than one node — whether for geographical redundancy, scaling, or active failover — you have two broad strategies:
+
+### Option A: Precise Allowlist
+
+Maintain a per-node allowlist using `addDevice` and `removeDevice`. Every node the app is allowed to run on has an explicit on-chain entry.
+
+- **Pros.** You get a cryptographic audit trail of exactly which physical machines were ever authorized to execute your app. Removing a node is a provable, on-chain event. This is the strongest model for compliance-sensitive workloads and for auditors that want to reason about the blast radius of a compromise.
+- **Cons.** Operational overhead. Adding capacity is a signed transaction; so is rotating out a failed node; so is recovering from a BIOS-driven `device_id` change.
+
+### Option B: `allowAnyDevice = true`
+
+Flip the bypass flag. The contract stops checking `allowedDeviceIds` and permits **any Phala Cloud node attached to this KMS** to host the app. The "any" is scoped to hosts that the KMS already considers trusted — hosts that have passed dstack-KMS onboarding and are part of the Phala Cloud fleet — not any random TEE machine on the internet.
+
+- **Pros.** You can scale freely across any Phala Cloud node without touching the allowlist. No per-migration overhead.
+- **Cons.** Weaker audit guarantees. Any Phala Cloud host the KMS considers trusted can attempt to run your app, and your on-chain record no longer pins execution to a specific set of machines.
+
+<Warning>
+  `allowAnyDevice = true` trades cryptographic per-node enforcement for operational convenience. For production workloads where execution locality is part of your threat model or compliance story, prefer Option A and accept the operational cost.
+</Warning>
+
+For production and audit-sensitive deployments we recommend Option A. Use Option B only when the simplicity is genuinely worth giving up the per-node audit trail.
+
+## Recovering from a Hardware Upgrade
+
+When a node's PPID changes after a BIOS, microcode, or platform update, any CVM whose allowlist entry still references the old `device_id` will stop booting there.
+
+**Symptoms.**
+
+- CVMs on the affected node fail to start or fail to obtain keys on the next reboot.
+- The boot log or the dashboard warning banner reports that the node's `device_id` is not on the allowlist.
+- `phala allow-devices list <cvm_or_app_id>` does not include the node's current `device_id`.
+
+**Recovery.**
+
+1. Look up the node's **new** `device_id` by running `phala nodes ls`. The output shows one row per deployable node, including the current `device_id` after any drift. The quickest path is to either remember the node name (for example `prod6`) or copy the new 32-byte hex value.
+2. Add the node back to the app's allowlist. You can pass either the node name or the raw `device_id`:
+   ```bash
+   phala allow-devices add <cvm-name-or-id> prod6 \
+     --private-key 0x... \
+     --wait
+   ```
+   The CLI resolves `prod6` against your workspace's node list and submits `addDevice(bytes32)` with the node's current `device_id`. If you prefer to be explicit, pass the 32-byte hex value instead:
+   ```bash
+   phala allow-devices add <cvm-name-or-id> 0x<new_device_id> \
+     --private-key 0x... \
+     --wait
+   ```
+3. The dashboard's **Device Allowlist** section is the fastest way to check the result — open `https://cloud.phala.com/<workspace>/apps/<app-address>`, and the warning banner for this node should be gone.
+4. Restart the CVM on the affected node. It should now complete the KMS handshake and boot successfully.
+5. Optionally, remove the old `device_id` with `phala allow-devices remove` once you are sure nothing else needs it.
+
+If the CVM was actively running on the node at the moment the platform update took effect, expect a brief window of downtime between the old identity being invalidated and the new one being authorized. You can shorten that window by preparing and signing the `addDevice` transaction in advance of the maintenance.
+
+## Non-EOA Owner
+
+<Warning>
+  The `phala allow-devices` commands assume the `DstackApp` owner is an externally-owned account whose private key you hold. If your app's owner is a Safe, a timelock, a DAO, or any other contract, the `--private-key` path will not work — the transaction will be sent from an EOA that the contract considers unauthorized, and it will revert.
+
+  The CLI does **not** currently support a `--prepare-only` mode for device operations. For non-EOA owners you must call the contract directly through your governance tooling:
+
+  - **Safe.** Open the Safe Transaction Builder, point it at your `DstackApp` contract address, and call `addDevice(bytes32)`, `removeDevice(bytes32)`, or `setAllowAnyDevice(bool)` with the 32-byte `device_id` you want to change.
+  - **Timelock.** Queue the same call through the timelock's `schedule` / `execute` flow.
+  - **Custom governance contract.** Use whatever path your contract exposes for executing arbitrary calls against external contracts.
+
+  See [Multisig and Governance](/phala-cloud/key-management/multisig-governance) for the full walkthrough of managing an Onchain KMS app whose owner is a multisig or timelock.
+</Warning>
+
+## Next Steps
+
+- [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms) — the prerequisite for everything on this page. Covers the first-time deploy of a `DstackApp` contract and its initial `device_id` / `compose_hash` registration.
+- [Multisig and Governance](/phala-cloud/key-management/multisig-governance) — how to operate an app whose owner is a Safe, a timelock, or a DAO, including the manual path for device operations when the CLI's `--private-key` flow cannot be used.
