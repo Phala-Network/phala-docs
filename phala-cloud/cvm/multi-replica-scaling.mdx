@@ -1,197 +1,74 @@
 ---
 title: Scale with Multiple Replicas
-description: Run multiple copies of your CVM for availability and load distribution using Terraform, SDKs, or the CLI.
+description: Understand when replicas make sense, what you get from them, and where they fall short. For concrete replication steps, see Replicating CVMs.
 ---
 
-Replicas let you run multiple copies of the same application across different TEE nodes. Each replica is an independent CVM that shares the same Docker Compose configuration and environment variables, but runs in its own isolated TEE enclave. This gives you both horizontal scaling and fault tolerance.
+Replicas let you run several copies of the same application side by side on Phala Cloud. This page covers the concepts and the decision criteria. For concrete dashboard and CLI steps, see [Replicating CVMs](/phala-cloud/cvm/replicating-cvms).
 
-## How Replicas Work
+## What a Replica Is
 
-When you create replicas of an app, Phala Cloud provisions separate CVMs that share a single `app_id`. All replicas use the same compose file and encrypted secrets. If you update the compose or environment, every replica picks up the change.
+A replica is an independent CVM instance provisioned from an existing source CVM. Replicas of the same app share an `app_id` and the same compose hash, but each replica has its own:
 
-Each replica gets its own CVM ID, endpoint URL, and TEE attestation. Traffic is not automatically load-balanced between replicas — add an external load balancer or DNS-based routing to distribute requests.
+- `vm_uuid`, endpoint URL, and internal IP
+- TEE attestation report
+- Process state, memory, and local disk
+- Billing meter
 
-## Deploy with Terraform
+Replicas are created one at a time from an existing source, not as an atomic group. If you ask for three replicas, Phala Cloud creates three independent CVMs whose only formal relationship is the shared `app_id`.
 
-Terraform is the most straightforward way to manage replicas declaratively. Set the `replicas` attribute on a `phala_app` resource and Terraform handles creation, updates, and teardown.
+## What Replicas Give You
 
-```hcl
-resource "phala_app" "api" {
-  name      = "api-service"
-  size      = "tdx.medium"
-  region    = "US-WEST-1"
-  image     = "dstack-dev-0.5.7-9b6a5239"
-  disk_size = 40
-  replicas  = 3
+**Horizontal capacity.** More replicas serve more concurrent traffic, assuming your workload is stateless or has a shared data layer behind it.
 
-  docker_compose = <<-YAML
-    services:
-      api:
-        image: myregistry/api:latest
-        ports:
-          - "8080:8080"
-  YAML
+**Failure isolation.** If one replica's node goes down for maintenance, the others keep serving. A single CVM has no such fallback.
 
-  wait_for_ready       = true
-  wait_timeout_seconds = 900
-}
+**Regional placement.** You can pin different replicas to nodes in different regions by passing a `node_id` when you replicate, which reduces latency for geographically distributed users.
 
-output "cvm_ids" {
-  value = phala_app.api.cvm_ids
-}
+**Independent attestation.** Each replica produces its own TDX quote. A relying party can verify any individual replica without trusting the others, which matters when the attestation is part of your security story.
 
-output "endpoint" {
-  value = phala_app.api.endpoint
-}
-```
+## What Replicas Do Not Give You
 
-To scale up or down, change the `replicas` value and run `terraform apply`. The provider adds or removes CVMs to match.
+**Load balancing.** Phala Cloud does not distribute traffic across replicas. Each replica gets its own public endpoint. You need an external load balancer, DNS round-robin, or service mesh to split traffic.
 
-```bash
-# Scale from 3 to 5 replicas
-terraform apply -var="replica_count=5" -auto-approve
-```
+**Shared state.** Replicas do not share filesystems, memory, or any in-process state. Two replicas writing to their local disks write to two separate disks. If your app keeps state locally, replicating it will cause divergence.
 
-<Note>
-Scaling down deletes the newest replicas. Make sure your application handles graceful shutdown, since in-flight requests on removed replicas will be interrupted.
-</Note>
+**Automatic propagation of compose updates.** Updating the compose of one replica does not update the others. Each replica is its own CVM and must be updated individually. See [Upgrade Application](/phala-cloud/update/upgrade-application) for the update flow.
 
-## Deploy with SDKs
-
-The SDKs expose a `replicateCvm` method that creates a copy of an existing CVM. Call it multiple times to create the number of replicas you need.
-
-<CodeGroup>
-
-```typescript JavaScript
-import { createClient } from "@phala/cloud";
-
-const client = createClient({ apiKey: process.env.PHALA_CLOUD_API_KEY });
-
-// Create 2 replicas of an existing CVM
-const sourceCvmId = "app_abc123";
-
-const replica1 = await client.replicateCvm({
-  id: sourceCvmId,
-  name: "api-replica-1",
-});
-
-const replica2 = await client.replicateCvm({
-  id: sourceCvmId,
-  name: "api-replica-2",
-});
-
-console.log("Replica 1:", replica1);
-console.log("Replica 2:", replica2);
-```
-
-```python Python
-from phala_cloud import create_client
-
-client = create_client()
-
-source_cvm_id = "app_abc123"
-
-replica1 = client.replicate_cvm({
-    "id": source_cvm_id,
-    "node_id": 5,  # optionally pin to a specific node
-})
-
-replica2 = client.replicate_cvm({
-    "id": source_cvm_id,
-    "node_id": 7,
-})
-
-print("Replica 1:", replica1)
-print("Replica 2:", replica2)
-```
-
-```go Go
-package main
-
-import (
-	"context"
-	"fmt"
-	"log"
-
-	phala "github.com/Phala-Network/phala-cloud/sdks/go"
-)
-
-func main() {
-	client, err := phala.NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx := context.Background()
-	sourceCvmID := "app_abc123"
-
-	replica1, err := client.ReplicateCVM(ctx, sourceCvmID, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	replica2, err := client.ReplicateCVM(ctx, sourceCvmID, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("Replica 1: %+v\n", replica1)
-	fmt.Printf("Replica 2: %+v\n", replica2)
-}
-```
-
-</CodeGroup>
-
-## Deploy with CLI
-
-The CLI doesn't have a dedicated replica command, but you can deploy the same compose file multiple times with different names. Each deployment creates an independent CVM.
-
-```bash
-export PHALA_CLOUD_API_KEY="phak_your_key"
-
-phala deploy -n api-primary -t tdx.medium --wait
-phala deploy -n api-replica-1 -t tdx.medium --wait
-phala deploy -n api-replica-2 -t tdx.medium --wait
-```
-
-To replicate from an existing CVM programmatically, use the SDK or Terraform approach instead.
-
-## Monitor Replica Health
-
-Once your replicas are running, check their status from the dashboard or CLI.
-
-**Dashboard:** Navigate to your app in the CVMs page. Each replica appears as a separate CVM entry with its own status indicator.
-
-**CLI:**
-
-```bash
-# List all CVMs and filter by name pattern
-phala cvms list
-```
-
-**SDK (polling):**
-
-```typescript
-const client = createClient({ apiKey: process.env.PHALA_CLOUD_API_KEY });
-
-const cvms = await client.getCvmList();
-for (const cvm of cvms.items) {
-  const state = await client.getCvmState({ id: cvm.id });
-  console.log(`${cvm.name}: ${state.status}`);
-}
-```
-
-<Warning>
-Each replica consumes its own resources and billing. Three replicas of a `tdx.medium` instance cost three times the single-instance price.
-</Warning>
+**Linear performance scaling.** Two replicas do not automatically serve twice the throughput. The upstream bottleneck (database, queue, external API) often dominates. Measure before assuming.
 
 ## When to Use Replicas
 
-Replicas are useful when you need high availability or want to distribute workloads across regions. They work best for stateless services like APIs, proxies, and workers. For stateful applications, consider whether your data layer supports multi-instance access before scaling out.
+Use replicas when:
 
-## Related
+- The workload is **stateless**, or reads and writes go to a shared backing store (managed Postgres, object storage, an external queue).
+- You need **high availability** and one CVM outage would be unacceptable.
+- You want to **distribute traffic geographically** and you have a way to route users to the nearest replica.
+- The attestation model assumes **independent instances** — each replica must be verifiable on its own.
 
-- [Terraform `phala_app` Resource](/phala-cloud/references/terraform-provider/app-resource) — full attribute reference including `replicas`
-- [CVM Lifecycle (JS SDK)](/phala-cloud/references/cloud-js-sdk/cvm-lifecycle) — `replicateCvm` method reference
-- [CVM Lifecycle (Python SDK)](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — `replicate_cvm` method reference
-- [Deploy Your First CVM](/phala-cloud/getting-started/deploy-first-cvm) — getting started with a single CVM
+Avoid replicas when:
+
+- The workload keeps **state on local disk** and you have no replication layer. Two divergent copies of the same database do not make a cluster.
+- The workload assumes it is the **only writer** to an external resource (a singleton job scheduler, a leader-elected worker).
+- You are trying to solve a **vertical scaling** problem. If one replica is slow because it is CPU- or memory-bound, bigger instance types often help more than more copies. See [Resize Resources](/phala-cloud/update/resize-resource).
+
+## Cost Model
+
+Each replica is billed as an independent CVM at the full rate of its instance type. Three `tdx.medium` replicas cost three times one `tdx.medium`. There is no bulk discount for adding replicas. Factor this into your scaling budget before raising the replica count.
+
+Stopping a replica pauses compute billing but keeps its disk allocation, which is billed separately. Deleting a replica releases both.
+
+## How to Create Replicas
+
+The concrete steps live in [Replicating CVMs](/phala-cloud/cvm/replicating-cvms), which covers:
+
+- The dashboard **Scale** dialog on the app detail page
+- The `phala cvms replicate` CLI command
+- Onchain KMS workflows for contract-governed apps
+- The replicate API for custom integrations
+
+## Related Documentation
+
+- [Replicating CVMs](/phala-cloud/cvm/replicating-cvms) — concrete dashboard, CLI, and API steps.
+- [Upgrade Application](/phala-cloud/update/upgrade-application) — how to update compose or environment, including across replicas.
+- [Resize Resources](/phala-cloud/update/resize-resource) — vertical scaling when more replicas is not the answer.
+- [Deploy Your First CVM](/phala-cloud/getting-started/deploy-first-cvm) — single-CVM getting started.
