@@ -1,0 +1,695 @@
+---
+title: Multisig and Governance
+description: Run production Onchain KMS apps with Safe, Timelock, or DAO ownership using the prepare and commit flow.
+---
+
+Production apps often need more than a single hot wallet for code updates. This page walks through transferring DstackApp ownership to a Safe or governance contract, then using the CLI prepare and commit flow (and webhooks) to push compose updates without the CVM operator ever holding the owner key.
+
+For a primer on which contracts govern what, see [Understanding Onchain KMS](/phala-cloud/key-management/understanding-onchain-kms). For the EOA-owned update path that this page replaces once ownership is transferred, see [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms). For device-level operations, see [Device Management](/phala-cloud/key-management/device-management).
+
+## When to Use Multisig
+
+Use multisig ownership when no single person on your team should be able to push a compose update on their own. Typical triggers:
+
+- Production apps where an unauthorized code change has material impact on users or funds.
+- Compliance programs that require separation of duties for production changes.
+- DAO-governed apps where token holders vote on what code runs.
+- Insurance or audit requirements that ask for m-of-n approval on sensitive deployments.
+
+The trade-off is speed. Every compose change has to be proposed, signed by enough owners, mined, and then committed back to Phala Cloud. Hot-patching a broken build takes minutes to hours instead of seconds. Plan release cycles accordingly, and keep an EOA-owned staging app for fast iteration.
+
+Phala Cloud does not host a multisig for you. You bring your own Safe, Timelock, DAO contract, or any other contract that exposes an owner role. Phala Cloud only cares about one thing: the `owner()` of your DstackApp contract must be able to authorize `addComposeHash(bytes32)` calls. Whatever contract shape makes that happen is up to you.
+
+## Ownership Model Recap
+
+Your DstackApp contract stores:
+
+- `owner` — the address allowed to call `addComposeHash`, `addDevice`, `removeDevice`, `setAllowAnyDevice`, and `transferOwnership`.
+- `allowedComposeHashes` — the set of compose hashes approved to boot under this app identity.
+- `allowedDeviceIds` — the set of nodes allowed to host this app (see [Device Management](/phala-cloud/key-management/device-management)).
+
+By default, `owner` is the deployer EOA that created the app. The CLI `phala deploy --cvm-id ... --private-key ...` path works as long as that EOA still holds ownership. To move to multisig, you transfer ownership to a contract address, after which direct EOA updates fail and all future updates go through the prepare and commit flow.
+
+<Note>
+  `owner` on DstackApp governs your application identity only. It does not control the KmsContract that Phala operates, and it cannot mint or rotate keys by itself. Keys are still derived inside the TEE after KMS verifies attestation against whatever compose hashes `owner` has approved.
+</Note>
+
+## Transferring Ownership to a Safe
+
+<Warning>
+  Ownership transfer is a one-way on-chain action. If you transfer to an address that cannot sign (a contract that does not implement `addComposeHash` forwarding, a Safe with the wrong threshold, a mistyped address), you lose the ability to update the app forever. Always test the full flow on a throwaway DstackApp first.
+</Warning>
+
+The transfer itself is a plain `transferOwnership(address)` call on the DstackApp contract. You do it from the current owner EOA using any Ethereum or Base tool you prefer.
+
+1. Deploy your Safe first, or have its address handy. On Base, use [safe.global](https://app.safe.global) with the network set to Base. Record the Safe address (for example `0x1234...abcd`) and the signer threshold (for example 3-of-5).
+2. Open your DstackApp contract on [Basescan](https://basescan.org) or [Etherscan](https://etherscan.io). The address is the same as your app ID with a `0x` prefix. You can also find it on the Phala Cloud dashboard under the app overview.
+3. DstackApp is deployed as a **proxy contract**, so its write methods live on the proxy page, not the implementation. Go to the **Contract** tab and choose **Write as Proxy** (not **Write Contract**). If the **Write as Proxy** tab is missing or shows no functions, click the **Verify** link on the proxy first — Basescan/Etherscan needs the implementation address resolved before it can expose the proxy's write methods.
+4. Click **Connect to Web3** and connect the EOA that currently owns the app.
+5. Find `transferOwnership` in the write methods. Enter the Safe address. Submit and wait for confirmation.
+6. Verify on-chain. Switch to **Read as Proxy** and call `owner()`. It should return the Safe address.
+
+From this moment on, `phala deploy --cvm-id <id> --private-key <eoa-key>` will fail with an owner-mismatch error on the `addComposeHash` step. Do not panic — this is expected. All future compose updates go through the prepare and commit flow described below.
+
+If your governance contract is a Timelock, DAO voting contract, or any other shape, the steps are the same. You are simply calling `transferOwnership(address)` from the EOA that currently holds the role. Use whichever UI you prefer — Basescan, Etherscan, Safe Transaction Builder, `cast send`, Foundry scripts — the on-chain effect is identical.
+
+## The Prepare, Approve, Commit Model
+
+With EOA ownership, the CLI does everything in one shot: it reads your compose file, computes the hash, sends `addComposeHash` to the chain, and tells Phala Cloud to roll the update forward. With multisig ownership, that one step splits into three phases across two different actors.
+
+<Note>
+  **The CVM does not restart until Phase 3 completes.** Prepare and approve are both no-ops from the running CVM's point of view — the live workload keeps serving traffic under the old compose hash throughout. Only when commit succeeds does Phala Cloud save the new compose, re-encrypt env vars, and trigger the restart. If you abandon a flow halfway, there is nothing to roll back.
+</Note>
+
+**Phase 1 — Prepare.** The CVM operator runs `phala deploy --cvm-id ... --prepare-only -c new-compose.yml`. Phala Cloud computes the compose hash, checks current on-chain state, and mints a one-time commit token (a UUID) valid for 14 days. The CLI prints the compose hash, the exact on-chain action required, and the commit URLs. Nothing on-chain has changed yet, and the CVM keeps running its existing compose hash.
+
+**Phase 2 — Approve.** A human (or a governance contract) takes the compose hash from Phase 1 and submits `addComposeHash(bytes32)` to the DstackApp contract through the Safe, Timelock, or DAO. This is where signatures are collected and the transaction is mined. Phala Cloud is not involved in Phase 2 at all — the approvers only need the compose hash and the DstackApp contract address. The CVM is still running the old compose during this phase.
+
+**Phase 3 — Commit.** Once the on-chain transaction is mined, someone (the original operator, a CI job, or an automation bot) tells Phala Cloud the transaction landed. The backend verifies that the compose hash is now registered on-chain and that the provided transaction hash contains the expected state change, then rolls the CVM update forward — this is the point where the CVM actually restarts onto the new compose.
+
+A few properties of this design worth internalizing:
+
+- **Commit tokens expire after 14 days.** If approval takes longer, re-run prepare. The expiry is enforced by the Phala Cloud backend. For a simple Safe with a few signers this is rarely a problem, but see the Timelock note below.
+- **Re-preparing invalidates the previous token.** If you run `--prepare-only` twice for the same CVM, only the second token works. This is intentional: it prevents stale updates from racing with newer ones. If two people are preparing in parallel, coordinate offline first.
+- **Prepare is idempotent with respect to the compose file.** If the compose file has not changed, re-running prepare gives you a fresh token pointing at the same compose hash.
+- **Prepare does not touch the CVM.** The CVM keeps running the old compose hash until Phase 3 completes. If you cancel mid-flow, nothing rolls back — just discard the token.
+
+### Long-delay Timelocks and the 14-day window
+
+If your governance contract is a Timelock with a delay approaching or exceeding 14 days, the straightforward "prepare, propose, wait, execute, commit" sequence can fail at commit time: by the time the Timelock delay elapses, the commit token has already expired.
+
+The fix is to decouple the Phase 2 on-chain action from the Phase 1 token's lifetime. Phases 2 and 3 only need to agree on the **compose hash**, not the token, because the backend verifies the chain state by hash. Concretely:
+
+1. Run `phala deploy --cvm-id ... --prepare-only` once to discover the compose hash. Record it and discard the token — you will not use it.
+2. Encode `addComposeHash(bytes32)` with that hash and queue it through your Timelock immediately.
+3. Wait for the Timelock delay to elapse and execute the transaction on-chain. Record the resulting transaction hash.
+4. Run `phala deploy --cvm-id ... --prepare-only` again with the same compose file. This produces a fresh 14-day token pointing at the same compose hash.
+5. Immediately commit with the fresh token and the real transaction hash.
+
+The second prepare is cheap (no on-chain writes) and exists solely to give you a current token. Keep the compose file identical across both prepare calls — any edit between them changes the hash and invalidates the on-chain approval you already waited days for.
+
+## CLI: Prepare Phase
+
+### Compose updates
+
+For a normal compose file update:
+
+```bash
+phala deploy --cvm-id <cvm-uuid> \
+  --prepare-only \
+  -c new-compose.yml \
+  -e .env
+```
+
+The `-e .env` is optional; include it if you are changing environment variables alongside the compose file. Environment variables are encrypted with the app's public key and bound to the commit token — they land atomically when Phase 3 runs.
+
+Human-readable output (exactly what the CLI prints with `--no-json` or when running interactively):
+
+```
+CVM update prepared successfully (pending on-chain approval).
+
+Compose Hash:    0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9
+App ID:          0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3
+Device ID:       0x7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8
+Chain:           Base (ID: 8453)
+Contract:        https://basescan.org/address/0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3
+Commit Token:    a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a
+Commit URL:      https://cloud.phala.com/my-team/cvms/01234567-89ab-cdef-0123-456789abcdef/confirm-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a&compose_hash=ff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9
+API Commit URL:  https://cloud-api.phala.com/api/v1/cvms/01234567-89ab-cdef-0123-456789abcdef/commit-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a (POST)
+
+On-chain Status:
+  Compose Hash:  NOT registered
+  Device ID:     registered
+
+To complete the update after on-chain approval:
+  phala deploy --cvm-id 01234567-89ab-cdef-0123-456789abcdef \
+    --commit \
+    --token a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a \
+    --compose-hash 0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9 \
+    --transaction-hash <tx-hash>
+```
+
+Every field carries information the approver or an automation needs:
+
+- **Compose Hash** — the 32-byte keccak256 hash of your compose document, prefixed with `0x`. This is the exact `bytes32` argument to pass to `addComposeHash` on-chain. It also serves as the idempotency key for the update.
+- **App ID** — the DstackApp contract address (same as the app ID with `0x` prefix). This is the `to` address for the on-chain transaction.
+- **Device ID** — the device identifier for the node currently hosting this CVM. It is shown so you can confirm whether the device is already allowed. If you see `Device ID: NOT registered`, you also need to call `addDevice(bytes32)` as part of the multisig flow (see section below).
+- **Chain** — human-readable chain name and EIP-155 chain ID. Double-check that your Safe and your CLI are pointed at the same chain.
+- **Contract** — a block explorer link to the DstackApp contract. Use this to verify `owner()` before approving, and to review the on-chain state after.
+- **Commit Token** — the UUID that unlocks Phase 3. It expires 14 days from prepare time. Treat it like a one-time API key.
+- **Commit URL** — the dashboard Confirm Update page. Share this with approvers who want a guided UI for Phase 3.
+- **API Commit URL** — the raw `POST` endpoint for Phase 3. Use this from CI or scripts.
+- **On-chain Status** — a live snapshot read from the chain at prepare time. It tells you whether `addComposeHash` and `addDevice` are strictly required, or whether the state is already good (for example, if the compose hash is already registered from a previous aborted flow).
+
+The same data is available as JSON for automation:
+
+```bash
+phala deploy --cvm-id <cvm-uuid> \
+  --prepare-only \
+  -c new-compose.yml \
+  --json
+```
+
+```json
+{
+  "success": true,
+  "prepare_only": true,
+  "compose_hash": "0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+  "app_id": "0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3",
+  "device_id": "0x7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+  "kms_info": { "chain_id": 8453, "kms_contract_address": "0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C" },
+  "chain_id": 8453,
+  "contract_explorer_url": "https://basescan.org/address/0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3",
+  "onchain_status": {
+    "compose_hash_allowed": false,
+    "device_id_allowed": true,
+    "is_allowed": false
+  },
+  "commit_token": "a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a",
+  "commit_url": "https://cloud.phala.com/my-team/cvms/01234567-89ab-cdef-0123-456789abcdef/confirm-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a&compose_hash=ff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+  "api_commit_url": "https://cloud-api.phala.com/api/v1/cvms/01234567-89ab-cdef-0123-456789abcdef/commit-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a"
+}
+```
+
+### Replicating to a new node
+
+Replication to an additional node (for HA or migration) uses the same prepare mechanism:
+
+```bash
+phala cvms replicate <source-cvm-id> \
+  --node-id <target-node-id> \
+  --prepare-only
+```
+
+The replicate prepare path prints the same fields as the deploy prepare path. If the target node's `device_id` is not already on the allowlist, the on-chain status will show `Device ID: NOT registered` — in that case you need to run two separate on-chain actions as part of Phase 2: `addDevice(bytes32)` for the new device, then `addComposeHash(bytes32)` if the compose hash is also missing. Both can be batched into a single Safe transaction (see the Transaction Builder section below).
+
+See [Device Management](/phala-cloud/key-management/device-management) for how to look up `device_id` for a given node.
+
+### What is on-chain Status telling me?
+
+`onchain_status` reflects the actual DstackApp state at prepare time. There are three useful combinations:
+
+- `compose_hash_allowed: false` and `device_id_allowed: true` — standard case for a compose file change on an existing node. Approve `addComposeHash` only.
+- `compose_hash_allowed: false` and `device_id_allowed: false` — new node and new compose hash. Approve `addDevice` and `addComposeHash`, ideally in a single Safe batch.
+- `compose_hash_allowed: true` — the compose hash was already registered, perhaps by a previous aborted prepare. You can skip Phase 2 entirely and go straight to Phase 3 with `--transaction-hash already-registered`.
+
+## Approve Phase — Three Paths
+
+The approve phase is off the Phala Cloud backend. Whoever holds signing power on the owner contract runs an on-chain transaction that calls `addComposeHash(bytes32)` (and possibly `addDevice(bytes32)`) on the DstackApp contract. How they do it depends on your governance setup.
+
+### Path A: Dashboard Confirm Update page
+
+The simplest path is for a single human approver who personally holds a signing wallet. Open the `Commit URL` from the prepare output. It takes you to the Confirm Update page, which shows:
+
+- Workspace name and slug
+- CVM name and App ID
+- The compose hash to register (with a copy button)
+- Who initiated the prepare and when
+- An input for the transaction hash
+- A large **Commit Update** button
+
+![Confirm Update page with compose hash and transaction hash input](/images/cloud/app-overview-pending-update.jpg)
+
+The page does not sign the on-chain transaction for you. You still need to run `addComposeHash` from your wallet (via Basescan, Etherscan, Safe, or any other tool), then paste the resulting transaction hash into the form. Once you click **Commit Update**, the dashboard calls the same `POST /cvms/{id}/commit-update` endpoint that the CLI calls in Phase 3, and the backend verifies the transaction receipt before rolling the update forward.
+
+If the compose hash is already registered on-chain (see `onchain_status.compose_hash_allowed: true`), leave the transaction hash field empty. The backend will accept `already-registered` as a sentinel and only re-verify state.
+
+### Path B: Gnosis Safe Transaction Builder
+
+For a Safe-owned app, most teams use the official Transaction Builder app.
+
+1. Open your Safe at [app.safe.global](https://app.safe.global). Make sure the network matches the chain from the prepare output (Base or Ethereum).
+2. Go to **Apps** and open **Transaction Builder**.
+3. Paste the DstackApp contract address (the **App ID** field from prepare output) into the address field. The Transaction Builder will fetch the ABI from Basescan/Etherscan if the contract is verified. If auto-fetch fails, paste the ABI for `addComposeHash(bytes32)` manually — you can copy it from any existing DstackApp contract page on the explorer.
+4. Select `addComposeHash` from the method dropdown.
+5. Enter the compose hash from the prepare output as the `bytes32` parameter. Triple-check the value — it is the single most important field and it is irreversible once executed. A mistyped hash means you authorized the wrong code to run.
+6. Click **Add Transaction**. If you also need to allow a new device, click **Add Transaction** again, select `addDevice`, and enter the `device_id` from the prepare output. Both actions end up in the same Safe batch.
+7. Click **Create Batch**, then **Send Batch**. This creates a Safe transaction pending signatures.
+8. Have the other signers approve through Safe's Transactions tab until the threshold is met.
+9. Execute the transaction. Copy the resulting transaction hash — you will need it for Phase 3.
+
+<Tip>
+  The Transaction Builder does not verify that the compose hash matches anything meaningful. You are trusting the prepare output. Before signing, cross-check the compose hash against the git commit or release artifact that the hash was computed from. The backend re-hashes the compose document at commit time, so a mismatch between the file you prepared and the file currently saved on Phala Cloud will surface as `HASH_INVALID_OR_EXPIRED`.
+</Tip>
+
+### Path C: Custom governance contract (Timelock, DAO)
+
+If your owner is a Timelock or a DAO voting contract, you typically need to encode a generic proposal targeting the DstackApp contract. Two pieces of information are required:
+
+- **Target** — the DstackApp contract address (the `app_id` field from prepare output, with `0x` prefix).
+- **Calldata** — the ABI-encoded call to `addComposeHash(bytes32)` with the compose hash as the argument.
+
+<Warning>
+  The `onchain_action.calldata` field in the webhook payload (see the next section) contains only the raw compose hash, **not** the fully ABI-encoded calldata that most governance contracts expect. You must encode the function call yourself before submitting to a Timelock or DAO proposer. The field name is kept generic because different governance frameworks expect different input shapes.
+</Warning>
+
+To encode the calldata, use any Ethereum tooling. With `cast` (Foundry):
+
+```bash
+cast calldata "addComposeHash(bytes32)" \
+  0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9
+```
+
+Output:
+
+```
+0x... (4-byte selector) || 32-byte compose hash
+```
+
+Or in TypeScript with `viem`:
+
+```typescript
+import { encodeFunctionData } from "viem";
+
+const calldata = encodeFunctionData({
+  abi: [
+    {
+      type: "function",
+      name: "addComposeHash",
+      inputs: [{ name: "composeHash", type: "bytes32" }],
+      stateMutability: "nonpayable",
+    },
+  ],
+  functionName: "addComposeHash",
+  args: [
+    "0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+  ],
+});
+```
+
+Feed the encoded bytes into your governance contract's proposal method alongside the DstackApp address. Once the proposal passes the Timelock delay or DAO vote, execute it. The resulting transaction hash goes into Phase 3.
+
+Before submitting, decode the calldata one more time to sanity-check:
+
+```bash
+cast calldata-decode "addComposeHash(bytes32)" <your-encoded-calldata>
+```
+
+It should echo back the same compose hash you started with.
+
+## CLI: Commit Phase
+
+Once the on-chain transaction is mined, tell Phala Cloud to roll the CVM update forward.
+
+```bash
+phala deploy --cvm-id <cvm-uuid> \
+  --commit \
+  --token a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a \
+  --compose-hash 0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9 \
+  --transaction-hash 0x1234abcd5678ef90...
+```
+
+You can also POST directly to `api_commit_url`:
+
+```bash
+curl -X POST "https://cloud-api.phala.com/api/v1/cvms/<cvm-uuid>/commit-update" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a",
+    "compose_hash": "0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+    "transaction_hash": "0x1234abcd5678ef90..."
+  }'
+```
+
+The commit endpoint is token-based and does not require an API key. Only someone holding the commit token can finalize the update. This is intentional — it lets you hand off Phase 3 to a CI job or an automation bot without provisioning a full API token.
+
+When the backend receives the commit request it:
+
+1. Looks up the token and checks that it has not expired or been superseded.
+2. Verifies that the compose hash in the request matches the compose hash bound to the token at prepare time. If they differ, it rejects with `HASH_INVALID_OR_EXPIRED` — usually because the compose file was edited between prepare and commit.
+3. Reads `allowedComposeHashes` from the DstackApp contract. If the compose hash is not present on-chain, it rejects with `HASH_REGISTRATION_REQUIRED`.
+4. If a transaction hash other than `already-registered` was provided, it fetches the receipt and checks that the transaction interacted with the DstackApp contract and produced the expected state change. Mismatches surface as `TX_VERIFICATION_FAILED`.
+5. On success, proceeds with the regular update workflow: saves the new compose file, re-encrypts environment variables, and triggers the CVM restart.
+
+Successful commit output:
+
+```json
+{
+  "success": true,
+  "vm_uuid": "01234567-89ab-cdef-0123-456789abcdef",
+  "correlation_id": "corr_01HXYZ...",
+  "status": "pending"
+}
+```
+
+`correlation_id` lets you trace the update in the workspace audit log. `status` reflects the CVM state machine at the moment of response — follow up with `phala cvms get <cvm-uuid>` or the dashboard to watch the actual update complete.
+
+## Automating Approvals with Webhooks
+
+The whole flow above assumes a human notices when a prepare happens. For production teams, that is too fragile. Phala Cloud emits a `cvm.update.pending_approval` webhook every time a prepare-only update is created, which lets you wire prepare into Slack bots, approval dashboards, or automated Safe proposers.
+
+### Subscribing
+
+In the dashboard, go to **Workspace → Webhooks** and click **Add Webhook**. Enter:
+
+- **Endpoint URL** — an HTTPS URL you control. Plain `http://` is rejected, and private IPs, cloud metadata endpoints, `localhost`, and `.local` hostnames are all blocked at delivery time by the URL validator.
+- **Events** — check **Update Pending Approval** (event type `cvm.update.pending_approval`).
+- **Name** (optional) — a label for your own bookkeeping.
+
+When you save, the dashboard shows the signing secret exactly once in a dialog. The secret is prefixed with `whsec_` followed by 32 base64url bytes. Copy it into your secrets manager right away. If you lose it, you can reveal it again or rotate it, but both actions require a second-factor challenge — the reveal and rotate endpoints are gated by 2FA step-up verification.
+
+![Webhook list with URL, masked secret, events, and stats columns](/images/cloud/webhooks-list.jpg)
+
+![Webhook Created dialog showing the signing secret](/images/cloud/webhook-created-signing-secret.jpg)
+
+The same operations are available via the API:
+
+```bash
+curl -X POST "https://cloud-api.phala.com/api/v1/workspace/webhooks" \
+  -H "Authorization: Bearer $PHALA_API_KEY" \
+  -H "X-Workspace-Id: my-team" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://bot.example.com/phala/webhook",
+    "events": ["cvm.update.pending_approval"],
+    "name": "Approval bot"
+  }'
+```
+
+The response body includes the generated `secret` on create. Subsequent `GET /workspace/webhooks` and `GET /workspace/webhooks/{id}` responses return a masked version — you have to hit `POST /workspace/webhooks/{id}/reveal-secret` (2FA required) to see the full value again, or `POST /workspace/webhooks/{id}/rotate-secret` (also 2FA required) to generate a new one.
+
+### Payload
+
+When a prepare-only update happens, Phala Cloud sends a JSON POST to your endpoint:
+
+```json
+{
+  "id": "evt_0a1b2c3d4e5f6789",
+  "event": "cvm.update.pending_approval",
+  "version": "1",
+  "created_at": "2026-04-10T12:34:56.789Z",
+  "workspace": {
+    "id": "my-team",
+    "name": "My Team"
+  },
+  "data": {
+    "cvm_id": "01234567-89ab-cdef-0123-456789abcdef",
+    "cvm_name": "payments-api",
+    "compose_hash": "0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+    "app_id": "0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3",
+    "device_id": "0x7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "kms": {
+      "chain_id": 8453,
+      "contract_address": "0x2f83172A49584C017F2B256F0FB2Dca14126Ba9C"
+    },
+    "onchain_action": {
+      "to": "0x09cef33ca9c6e4f2b1d5a7c3e8f0b2a4d6e8f1c3",
+      "method": "addComposeHash(bytes32)",
+      "calldata": "0xff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9"
+    },
+    "commit_token": "a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a",
+    "commit_url": "https://cloud.phala.com/my-team/cvms/01234567-89ab-cdef-0123-456789abcdef/confirm-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a&compose_hash=ff22c67f1c8d5e4a9b3d2c1e0f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9",
+    "api_commit_url": "https://cloud-api.phala.com/api/v1/cvms/01234567-89ab-cdef-0123-456789abcdef/commit-update?token=a5732e36-8f4b-4c1d-9e7a-2b5c8d9e0f1a",
+    "expires_at": "2026-04-24T12:34:56.789Z",
+    "initiated_by": {
+      "user_id": "usr_01HXYZ",
+      "username": "alice"
+    }
+  }
+}
+```
+
+Envelope fields (present on every webhook, not just this event):
+
+- `id` — unique event ID in the form `evt_<16 hex chars>`. Use this as an idempotency key on your side.
+- `event` — the event type. For this flow it is always `cvm.update.pending_approval`.
+- `version` — schema version, currently `"1"`.
+- `created_at` — ISO 8601 UTC timestamp of dispatch.
+- `workspace.id` — the workspace slug (not the numeric team ID).
+- `workspace.name` — human-readable workspace name.
+
+Event-specific `data` fields:
+
+- `cvm_id` — the CVM UUID that is being updated.
+- `cvm_name` — user-provided CVM name.
+- `compose_hash` — the 32-byte compose hash with `0x` prefix. This is the argument to `addComposeHash`.
+- `app_id` — the DstackApp contract address. Same value as `onchain_action.to`.
+- `device_id` — the node device ID currently hosting the CVM.
+- `kms.chain_id` — EIP-155 chain ID (1 for Ethereum, 8453 for Base).
+- `kms.contract_address` — the KmsContract address (the Phala-operated KMS root, not your DstackApp).
+- `onchain_action.to` — target address for the on-chain transaction (your DstackApp address).
+- `onchain_action.method` — the method signature, currently always `addComposeHash(bytes32)`.
+- `onchain_action.calldata` — the raw compose hash. Note again: this is **not** ABI-encoded calldata. Encode it yourself if your governance contract needs a full function call payload.
+- `commit_token` — the commit token. Combined with `api_commit_url`, enough to complete Phase 3.
+- `commit_url` — the dashboard Confirm Update page.
+- `api_commit_url` — the raw `POST` endpoint.
+- `expires_at` — ISO 8601 timestamp, exactly 14 days after dispatch. Your automation should refuse to act on expired tokens.
+- `initiated_by.user_id` — hashed user ID of the person who ran `--prepare-only`.
+- `initiated_by.username` — their username.
+
+### Headers
+
+Every webhook delivery carries these HTTP headers:
+
+- `Content-Type: application/json`
+- `User-Agent: PhalaCloud-Webhook/1.0`
+- `X-Webhook-Id` — same as `payload.id`.
+- `X-Webhook-Event` — same as `payload.event`.
+- `X-Webhook-Timestamp` — Unix epoch seconds as a decimal string. This is the timestamp used in the HMAC message.
+- `X-Webhook-Signature` — the HMAC-SHA256 signature, in the form `sha256=<64 hex chars>`.
+
+### HMAC verification
+
+The signature is computed from the raw request body (as sent on the wire) and the timestamp header. The exact formula:
+
+```
+message   = f"{X-Webhook-Timestamp}.{raw_body_utf8}"
+signature = hex(HMAC_SHA256(key=secret, msg=message))
+header    = f"sha256={signature}"
+```
+
+Two things matter for correctness:
+
+1. The body must be the **raw** POST body, not a re-serialized version. If your framework parses JSON and then re-encodes it, key order or whitespace may differ and the HMAC will not match. Grab the raw bytes before parsing.
+2. Use a **constant-time** comparison when matching the signature. A naive `==` on strings leaks timing information.
+
+#### Python (FastAPI)
+
+```python
+import hashlib
+import hmac
+import logging
+import os
+
+from fastapi import FastAPI, Header, HTTPException, Request
+
+app = FastAPI()
+logger = logging.getLogger("phala-webhook")
+
+WEBHOOK_SECRET = os.environ["PHALA_WEBHOOK_SECRET"]  # whsec_...
+
+
+def verify_signature(
+    secret: str, timestamp: str, raw_body: bytes, signature_header: str
+) -> bool:
+    if not signature_header.startswith("sha256="):
+        return False
+    provided = signature_header.removeprefix("sha256=")
+    message = f"{timestamp}.{raw_body.decode('utf-8')}".encode("utf-8")
+    expected = hmac.new(
+        secret.encode("utf-8"), message, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, provided)
+
+
+@app.post("/phala/webhook")
+async def receive_webhook(
+    request: Request,
+    x_webhook_timestamp: str = Header(...),
+    x_webhook_signature: str = Header(...),
+    x_webhook_event: str = Header(...),
+):
+    raw_body = await request.body()
+
+    if not verify_signature(
+        WEBHOOK_SECRET, x_webhook_timestamp, raw_body, x_webhook_signature
+    ):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+
+    if x_webhook_event != "cvm.update.pending_approval":
+        # Ignore other events for this endpoint
+        return {"ok": True}
+
+    payload = await request.json()
+    data = payload["data"]
+    logger.info(
+        "Pending approval: cvm=%s hash=%s commit_url=%s expires_at=%s",
+        data["cvm_id"],
+        data["compose_hash"],
+        data["commit_url"],
+        data["expires_at"],
+    )
+    # Hand off to your approval pipeline here (Slack, Safe API, etc.)
+    return {"ok": True}
+```
+
+#### Node.js (Express)
+
+```javascript
+import crypto from "node:crypto";
+import express from "express";
+
+const app = express();
+const WEBHOOK_SECRET = process.env.PHALA_WEBHOOK_SECRET; // whsec_...
+
+// IMPORTANT: capture the raw body before JSON parsing
+app.use("/phala/webhook", express.raw({ type: "application/json" }));
+
+function verifySignature(secret, timestamp, rawBody, signatureHeader) {
+  if (!signatureHeader?.startsWith("sha256=")) return false;
+  const provided = signatureHeader.slice("sha256=".length);
+  const message = `${timestamp}.${rawBody.toString("utf8")}`;
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(message, "utf8")
+    .digest("hex");
+  const providedBuf = Buffer.from(provided, "hex");
+  const expectedBuf = Buffer.from(expected, "hex");
+  if (providedBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(providedBuf, expectedBuf);
+}
+
+app.post("/phala/webhook", (req, res) => {
+  const timestamp = req.header("x-webhook-timestamp");
+  const signature = req.header("x-webhook-signature");
+  const event = req.header("x-webhook-event");
+
+  if (!verifySignature(WEBHOOK_SECRET, timestamp, req.body, signature)) {
+    return res.status(401).json({ error: "Invalid signature" });
+  }
+
+  const payload = JSON.parse(req.body.toString("utf8"));
+  if (event !== "cvm.update.pending_approval") {
+    return res.json({ ok: true });
+  }
+
+  const { cvm_id, compose_hash, commit_url, expires_at } = payload.data;
+  console.log("Pending approval", {
+    cvm_id,
+    compose_hash,
+    commit_url,
+    expires_at,
+  });
+  // Hand off to your approval pipeline here
+  return res.json({ ok: true });
+});
+
+app.listen(3000);
+```
+
+### Delivery semantics
+
+- **Success** — any HTTP 2xx response is treated as success. The delivery is recorded and no further attempts are made.
+- **Failure** — any non-2xx response, connection error, or timeout is treated as a failure and retried.
+- **Timeout** — 10 seconds per delivery attempt. Design your handler to return quickly (queue the work, return 200 immediately).
+- **Retries** — up to 3 additional attempts on failure, with delays of 1 minute, 10 minutes, and 1 hour. After the final attempt the delivery is logged as `failed` and no further retries happen.
+- **Idempotency** — retries reuse the same `event_id`. Use it as a dedup key on your side so retried deliveries do not double-approve.
+- **URL validation at delivery time** — every attempt re-validates the URL. HTTPS is mandatory; private IPs, link-local addresses, loopback, `169.254.169.254` (cloud metadata), `localhost`, and `.local` hostnames are all rejected. This guards against DNS rebinding attacks — a hostname that passes validation at save time but later resolves to an internal IP will be blocked on delivery.
+
+### Viewing deliveries
+
+The dashboard has a per-webhook deliveries page at **Workspace → Webhooks → (view icon)** that shows the last 50 attempts: status, attempt count, response code, latency, and any error message. From the same page you can resend a failed delivery — this generates a new `event_id` linked to the original via `original_event_id`, so your handler can dedupe either way.
+
+![Webhook deliveries table with status badges, latency, and resend button](/images/cloud/webhook-deliveries.jpg)
+
+The same data is available programmatically:
+
+```bash
+curl "https://cloud-api.phala.com/api/v1/workspace/webhooks/<id>/deliveries?limit=50" \
+  -H "Authorization: Bearer $PHALA_API_KEY" \
+  -H "X-Workspace-Id: my-team"
+```
+
+And aggregate stats:
+
+```bash
+curl "https://cloud-api.phala.com/api/v1/workspace/webhooks/<id>/stats" \
+  -H "Authorization: Bearer $PHALA_API_KEY" \
+  -H "X-Workspace-Id: my-team"
+```
+
+### Automation patterns
+
+Once you have a verified receiver, the question is what to do with the event. A few common shapes:
+
+- **Slack bot approval** — post a message to a private channel with the CVM name, compose hash, and a link to the Confirm Update page. Require a specific reviewer to click an approval button, then call `api_commit_url` from the bot after the on-chain transaction is mined.
+- **Auto-propose to Safe** — use the [Safe API Kit](https://github.com/safe-global/safe-core-sdk) to create a pending Safe transaction calling `addComposeHash(bytes32)` the moment a webhook fires. Signers approve in the Safe UI. A second script watches the Safe for executed transactions and calls the commit endpoint when the transaction lands.
+- **CI/CD approval queue** — store the webhook payload in a queue table (Postgres, Redis, S3). Your release pipeline reads the queue, assigns a reviewer, and eventually commits through a service account. `expires_at` gates the queue: drop entries after 14 days.
+- **Timelock relay** — decode the webhook into a Timelock proposal, submit, wait for the delay to elapse, execute, and commit. This is the fully on-chain DAO shape.
+
+## Error Modes and Troubleshooting
+
+### Compose hash drift between prepare and commit
+
+Symptom: Phase 3 fails with `HASH_INVALID_OR_EXPIRED` even though the on-chain transaction was accepted.
+
+Cause: someone edited the compose file between prepare and commit, so the hash you registered on-chain no longer matches the compose currently saved for this CVM. The backend re-hashes the compose document at commit time and refuses to roll forward if the hashes disagree.
+
+Fix: rerun `phala deploy --cvm-id ... --prepare-only -c new-compose.yml` with the final compose file, repeat Phase 2 with the new hash, and commit again. The old on-chain `addComposeHash` is harmless — it stays in the allowlist but is never used.
+
+### Expired commit token
+
+Symptom: Phase 3 fails with `Failed to commit CVM update: ... expired ...` and the CLI suggests running `--prepare-only` again.
+
+Cause: either the 14-day TTL elapsed, or a newer prepare for the same CVM invalidated this token.
+
+Fix: rerun prepare. If your team is hitting the 14-day window regularly, shorten your review cycle or switch to webhook-driven automation. If a second operator also ran prepare, coordinate and pick which token to use — only the latest one is valid.
+
+### Owner mismatch (direct EOA update after transferring to Safe)
+
+Symptom: `phala deploy --cvm-id ... --private-key ... -c new-compose.yml` fails inside the `addComposeHash` or `addDevice` step with an EVM revert about ownership.
+
+Cause: you transferred ownership to a Safe (or any other contract) and then tried to update using an EOA. The EOA no longer holds the owner role, so the on-chain write reverts.
+
+Fix: check `owner()` on Basescan or Etherscan. If it returns a Safe address, use the prepare and commit flow. If it returns an EOA different from the one you signed with, you transferred to the wrong account — recover by signing with the correct EOA and calling `transferOwnership` back, or by using the current owner to push the update.
+
+### Transaction reverted on-chain
+
+Symptom: Your Safe or governance contract executes the proposal but the `addComposeHash` call reverts.
+
+Common causes:
+
+- The Safe is on a different chain than the DstackApp contract. Double-check the network selector before signing.
+- The calldata was hand-built with the wrong function selector or the wrong argument type. Use `cast calldata-decode` to sanity-check before proposing.
+- The `owner()` of the DstackApp contract is still the EOA, not the Safe. Verify ownership was transferred before preparing.
+- Gas ran out on a Timelock relay. Resubmit with a higher gas limit.
+
+### Error code reference
+
+The four error codes you will see most often in this flow all live under Module 01 in the [Error Codes reference](/phala-cloud/references/error-codes): `ERR-01-005` (hash registration required), `ERR-01-006` (hash invalid or expired), `ERR-01-007` (transaction verification failed), and `ERR-01-008` (hash not allowed). The reference page has the full list with HTTP status codes and exception class names; use it as the source of truth.
+
+A quick map of which phase you most commonly hit each one in:
+
+- **Phase 3 commit fails with `ERR-01-005`** — Phase 2 has not actually landed on-chain yet, or it landed on a different contract. Check `allowedComposeHashes` on the DstackApp you prepared against.
+- **Phase 3 commit fails with `ERR-01-006`** — the commit token is expired or superseded, or the compose file on the backend no longer matches what the token was bound to. Re-prepare.
+- **Phase 3 commit fails with `ERR-01-007`** — the transaction hash you passed does not verify against the expected state change. Double-check you pasted the correct hash and that the transaction is mined.
+- **Phase 3 commit fails with `ERR-01-008`** — the compose hash is simply not on the allowlist. Same remediation as `ERR-01-005`; most often it means the Safe batch executed but targeted the wrong address or wrong method selector.
+
+When the CLI hits `ERR-01-006`, it explicitly hints at re-running `--prepare-only` to get a new token. When it hits `ERR-01-007`, it prints the transaction hash so you can look it up on the explorer.
+
+## Device Operations Without CLI Prepare/Commit
+
+<Warning>
+  At the time of writing, the CLI `phala allow-devices` subcommands (`list`, `add`, `remove`, `allow-any`, `disallow-any`, `toggle-allow-any`) all require `--private-key` and do not support `--prepare-only`. If your DstackApp owner is a Safe, Timelock, or DAO, the CLI cannot drive device operations for you. You must use the wallet UI path.
+</Warning>
+
+The workaround is straightforward: use the same Safe Transaction Builder or governance proposal path from the approve phase, just targeting a different method on the same DstackApp contract.
+
+1. Look up the `device_id` you want to add or remove. For a new node, this is the `device_id` shown in the node picker when provisioning, and also in the prepare output when you run `phala cvms replicate ... --prepare-only`. See [Device Management](/phala-cloud/key-management/device-management) for the lookup paths.
+2. Open your DstackApp contract on Basescan or Etherscan, or open Safe Transaction Builder and paste the contract address.
+3. Call the relevant method:
+   - `addDevice(bytes32 deviceId)` — allow a specific device to host the app.
+   - `removeDevice(bytes32 deviceId)` — revoke a previously allowed device.
+   - `setAllowAnyDevice(bool allow)` — toggle the global bypass. When `true`, any node in the workspace can boot the CVM without the per-device check.
+4. Collect Safe signatures and execute, or push through the Timelock delay / DAO vote.
+5. There is no commit phase for device operations. The next time the CVM is provisioned on a new node, KMS reads the allowlist straight from the contract.
+
+See [Device Management](/phala-cloud/key-management/device-management) for the full conceptual model, how `device_id` is derived from TDX PPID, the one-node-to-one-device rule, and HA recommendations for `allowAnyDevice`.
+
+## Next Steps
+
+- [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms) — the first-time deployment walkthrough.
+- [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms) — the direct EOA update path when ownership has not been transferred to a multisig yet.
+- [Understanding Onchain KMS](/phala-cloud/key-management/understanding-onchain-kms) — the conceptual model (contracts, boot-time flow, compose hash).
+- [Device Management](/phala-cloud/key-management/device-management) — device allowlisting, PPID, HA, and the `allow-devices` CLI reference.
+- [Cloud vs Onchain KMS](/phala-cloud/key-management/cloud-vs-onchain-kms) — conceptual comparison and governance trade-offs.

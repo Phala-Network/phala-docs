@@ -1,0 +1,135 @@
+---
+title: Updating with Onchain KMS
+description: Roll a new compose file to a running Onchain KMS CVM when the DstackApp owner is a plain wallet you control.
+---
+
+This page covers the happy path for changing the compose file of a running Onchain KMS CVM when you still hold the DstackApp `owner` key as a plain EOA. The update is a single CLI command that handles the on-chain transactions for you.
+
+If the owner is a Safe, timelock, or DAO contract, the single-command path will not work — jump to [Multisig and Governance](/phala-cloud/key-management/multisig-governance). For the first-deploy flow and conceptual background, see [Deploying with Onchain KMS](/phala-cloud/key-management/deploying-with-onchain-kms) and [Understanding Onchain KMS](/phala-cloud/key-management/understanding-onchain-kms).
+
+## What Triggers a New Compose Hash
+
+Any change that modifies `app-compose.json` produces a new `compose_hash` and requires a new on-chain `addComposeHash` call before the CVM can start running the new version. Common triggers:
+
+- Editing `docker-compose.yml` (bumping an image tag, adding a service, changing a port, whitespace changes — all count)
+- Changing `allowed_envs`, `public_logs`, `public_sysinfo`, or `public_tcbinfo`
+- Changing the `runner` or `pre_launch_script`
+
+Env var value changes alone (without touching `allowed_envs`) do not change the compose hash — they are encrypted and stored separately. But they still go through this same update command.
+
+See [What the compose hash is](/phala-cloud/key-management/understanding-onchain-kms#what-the-compose-hash-is) for the full list of fields that participate in hashing.
+
+## The Single-Command Update
+
+When the DstackApp owner is still a plain wallet, updating is one command:
+
+```bash
+phala deploy \
+  --cvm-id <cvm-name-or-id> \
+  -c new-compose.yml \
+  --private-key "$PRIVATE_KEY"
+```
+
+The `--cvm-id` flag accepts the CVM name (if unique in your workspace), the CVM UUID, or the app_id — whichever is most convenient. The CLI detects that you passed `--cvm-id`, so it goes down the update path instead of the new-deployment path.
+
+Add `-e .env` or inline `-e KEY=VALUE` if you are changing environment variables alongside the compose file. Env var values are encrypted with the CVM's per-application env-encryption public key before leaving the CLI, same as on first deploy.
+
+Expect two wallet signatures in the worst case (one for `addDevice`, one for `addComposeHash`). In the common case where the scheduler kept your CVM on the same node, just one.
+
+## What Happens Under the Hood
+
+The single command maps to the following sequence, in order:
+
+1. **Reads the CVM metadata** from the backend, including the existing DstackApp contract address and the chain info.
+2. **Patches the CVM** with the new compose file (and optional new env vars). The backend computes the new `compose_hash` and responds with `requiresOnChainHash: true`, along with the device ID of the current node.
+3. **Checks on-chain prerequisites** by calling a read-only helper that asks the DstackApp contract whether the compose hash and device ID are already allowed.
+4. **If the device is not yet allowed**, sends `addDevice(deviceId)` from `--private-key`. This happens automatically when the scheduler puts your CVM on a node it has not used before.
+5. **Sends `addComposeHash(newHash)`** from `--private-key`. This is the main update transaction. It is idempotent at the contract level — the CLI sends it even if a state read says the hash is already allowed, so the backend can confirm against a real transaction hash.
+6. **Confirms the patch** with the backend. The backend reads the receipt, checks the `ComposeHashAdded` event, re-reads the contract state, and rolls the CVM over to the new compose file.
+
+For reference when reading CI/CD logs, the flow maps to these backend and on-chain calls in order:
+
+1. `GET /api/v1/cvms/<id>` — read existing CVM metadata.
+2. `POST /api/v1/cvms/<id>` (patch) — send new compose file and encrypted env. Backend returns new `composeHash`, `deviceId`, and `requiresOnChainHash: true`.
+3. Read-only chain call — `DstackApp.allowedDeviceIds(deviceId)` and `DstackApp.allowedComposeHashes(composeHash)` batched through a single RPC.
+4. If needed, on-chain `DstackApp.addDevice(deviceId)` signed by `--private-key`.
+5. On-chain `DstackApp.addComposeHash(composeHash)` signed by `--private-key`. The CLI waits for one confirmation.
+6. `POST /api/v1/cvms/<id>/confirm-patch` — the backend verifies the receipt, re-reads the contract state, and rolls the CVM onto the new compose.
+
+## What Changes and What Does Not
+
+When you run an update like this, the following stay the same:
+
+- **The DstackApp contract address.** It is still your `app_id`. Clients already talking to your service do not need to change anything.
+- **The CVM's `vm_uuid`.** The dashboard URL for the CVM does not change.
+- **The KMS-derived application keys.** Key derivation is tied to the `app_id`, not to the compose hash, so your persistent encrypted storage continues to decrypt correctly across updates.
+
+The following change:
+
+- **`compose_hash`** — a new hash is now in `allowedComposeHashes`.
+- **The container image and env var ciphertext.** The CLI re-encrypts new env values for the CVM's env-encryption key.
+- **The running processes inside the CVM.** The old compose is replaced by the new one.
+
+The old compose hash is not automatically removed from the allowlist. If you want to strictly block rollbacks, call `removeComposeHash(oldHash)` on the DstackApp from your wallet after the update is live.
+
+## When This Simple Flow Does Not Work
+
+The single-command EOA path assumes `--private-key` can sign transactions that the DstackApp will accept. Two situations break that assumption:
+
+- **The owner is no longer an EOA.** If you transferred ownership to a Safe, a timelock, or any other contract, `addComposeHash` called from a bare wallet will revert on-chain. You need the prepare-and-commit flow so the transaction can be routed through your governance contract. See [Multisig and Governance](/phala-cloud/key-management/multisig-governance).
+- **You want to add or remove a node without changing the compose file.** Device allowlisting is a separate flow from compose-hash updates. See [Device Management](/phala-cloud/key-management/device-management).
+
+<Warning>
+  Do not transfer DstackApp ownership on a production CVM before reading [Multisig and Governance](/phala-cloud/key-management/multisig-governance). An irreversible mistake (pointing `owner` at an address you do not control) will leave you unable to update the compose hash, and the CVM will be frozen on its current version.
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'Transaction verification failed on backend' during the update">
+    The backend reads the receipt for the `addComposeHash` transaction and looks for the `ComposeHashAdded(bytes32)` event. This can fail briefly right after sending due to RPC propagation delay. The backend retries a few times with short gaps before giving up. If you consistently see this error:
+
+    - Double-check that `--rpc-url` points to a healthy endpoint and is consistent between your signing RPC and the backend's read RPC.
+    - Verify the transaction actually succeeded on the block explorer — a reverted transaction will also produce this error.
+    - If everything looks fine on-chain but the backend still rejects, retry the update from the start. The CLI will re-send `addComposeHash`, which is idempotent at the contract level.
+  </Accordion>
+
+  <Accordion title="'Owner mismatch' or EVM revert on addComposeHash">
+    The wallet behind `--private-key` is not the current DstackApp owner. Open the DstackApp contract on Basescan or Etherscan and read `owner()`:
+
+    - If `owner()` returns a different EOA, you are signing with the wrong key. Switch keys and retry.
+    - If `owner()` returns a contract address (Safe, Timelock, or other), the EOA path will never work. Switch to [Multisig and Governance](/phala-cloud/key-management/multisig-governance).
+  </Accordion>
+
+  <Accordion title="Compose hash did not change when I expected it to">
+    You edited something that does not affect `app-compose.json`. Env var values, the `--private-key`, and the `--rpc-url` do not participate in the hash. Only the fields listed in [What the compose hash is](/phala-cloud/key-management/understanding-onchain-kms#what-the-compose-hash-is) do.
+
+    Run the update anyway — if the CLI sees no hash change, it skips `addComposeHash` entirely and only pushes the new env var ciphertext through the patch endpoint.
+  </Accordion>
+
+  <Accordion title="CVM stuck in 'updating' or 'pending' after confirm-patch succeeded">
+    Commit succeeded but the CVM restart is still rolling. Check the CVM logs with `phala logs <cvm-name-or-id>` or in the dashboard. The common slow paths are image pull time (large images on a fresh node) and the workload's own startup time. If the CVM keeps reverting to the old compose, open a support ticket with the correlation_id from the CLI output.
+  </Accordion>
+
+  <Accordion title="The CLI says 'Chain required for publicClient' or 'Chain required for walletClient'">
+    The CLI could not resolve the chain from the CVM metadata and no `--rpc-url` / `ETH_RPC_URL` fallback was provided. Set `--rpc-url` explicitly and retry, or set `ETH_RPC_URL` in your environment. You can verify with `echo $ETH_RPC_URL`.
+  </Accordion>
+</AccordionGroup>
+
+### Error codes
+
+Errors from the confirm step map to structured error codes from Module 01 of the [Error Codes reference](/phala-cloud/references/error-codes). The four that matter for this flow are `ERR-01-005` through `ERR-01-008`. Each one tells you something specific:
+
+- **`ERR-01-005` (HTTP 465)** — the compose hash is not yet on `allowedComposeHashes`. Usually a transient state during the confirm step if you bailed out before `addComposeHash` landed; retry.
+- **`ERR-01-006` (HTTP 466)** — the provision cache for this compose hash has expired (14-day TTL) or the compose file changed since you started the update. Re-run the update command.
+- **`ERR-01-007` (HTTP 467)** — the transaction hash you (or the CLI) passed does not verify against the expected `addComposeHash` state change. Usually RPC propagation delay or a reverted tx; see the accordion above.
+- **`ERR-01-008` (HTTP 468)** — the compose hash is genuinely not in `allowedComposeHashes` from the contract's point of view. If this appears after `addComposeHash` supposedly succeeded, you probably called it on the wrong contract — check the DstackApp address on Basescan.
+
+[Multisig and Governance](/phala-cloud/key-management/multisig-governance#error-code-reference) discusses which phase of a multisig update each error typically appears in.
+
+## Next Steps
+
+- [Multisig and Governance](/phala-cloud/key-management/multisig-governance) — the prepare-and-commit flow for compose updates when the DstackApp owner is a Safe, a timelock, a DAO, or any custom contract. Also covers webhook notifications for pending approvals.
+- [Device Management](/phala-cloud/key-management/device-management) — how to add and remove nodes from the allowlist without touching the compose file, and how to recover from hardware-driven `device_id` drift.
+- [Understanding Onchain KMS](/phala-cloud/key-management/understanding-onchain-kms) — the conceptual model behind compose hashes and the boot-time verification flow.
+- [Error Codes reference](/phala-cloud/references/error-codes) — the full catalog of `ERR-01-*` codes returned by the CVM API.
