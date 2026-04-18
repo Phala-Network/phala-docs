@@ -514,6 +514,7 @@
                   "/phala-cloud/references/overview",
                   {
                     "group": "Phala Cloud API",
+                    "openapi": "openapi.json",
                     "pages": [
                       "/phala-cloud/phala-cloud-api/overview",
                       "/phala-cloud/phala-cloud-api/attestations",
@@ -525,12 +526,16 @@
                           "GET /api/v1/apps/filter-options",
                           "GET /api/v1/apps/{app_id}",
                           "GET /api/v1/apps/{app_id}/attestations",
+                          "GET /api/v1/apps/{app_id}/attestations/tcb-evaluation",
                           "GET /api/v1/apps/{app_id}/cvms",
                           "POST /api/v1/apps/{app_id}/cvms/is-allowed",
                           "POST /api/v1/apps/{app_id}/cvms/{vm_uuid}/replicas",
+                          "POST /api/v1/apps/{app_id}/instances",
                           "GET /api/v1/apps/{app_id}/device-allowlist",
-                          "GET /api/v1/apps/{app_id}/events",
                           "POST /api/v1/apps/{app_id}/is-allowed",
+                          "GET /api/v1/apps/{app_id}/kms-info",
+                          "GET /api/v1/apps/{app_id}/pending-updates",
+                          "GET /api/v1/apps/{app_id}/pending-updates/{vm_uuid}/{compose_hash}/preview",
                           "GET /api/v1/apps/{app_id}/revisions",
                           "GET /api/v1/apps/{app_id}/revisions/{revision_id}",
                           "POST /api/v1/apps/{app_id}/revisions/{revision_id}/redeploy",
@@ -548,8 +553,6 @@
                           "POST /api/v1/cvms/batch-stop",
                           "POST /api/v1/cvms/eliza",
                           "POST /api/v1/cvms/provision/eliza",
-                          "POST /api/v1/cvms/from_cvm_configuration",
-                          "POST /api/v1/cvms/pubkey/from_cvm_configuration",
                           "PATCH /api/v1/cvms/instance-ids",
                           "POST /api/v1/status/batch",
                           "GET /api/v1/cvms/{cvm_id}",
@@ -557,31 +560,33 @@
                           "PATCH /api/v1/cvms/{cvm_id}",
                           "GET /api/v1/cvms/{cvm_id}/attestation",
                           "GET /api/v1/cvms/{cvm_id}/available-os-images",
+                          "POST /api/v1/cvms/{cvm_id}/commit-replica",
                           "GET /api/v1/cvms/{cvm_id}/commit-update",
                           "POST /api/v1/cvms/{cvm_id}/commit-update",
-                          "GET /api/v1/cvms/{cvm_id}/compose",
-                          "PUT /api/v1/cvms/{cvm_id}/compose",
-                          "PATCH /api/v1/cvms/{cvm_id}/compose",
                           "GET /api/v1/cvms/{cvm_id}/compose_file",
                           "PATCH /api/v1/cvms/{cvm_id}/compose_file",
                           "POST /api/v1/cvms/{cvm_id}/compose_file",
                           "POST /api/v1/cvms/{cvm_id}/compose_file/provision",
-                          "GET /api/v1/cvms/{cvm_id}/composition",
                           "POST /api/v1/cvms/{cvm_id}/customize-domain-diagnose",
                           "PATCH /api/v1/cvms/{cvm_id}/docker-compose",
                           "GET /api/v1/cvms/{cvm_id}/docker-compose.yml",
                           "PATCH /api/v1/cvms/{cvm_id}/envs",
+                          "GET /api/v1/cvms/{cvm_id}/firewall-status",
                           "PATCH /api/v1/cvms/{cvm_id}/instance-id",
                           "PATCH /api/v1/cvms/{cvm_id}/listed",
                           "PATCH /api/v1/cvms/{cvm_id}/name",
                           "GET /api/v1/cvms/{cvm_id}/network",
+                          "GET /api/v1/cvms/{cvm_id}/network-config",
+                          "PATCH /api/v1/cvms/{cvm_id}/network-config",
                           "GET /api/v1/cvms/{cvm_id}/operation-status",
                           "GET /api/v1/cvms/{cvm_id}/operations",
+                          "POST /api/v1/cvms/{cvm_id}/operations/cancel",
                           "PATCH /api/v1/cvms/{cvm_id}/os-image",
+                          "GET /api/v1/cvms/{cvm_id}/ports",
+                          "PUT /api/v1/cvms/{cvm_id}/ports",
                           "GET /api/v1/cvms/{cvm_id}/pre-launch-script",
                           "PATCH /api/v1/cvms/{cvm_id}/pre-launch-script",
                           "POST /api/v1/cvms/{cvm_id}/replicas",
-                          "PATCH /api/v1/cvms/{cvm_id}/resources",
                           "POST /api/v1/cvms/{cvm_id}/restart",
                           "POST /api/v1/cvms/{cvm_id}/revisions/{revision_id}/redeploy",
                           "PATCH /api/v1/cvms/{cvm_id}/scheduled-delete",
@@ -590,8 +595,7 @@
                           "GET /api/v1/cvms/{cvm_id}/state",
                           "GET /api/v1/cvms/{cvm_id}/stats",
                           "POST /api/v1/cvms/{cvm_id}/stop",
-                          "GET /api/v1/cvms/{cvm_id}/user_config",
-                          "PATCH /api/v1/cvms/{cvm_id}/visibility"
+                          "GET /api/v1/cvms/{cvm_id}/user_config"
                         ]
                       },
                       {
@@ -606,52 +610,6 @@
                           "GET /api/v1/attestations/nodes",
                           "GET /api/v1/attestations/device_ids",
                           "GET /api/v1/attestations/ppids"
-                        ]
-                      },
-                      {
-                        "group": "Authentication",
-                        "pages": [
-                          "POST /api/v1/auth/token",
-                          "GET /api/v1/auth/authenticated",
-                          "GET /api/v1/auth/me",
-                          "POST /api/v1/auth/login",
-                          "POST /api/v1/auth/logout",
-                          "POST /api/v1/auth/register",
-                          "POST /api/v1/auth/forgot-password",
-                          "PUT /api/v1/auth/reset-password",
-                          "GET /api/v1/auth/validate-reset-token",
-                          "POST /api/v1/auth/password",
-                          "POST /api/v1/auth/change-email",
-                          "POST /api/v1/auth/request-email-verification",
-                          "POST /api/v1/auth/verify-email-token",
-                          "PUT /api/v1/auth/username",
-                          "GET /api/v1/auth/sessions",
-                          "DELETE /api/v1/auth/sessions",
-                          "DELETE /api/v1/auth/sessions/{jti}",
-                          "POST /api/v1/auth/step-up/verify",
-                          "GET /api/v1/auth/oauth/google/authorize",
-                          "GET /api/v1/auth/oauth/google/callback",
-                          "GET /api/v1/auth/oauth/github/authorize",
-                          "GET /api/v1/auth/oauth/github/callback",
-                          "GET /api/v1/auth/decode-link-token",
-                          "POST /api/v1/auth/verify-and-link-oauth",
-                          "POST /api/v1/auth/login-with-2fa",
-                          "POST /api/v1/auth/2fa/setup",
-                          "POST /api/v1/auth/2fa/confirm",
-                          "POST /api/v1/auth/2fa/disable",
-                          "GET /api/v1/auth/2fa/status",
-                          "POST /api/v1/auth/2fa/verify",
-                          "POST /api/v1/auth/2fa/verify-and-set-cookie",
-                          "POST /api/v1/auth/2fa/regenerate-backup-codes"
-                        ]
-                      },
-                      {
-                        "group": "Tokens",
-                        "pages": [
-                          "GET /api/v1/tokens",
-                          "POST /api/v1/tokens",
-                          "DELETE /api/v1/tokens/{token_id}",
-                          "POST /api/v1/tokens/{token_id}/refresh"
                         ]
                       },
                       {
@@ -683,77 +641,19 @@
                         ]
                       },
                       {
-                        "group": "GPUs",
+                        "group": "Webhooks",
                         "pages": [
-                          "GET /api/v1/gpus/reserved",
-                          "POST /api/v1/gpus/switch-mode"
-                        ]
-                      },
-                      {
-                        "group": "Workspace",
-                        "pages": [
-                          "GET /api/v1/workspaces",
-                          "POST /api/v1/workspaces/check-slug",
-                          "GET /api/v1/workspaces/{team_slug}",
-                          "GET /api/v1/workspaces/{team_slug}/nodes",
-                          "GET /api/v1/workspaces/{team_slug}/quotas",
-                          "POST /api/v1/workspaces/{workspace_slug}/invitations",
-                          "GET /api/v1/workspaces/{workspace_slug}/invitations",
-                          "POST /api/v1/workspaces/{workspace_slug}/invitations/shareable",
-                          "DELETE /api/v1/workspaces/{workspace_slug}/invitations/{invitation_id}",
-                          "POST /api/v1/workspaces/{workspace_slug}/leave",
-                          "GET /api/v1/workspaces/{workspace_slug}/members",
-                          "DELETE /api/v1/workspaces/{workspace_slug}/members/{user_id}",
-                          "PATCH /api/v1/workspaces/{workspace_slug}/members/{user_id}"
-                        ]
-                      },
-                      {
-                        "group": "Billing",
-                        "pages": [
-                          "GET /api/v1/billing",
-                          "GET /api/v1/billing/balance",
-                          "GET /api/v1/billing/billing_items",
-                          "GET /api/v1/billing/billing_items/{cvm_id}",
-                          "GET /api/v1/billing/settings",
-                          "PATCH /api/v1/billing/settings",
-                          "GET /api/v1/billing/invoices",
-                          "GET /api/v1/billing/invoices/{invoice_id}",
-                          "GET /api/v1/billing/invoices/{invoice_id}/items",
-                          "POST /api/v1/billing/invoices/{invoice_id}/pay",
-                          "GET /api/v1/credits",
-                          "POST /api/v1/credits/redeem",
-                          "GET /api/v1/credits/transactions",
-                          "GET /api/v1/card",
-                          "DELETE /api/v1/card/{payment_method_id}",
-                          "POST /api/v1/charge",
-                          "GET /api/v1/debt",
-                          "POST /api/v1/debt/settlement",
-                          "GET /api/v1/orders",
-                          "POST /api/v1/setup-billing/create-intent",
-                          "POST /api/v1/setup-billing/save-intent",
-                          "GET /api/v1/setup-billing/check"
-                        ]
-                      },
-                      {
-                        "group": "Profiles",
-                        "pages": [
-                          "GET /api/v1/profiles/me",
-                          "PUT /api/v1/profiles/me",
-                          "PUT /api/v1/profiles/me/avatar",
-                          "DELETE /api/v1/profiles/me/avatar",
-                          "GET /api/v1/profiles/{entity_type}/{entity_id}",
-                          "PUT /api/v1/profiles/{entity_type}/{entity_id}",
-                          "DELETE /api/v1/profiles/{entity_type}/{entity_id}",
-                          "PUT /api/v1/profiles/{entity_type}/{entity_id}/avatar",
-                          "DELETE /api/v1/profiles/{entity_type}/{entity_id}/avatar"
-                        ]
-                      },
-                      {
-                        "group": "Usage",
-                        "pages": [
-                          "GET /api/v1/usage/current",
-                          "GET /api/v1/usage/data",
-                          "GET /api/v1/usage/export"
+                          "GET /api/v1/workspace/webhooks",
+                          "POST /api/v1/workspace/webhooks",
+                          "GET /api/v1/workspace/webhooks/{webhook_id}",
+                          "PUT /api/v1/workspace/webhooks/{webhook_id}",
+                          "DELETE /api/v1/workspace/webhooks/{webhook_id}",
+                          "POST /api/v1/workspace/webhooks/{webhook_id}/reveal-secret",
+                          "POST /api/v1/workspace/webhooks/{webhook_id}/rotate-secret",
+                          "POST /api/v1/workspace/webhooks/{webhook_id}/test",
+                          "GET /api/v1/workspace/webhooks/{webhook_id}/deliveries",
+                          "POST /api/v1/workspace/webhooks/{webhook_id}/deliveries/{event_id}/resend",
+                          "GET /api/v1/workspace/webhooks/{webhook_id}/stats"
                         ]
                       }
                     ]
@@ -907,7 +807,6 @@
       }
     ]
   },
-  "openapi": "openapi.json",
   "redirects": [
     {
       "destination": "/phala-cloud/key-management/deploying-with-onchain-kms",
