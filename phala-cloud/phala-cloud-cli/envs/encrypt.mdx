@@ -1,0 +1,75 @@
+---
+title: "envs encrypt"
+description: "Encrypt environment variables for a CVM (sealed, only readable inside TEE)"
+---
+
+## Command: `phala envs encrypt`
+
+### Syntax
+
+```
+phala envs encrypt [options] [<cvm_id>]
+```
+
+### Description
+
+Encrypt environment variables for a CVM (sealed, only readable inside TEE)
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-e, --env <value>` | Environment variable (KEY=VALUE) or env file path (repeatable) |
+| `-n, --no-newline` | Do not print trailing newline (useful for piping) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `-i, --interactive` | Enable interactive mode |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Encrypt inline variables
+
+```bash
+phala envs encrypt app_abc123 -e SECRET=value -e API_KEY=xxx
+```
+
+* Encrypt from env file
+
+```bash
+phala envs encrypt app_abc123 -e .env
+```
+
+* Encrypt with CVM from phala.toml
+
+```bash
+phala envs encrypt -e .env.production
+```
+
+* Pipe to file for later use
+
+```bash
+phala envs encrypt app_abc123 -e .env > encrypted.hex
+```
+
+* Pipe without trailing newline
+
+```bash
+phala envs encrypt app_abc123 -n -e .env | some-tool
+```
+

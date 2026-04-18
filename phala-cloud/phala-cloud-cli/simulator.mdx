@@ -1,25 +1,26 @@
 ---
 title: "simulator"
 description: "TEE simulator commands"
+hidden: true
 ---
 
 <Note>
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala simulator`
+### Command: `phala simulator`
 
-### Syntax
+#### Syntax
 
 ```
 phala simulator <command> [options]
 ```
 
-### Description
+#### Description
 
 TEE simulator commands
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -32,6 +33,13 @@ TEE simulator commands
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala simulator --help
+```
 ### Subcommands
 
 | Command | Description |
@@ -39,10 +47,3 @@ TEE simulator commands
 | `start` | Start the TEE simulator |
 | `stop` | Stop the TEE simulator |
 
-### Examples
-
-* Display help:
-
-```bash
-phala simulator --help
-```

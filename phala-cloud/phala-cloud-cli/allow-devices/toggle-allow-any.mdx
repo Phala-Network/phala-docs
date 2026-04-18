@@ -1,0 +1,69 @@
+---
+title: "allow-devices toggle-allow-any"
+description: "Toggle allow-any-device on the contract (or force via --enable/--disable)"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala allow-devices toggle-allow-any`
+
+### Syntax
+
+```
+phala allow-devices toggle-allow-any [options] <cvm>
+```
+
+### Description
+
+Toggle allow-any-device on the contract (or force via --enable/--disable)
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm>` | CVM or app identifier (UUID, app_id, instance_id, or name) |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--enable` | Force enable allow-any-device |
+| `--disable` | Force disable allow-any-device |
+| `--wait` | Wait for on-chain state to reflect the change via RPC polling |
+
+### Advanced Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--private-key <value>` | Private key for signing on-chain transactions (or set PRIVATE_KEY env var) |
+| `--rpc-url <value>` | RPC URL for on-chain KMS transactions (or set ETH_RPC_URL env var) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--interactive` | Enable interactive mode for commands that support it |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Toggle based on current state
+
+```bash
+phala allow-devices toggle-allow-any app_abc123 --private-key 0x...
+```
+
+* Force enable
+
+```bash
+phala allow-devices toggle-allow-any app_abc123 --enable --private-key 0x...
+```
+

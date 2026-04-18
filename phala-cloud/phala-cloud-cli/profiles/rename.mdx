@@ -1,0 +1,44 @@
+---
+title: "profiles rename"
+description: "Rename an auth profile"
+---
+
+## Command: `phala profiles rename`
+
+### Syntax
+
+```
+phala profiles rename <old-name> <new-name>
+```
+
+### Description
+
+Rename an auth profile
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<old-name>` | Current profile name |
+| `<new-name>` | New profile name |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--interactive` | Enable interactive mode for commands that support it |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Display help:
+
+```bash
+phala profiles rename --help
+```

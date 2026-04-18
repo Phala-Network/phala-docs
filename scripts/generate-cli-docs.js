@@ -24,7 +24,7 @@ const SKIP_COMMANDS = new Set(["help", "completion"]);
 
 // Files to preserve (manually edited, not auto-generated)
 // These files won't be overwritten but will still be included in docs.json
-const PRESERVE_FILES = new Set(["overview"]);
+const PRESERVE_FILES = new Set(["overview", "link"]);
 
 // Commands that are deprecated but should redirect to new commands
 const DEPRECATED_REDIRECTS = {
@@ -308,66 +308,37 @@ function parseHelpOutput(output, commandPath) {
   return command;
 }
 
+function h(level) {
+  return "#".repeat(level);
+}
+
 /**
- * Generate MDX content for a command
+ * Render the body of a command (without frontmatter) at a given heading level.
  */
-function generateMdx(command, commandPath) {
+function renderCommandBody(command, commandPath, level) {
   const fullCommand = ["phala", ...commandPath.slice(1)].join(" ");
-  let title =
-    commandPath.length > 1
-      ? commandPath[commandPath.length - 1]
-      : "Overview";
-
-  // Add deprecation marker to title
-  if (command.deprecated) {
-    title += " (Deprecated)";
-  }
-
-  let mdx = `---
-title: "${title}"
-description: "${escapeForYaml(command.description || `Reference for the ${fullCommand} command`)}"
----
-
-`;
-
-  // Add deprecation notice
-  if (command.deprecated) {
-    mdx += `<Warning>
-This command is deprecated. ${DEPRECATED_REDIRECTS[command.name] || "See the newer alternatives."}
-</Warning>
-
-`;
-  }
-
-  // Add unstable notice
-  if (command.unstable) {
-    mdx += `<Note>
-This command is marked as unstable and may change in future releases.
-</Note>
-
-`;
-  }
+  let mdx = "";
 
   // Command header
   if (commandPath.length > 1) {
-    mdx += `## Command: \`${fullCommand}\`\n\n`;
+    mdx += `${h(level)} Command: \`${fullCommand}\`\n\n`;
   } else {
-    mdx += `## Base Command: \`phala\`\n\n`;
+    mdx += `${h(level)} Base Command: \`phala\`\n\n`;
   }
 
   // Syntax
-  mdx += `### Syntax\n\n`;
+  mdx += `${h(level + 1)} Syntax\n\n`;
   mdx += "```\n";
   mdx += command.usage + "\n";
   mdx += "```\n\n";
 
   // Description
-  mdx += `### Description\n\n`;
+  mdx += `${h(level + 1)} Description\n\n`;
   mdx += `${command.description}\n\n`;
 
   // Arguments
   if (command.arguments.length > 0) {
-    mdx += `### Arguments\n\n`;
+    mdx += `${h(level + 1)} Arguments\n\n`;
     mdx += `| Argument | Description |\n`;
     mdx += `| -------- | ----------- |\n`;
     for (const arg of command.arguments) {
@@ -392,7 +363,7 @@ This command is marked as unstable and may change in future releases.
       for (const groupName of groupOrder) {
         const groupOpts = command.optionGroups[groupName];
         if (groupOpts && groupOpts.length > 0) {
-          mdx += `### ${groupName}\n\n`;
+          mdx += `${h(level + 1)} ${groupName}\n\n`;
           mdx += `| Option | Description |\n`;
           mdx += `| ------ | ----------- |\n`;
           for (const opt of groupOpts) {
@@ -405,7 +376,7 @@ This command is marked as unstable and may change in future releases.
       // Only global options — just render as "Global Options"
       const globalOpts = command.optionGroups["Global Options"];
       if (globalOpts && globalOpts.length > 0) {
-        mdx += `### Global Options\n\n`;
+        mdx += `${h(level + 1)} Global Options\n\n`;
         mdx += `| Option | Description |\n`;
         mdx += `| ------ | ----------- |\n`;
         for (const opt of globalOpts) {
@@ -416,37 +387,9 @@ This command is marked as unstable and may change in future releases.
     }
   }
 
-  // Subcommands tables (separate active from deprecated)
-  if (command.subcommands.length > 0) {
-    const activeSubcommands = command.subcommands.filter(sub => !sub.deprecated);
-    const deprecatedSubcommands = command.subcommands.filter(sub => sub.deprecated);
-
-    // Active subcommands
-    if (activeSubcommands.length > 0) {
-      mdx += `### Subcommands\n\n`;
-      mdx += `| Command | Description |\n`;
-      mdx += `| ------- | ----------- |\n`;
-      for (const sub of activeSubcommands) {
-        mdx += `| \`${sub.name}\` | ${escapeForTable(sub.description)} |\n`;
-      }
-      mdx += "\n";
-    }
-
-    // Deprecated subcommands
-    if (deprecatedSubcommands.length > 0) {
-      mdx += `### Deprecated Subcommands\n\n`;
-      mdx += `| Command | Description |\n`;
-      mdx += `| ------- | ----------- |\n`;
-      for (const sub of deprecatedSubcommands) {
-        mdx += `| \`${sub.name}\` | ${escapeForTable(sub.description)} |\n`;
-      }
-      mdx += "\n";
-    }
-  }
-
   // Pass-through section
   if (command.passThrough) {
-    mdx += `### Pass-through Arguments\n\n`;
+    mdx += `${h(level + 1)} Pass-through Arguments\n\n`;
     mdx += command.passThrough
       .split("\n")
       .map((line) => line.trim())
@@ -457,7 +400,7 @@ This command is marked as unstable and may change in future releases.
 
   // Examples
   if (command.examples.length > 0) {
-    mdx += `### Examples\n\n`;
+    mdx += `${h(level + 1)} Examples\n\n`;
     for (const example of command.examples) {
       const lines = example.split("\n");
       for (const line of lines) {
@@ -473,11 +416,92 @@ This command is marked as unstable and may change in future releases.
     }
   } else {
     // Default examples
-    mdx += `### Examples\n\n`;
+    mdx += `${h(level + 1)} Examples\n\n`;
     mdx += `* Display help:\n\n`;
     mdx += "```bash\n";
     mdx += `${fullCommand} --help\n`;
     mdx += "```\n";
+  }
+
+  return mdx;
+}
+
+/**
+ * Generate MDX content for a command
+ */
+function generateMdx(command, commandPath, isStandalone = false) {
+  let title;
+  if (commandPath.length > 2) {
+    // Subcommand — use "parent sub" form so sidebar matches CLI invocation
+    title = commandPath.slice(1).join(" ");
+  } else if (commandPath.length > 1) {
+    // Parent/top-level command
+    title = commandPath[commandPath.length - 1];
+  } else {
+    title = "Overview";
+  }
+
+  // Add deprecation marker to title
+  if (command.deprecated) {
+    title += " (Deprecated)";
+  }
+
+  const hasSubcommands = command.subcommands && command.subcommands.length > 0;
+  const hiddenAttr = !isStandalone && hasSubcommands ? "\nhidden: true" : "";
+
+  let mdx = `---
+title: "${escapeForYaml(title)}"
+description: "${escapeForYaml(command.description || `Reference for the ${["phala", ...commandPath.slice(1)].join(" ")} command`)}"${hiddenAttr}
+---
+
+`;
+
+  // Add deprecation notice
+  if (command.deprecated) {
+    mdx += `<Warning>
+This command is deprecated. ${DEPRECATED_REDIRECTS[command.name] || "See the newer alternatives."}
+</Warning>
+
+`;
+  }
+
+  // Add unstable notice
+  if (command.unstable) {
+    mdx += `<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+`;
+  }
+
+  // Heading level: standalone pages use ##, parent pages use ###
+  const level = isStandalone ? 2 : 3;
+  mdx += renderCommandBody(command, commandPath, level);
+
+  // Subcommands summary table — only on parent pages
+  if (!isStandalone && command.subcommands.length > 0) {
+    const activeSubcommands = command.subcommands.filter(sub => !sub.deprecated);
+    const deprecatedSubcommands = command.subcommands.filter(sub => sub.deprecated);
+
+    if (activeSubcommands.length > 0) {
+      mdx += `### Subcommands\n\n`;
+      mdx += `| Command | Description |\n`;
+      mdx += `| ------- | ----------- |\n`;
+      for (const sub of activeSubcommands) {
+        mdx += `| \`${sub.name}\` | ${escapeForTable(sub.description)} |\n`;
+      }
+      mdx += "\n";
+    }
+
+    if (deprecatedSubcommands.length > 0) {
+      mdx += `### Deprecated Subcommands\n\n`;
+      mdx += `| Command | Description |\n`;
+      mdx += `| ------- | ----------- |\n`;
+      for (const sub of deprecatedSubcommands) {
+        mdx += `| \`${sub.name}\` | ${escapeForTable(sub.description)} |\n`;
+      }
+      mdx += "\n";
+    }
   }
 
   // Replace placeholder domains with realistic Phala examples
@@ -535,6 +559,15 @@ function getAllCommands() {
     // Get subcommands for this command (for reference in the same page)
     if (cmd.subcommands.length > 0) {
       console.log(`    Found ${cmd.subcommands.length} subcommands`);
+      cmd.subcommandDetails = [];
+      for (const nestedSub of cmd.subcommands) {
+        if (SKIP_COMMANDS.has(nestedSub.name)) continue;
+        const nestedOutput = runCommand([subCmd.name, nestedSub.name]);
+        const nestedCmd = parseHelpOutput(nestedOutput, ["phala", subCmd.name, nestedSub.name]);
+        if (nestedSub.deprecated) nestedCmd.deprecated = true;
+        if (nestedSub.unstable) nestedCmd.unstable = true;
+        cmd.subcommandDetails.push(nestedCmd);
+      }
     }
   }
 
@@ -542,16 +575,18 @@ function getAllCommands() {
 }
 
 /**
- * Generate MDX files for all commands
+ * Generate MDX files for all commands and their subcommands
  */
 function generateMdxFiles(commands) {
   const generatedFiles = [];
+  const subcommandGroups = [];
 
   // Ensure output directory exists
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
+  // Generate parent command pages
   for (const [name, command] of commands) {
     const filename = `${name}.mdx`;
     const filepath = path.join(OUTPUT_DIR, filename);
@@ -570,46 +605,109 @@ function generateMdxFiles(commands) {
     generatedFiles.push(name);
   }
 
-  return generatedFiles;
+  // Generate standalone subcommand pages
+  for (const [name, command] of commands) {
+    if (command.subcommandDetails && command.subcommandDetails.length > 0) {
+      const subDir = path.join(OUTPUT_DIR, name);
+      if (!fs.existsSync(subDir)) {
+        fs.mkdirSync(subDir, { recursive: true });
+      }
+
+      const subPages = [];
+      for (const sub of command.subcommandDetails) {
+        if (SKIP_COMMANDS.has(sub.name)) continue;
+        const subFile = path.join(subDir, `${sub.name}.mdx`);
+        const subMdx = generateMdx(sub, ["phala", name, sub.name], true);
+        fs.writeFileSync(subFile, subMdx);
+        console.log(`Generated: ${subFile}`);
+        subPages.push(sub.name);
+      }
+
+      if (subPages.length > 0) {
+        subcommandGroups.push({ parent: name, pages: subPages });
+      }
+    }
+  }
+
+  return { generatedFiles, subcommandGroups };
 }
 
 /**
- * Update docs.json with new CLI pages
+ * Update docs.json with new CLI pages and subcommand groups
  */
-function updateDocsJson(commandNames) {
+function updateDocsJson({ generatedFiles, subcommandGroups }) {
   const docsJson = JSON.parse(fs.readFileSync(DOCS_JSON_PATH, "utf-8"));
 
-  // Define the order of commands
-  const commandOrder = [
-    "overview",
-    "login",
-    "logout",
-    "status",
-    "deploy",
-    "cvms",
-    "ssh",
-    "cp",
-    "docker",
-    "simulator",
-    "nodes",
-    "config",
-    "auth", // deprecated, at the end
-  ];
+  // Build a set of parent commands that have subcommands
+  const parentsWithSubcommands = new Set(subcommandGroups.map((g) => g.parent));
 
-  // Sort command names by the defined order
-  const sortedNames = commandNames.sort((a, b) => {
-    const aIndex = commandOrder.indexOf(a);
-    const bIndex = commandOrder.indexOf(b);
-    if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
-    return aIndex - bIndex;
-  });
+  // Build a map of parent path -> nested group for subcommands.
+  // Entries are plain strings — the sidebar label comes from each MDX's
+  // frontmatter `title`, which the generator sets to "parent sub".
+  const subcommandMap = new Map();
+  for (const { parent, pages } of subcommandGroups) {
+    const groupPages = [`/phala-cloud/phala-cloud-cli/${parent}`];
+    for (const sub of pages) {
+      groupPages.push(`/phala-cloud/phala-cloud-cli/${parent}/${sub}`);
+    }
+    subcommandMap.set(parent, {
+      group: parent,
+      pages: groupPages,
+    });
+  }
 
-  // Build the new pages array
-  const cliPages = sortedNames.map(
-    (name) => `/phala-cloud/phala-cloud-cli/${name}`
-  );
+  // Wrap a string path into a subcommand group if applicable.
+  // For existing parent commands (like cvms, profiles), this turns the
+  // flat string into the nested group. For new commands, same thing.
+  function wrapIfNeeded(nameOrPath) {
+    const name = typeof nameOrPath === "string"
+      ? nameOrPath.replace("/phala-cloud/phala-cloud-cli/", "")
+      : nameOrPath;
+    if (subcommandMap.has(name)) {
+      return subcommandMap.get(name);
+    }
+    return nameOrPath;
+  }
+
+  // Recursively process a pages array. Two jobs:
+  //  - Replace a parent command's flat path with its subcommand group (only
+  //    at the outermost level where the parent appears as a sibling of other
+  //    commands — not inside its own already-wrapped group).
+  //  - Recurse into existing groups to normalize legacy `{page, title}`
+  //    objects back to plain strings (Mintlify `pages` entries must be a
+  //    string or a nested `{group, pages}` — no other shapes are valid; the
+  //    sidebar label comes from each MDX's frontmatter `title`).
+  //
+  // `insideGroup` is set while recursing into a group with that name; inside
+  // it we must NOT re-wrap `/phala-cloud/phala-cloud-cli/<insideGroup>` into
+  // another nested group, which would compound on each run.
+  function processPages(pages, insideGroup = null) {
+    if (!Array.isArray(pages)) return pages;
+    const result = [];
+    for (const page of pages) {
+      if (typeof page === "string") {
+        const name = page.replace("/phala-cloud/phala-cloud-cli/", "");
+        if (name !== insideGroup && subcommandMap.has(name)) {
+          result.push(subcommandMap.get(name));
+        } else {
+          result.push(page);
+        }
+      } else if (typeof page === "object" && page !== null && Array.isArray(page.pages)) {
+        // If this group corresponds to a freshly-built subcommand group,
+        // replace it outright so we emit a clean, flat list of strings.
+        if (page.group && subcommandMap.has(page.group)) {
+          result.push(subcommandMap.get(page.group));
+        } else {
+          result.push({ ...page, pages: processPages(page.pages, page.group || insideGroup) });
+        }
+      } else if (typeof page === "object" && page !== null && typeof page.page === "string") {
+        result.push(page.page);
+      } else {
+        result.push(page);
+      }
+    }
+    return result;
+  }
 
   // Find and update the CLI Reference group in docs.json
   function findAndUpdateCliGroup(obj) {
@@ -621,7 +719,84 @@ function updateDocsJson(commandNames) {
       }
     } else if (typeof obj === "object" && obj !== null) {
       if (obj.group === "Phala Cloud CLI") {
-        obj.pages = cliPages;
+        const pages = obj.pages;
+        const isGrouped = pages.some((p) => typeof p === "object" && p.group);
+
+        if (isGrouped) {
+          // Collect existing leaf paths (strings and {page} objects)
+          const existingPaths = new Set();
+          const groupMap = {};
+          function collectPaths(items) {
+            for (const p of items) {
+              if (typeof p === "string") {
+                existingPaths.add(p);
+              } else if (p.page) {
+                existingPaths.add(p.page);
+              } else if (p.group && Array.isArray(p.pages)) {
+                groupMap[p.group] = p;
+                collectPaths(p.pages);
+              }
+            }
+          }
+          collectPaths(pages);
+
+          // Add any new parent commands
+          generatedFiles.forEach((name) => {
+            const pagePath = `/phala-cloud/phala-cloud-cli/${name}`;
+            if (existingPaths.has(pagePath)) return;
+            existingPaths.add(pagePath);
+
+            if (name === "instances") {
+              const manage = groupMap["Manage"];
+              if (manage) {
+                const idx = manage.pages.indexOf("/phala-cloud/phala-cloud-cli/apps");
+                if (idx !== -1) {
+                  manage.pages.splice(idx + 1, 0, pagePath);
+                } else {
+                  manage.pages.push(pagePath);
+                }
+              }
+            } else {
+              const firstGroupIndex = pages.findIndex((p) => typeof p === "object");
+              if (firstGroupIndex !== -1) {
+                pages.splice(firstGroupIndex, 0, pagePath);
+              } else {
+                pages.push(pagePath);
+              }
+            }
+          });
+
+          // Replace string paths with subcommand groups in one pass
+          obj.pages = processPages(pages);
+        } else {
+          // Flat list fallback — reconstruct as flat strings
+          const commandOrder = [
+            "overview",
+            "login",
+            "logout",
+            "status",
+            "deploy",
+            "cvms",
+            "ssh",
+            "cp",
+            "docker",
+            "simulator",
+            "nodes",
+            "config",
+            "auth",
+          ];
+          const sortedNames = generatedFiles.sort((a, b) => {
+            const aIndex = commandOrder.indexOf(a);
+            const bIndex = commandOrder.indexOf(b);
+            if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+            return aIndex - bIndex;
+          });
+          obj.pages = sortedNames.map(
+            (name) => `/phala-cloud/phala-cloud-cli/${name}`
+          );
+        }
         return true;
       }
       for (const key of Object.keys(obj)) {
@@ -653,11 +828,12 @@ function main() {
   console.log(`\nTotal commands found: ${commands.size}\n`);
 
   // Generate MDX files
-  const generatedFiles = generateMdxFiles(commands);
-  console.log(`\nGenerated ${generatedFiles.length} MDX files\n`);
+  const { generatedFiles, subcommandGroups } = generateMdxFiles(commands);
+  const totalFiles = generatedFiles.length + subcommandGroups.reduce((sum, g) => sum + g.pages.length, 0);
+  console.log(`\nGenerated ${totalFiles} MDX files (${generatedFiles.length} parents, ${subcommandGroups.length} subcommand groups)\n`);
 
   // Update docs.json
-  updateDocsJson(generatedFiles);
+  updateDocsJson({ generatedFiles, subcommandGroups });
 
   console.log("\nDone! Run 'npx mintlify dev' to preview the documentation.");
 }

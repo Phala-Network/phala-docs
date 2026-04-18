@@ -1,0 +1,73 @@
+---
+title: "cvms delete"
+description: "Delete a CVM"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala cvms delete`
+
+### Syntax
+
+```
+phala cvms delete [options] [<cvm_id>]
+```
+
+### Description
+
+Delete a CVM
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-f, --force` | Skip confirmation prompt |
+| `-y, --yes` | Alias for --force (skip confirmation prompt) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `-i, --interactive` | Enable interactive mode |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Delete a CVM interactively
+
+```bash
+phala cvms delete
+```
+
+* Delete CVM by app_id
+
+```bash
+phala cvms delete app_123 --force
+```
+
+* Delete CVM by UUID
+
+```bash
+phala cvms delete 550e8400-e29b-41d4-a716-446655440000 -f
+```
+
+* Delete CVM by name
+
+```bash
+phala cvms delete my-app --yes
+```
+

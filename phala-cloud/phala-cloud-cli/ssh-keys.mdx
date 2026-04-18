@@ -1,21 +1,22 @@
 ---
 title: "ssh-keys"
 description: "Manage SSH keys"
+hidden: true
 ---
 
-## Command: `phala ssh-keys`
+### Command: `phala ssh-keys`
 
-### Syntax
+#### Syntax
 
 ```
 phala ssh-keys <command> [options]
 ```
 
-### Description
+#### Description
 
 Manage SSH keys
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -28,6 +29,13 @@ Manage SSH keys
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala ssh-keys --help
+```
 ### Subcommands
 
 | Command | Description |
@@ -37,10 +45,3 @@ Manage SSH keys
 | `remove` | Remove an SSH key from your account |
 | `import-github` | Import SSH keys from a GitHub user's public profile |
 
-### Examples
-
-* Display help:
-
-```bash
-phala ssh-keys --help
-```

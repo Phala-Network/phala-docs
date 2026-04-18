@@ -7,26 +7,26 @@ description: "Copy files to/from a CVM via SCP"
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala cp`
+### Command: `phala cp`
 
-### Syntax
+#### Syntax
 
 ```
 phala cp [options] <source> <destination>
 ```
 
-### Description
+#### Description
 
 Copy files to/from a CVM via SCP
 
-### Arguments
+#### Arguments
 
 | Argument | Description |
 | -------- | ----------- |
 | `<source>` | Source path (local or cvm-name:path, use :path for phala.toml cvm_id) |
 | `<destination>` | Destination path (local or cvm-name:path, use :path for phala.toml cvm_id) |
 
-### Options
+#### Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -37,7 +37,7 @@ Copy files to/from a CVM via SCP
 | `-v, --verbose` | Show verbose SCP details |
 | `--dry-run` | Print SCP command without executing |
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -50,7 +50,7 @@ Copy files to/from a CVM via SCP
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### Examples
+#### Examples
 
 * Upload from phala.toml
 

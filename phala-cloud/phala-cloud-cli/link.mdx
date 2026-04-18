@@ -17,7 +17,11 @@ phala link [options] [<cvm-id>]
 
 ### Description
 
-Link a local directory to a CVM
+Link a local directory to a CVM.
+
+<Note>
+As of v1.1.18, `phala link` supports linking by a 40-character hex <code>app_id</code> (resolved via the <code>/apps/{app_id}</code> endpoint). After authentication, the CLI prints the workspace <code>name</code> and <code>slug</code> so you can confirm the target context before the link is written.
+</Note>
 
 ### Arguments
 

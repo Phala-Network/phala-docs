@@ -1,0 +1,68 @@
+---
+title: "allow-devices add"
+description: "Add devices to the on-chain allowlist"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala allow-devices add`
+
+### Syntax
+
+```
+phala allow-devices add [options] <cvm> [<device_id>]
+```
+
+### Description
+
+Add devices to the on-chain allowlist
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm>` | CVM or app identifier (UUID, app_id, instance_id, or name) |
+| `<device_id>?` | Device ID (bytes32 hex) or node name. Node names are resolved to device IDs from available nodes. |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--wait` | Wait for on-chain state to reflect the change via RPC polling |
+
+### Advanced Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--private-key <value>` | Private key for signing on-chain transactions (or set PRIVATE_KEY env var) |
+| `--rpc-url <value>` | RPC URL for on-chain KMS transactions (or set ETH_RPC_URL env var) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `-i, --interactive` | Enable interactive mode |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Add device to allowlist
+
+```bash
+phala allow-devices add app_abc123 0xaabb... --private-key 0x...
+```
+
+* Interactive multi-select from available nodes
+
+```bash
+phala allow-devices add app_abc123 -i --private-key 0x...
+```
+

@@ -1,21 +1,22 @@
 ---
 title: "envs"
 description: "Encrypt and update CVM sealed environment variables"
+hidden: true
 ---
 
-## Command: `phala envs`
+### Command: `phala envs`
 
-### Syntax
+#### Syntax
 
 ```
 phala envs <command> [options]
 ```
 
-### Description
+#### Description
 
 Encrypt and update CVM sealed environment variables
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -28,6 +29,13 @@ Encrypt and update CVM sealed environment variables
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala envs --help
+```
 ### Subcommands
 
 | Command | Description |
@@ -35,10 +43,3 @@ Encrypt and update CVM sealed environment variables
 | `encrypt` | Encrypt environment variables for a CVM (sealed, only readable inside TEE) |
 | `update` | Encrypt and push sealed environment variables to a CVM (only readable inside TEE) |
 
-### Examples
-
-* Display help:
-
-```bash
-phala envs --help
-```

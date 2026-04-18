@@ -1,25 +1,26 @@
 ---
 title: "docker (Deprecated)"
 description: "Docker Hub login and image management"
+hidden: true
 ---
 
 <Warning>
 This command is deprecated. See the newer alternatives.
 </Warning>
 
-## Command: `phala docker`
+### Command: `phala docker`
 
-### Syntax
+#### Syntax
 
 ```
 phala docker <command> [options]
 ```
 
-### Description
+#### Description
 
 Docker Hub login and image management
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -32,6 +33,13 @@ Docker Hub login and image management
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala docker --help
+```
 ### Subcommands
 
 | Command | Description |
@@ -42,10 +50,3 @@ Docker Hub login and image management
 | `generate` | Generate a Docker Compose file |
 | `run` | Run a Docker Compose setup |
 
-### Examples
-
-* Display help:
-
-```bash
-phala docker --help
-```
