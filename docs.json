@@ -215,7 +215,13 @@
                     "pages": [
                       "/phala-cloud/phala-cloud-cli/deploy",
                       "/phala-cloud/phala-cloud-cli/instance-types",
-                      "/phala-cloud/phala-cloud-cli/nodes",
+                      {
+                        "group": "nodes",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/nodes",
+                          "/phala-cloud/phala-cloud-cli/nodes/list"
+                        ]
+                      },
                       "/phala-cloud/phala-cloud-cli/os-images"
                     ]
                   },
@@ -223,11 +229,63 @@
                     "group": "Manage",
                     "pages": [
                       "/phala-cloud/phala-cloud-cli/apps",
-                      "/phala-cloud/phala-cloud-cli/cvms",
-                      "/phala-cloud/phala-cloud-cli/envs",
+                      {
+                        "group": "instances",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/instances",
+                          "/phala-cloud/phala-cloud-cli/instances/ls",
+                          "/phala-cloud/phala-cloud-cli/instances/add",
+                          "/phala-cloud/phala-cloud-cli/instances/rm"
+                        ]
+                      },
+                      {
+                        "group": "cvms",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/cvms",
+                          "/phala-cloud/phala-cloud-cli/cvms/attestation",
+                          "/phala-cloud/phala-cloud-cli/cvms/create",
+                          "/phala-cloud/phala-cloud-cli/cvms/delete",
+                          "/phala-cloud/phala-cloud-cli/cvms/device-allowlist",
+                          "/phala-cloud/phala-cloud-cli/cvms/get",
+                          "/phala-cloud/phala-cloud-cli/cvms/list",
+                          "/phala-cloud/phala-cloud-cli/cvms/list-nodes",
+                          "/phala-cloud/phala-cloud-cli/cvms/logs",
+                          "/phala-cloud/phala-cloud-cli/cvms/replicate",
+                          "/phala-cloud/phala-cloud-cli/cvms/resize",
+                          "/phala-cloud/phala-cloud-cli/cvms/restart",
+                          "/phala-cloud/phala-cloud-cli/cvms/serial-logs",
+                          "/phala-cloud/phala-cloud-cli/cvms/start",
+                          "/phala-cloud/phala-cloud-cli/cvms/stop",
+                          "/phala-cloud/phala-cloud-cli/cvms/upgrade"
+                        ]
+                      },
+                      {
+                        "group": "envs",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/envs",
+                          "/phala-cloud/phala-cloud-cli/envs/encrypt",
+                          "/phala-cloud/phala-cloud-cli/envs/update"
+                        ]
+                      },
                       "/phala-cloud/phala-cloud-cli/link",
-                      "/phala-cloud/phala-cloud-cli/simulator",
-                      "/phala-cloud/phala-cloud-cli/ssh-keys"
+                      {
+                        "group": "simulator",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/simulator",
+                          "/phala-cloud/phala-cloud-cli/simulator/start",
+                          "/phala-cloud/phala-cloud-cli/simulator/stop"
+                        ]
+                      },
+                      {
+                        "group": "ssh-keys",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/ssh-keys",
+                          "/phala-cloud/phala-cloud-cli/ssh-keys/list",
+                          "/phala-cloud/phala-cloud-cli/ssh-keys/add",
+                          "/phala-cloud/phala-cloud-cli/ssh-keys/remove",
+                          "/phala-cloud/phala-cloud-cli/ssh-keys/import-github"
+                        ]
+                      }
                     ]
                   },
                   {
@@ -245,7 +303,15 @@
                     "pages": [
                       "/phala-cloud/phala-cloud-cli/login",
                       "/phala-cloud/phala-cloud-cli/logout",
-                      "/phala-cloud/phala-cloud-cli/profiles",
+                      {
+                        "group": "profiles",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/profiles",
+                          "/phala-cloud/phala-cloud-cli/profiles/use",
+                          "/phala-cloud/phala-cloud-cli/profiles/rename",
+                          "/phala-cloud/phala-cloud-cli/profiles/delete"
+                        ]
+                      },
                       "/phala-cloud/phala-cloud-cli/status",
                       "/phala-cloud/phala-cloud-cli/switch",
                       "/phala-cloud/phala-cloud-cli/whoami"
@@ -254,19 +320,70 @@
                   {
                     "group": "Advanced",
                     "pages": [
-                      "/phala-cloud/phala-cloud-cli/allow-devices",
+                      {
+                        "group": "allow-devices",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/allow-devices",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/list",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/add",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/remove",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/allow-any",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/disallow-any",
+                          "/phala-cloud/phala-cloud-cli/allow-devices/toggle-allow-any"
+                        ]
+                      },
                       "/phala-cloud/phala-cloud-cli/api",
                       "/phala-cloud/phala-cloud-cli/completion",
-                      "/phala-cloud/phala-cloud-cli/kms",
-                      "/phala-cloud/phala-cloud-cli/self"
+                      {
+                        "group": "kms",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/kms",
+                          "/phala-cloud/phala-cloud-cli/kms/list",
+                          "/phala-cloud/phala-cloud-cli/kms/ethereum",
+                          "/phala-cloud/phala-cloud-cli/kms/base"
+                        ]
+                      },
+                      {
+                        "group": "self",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/self",
+                          "/phala-cloud/phala-cloud-cli/self/update"
+                        ]
+                      }
                     ]
                   },
                   {
                     "group": "Deprecated",
                     "pages": [
-                      "/phala-cloud/phala-cloud-cli/auth",
-                      "/phala-cloud/phala-cloud-cli/config",
-                      "/phala-cloud/phala-cloud-cli/docker"
+                      {
+                        "group": "auth",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/auth",
+                          "/phala-cloud/phala-cloud-cli/auth/login",
+                          "/phala-cloud/phala-cloud-cli/auth/logout",
+                          "/phala-cloud/phala-cloud-cli/auth/status"
+                        ]
+                      },
+                      {
+                        "group": "config",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/config",
+                          "/phala-cloud/phala-cloud-cli/config/get",
+                          "/phala-cloud/phala-cloud-cli/config/list",
+                          "/phala-cloud/phala-cloud-cli/config/set"
+                        ]
+                      },
+                      {
+                        "group": "docker",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/docker",
+                          "/phala-cloud/phala-cloud-cli/docker/login",
+                          "/phala-cloud/phala-cloud-cli/docker/build",
+                          "/phala-cloud/phala-cloud-cli/docker/push",
+                          "/phala-cloud/phala-cloud-cli/docker/generate",
+                          "/phala-cloud/phala-cloud-cli/docker/run"
+                        ]
+                      }
                     ]
                   }
                 ]

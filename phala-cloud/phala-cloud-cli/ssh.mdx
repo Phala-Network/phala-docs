@@ -7,25 +7,25 @@ description: "Connect to a CVM via SSH"
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala ssh`
+### Command: `phala ssh`
 
-### Syntax
+#### Syntax
 
 ```
 phala ssh [options] [<cvm_id>] [--] [...]
 ```
 
-### Description
+#### Description
 
 Connect to a CVM via SSH
 
-### Arguments
+#### Arguments
 
 | Argument | Description |
 | -------- | ----------- |
 | `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
 
-### Options
+#### Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -35,7 +35,7 @@ Connect to a CVM via SSH
 | `-v, --verbose` | Show verbose connection details |
 | `--dry-run` | Print SSH command without executing |
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -48,11 +48,11 @@ Connect to a CVM via SSH
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### Pass-through Arguments
+#### Pass-through Arguments
 
 All arguments after -- are passed directly to ssh. Common options: -i (identity file), -L (local forward), -R (remote forward), -D (SOCKS proxy), -N (no command), -v (ssh verbose). Any trailing arguments are executed as remote command. Note: -o ProxyCommand is blocked.
 
-### Examples
+#### Examples
 
 * Connect from phala.toml
 

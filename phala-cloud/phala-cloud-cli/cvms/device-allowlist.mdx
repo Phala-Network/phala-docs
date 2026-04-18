@@ -1,0 +1,48 @@
+---
+title: "cvms device-allowlist"
+description: "Show device allowlist status for a CVM's app"
+---
+
+<Note>
+This command is marked as unstable and may change in future releases.
+</Note>
+
+## Command: `phala cvms device-allowlist`
+
+### Syntax
+
+```
+phala cvms device-allowlist [options] [<cvm_id>]
+```
+
+### Description
+
+Show device allowlist status for a CVM's app
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `-i, --interactive` | Enable interactive mode |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Check device allowlist
+
+```bash
+phala cvms device-allowlist app_abc123
+```
+

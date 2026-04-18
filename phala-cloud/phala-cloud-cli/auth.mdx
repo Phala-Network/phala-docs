@@ -1,25 +1,26 @@
 ---
 title: "auth (Deprecated)"
 description: "Authenticate with Phala Cloud"
+hidden: true
 ---
 
 <Warning>
 This command is deprecated. Use `phala login`, `phala logout`, and `phala status` instead.
 </Warning>
 
-## Command: `phala auth`
+### Command: `phala auth`
 
-### Syntax
+#### Syntax
 
 ```
 phala auth <command> [options]
 ```
 
-### Description
+#### Description
 
 Authenticate with Phala Cloud
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -32,6 +33,13 @@ Authenticate with Phala Cloud
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala auth --help
+```
 ### Deprecated Subcommands
 
 | Command | Description |
@@ -40,10 +48,3 @@ Authenticate with Phala Cloud
 | `logout` | Remove stored API key (use 'phala logout' instead) |
 | `status` | Check auth status (use 'phala status' instead) |
 
-### Examples
-
-* Display help:
-
-```bash
-phala auth --help
-```

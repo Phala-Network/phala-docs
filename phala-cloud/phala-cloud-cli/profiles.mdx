@@ -1,21 +1,22 @@
 ---
 title: "profiles"
 description: "List auth profiles"
+hidden: true
 ---
 
-## Command: `phala profiles`
+### Command: `phala profiles`
 
-### Syntax
+#### Syntax
 
 ```
 phala profiles
 ```
 
-### Description
+#### Description
 
 List auth profiles
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -28,6 +29,13 @@ List auth profiles
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
+#### Examples
+
+* Display help:
+
+```bash
+phala profiles --help
+```
 ### Subcommands
 
 | Command | Description |
@@ -36,10 +44,3 @@ List auth profiles
 | `rename` | Rename an auth profile |
 | `delete` | Delete an auth profile |
 
-### Examples
-
-* Display help:
-
-```bash
-phala profiles --help
-```

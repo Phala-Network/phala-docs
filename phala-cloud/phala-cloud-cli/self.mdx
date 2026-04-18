@@ -1,25 +1,26 @@
 ---
 title: "self"
 description: "CLI self-management"
+hidden: true
 ---
 
 <Note>
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala self`
+### Command: `phala self`
 
-### Syntax
+#### Syntax
 
 ```
 phala self <command> [options]
 ```
 
-### Description
+#### Description
 
 CLI self-management
 
-### Global Options
+#### Global Options
 
 | Option | Description |
 | ------ | ----------- |
@@ -32,16 +33,16 @@ CLI self-management
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
 | `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
 
-### Subcommands
-
-| Command | Description |
-| ------- | ----------- |
-| `update` | Update the Phala CLI |
-
-### Examples
+#### Examples
 
 * Display help:
 
 ```bash
 phala self --help
 ```
+### Subcommands
+
+| Command | Description |
+| ------- | ----------- |
+| `update` | Update the Phala CLI |
+

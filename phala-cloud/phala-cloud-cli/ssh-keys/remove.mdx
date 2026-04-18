@@ -1,0 +1,50 @@
+---
+title: "ssh-keys remove"
+description: "Remove an SSH key from your account"
+---
+
+## Command: `phala ssh-keys remove`
+
+### Syntax
+
+```
+phala ssh-keys remove [options] [<key_id>]
+```
+
+### Description
+
+Remove an SSH key from your account
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<key_id>?` | SSH key ID to remove (from `phala ssh-keys list`) |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `-i, --interactive` | Enable interactive mode |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Remove an SSH key by ID
+
+```bash
+phala ssh-keys remove sshkey_xxx
+```
+
+* Interactive selection
+
+```bash
+phala ssh-keys rm -i
+```
+

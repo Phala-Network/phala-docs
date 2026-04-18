@@ -1,0 +1,63 @@
+---
+title: "cvms create (Deprecated)"
+description: "Create a new CVM (use \"phala deploy\" instead)"
+---
+
+<Warning>
+This command is deprecated. See the newer alternatives.
+</Warning>
+
+## Command: `phala cvms create`
+
+### Syntax
+
+```
+phala cvms create [options]
+```
+
+### Description
+
+Create a new CVM (use "phala deploy" instead)
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-n, --name <value>` | Name of the CVM |
+| `-c, --compose <value>` | Path to Docker Compose file |
+| `--vcpu <value>` | Virtual CPUs (default: 1) |
+| `--memory <value>` | Memory in MB (default: 2048) |
+| `--disk-size <value>` | Disk size in GB (default: 40) |
+| `--teepod-id <value>` | TEEPod ID (auto-selected if omitted) |
+| `--image <value>` | dstack image version (uses default if omitted) |
+| `-e, --env-file <value>` | Path to environment file |
+| `--skip-env` | Skip env var prompt |
+| `--debug` | Enable debug output |
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--interactive` | Enable interactive mode for commands that support it |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+
+### Examples
+
+* Create a CVM interactively
+
+```bash
+phala cvms create
+```
+
+* Create using predefined values
+
+```bash
+phala cvms create --name demo --compose ./docker-compose.yml
+```
+
