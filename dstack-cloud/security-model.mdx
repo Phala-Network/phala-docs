@@ -1,0 +1,133 @@
+---
+title: Threat Model and Security Guarantees
+description: Trust boundaries, threat categories, security guarantees, and residual risks for dstack-cloud deployments.
+---
+
+# Threat Model and Security Guarantees
+
+## Trust Boundaries
+
+Understanding what is trusted, partially trusted, and untrusted is essential for evaluating the security of dstack-cloud deployments.
+
+![Trust Boundaries](/images/dstack-cloud/trust-boundaries.png)
+
+### Untrusted
+
+| Entity | Assumption |
+|--------|-----------|
+| **Cloud platform** (GCP / AWS) | May attempt to read workload memory, inspect traffic, or modify configurations. TEE hardware prevents memory access. |
+| **Host machine** (EC2 instance on Nitro) | Has root access to the host OS. Cannot access Enclave memory or modify Enclave code. |
+| **Network attackers** | May intercept, modify, or replay network traffic. Defended by TLS / RA-TLS. |
+| **RPC providers** | May return stale or malicious blockchain state. KMS should use multiple RPC sources. |
+
+### Protected by Hardware (TEE)
+
+| Entity | Protection |
+|--------|-----------|
+| **dstack CVM** (GCP workload) | Memory encrypted by TDX. Host and cloud platform cannot read or modify it. Guest Agent handles attestation and key management. |
+| **Nitro Enclave** (AWS workload) | Memory encrypted by Nitro. Host and cloud platform cannot read or modify it. `dstack-util` handles attestation and key retrieval. |
+| **dstack-kms** (KMS) | Runs in its own TEE. Keys are generated and stored inside; never exposed outside. |
+
+### Protected by Blockchain Consensus
+
+| Entity | Protection |
+|--------|-----------|
+| **On-chain contracts** (DstackKms, DstackApp) | Immutable unless governance process is followed. Changes require multisig + timelock. |
+
+### Partially Trusted
+
+| Entity | Risk |
+|--------|------|
+| **Multisig signers** | Can collude to push through unauthorized changes. Impact is limited by the signature threshold and timelock delay. |
+
+## Threat Categories
+
+### T1: Malicious Cloud Platform Operator
+
+- **Attack:** Cloud provider attempts to read workload memory or extract keys.
+- **Impact:** Data breach, key compromise.
+- **Mitigation:** TEE hardware encryption prevents memory access. Attestation proves hardware authenticity.
+- **Residual risk:** Side-channel attacks against TEE hardware (see Residual Risks).
+
+### T2: Compromised Host OS / Hypervisor
+
+- **Attack:** Attacker gains root access to the EC2 host and tries to read Enclave memory or modify Enclave code.
+- **Impact:** Same as T1.
+- **Mitigation:** Nitro Enclave memory is encrypted and inaccessible from the host. TDX provides similar isolation.
+- **Residual risk:** Hypervisor-level side-channels (speculative execution, etc.).
+
+### T3: Malicious or Compromised Workload
+
+- **Attack:** An attacker gains control of a workload container inside the CVM or Enclave.
+- **Impact:** Data within that container is compromised. The attacker may try to escalate to the Guest Agent (GCP) or dstack-util (Nitro).
+- **Mitigation:** Container isolation within the CVM/Enclave. The Guest Agent (GCP) or dstack-util (Nitro) validates attestation before delivering keys.
+- **Residual risk:** If the attacker can modify the CVM/Enclave image itself, the measurements change and KMS will refuse to deliver keys. On Nitro, since encryption strategy is user-controlled, a compromised workload may misuse any keys it has already obtained.
+
+### T4: Man-in-the-Middle / Network Attack
+
+- **Attack:** Attacker intercepts communication between CVM and KMS, or between CVM and external services.
+- **Impact:** Key interception, data theft, configuration tampering.
+- **Mitigation:** All communication uses TLS or RA-TLS. RA-TLS additionally verifies both parties' attestation.
+- **Residual risk:** TLS implementation vulnerabilities, certificate authority compromise.
+
+### T5: Compromised RPC Provider
+
+- **Attack:** Attacker operates a malicious RPC node that returns false blockchain state.
+- **Impact:** KMS may accept unauthorized measurements or reject authorized ones.
+- **Mitigation:** Use multiple independent RPC providers. KMS should verify blockchain state across sources.
+- **Residual risk:** If all RPC providers are colluding or compromised.
+
+### T6: Compromised or Colluding Multisig Signers
+
+- **Attack:** Multiple signers collude to push through unauthorized governance changes (e.g., register malicious measurements).
+- **Impact:** Unauthorized workloads receive keys from KMS.
+- **Mitigation:** Signature threshold (≥ 2/3) limits the number of signers that must be compromised. Timelock provides a window for detection.
+- **Residual risk:** If enough signers collude to meet the threshold, the system is compromised.
+
+### T7: Covert Deployer Attack
+
+- **Attack:** A workload deployer secretly modifies the application code after deployment.
+- **Impact:** The workload behaves differently from what was approved.
+- **Mitigation:** On-chain measurement registration. Any code change produces new measurements. KMS refuses to deliver keys to unregistered measurements.
+- **Residual risk:** If the attacker can register the new measurements through governance without being detected.
+
+## Security Guarantees
+
+| Guarantee | Mechanism |
+|-----------|-----------|
+| **Keys never leave verified TEE** | KMS runs in its own TEE. Keys are generated, stored, and dispatched entirely within TEE. The cloud provider cannot access them. |
+| **Only approved code receives keys** | Workload measurements must be registered on-chain. KMS verifies measurements before dispatching keys. |
+| **Governance changes are auditable** | All governance actions go through Multisig + Timelock and are recorded on-chain. Anyone can verify the history. |
+| **Memory is encrypted** | TEE hardware encrypts all memory. The host OS and cloud platform cannot read CVM (GCP) or Enclave (Nitro) memory. |
+| **Code integrity is verifiable** | Attestation proves the exact code and configuration running in the TEE. External parties can independently verify. |
+
+## Residual Risks
+
+These are risks that the current architecture does not fully mitigate:
+
+| Risk | Description | Mitigation |
+|------|-------------|------------|
+| **Hardware side-channels** | TEE hardware may be vulnerable to microarchitectural side-channel attacks (e.g., Spectre, Meltdown variants). | Keep TCB (Trusted Computing Base) firmware updated. Monitor Intel / AWS security advisories. |
+| **Smart contract vulnerabilities** | Bugs in DstackKms, DstackApp, or governance contracts could lead to unauthorized access. | Conduct formal smart contract audits. Use well-tested contract libraries (Safe, Timelock). |
+| **KMS root key** | The KMS root key is currently a single point of trust within the KMS TEE. | Future plans include MPC (Multi-Party Computation) to distribute root key generation. |
+| **Denial of service** | The cloud provider or host operator can shut down CVMs or Enclaves, denying service. | Use cross-region, cross-provider redundancy for high-availability deployments. |
+
+## Security Checklist for Deployments
+
+Before going to production, verify:
+
+- [ ] dstack OS image is built from audited source code
+- [ ] All measurements (RTMR / OS_IMAGE_HASH) are registered on-chain
+- [ ] Multisig signers are using hardware wallets
+- [ ] Signature threshold is ≥ 2/3
+- [ ] Timelock delay is appropriate for your risk profile
+- [ ] Multiple independent RPC providers are configured
+- [ ] TLS certificates are valid and properly configured
+- [ ] Monitoring and alerting are set up for attestation failures and governance events
+- [ ] Runbook exists for common failure scenarios
+
+## Next Steps
+
+- **[Glossary](/dstack-cloud/glossary)** — Definitions of security-related terms
+- **[Runbook](/dstack-cloud/runbook)** — Troubleshooting security-related issues
+- **[dstack Security Model](https://github.com/Phala-Network/dstack-cloud/blob/master/docs/security/security-model.md)** — Official security model document

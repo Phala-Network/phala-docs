@@ -1,0 +1,216 @@
+---
+title: Upgrade Procedures
+description: Upgrade procedures for KMS images, CVM applications, and smart contracts.
+---
+
+# Upgrade Procedures
+
+This guide covers upgrade procedures for dstack-cloud deployments: KMS images, CVM/Enclave applications, and smart contracts.
+
+## Pre-upgrade Checklist
+
+Before any upgrade:
+
+- [ ] Review the changelog for the new version
+- [ ] Test the upgrade in a non-production environment first
+- [ ] Ensure you have access to all required signers (for governance changes)
+- [ ] Back up current configuration (`app.json`, `docker-compose.yaml`, `.env`)
+- [ ] Verify monitoring and alerting is operational
+- [ ] Notify stakeholders of planned downtime (if applicable)
+- [ ] Prepare a rollback plan
+
+## KMS Image Upgrade
+
+### When to Upgrade
+
+- New dstack-cloud version available with security fixes
+- New KMS features needed
+- KMS vulnerability disclosed
+
+### Procedure (GCP)
+
+1. **Pull the new OS image:**
+   ```bash
+   dstack-cloud pull --os-image dstack-cloud-0.7.0
+   ```
+
+2. **Stop the current KMS CVM:**
+   ```bash
+   cd kms-prod
+   dstack-cloud stop
+   ```
+
+3. **Update the OS image reference in `app.json`:**
+   ```json
+   {
+     "os_image": "dstack-cloud-0.7.0"
+   }
+   ```
+
+4. **Redeploy:**
+   ```bash
+   dstack-cloud deploy
+   ```
+
+5. **Re-bootstrap if the KMS image changed:**
+   - If the new KMS image produces different measurements, you must register them on-chain before KMS will work
+   - Follow the bootstrap procedure in [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp)
+
+6. **Verify:**
+   ```bash
+   dstack-cloud status
+   dstack-cloud logs --follow
+   ```
+
+### Procedure (Nitro)
+
+The process is similar, but note:
+
+- The Enclave is stateless — after stopping and restarting, key material must be re-derived
+- Ensure the VSOCK proxy is running before deploying the new Enclave
+- New measurements may require on-chain registration
+
+### Rollback
+
+1. Stop the new KMS CVM: `dstack-cloud stop`
+2. Revert `app.json` to the previous OS image version
+3. Redeploy: `dstack-cloud deploy`
+4. If measurements changed during upgrade, the old measurements should still be registered on-chain
+
+## CVM / Enclave Application Upgrade
+
+### When Upgrading Requires Governance
+
+If your application upgrade changes the measurements (different Docker images, different `docker-compose.yaml`, different dstack OS version), you must go through governance:
+
+1. **Build and deploy the updated CVM/Enclave** (in a test environment first)
+2. **Extract the new measurements:**
+   ```bash
+   dstack-cloud status
+   # Note the RTMR3 / OS_IMAGE_HASH
+   ```
+
+3. **Register new measurements on-chain:**
+   - See [Register Workload Measurements](/dstack-cloud/register-enclave-measurement)
+
+4. **Wait for governance approval and timelock**
+
+5. **Deploy to production:**
+   ```bash
+   dstack-cloud deploy
+   ```
+
+### When Upgrading Does NOT Require Governance
+
+If the upgrade only changes application logic without changing the Docker images or configuration (e.g., updating application code via a mounted volume, which is not possible in TEE), no governance is needed. In practice, most upgrades in a TEE environment require governance because the code is measured at build time.
+
+### Procedure (GCP)
+
+1. Update `docker-compose.yaml` with new image versions:
+   ```yaml
+   services:
+     web:
+       image: my-app:v2.0.0@sha256:abcd1234...
+   ```
+
+2. Redeploy:
+   ```bash
+   dstack-cloud deploy
+   ```
+
+3. Verify:
+   ```bash
+   dstack-cloud logs --follow
+   ```
+
+### Procedure (Nitro)
+
+1. Update `docker-compose.yaml`
+2. Redeploy:
+   ```bash
+   dstack-cloud deploy
+   ```
+3. The Enclave is rebuilt from the new image
+4. Verify via VSOCK proxy
+
+## Smart Contract Upgrade
+
+### When to Upgrade
+
+- Security vulnerability in contract code
+- New governance feature needed
+- Bug fix in contract logic
+
+### Procedure (Using Proxy Pattern)
+
+If contracts use an upgradeable proxy pattern:
+
+1. **Deploy the new implementation contract:**
+   ```bash
+   npx hardhat run scripts/deploy-kms-v2.ts --network <network>
+   ```
+
+2. **Draft a governance transaction** to call `proxy.upgradeTo(newImplementation)`:
+   - Use the Safe web interface
+   - The transaction must go through multisig + timelock
+
+3. **Test the upgrade on testnet first:**
+   - Deploy new implementation on testnet
+   - Run through governance on testnet
+   - Verify the upgraded contract works as expected
+
+4. **Execute governance on mainnet:**
+   - Collect signatures
+   - Wait for timelock
+   - Execute
+
+5. **Verify:**
+   ```bash
+   # Check the implementation address
+   cast call <PROXY_ADDRESS> "implementation()(address)" --rpc-url $RPC_URL
+   ```
+
+### Rollback
+
+To rollback, follow the same procedure with the previous implementation address.
+
+### Important Notes
+
+- The proxy admin must be the governance Safe — never an EOA
+- Upgrades cannot be rushed — the timelock delay applies
+- Plan upgrades during low-traffic windows
+- Have a tested rollback procedure ready before upgrading
+
+## Coordinated Upgrade: Application + Measurements + Contracts
+
+A full-stack upgrade requires careful coordination:
+
+```
+1. Test new application + new KMS + new contracts in staging
+2. Deploy new contracts to mainnet (governance)
+3. Register new measurements on-chain (governance)
+4. Wait for all governance actions to complete
+5. Deploy new KMS image to production
+6. Deploy new application CVMs to production
+7. Verify end-to-end key delivery
+8. (After verification) Optionally revoke old measurements
+```
+
+## Downtime Considerations
+
+| Component | Downtime During Upgrade |
+|-----------|------------------------|
+| KMS (GCP) | 1-2 minutes (stop + redeploy) |
+| CVM (GCP) | 2-3 minutes |
+| CVM (Nitro) | 30 seconds to 1 minute |
+| Smart contracts | No downtime (upgrade is a transaction) |
+
+To minimize downtime:
+- Deploy new CVMs first, then switch traffic
+- Keep old CVMs running until new ones are verified
+- For KMS, consider running multiple instances for high availability
+
+## Next Steps
+
+- **[Monitoring and Alerting](monitoring-alerting)** — Monitor upgrade impact
+- **[Runbook](runbook)** — Troubleshoot upgrade issues

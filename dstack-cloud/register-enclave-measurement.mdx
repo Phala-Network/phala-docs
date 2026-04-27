@@ -1,0 +1,207 @@
+---
+title: Register Workload Measurements On-chain
+description: Register workload measurements (OS_IMAGE_HASH / RTMR) on-chain for KMS authorization.
+---
+
+# Register Workload Measurements On-chain
+
+This guide explains how to register workload measurements (RTMR / OS_IMAGE_HASH) on-chain so that KMS will authorize your workloads to receive keys.
+
+## Background
+
+When a TEE workload starts — whether a dstack CVM (GCP) or a Nitro Enclave (AWS) — it generates a hardware attestation that includes measurements (cryptographic hashes of the code and configuration). KMS checks these measurements against an on-chain allowlist before dispatching keys.
+
+If you update your application code, Docker images, or the base image version, the measurements change. You must register the new measurements before KMS will authorize the updated workload.
+
+### Two Layers of On-chain Registration
+
+There are two distinct registration flows in the dstack ecosystem:
+
+| Registration Type | What Gets Registered | Purpose | Where to Find |
+|-------------------|---------------------|---------|---------------|
+| **KMS Registration** | KMS's `mrAggregated` (GCP) or public key | Proves KMS runs in a genuine TEE | [Run dstack-kms on GCP](run-kms-on-gcp) Step 8 |
+| **Workload Registration** (this guide) | Workload's `compose-hash` or `OS_IMAGE_HASH | Authorizes workload to receive keys from KMS | This document |
+
+**This guide covers workload registration** — the process of registering your application's measurement so that KMS will dispatch keys to it. This applies to:
+
+- **GCP workloads** — dstack CVMs running applications that need keys from KMS
+- **Nitro workloads** — Enclaves that need keys from KMS (KMS itself runs on GCP only)
+
+Both types of workloads must register their measurements on-chain before KMS will authorize key delivery.
+
+| Platform | Measurement Field | Where It Comes From |
+|----------|-------------------|---------------------|
+| GCP (TDX) | `compose-hash` (in RTMR3) | `dstack-cloud deploy` output |
+| AWS Nitro | `OS_IMAGE_HASH` | `nitro-cli describe-enclave` output |
+
+## Prerequisites
+
+- A deployed dstack-kms instance with on-chain governance configured
+- Governance contracts (DstackKms, DstackApp) deployed
+- Multisig Safe with signer access
+- The new measurement value (from your build/deploy output)
+
+## Step 1: Build and Deploy Your Workload
+
+First, build and deploy your application to get the measurements:
+
+```bash
+# On GCP
+dstack-cloud deploy
+dstack-cloud status
+# Note the compose-hash value in RTMR3
+
+# On Nitro
+./scripts/build-eif.sh
+# Note the OS_IMAGE_HASH value from output
+```
+
+## Step 2: Extract the Measurement
+
+**GCP (TDX):**
+The measurement is the `compose-hash` value in RTMR3, displayed in the `dstack-cloud status` output. This value represents the hash of your docker-compose.yaml configuration.
+
+**AWS Nitro:**
+The measurement is the `OS_IMAGE_HASH`, calculated as `sha256(PCR0 || PCR1 || PCR2)`. Run:
+
+```bash
+./scripts/build-eif.sh
+```
+
+The script outputs:
+```
+PCR0: <hash>
+PCR1: <hash>
+PCR2: <hash>
+OS_IMAGE_HASH: <combined-hash>
+```
+
+**PCR values are derived from:**
+- **PCR0** — Complete EIF content hash (enclave image)
+- **PCR1** — Linux kernel and boot ramdisk
+- **PCR2** — Application layer (Docker image filesystem)
+
+> **Note:** The `OS_IMAGE_HASH` is the value you register on-chain. Any change to the Dockerfile, application code, or configuration produces a different hash.
+
+**Alternative: Preview measurements without full build:**
+
+```bash
+dstack-util get-keys --show-mrs \
+  --kms-url "https://your-kms:12001" \
+  --app-id "0xYOUR_APP_ID"
+```
+
+> **Important:** When using `--show-mrs` to preview, you must use the exact same `KMS_URL`, `APP_ID`, and `root_ca.pem` as the production build. Any difference will produce different PCR values.
+
+## Step 3: Prepare the Governance Transaction
+
+You need to call `DstackKms.addMeasurement()` (or equivalent function) with the new measurement value.
+
+### 3.1 Draft the Transaction
+
+Using the Safe web interface (https://app.safe.global):
+
+1. Connect your signer wallet
+2. Go to your Safe
+3. Click "New Transaction" → "Contract interaction"
+4. Select the `DstackKms` contract
+5. Select the `addMeasurement` function
+6. Enter the measurement value (hex string)
+7. Review and submit
+
+### 3.2 Alternative: Using CLI
+
+```bash
+# Using cast (from Foundry)
+cast send <DstackKms_ADDRESS> \
+  "addMeasurement(bytes32)" \
+  0xYOUR_MEASUREMENT_HASH \
+  --rpc-url $RPC_URL \
+  --private-key $SIGNER_KEY
+```
+
+> **Note:** In production, do not use a single private key. Submit the transaction through the multisig Safe instead.
+
+## Step 4: Collect Signatures
+
+The transaction enters the multisig queue. Other signers must approve it.
+
+1. Each signer connects to the Safe web interface
+2. Opens the pending transaction
+3. Reviews the measurement value
+4. Confirms (signs) the transaction
+
+The transaction is executed once the required threshold of signatures is collected.
+
+## Step 5: Wait for Timelock
+
+After multisig approval, the transaction enters the Timelock queue.
+
+- **Production:** Wait 24-72 hours (depending on your configuration)
+- **Testnet:** Wait 1-4 hours
+
+During this period, any signer or observer can review and, if necessary, raise concerns.
+
+## Step 6: Execute
+
+After the Timelock expires, the transaction can be executed:
+
+1. Open the Safe web interface
+2. Find the transaction in the queue
+3. Click "Execute"
+
+The measurement is now registered on-chain. KMS will authorize workloads with this measurement.
+
+## Step 7: Verify
+
+Verify that the measurement is registered:
+
+```bash
+# Using cast
+cast call <DstackKms_ADDRESS> \
+  "isAuthorized(bytes32)(bool)" \
+  0xYOUR_MEASUREMENT_HASH \
+  --rpc-url $RPC_URL
+```
+
+Expected output: `true`
+
+## Workflow Summary
+
+![Measurement Registration Flow](/images/dstack-cloud/measurement-registration-flow.png)
+
+## Registering Multiple Measurements
+
+If you are deploying multiple workloads (e.g., different application versions for canary testing), you can register multiple measurements in a single governance transaction:
+
+1. Call `addMeasurement` for each measurement value
+2. Bundle them into a batch transaction in the Safe
+3. Submit for approval as usual
+
+## Revoking a Measurement
+
+If a measurement is found to be compromised or no longer needed:
+
+```bash
+cast send <DstackKms_ADDRESS> \
+  "removeMeasurement(bytes32)" \
+  0xCOMPROMISED_MEASUREMENT_HASH \
+  --rpc-url $RPC_URL
+```
+
+Follow the same governance flow (multisig → timelock → execute).
+
+## Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| KMS refuses to dispatch keys | Verify the measurement is registered: `cast call ... isAuthorized(...)`. Check that the measurement matches exactly (case-sensitive hex). |
+| Governance transaction stuck | Verify the timelock has expired. Check that the Safe has sufficient gas. |
+| Wrong measurement registered | You must revoke the wrong measurement and register the correct one through separate governance transactions. |
+| Measurement changes on every deploy | The `compose-hash` / `OS_IMAGE_HASH` is derived from your Docker images and configuration. Use pinned image tags (SHA256 digests) for reproducible builds. |
+
+## Next Steps
+
+- **[Manage Governance](manage-governance)** — Other governance operations
+- **[Concept: Attestation Integration](/dstack-cloud/attestation-integration)** — How measurements are generated
+- **[Concept: KMS and Key Delivery](/dstack-cloud/kms-and-key-delivery)** — How KMS uses measurements

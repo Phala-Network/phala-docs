@@ -1,0 +1,39 @@
+---
+title: Release Notes
+description: Release notes, version history, compatibility notes, and known issues.
+---
+
+# Release Notes
+
+## v0.6.0 (Current)
+
+### Features
+
+- Initial release with support for GCP Confidential VMs and AWS Nitro Enclaves
+- dstack-cloud CLI for packaging Docker Compose apps into CVM images
+- KMS with two modes: Local Key Provider and standalone KMS
+- On-chain governance (DstackKms, DstackApp, Multisig + Timelock)
+- RA-TLS for secure KMS ↔ workload communication
+- VSOCK proxy support for Nitro Enclave networking
+- KMS bootstrap (Onboard → Finish) flow
+- Attestation verification (TDX Quote on GCP, NSM Document on Nitro)
+
+### Compatibility Notes
+
+- Requires Intel TDX-capable GCP zones or Nitro Enclave-capable EC2 instances
+- Docker Compose format: standard `docker-compose.yaml` (v3+)
+- Blockchain: supports EVM-compatible chains (Base, Ethereum)
+
+### Known Issues
+
+- KMS root key is single-point (MPC planned for future release)
+- Nitro Enclaves are stateless (workloads lose state on restart; KMS runs on GCP only)
+- Public testnet RPCs may experience intermittent issues
+
+---
+
+## Changelog
+
+All notable changes will be documented here.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/).
