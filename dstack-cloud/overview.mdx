@@ -1,0 +1,121 @@
+---
+title: dstack-cloud Overview
+description: dstack-cloud is an extension of the dstack SDK that enables deploying confidential Docker applications on GCP Confidential VMs and AWS Nitro Enclaves.
+---
+
+# dstack-cloud Overview
+
+dstack-cloud is an extension of the [dstack SDK](https://github.com/Dstack-TEE/dstack) that enables deploying confidential Docker applications on **GCP Confidential VMs** and **AWS Nitro Enclaves**.
+
+## What is dstack SDK
+
+dstack SDK is an open-source confidential computing framework originally designed to run on TDX BareMetal servers. It provides:
+
+- Hardware-level memory encryption and isolation via TEE (Trusted Execution Environment)
+- A key management system (KMS) that delivers secrets exclusively to verified workloads
+- Remote attestation to prove that code is running in genuine TEE hardware
+- SDK libraries in Python, TypeScript, Rust, and Go for application integration
+
+## What is dstack-cloud
+
+dstack-cloud extends dstack SDK to run on major cloud platforms. Instead of requiring bare-metal TDX hardware, it enables deployment on:
+
+- **GCP Confidential VMs** (Intel TDX)
+- **AWS Nitro Enclaves** (NSM)
+
+This means you can use the full dstack security model — hardware isolation, attested key delivery, encrypted storage — without owning specialized hardware.
+
+## How It Works
+
+![How It Works](/images/dstack-cloud/architecture-overview-v2.png)
+
+1. You define your application in a `docker-compose.yaml` file (GCP) or a `Dockerfile` (AWS Nitro).
+2. `dstack-cloud deploy` packages and deploys your application into a TEE environment.
+
+### On GCP:
+
+3. The containers are packaged into a **dstack CVM** — a Confidential Virtual Machine running dstack OS.
+4. The CVM runs as a Confidential VM with Intel TDX enabled.
+5. A **Guest Agent** inside the CVM handles attestation, key retrieval, and automatic disk encryption.
+6. Your application communicates with the Guest Agent via a Unix socket (`/var/run/dstack.sock`).
+
+### On AWS Nitro:
+
+3. AWS Nitro CLI (`nitro-cli build-enclave`) converts your Dockerfile into an **Enclave Image File (EIF)** — using Enclave OS (AWS-provided), not dstack OS.
+4. The EIF runs as a Nitro Enclave inside an EC2 instance.
+5. **`dstack-util`** (packaged into the EIF) handles attestation and key retrieval from KMS — there is no Guest Agent.
+6. Your application decides how to use the key (e.g., encrypting disk, decrypting model weights).
+
+> **Note:** GCP and Nitro have different architectures. See [Nitro Enclave Integration](nitro-enclave) for details.
+
+## Key Components
+
+### Components Shared Across Platforms
+
+| Component | Role |
+|-----------|------|
+| **dstack-cloud CLI** | Build and deployment tool |
+| **dstack-kms** | Key Management Service running in its own TEE; verifies workloads and dispatches keys |
+| **Gateway** | Edge TLS termination, automatic ACME certificate provisioning, RA-TLS support |
+
+### GCP-Specific Components
+
+| Component | Role |
+|-----------|------|
+| **dstack CVM** | Confidential Virtual Machine running dstack OS with your containers inside |
+| **Guest Agent** | Process inside each CVM that handles attestation, key management, and automatic disk encryption |
+| **VMM** | Virtual Machine Monitor that parses Docker Compose and boots CVMs from reproducible OS images |
+
+### Nitro-Specific Components
+
+| Component | Role |
+|-----------|------|
+| **Enclave Image (EIF)** | Built by AWS Nitro CLI from a Dockerfile; runs inside a Nitro Enclave using Enclave OS (AWS-provided) |
+| **dstack-util** | Lightweight tool packaged into the EIF; handles attestation and key retrieval from KMS (replaces Guest Agent) |
+| **VSOCK Proxy** | Runs on the EC2 host; forwards network traffic between the Enclave and external services (KMS, RPC) |
+
+## Typical Use Cases
+
+### AI Inference with Model Protection
+
+Deploy AI models (e.g., vLLM, Ollama) with model weights fully encrypted in memory. The cloud provider cannot access or copy your proprietary models.
+
+```yaml
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    runtime: nvidia
+    command: --model Qwen/Qwen2.5-7B-Instruct
+    ports:
+      - "8000:8000"
+```
+
+### Sensitive Data Processing
+
+Process healthcare, financial, or personal data in a hardware-isolated environment. Memory encryption ensures that even system administrators cannot read your data.
+
+### DeFi and Web3 Applications
+
+Run smart contract backend services or trading bots with private keys that never leave the TEE. The on-chain governance model provides verifiable, auditable key management.
+
+## Supported Environments
+
+| Platform | TEE Technology | Attestation | Status |
+|----------|---------------|-------------|--------|
+| GCP Confidential VMs | Intel TDX + TPM | TDX Quote | Available |
+| AWS Nitro Enclaves | Nitro Secure Module | NSM Attestation Document | Available |
+
+## What You Need
+
+- An AWS or GCP account with appropriate permissions
+- `dstack-cloud` CLI installed
+- A `docker-compose.yaml` defining your application
+- (Optional) [dstack SDK](https://github.com/Dstack-TEE/dstack/tree/master/sdk) integration for key retrieval from within your containers
+
+## Next Steps
+
+- **[Quick Start Tutorial](/dstack-cloud/get-started)** — Deploy your first dstack CVM in 30 minutes
+- **[Nitro Enclave](nitro-enclave)** — How AWS Nitro Enclaves work in dstack-cloud
+- **[KMS and Key Delivery](kms-and-key-delivery)** — Understand how keys are managed and delivered
+- **[Security Model](security-model)** — Trust boundaries and security guarantees
+- **[Attestation Integration](attestation-integration)** — How remote attestation works across platforms

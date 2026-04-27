@@ -1,0 +1,165 @@
+---
+title: Governance Operations
+description: Create governance proposals, manage Multisig signing, and execute Timelock transactions.
+---
+
+# Governance Operations
+
+This guide explains how to perform common governance operations — creating proposals, approving transactions, and executing changes through the Multisig + Timelock system.
+
+## Prerequisites
+
+- Access to a signer wallet in the GovernanceSafe
+- The Safe web interface (https://app.safe.global) or Safe CLI
+- Understanding of the governance model — see [On-chain Governance Model](/dstack-cloud/governance)
+
+## Creating a Governance Proposal
+
+All governance changes start as a transaction submitted to the GovernanceSafe.
+
+### Via Safe Web Interface
+
+1. Go to https://app.safe.global and connect your signer wallet
+2. Select your governance Safe
+3. Click **"New Transaction"**
+4. Choose the transaction type:
+   - **Contract interaction** — Call a function on DstackKms, DstackApp, or other contracts
+   - **Transfer** — Send funds (if needed for gas or contract operations)
+   - **Raw transaction** — For complex multi-call transactions
+
+### Common Governance Actions
+
+| Action | Contract | Function |
+|--------|----------|----------|
+| Register new measurement | DstackKms | `addMeasurement(bytes32)` |
+| Revoke measurement | DstackKms | `removeMeasurement(bytes32)` |
+| Update admin role | DstackKms | `setAdmin(address)` |
+| Update KMS reference | DstackApp | `setKms(address)` |
+| Upgrade contract implementation | Proxy | `upgradeTo(address)` |
+
+### Example: Register a New Measurement
+
+1. **New Transaction** → **Contract interaction**
+2. Select `DstackKms` contract
+3. Select `addMeasurement(bytes32)` function
+4. Enter the measurement hash: `0x1234abcd...`
+5. Click **"Create"**
+6. The transaction enters the Safe queue
+
+## Multisig Signing and Approval
+
+After a transaction is created, it must be approved by enough signers to meet the threshold.
+
+### Approving a Transaction
+
+1. Each signer connects to the Safe web interface
+2. Opens the pending transaction
+3. Reviews:
+   - Target contract address
+   - Function name and parameters
+   - Simulation result (if available)
+4. Clicks **"Confirm"** (signs with their wallet)
+
+### Tracking Approval Progress
+
+The Safe interface shows:
+- Number of confirmations collected
+- Required threshold (e.g., "3 of 5 confirmations")
+- Status: Pending / Awaiting execution / Executed
+
+### Rejecting a Transaction
+
+If a signer disagrees with a proposal, they should:
+1. Not sign the transaction
+2. Communicate concerns to other signers
+3. If the transaction has already been approved, wait for the timelock — there is no "cancel" after execution
+
+## Timelock
+
+After the required number of signatures is collected, the transaction enters the Timelock queue.
+
+### How It Works
+
+1. The transaction is queued with a mandatory delay
+2. No one can execute the transaction until the delay expires
+3. During the delay, anyone can review the transaction on-chain
+4. After the delay, any authorized address (typically a signer) can execute it
+
+### Timelock Duration
+
+| Environment | Typical Duration |
+|-------------|-----------------|
+| Testnet | 1-4 hours |
+| Staging | 4-24 hours |
+| Production | 24-72 hours |
+
+### Monitoring the Timelock
+
+- **Safe web interface:** Shows the queue position and remaining time
+- **Block explorer:** Look for the Timelock contract's `QueuedTransactions` event
+
+## Execution
+
+After the timelock expires:
+
+1. Open the Safe web interface
+2. Find the transaction (status: "Ready to execute")
+3. Click **"Execute"**
+4. Confirm the transaction in your wallet
+5. The transaction is submitted on-chain
+
+After execution, the change takes effect immediately. KMS syncs the latest on-chain state on its next query.
+
+## Emergency Operations
+
+### Revoke a Compromised Measurement
+
+If you discover that a measurement is compromised:
+
+1. Draft a transaction to call `DstackKms.removeMeasurement(bytes32)` with the compromised hash
+2. Submit to the Safe for priority approval
+3. Collect signatures as quickly as possible
+4. **Wait for the timelock** — this cannot be bypassed
+5. Execute after the delay
+
+> **Important:** The timelock cannot be skipped, even in emergencies. This is by design — it prevents covert changes. Plan your incident response to account for the delay.
+
+### Replace a Signer
+
+If a signer key is compromised or a signer needs to be replaced:
+
+1. Draft a transaction to call `Safe.addOwner(address)` and `Safe.removeOwner(address, address)`
+2. Submit for multisig approval
+3. Wait for timelock
+4. Execute
+
+The replacement signer should use a hardware wallet.
+
+### Governance Health Check
+
+Periodically verify the health of your governance setup:
+
+| Check | How |
+|-------|-----|
+| All signers are reachable | Contact each signer; confirm they have access to their wallet |
+| Signer keys are secure | Verify signers are using hardware wallets |
+| Threshold is appropriate | Review the threshold against the number of active signers |
+| Timelock duration is appropriate | Adjust if the threat landscape has changed |
+| No stale transactions in queue | Review and cancel any outdated proposals |
+| Contract ownership is correct | Verify DstackKms and DstackApp owners point to the Safe |
+
+## Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| Transaction not appearing in queue | Ensure the transaction was submitted correctly. Check the nonce. Verify gas is sufficient. |
+| Signer cannot confirm | Ensure the signer is connected to the correct network. Check that the wallet has ETH for gas. |
+| Timelock delay seems too long | Adjust the Timelock parameters through a governance action (which itself goes through the current timelock). |
+| Transaction execution reverts | Check the contract state. The transaction may depend on state that changed during the timelock period. Simulate the transaction before executing. |
+| Lost signer key | Immediately add a new signer and remove the lost one through governance. Use the remaining signers to approve. |
+
+## Next Steps
+
+- **[Register Workload Measurements](register-enclave-measurement)** — Most common governance action
+- **[Deploy On-chain KMS Smart Contracts](deploy-onchain-kms)** — Initial contract setup
+- **[Concept: Governance](/dstack-cloud/governance)** — Understand the governance model

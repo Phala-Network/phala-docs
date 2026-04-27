@@ -1,0 +1,173 @@
+---
+title: Attestation Integration
+description: How dstack-cloud integrates remote attestation mechanisms on GCP (TDX Quote) and AWS Nitro (NSM Attestation Document).
+---
+
+# Attestation Integration
+
+> For the fundamentals of dstack Remote Attestation, the RA-TLS protocol design, and ZT-TLS / ACME certificate management, refer to the official Phala documentation:
+>
+> - [TEE Attestation Guide](https://docs.phala.com/dstack/trust-center-technical)
+> - [TEE-Controlled Domain Certificates](https://docs.phala.com/dstack/design-documents/tee-controlled-domain-certificates)
+>
+> This document explains **how dstack-cloud integrates attestation on different hardware platforms**.
+
+## What Is Remote Attestation
+
+Remote Attestation is the process by which a TEE proves its identity and integrity to an external party. The proof contains:
+
+1. **Hardware signature** — Confirms the workload is running in genuine TEE hardware (not emulated)
+2. **Workload measurements** — Cryptographic hash of the code and configuration running inside the TEE
+3. **User data** — An optional challenge value to prevent replay attacks
+
+The verifier (e.g., KMS) checks the hardware signature and measurements to confirm the workload has not been tampered with.
+
+## Attestation on GCP (Intel TDX + vTPM)
+
+On GCP, dstack uses a **dual-attestation approach** combining Intel TDX and Google-managed vTPM to build a comprehensive trust chain.
+
+### Architecture Overview
+
+GCP Confidential VMs provide two independent attestation mechanisms:
+
+| Source | Type | Coverage | Trust Root |
+|--------|------|----------|------------|
+| **Intel TDX Module** | Hardware-based | Firmware + RTMR registers | Intel TDX hardware |
+| **Google vTPM** | Software-based | Boot loader + kernel integrity | Google's certificate authority |
+
+dstack binds these two mechanisms together to provide defense-in-depth attestation.
+
+### Attestation Creation Flow
+
+When a dstack CVM starts on GCP, the Guest Agent performs the following steps:
+
+1. **Collect report_data** (64 bytes), optionally bound to an RA-TLS public key
+2. **Generate TDX Quote** via `tdx-attest::get_quote(report_data)`:
+   - Includes all measurement values (MRTD, RTMR0-3)
+   - Signed by the Intel TDX module
+3. **Read TDX event log** via `cc-eventlog::tdx::read_event_log()`
+4. **Compute TPM qualifying data** as `sha256(tdx_quote)` — this binds the two attestations together
+5. **Generate vTPM Quote** via `tpm-attest::TpmContext::create_quote(qualifying_data, policy)`:
+   - Signed by Google's vTPM attestation key
+   - Includes PCR values representing boot chain integrity
+6. **Package attestation** as `DstackGcpTdxQuote { tdx_quote, tpm_quote }`
+
+### Trust Chain Binding
+
+The key innovation is the **qualifying data binding**:
+
+```
+tpm_quote.qualifying_data = sha256(tdx_quote)
+```
+
+This creates a cryptographic link between the two independent attestation mechanisms:
+- **TDX Quote** proves the workload runs in genuine Intel TDX hardware with specific RTMR values
+- **vTPM Quote** proves the boot chain integrity via PCR values
+- The SHA-256 binding ensures both attestations come from the same CVM instance
+
+### Verification Flow
+
+The verifier (e.g., KMS) performs dual verification:
+
+**TDX Verification:**
+1. Retrieve TDX collateral and verify quote signature using Intel's TCB info
+2. Verify TCB status (debug mode disabled, mr_signer_seam valid)
+3. Replay runtime events and compare RTMR3 with quote's RTMR3
+4. Verify `report_data` matches expected value
+
+**vTPM Verification:**
+1. Retrieve vTPM collateral and verify quote signature using Google's certificate chain
+2. Replay runtime events and compare PCR values
+3. Verify `qualifying_data == sha256(tdx_quote)` — confirms binding
+
+Only when **both** verifications succeed is the attestation considered valid
+
+### Measurement Registers (GCP)
+
+**TDX RTMR Registers:**
+
+| Register | Contents |
+|----------|----------|
+| **MRTD** | Measured firmware (virtual firmware measurement) |
+| **RTMR0** | OS kernel and initramfs |
+| **RTMR1** | OS kernel command-line parameters |
+| **RTMR2** | OS runtime and init scripts |
+| **RTMR3** | Application `compose-hash` + KMS binding + instance ID |
+
+**vTPM PCR Registers:**
+
+The vTPM provides an independent measurement of the boot chain. While dstack primarily relies on TDX RTMRs for application attestation, the vTPM PCRs offer an additional layer of verification for the boot process.
+
+> **Note:** For detailed PCR assignments and event log structure, refer to the [GCP Confidential VM Attestation Documentation](https://cloud.google.com/confidential-computing/confidential-vm/docs/attestation).
+
+## Attestation on AWS Nitro (NSM)
+
+When a Nitro Enclave launches from its EIF (Enclave Image File):
+
+1. **NSM auto-generation** — The Nitro Secure Module automatically generates an Attestation Document when the Enclave launches
+2. **Document contents** — The Attestation Document includes:
+   - PCR0-2 values (Platform Configuration Registers) — 3 measurements generated during EIF build
+   - NSM signature
+   - Enclave ID and launch timestamp
+3. **OS_IMAGE_HASH** — The 3 PCR values (PCR0, PCR1, PCR2) are combined into a single `OS_IMAGE_HASH`, which serves as the unique workload identifier
+4. **Verification** — KMS verifies the Attestation Document:
+   - Validates the NSM signature using AWS root certificates
+   - Checks that the `OS_IMAGE_HASH` matches an authorized value registered on-chain
+   - Confirms the Enclave is running on genuine Nitro hardware
+
+### Measurement Registers (Nitro)
+
+| Register | Contents |
+|----------|----------|
+| **PCR0** | OS image (kernel + initramfs) |
+| **PCR1** | Application code and runtime |
+| **PCR2** | Additional configuration and dstack-util |
+
+These 3 PCR values are combined into a single `OS_IMAGE_HASH`, which is the unique identifier used for on-chain authorization. Any change to the Dockerfile, application code, or `dstack-util` version produces a different `OS_IMAGE_HASH`.
+
+## GCP vs. Nitro: Attestation Comparison
+
+| Aspect | GCP (TDX) | AWS Nitro |
+|--------|-----------|-----------|
+| **Attestation format** | TDX Quote | NSM Attestation Document |
+| **Signed by** | Intel TDX hardware | AWS Nitro Secure Module |
+| **Verification method** | Intel TCB recovery / DCAP QVL | AWS certificate chain |
+| **Measurement registers** | RTMR0-3 | PCR0-2 (3 values combined into OS_IMAGE_HASH) |
+| **Key measurement field** | `compose-hash` (in RTMR3) | `OS_IMAGE_HASH` (from PCRs) |
+| **Challenge data** | `reportData` in Quote | User data in Document |
+| **Boot measurement** | Automatic (hardware records full boot chain) | Automatic (NSM records at Enclave launch) |
+
+## Measurements and On-chain Authorization
+
+Measurements are the foundation of on-chain key access control:
+
+- Before KMS dispatches keys to a workload, the workload's measurements must be **registered on-chain**
+- This ensures only audited, approved code versions can obtain keys
+- If you update your application code, the measurements change, and you must re-register them through governance
+
+![Measurement Registration Flow](/images/dstack-cloud/measurement-registration-flow.png)
+
+For the registration process, see [Register Workload Measurements](/dstack-cloud/register-enclave-measurement).
+
+## Verifying Attestation
+
+You can verify that a dstack CVM is running in genuine TEE by requesting its attestation:
+
+```bash
+# Request attestation from a running CVM
+curl https://your-app.example.com/attestation
+```
+
+The response includes the full attestation data that can be independently verified using:
+
+- **dstack-verifier** — HTTP service or CLI tool provided by dstack-cloud
+- **dcap-qvl** — Open-source Intel DCAP Quote Verification Library
+- **dstack SDK** — `replayRtmrs()` function for local verification
+
+For more details, see the [dstack-cloud Verification Guide](https://github.com/Phala-Network/dstack-cloud/blob/master/docs/verification.md).
+
+## Next Steps
+
+- **[Security Model](security-model)** — Trust boundaries and security guarantees
+- **[Register Workload Measurements](/dstack-cloud/register-enclave-measurement)** — How to register measurements on-chain
+- **[Runbook](/dstack-cloud/runbook)** — Troubleshooting attestation failures

@@ -89,6 +89,14 @@
           {
             "href": "https://docs.phala.network/dstack/design-documents",
             "label": "Design Documents"
+          },
+          {
+            "href": "https://docs.phala.network/dstack-cloud/overview",
+            "label": "Cloud Overview"
+          },
+          {
+            "href": "https://docs.phala.network/dstack-cloud/get-started",
+            "label": "Cloud Quick Start"
           }
         ]
       },
@@ -773,6 +781,59 @@
           "/dstack/faqs"
         ],
         "tab": "dstack"
+      },
+      {
+        "icon": "server",
+        "pages": [
+          "/dstack-cloud/overview",
+          "/dstack-cloud/get-started",
+          {
+            "group": "Concepts",
+            "pages": [
+              "/dstack-cloud/kms-and-key-delivery",
+              "/dstack-cloud/nitro-enclave",
+              "/dstack-cloud/attestation-integration",
+              "/dstack-cloud/governance",
+              "/dstack-cloud/security-model"
+            ]
+          },
+          {
+            "group": "How-to Guides",
+            "pages": [
+              "/dstack-cloud/run-on-gcp",
+              "/dstack-cloud/run-on-nitro",
+              "/dstack-cloud/run-kms-on-gcp",
+              "/dstack-cloud/deploy-onchain-kms",
+              "/dstack-cloud/register-enclave-measurement",
+              "/dstack-cloud/manage-governance"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "/dstack-cloud/monitoring-alerting",
+              "/dstack-cloud/upgrade",
+              "/dstack-cloud/runbook"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "/dstack-cloud/api-reference",
+              "/dstack-cloud/configuration",
+              "/dstack-cloud/glossary"
+            ]
+          },
+          {
+            "group": "Appendix",
+            "pages": [
+              "/dstack-cloud/code-walkthrough",
+              "/dstack-cloud/e2e-test-report",
+              "/dstack-cloud/release-notes"
+            ]
+          }
+        ],
+        "tab": "dstack Cloud"
       },
       {
         "icon": "network",

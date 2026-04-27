@@ -1,0 +1,78 @@
+---
+title: E2E Test Report
+description: End-to-end test report covering test coverage and pre-production validation results.
+---
+
+# E2E Test Report
+
+> **Note:** This document is an internal deliverable. It will be populated with test results as they become available.
+
+## Test Coverage
+
+### Overview
+
+| Category | Status | Notes |
+|----------|--------|-------|
+| GCP CVM deployment | Pending | |
+| GCP KMS deployment + bootstrap | Pending | |
+| Nitro Enclave deployment | Pending | |
+| RA-TLS connection (GCP KMS → GCP workload) | Pending | |
+| RA-TLS connection (GCP KMS → Nitro workload) | Pending | |
+| getKey() key retrieval | Pending | |
+| On-chain measurement registration | Pending | |
+| On-chain measurement revocation | Pending | |
+| Governance flow (propose → approve → timelock → execute) | Pending | |
+| KMS bootstrap (Onboard → Finish) | Pending | |
+| Multi-node key replication | Pending | |
+
+## Pre-production Validation
+
+### Test Environment
+
+| Component | Version |
+|-----------|---------|
+| dstack-cloud | 0.6.0-test |
+| dstack OS | dstack-cloud-0.6.0 |
+| GCP zone | us-central1-a |
+| AWS region | us-east-1 |
+| Blockchain | Base Sepolia (testnet) |
+
+### Test Scenarios
+
+> To be populated with detailed test results.
+
+#### Scenario 1: GCP CVM + KMS Key Delivery
+
+- **Objective:** Deploy a workload on GCP, register measurements on-chain, and retrieve keys from KMS.
+- **Steps:** [TBD]
+- **Result:** [TBD]
+- **Issues:** [TBD]
+
+#### Scenario 2: Nitro Enclave + GCP KMS Key Delivery
+
+- **Objective:** Deploy a workload on AWS Nitro, register measurements on-chain, and retrieve keys from a GCP-hosted KMS.
+- **Steps:** [TBD]
+- **Result:** [TBD]
+- **Issues:** [TBD]
+
+#### Scenario 3: End-to-end Governance
+
+- **Objective:** Register new measurements through the full governance flow (propose → multisig → timelock → execute).
+- **Steps:** [TBD]
+- **Result:** [TBD]
+- **Issues:** [TBD]
+
+## Known Limitations
+
+| Limitation | Impact | Mitigation |
+|-----------|--------|-----------|
+| KMS root key is single-point | If the KMS TEE is compromised, all keys are at risk | MPC distribution planned for future version |
+| Nitro Enclaves are stateless | Workloads lose state on restart | Use GCP for persistent workloads; KMS runs on GCP only |
+| Public RPC reliability | Testnet RPCs may return stale state | Use multiple RPC providers |
+
+## Accepted Risks
+
+| Risk | Acceptance Criteria |
+|------|-------------------|
+| TEE hardware side-channels | Accept residual risk. Monitor Intel/AWS advisories. |
+| Smart contract vulnerabilities | Mitigate with audits. Re-audit after each contract change. |

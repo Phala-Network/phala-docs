@@ -1,0 +1,148 @@
+---
+title: On-chain Governance Model
+description: The on-chain governance model using Multisig + Timelock to control KMS authorization and prevent covert upgrades.
+---
+
+# On-chain Governance Model
+
+## Why On-chain Governance
+
+dstack supports use on-chain smart contracts to enforce that key management policies cannot be silently altered. This is critical because:
+
+- **Code is law:** Once a workload is deployed, its code and configuration cannot be changed without going through a visible, auditable process.
+- **Observable authorization:** All changes to key access policies are recorded on-chain. Anyone can verify which workloads are authorized.
+- **Covert deployer protection:** Prevents a malicious operator from secretly injecting code into a workload by updating it off-chain. If code changes, the measurements change, and on-chain re-authorization is required.
+
+## Core Smart Contracts
+
+### DstackKms
+
+The KMS policy contract. It stores:
+
+- **Authorized measurements** — The list of workload measurements (RTMR / OS_IMAGE_HASH) that are allowed to receive keys
+- **Configuration parameters** — KMS-related settings controlled by governance
+- **Admin roles** — Addresses authorized to perform governance operations
+
+The off-chain dstack-kms service queries DstackKms to determine whether a workload is authorized before dispatching keys.
+
+### DstackApp
+
+The application-level entry contract. It:
+
+- Holds a reference to DstackKms
+- Enforces application-specific checks before delegating to the KMS
+- Acts as the on-chain identity for a specific deployment
+
+### GovernanceSafe
+
+**Optional.** A multisig wallet (typically [Safe](https://safe.global)) that you can introduce to enhance governance security:
+
+- Owns DstackKms and DstackApp
+- Is the only entity allowed to execute governance operations (registering measurements, changing admin, upgrading contracts)
+- Requires multiple signers to approve any transaction
+
+> **Note:** GovernanceSafe is not part of dstack or dstack-cloud. It is an optional governance mechanism you can add to prevent unilateral control over key policies.
+
+### Timelock
+
+**Optional.** A delay module attached to the multisig that:
+
+- Enforces a mandatory waiting period between approval and execution
+- Maintains a queue of pending governance actions
+- Gives the community time to review and respond to proposed changes
+
+> **Note:** Like GovernanceSafe, Timelock is an optional enhancement. You can use it with a multisig to add a delay before governance actions take effect.
+
+## Governance Workflow
+
+### Basic Workflow (without Multisig/Timelock)
+
+At minimum, governance operations (registering measurements, updating configuration) are performed by the admin address directly:
+
+1. Admin submits a transaction to DstackKms or DstackApp
+2. Transaction executes immediately
+3. Changes take effect right away
+
+This is suitable for development and testing, but lacks the security guarantees needed for production.
+
+### Enhanced Workflow (with Multisig + Timelock)
+
+For production deployments, we recommend introducing a multisig wallet (e.g., Safe) and a timelock. The workflow becomes:
+
+![Governance Workflow](/images/dstack-cloud/governance-workflow.png)
+
+1. **Draft** — A governance action is proposed (e.g., register new measurement)
+2. **Submit to Multisig** — The action is submitted to the multisig wallet
+3. **Approve** — Required number of signers approve the transaction
+4. **Queue in Timelock** — The approved action is queued and must wait for the delay period
+5. **Wait** — The delay period passes (e.g., 48 hours), allowing time for review
+6. **Execute** — After the delay, anyone can execute the action
+
+This ensures:
+- No single party can unilaterally modify key policies
+- All changes are visible and reviewable before taking effect
+- Stakeholders have time to respond to suspicious proposals
+
+## Role of Multisig + Timelock
+
+| Mechanism | Purpose |
+|-----------|---------|
+| **Multisig** | Prevents unilateral actions. No single person can modify key policies — requires multi-party approval. |
+| **Timelock** | Enforces a delay, giving all stakeholders time to detect and respond to suspicious changes. |
+
+### Recommended Configuration
+
+| Parameter | Production | Non-production |
+|-----------|------------|----------------|
+| **Number of signers** | 5-7 (from at least 2 organizations) | 2-3 |
+| **Signature threshold** | ≥ 2/3 (e.g., 4-of-6) | ≥ 2/3 |
+| **Timelock delay** | 24-72 hours | 1-4 hours |
+| **Transaction expiration** | 7-14 days | 3-7 days |
+
+## Typical Governance Scenarios
+
+### Register New Measurements (New Version Deploy)
+
+When you update your application code or dstack OS version, the measurements change. You must register the new measurements before KMS will dispatch keys:
+
+1. Build the updated CVM image
+2. Extract new measurements (RTMR3 / OS_IMAGE_HASH)
+3. Draft a governance transaction to add the new measurements to DstackKms
+4. Submit to multisig for approval
+5. Wait for timelock
+6. Execute — KMS now authorizes workloads with the new measurements
+7. Deploy the updated CVM
+
+### Revoke a Compromised Measurement (Emergency)
+
+If a measurement is found to be vulnerable or unauthorized:
+
+1. Draft a governance transaction to remove the measurement from DstackKms
+2. Submit to multisig for expedited approval
+3. Wait for timelock (cannot be bypassed — this is by design)
+4. Execute — KMS immediately stops dispatching keys to workloads with that measurement
+
+> **Note:** Even in emergencies, the timelock cannot be skipped. This is intentional — it ensures all changes are visible and reviewable. Plan your security incident response accordingly.
+
+### Upgrade Smart Contracts
+
+If the contracts need to be upgraded (e.g., bug fix, new feature):
+
+1. Deploy the new contract implementation
+2. Draft a governance transaction to update the proxy's implementation address
+3. Submit to multisig for approval
+4. Wait for timelock
+5. Execute — the proxy now points to the new implementation
+
+## Security Considerations
+
+- **Use hardware wallets:** All multisig signers should use hardware wallets (e.g., Ledger, Trezor) to protect their signing keys.
+- **Set appropriate thresholds:** A threshold of ≥ 2/3 ensures that compromising a minority of signers is insufficient to push through malicious changes.
+- **Regular health checks:** Periodically verify that all signers are still accessible and the governance configuration is as expected.
+- **Monitor governance activity:** Set up alerts for governance transactions (proposals, approvals, executions) to detect suspicious activity early.
+
+## Next Steps
+
+- **[Deploy On-chain KMS Smart Contracts](/dstack-cloud/deploy-onchain-kms)** — Set up contracts on testnet or mainnet
+- **[Manage Governance](/dstack-cloud/manage-governance)** — How to create proposals and execute governance actions
+- **[Security Model](security-model)** — Trust boundaries and security guarantees
