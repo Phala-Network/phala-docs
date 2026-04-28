@@ -20,7 +20,7 @@ There are two distinct registration flows in the dstack ecosystem:
 | Registration Type | What Gets Registered | Purpose | Where to Find |
 |-------------------|---------------------|---------|---------------|
 | **KMS Registration** | KMS's `mrAggregated` (GCP) or public key | Proves KMS runs in a genuine TEE | [Run dstack-kms on GCP](run-kms-on-gcp) Step 8 |
-| **Workload Registration** (this guide) | Workload's `compose-hash` or `OS_IMAGE_HASH | Authorizes workload to receive keys from KMS | This document |
+| **Workload Registration** (this guide) | Workload's `compose-hash` or `OS_IMAGE_HASH` | Authorizes workload to receive keys from KMS | This document |
 
 **This guide covers workload registration** — the process of registering your application's measurement so that KMS will dispatch keys to it. This applies to:
 
@@ -95,7 +95,7 @@ dstack-util get-keys --show-mrs \
 
 ## Step 3: Prepare the Governance Transaction
 
-You need to call `DstackKms.addMeasurement()` (or equivalent function) with the new measurement value.
+You need to call `DstackKms.addOsImageHash()` with the new measurement value.
 
 ### 3.1 Draft the Transaction
 
@@ -105,7 +105,7 @@ Using the Safe web interface (https://app.safe.global):
 2. Go to your Safe
 3. Click "New Transaction" → "Contract interaction"
 4. Select the `DstackKms` contract
-5. Select the `addMeasurement` function
+5. Select the `addOsImageHash` function
 6. Enter the measurement value (hex string)
 7. Review and submit
 
@@ -114,7 +114,7 @@ Using the Safe web interface (https://app.safe.global):
 ```bash
 # Using cast (from Foundry)
 cast send <DstackKms_ADDRESS> \
-  "addMeasurement(bytes32)" \
+  "addOsImageHash(bytes32)" \
   0xYOUR_MEASUREMENT_HASH \
   --rpc-url $RPC_URL \
   --private-key $SIGNER_KEY
@@ -174,7 +174,7 @@ Expected output: `true`
 
 If you are deploying multiple workloads (e.g., different application versions for canary testing), you can register multiple measurements in a single governance transaction:
 
-1. Call `addMeasurement` for each measurement value
+1. Call `addOsImageHash` for each measurement value
 2. Bundle them into a batch transaction in the Safe
 3. Submit for approval as usual
 
@@ -184,7 +184,7 @@ If a measurement is found to be compromised or no longer needed:
 
 ```bash
 cast send <DstackKms_ADDRESS> \
-  "removeMeasurement(bytes32)" \
+  "removeOsImageHash(bytes32)" \
   0xCOMPROMISED_MEASUREMENT_HASH \
   --rpc-url $RPC_URL
 ```

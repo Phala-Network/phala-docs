@@ -5,12 +5,7 @@ description: Step-by-step guide to deploy a Docker application as a dstack CVM o
 
 # Run a Workload on GCP
 
-This guide explains how to deploy a Docker application as a dstack CVM (Confidential Virtual Machine) on GCP with Intel TDX.
-
-It also covers two key-management modes:
-
-- **Official/managed KMS endpoints** (quick start)
-- **External self-hosted KMS** (recommended for production/compliance)
+Deploy a Docker application as a dstack CVM on GCP with Intel TDX. This page covers the full workflow — from configuration to verification — including how to choose between managed and self-hosted KMS endpoints.
 
 ---
 
@@ -77,21 +72,7 @@ gcloud storage buckets create gs://YOUR_BUCKET_NAME --project YOUR_PROJECT_ID --
 | **Phala Official KMS** | Use managed KMS endpoints in `services.kms_urls` | Quick start, testing |
 | **Self-hosted KMS** | Use your own KMS endpoint in `services.kms_urls` | Production, compliance, full control |
 
-For Self-hosted KMS, point `services.kms_urls` to your deployed KMS URL, e.g.:
-
-```json
-"services": {
-  "kms_urls": ["https://YOUR_KMS_IP_OR_DOMAIN:12001"]
-}
-```
-
-Example used in validation:
-
-```json
-"services": {
-  "kms_urls": ["https://136.119.90.147:12001"]
-}
-```
+For Self-hosted KMS, point `services.kms_urls` to your deployed KMS URL (see [Run a dstack-kms CVM on GCP](run-kms-on-gcp) for how to set one up).
 
 If you run with key provider `tpm`/`none` (no external KMS), remove `.env` in project and remove `env_file` from `app.json`.
 

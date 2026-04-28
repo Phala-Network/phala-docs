@@ -5,13 +5,7 @@ description: The on-chain governance model using Multisig + Timelock to control 
 
 # On-chain Governance Model
 
-## Why On-chain Governance
-
-dstack supports use on-chain smart contracts to enforce that key management policies cannot be silently altered. This is critical because:
-
-- **Code is law:** Once a workload is deployed, its code and configuration cannot be changed without going through a visible, auditable process.
-- **Observable authorization:** All changes to key access policies are recorded on-chain. Anyone can verify which workloads are authorized.
-- **Covert deployer protection:** Prevents a malicious operator from secretly injecting code into a workload by updating it off-chain. If code changes, the measurements change, and on-chain re-authorization is required.
+On-chain governance ensures that key policy changes — like adding or revoking workload measurements — cannot happen silently. Every authorization change goes through a Multisig + Timelock process and is recorded on-chain for anyone to audit.
 
 ## Core Smart Contracts
 

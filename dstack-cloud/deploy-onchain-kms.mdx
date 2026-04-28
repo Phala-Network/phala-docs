@@ -5,7 +5,7 @@ description: Deploy DstackKms smart contracts and configure governance with Mult
 
 # Deploy On-chain KMS Smart Contracts
 
-This guide explains how to deploy the `DstackKms` smart contract and optionally configure governance with Timelock.
+Deploy the `DstackKms` smart contract to enforce that only authorized workloads can receive keys. This page covers the full contract deployment workflow, including the recommended Safe + Timelock governance setup for production.
 
 ## Overview
 
@@ -116,6 +116,18 @@ echo "DstackKms proxy: $KMS_PROXY"
 ---
 
 ## Step 4: Deploy with Timelock (Recommended for Production)
+
+### Timelock Configuration
+
+The timelock delay depends on your deployment environment:
+
+| Parameter | Testnet | Mainnet |
+|-----------|---------|---------|
+| **Timelock delay** | 1-4 hours | 24-72 hours |
+| **Safe signers** | 2-3 addresses | 5-7 addresses (from multiple organizations) |
+| **Safe threshold** | 2/3 | ≥ 2/3 |
+| **Executor role** | Open or EOA | Safe only (strict control) |
+| **Admin role** | EOA or 0x0 | 0x0 (self-managed by timelock) |
 
 ### 4.1 Prepare Timelock Configuration
 
@@ -268,18 +280,6 @@ cast send $TIMELOCK "execute(address,uint256,bytes,bytes32,bytes32)" \
   --rpc-url $RPC_URL \
   --private-key $EXECUTOR_KEY
 ```
-
----
-
-## Testnet vs. Mainnet Configuration
-
-| Parameter | Testnet | Mainnet |
-|-----------|---------|---------|
-| **Timelock delay** | 1-4 hours | 24-72 hours |
-| **Safe signers** | 2-3 addresses | 5-7 addresses (from multiple organizations) |
-| **Safe threshold** | 2/3 | ≥ 2/3 |
-| **Executor role** | Open or EOA | Safe only (strict control) |
-| **Admin role** | EOA or 0x0 | 0x0 (self-managed by timelock) |
 
 ---
 

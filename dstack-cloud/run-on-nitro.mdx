@@ -5,7 +5,7 @@ description: Step-by-step guide to deploy a Docker application as a Nitro Enclav
 
 # Run a Workload on AWS Nitro
 
-This guide explains how to deploy a Docker application as a Nitro Enclave using the official dstack template.
+Run a Docker application inside an AWS Nitro Enclave — one of the strongest isolation guarantees available in the public cloud. The host OS cannot read your enclave's memory, even with root access.
 
 > **Important:** On AWS Nitro, your workload runs inside an **AWS Enclave OS image** — not a dstack CVM. There is no Guest Agent. `dstack-util` is packaged into the Enclave for attestation and key retrieval. You control how keys are used (for example disk/data decryption in your app).
 
@@ -214,23 +214,9 @@ nitro-cli console
 
 ## Entrypoint Notes
 
-Template uses `dstack-util get-keys` and VSOCK proxy. Keys are returned to:
+The template uses `dstack-util get-keys` and a VSOCK proxy for key retrieval. Keys are returned to `/var/run/dstack/keys.json` inside the enclave, or captured on the host via VSOCK in helper scripts.
 
-- `/var/run/dstack/keys.json` (inside enclave flow)
-- host-captured file via VSOCK in helper scripts
-
----
-
-## What Changes OS_IMAGE_HASH
-
-All of these affect measured hash:
-
-- KMS URL (baked into entrypoint)
-- APP_ID (baked into entrypoint)
-- `app/root_ca.pem`
-- entrypoint/script content and included binaries
-
-Use the **exact same inputs** between `--show-mrs` and real run.
+> **Important:** The KMS URL, APP_ID, and `root_ca.pem` are all baked into the enclave image and affect the measured hash. You must use the exact same inputs between `--show-mrs` preview and the real run — any difference produces a different `OS_IMAGE_HASH`.
 
 ---
 
@@ -248,14 +234,9 @@ Use the **exact same inputs** between `--show-mrs` and real run.
 
 ## Differences from GCP
 
-| Aspect | GCP CVM | Nitro Enclave |
-|--------|---------|---------------|
-| Deployment | `dstack-cloud` | `build-eif` + `nitro-cli` |
-| OS in TEE | dstack OS | AWS enclave OS |
-| Guest Agent | Yes | No (`dstack-util`) |
-| App format | `docker-compose` | Dockerfile/EIF |
-| Disk encryption | automatic | app-managed |
-| Networking | direct/gateway | host VSOCK proxy |
+Nitro and GCP take fundamentally different approaches. On GCP, the Guest Agent handles attestation, key management, and automatic disk encryption. On Nitro, `dstack-util` only retrieves the key — your application decides what to encrypt.
+
+For a full comparison, see the [overview](overview) and [KMS and Key Delivery](kms-and-key-delivery).
 
 ---
 

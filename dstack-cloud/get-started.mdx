@@ -5,7 +5,7 @@ description: Quick start tutorial to deploy your first dstack CVM on GCP in 15-2
 
 # Quick Start: Deploy Your First dstack App on GCP
 
-This tutorial walks you through deploying a Docker application as a Confidential VM on Google Cloud Platform using `dstack-cloud`.
+You'll have a Docker application running inside a hardware-encrypted Confidential VM on GCP within 25 minutes. This tutorial covers the full path: install the CLI, configure your project, deploy, and verify that attestation proves your workload runs in genuine TEE hardware.
 
 **Estimated time:** 15–25 minutes (first run).
 
@@ -29,9 +29,9 @@ Before you begin:
   gcloud auth login
   gcloud config set project YOUR_PROJECT_ID
   ```
-- Linux host
+- **Linux host** (required — `dstack-cloud deploy` uses FAT32 disk images, which don't work on macOS)
 - Docker installed
-- `gsutil`, `jq`, `mtools`, `dosfstools` installed
+- `gsutil`, `jq`, `mtools` (for `mcopy`), `dosfstools` (for `mkfs.fat`) — these are needed by the deploy process to build a shared disk image
 
 ---
 
@@ -172,8 +172,11 @@ dstack-cloud fw allow 8080
 
 ## Step 9: Verify
 
+Check that the CVM is running and your workload is accessible:
+
 ```bash
 dstack-cloud status
+# Expected: shows "RUNNING" with measurements (RTMR values)
 dstack-cloud logs --follow
 
 # Get attestation from your app

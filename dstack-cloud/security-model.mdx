@@ -7,7 +7,7 @@ description: Trust boundaries, threat categories, security guarantees, and resid
 
 ## Trust Boundaries
 
-Understanding what is trusted, partially trusted, and untrusted is essential for evaluating the security of dstack-cloud deployments.
+Understanding what you must trust — and what's protected by hardware or blockchain — is the foundation of evaluating dstack-cloud's security. This page maps out trust boundaries, threat categories, and the guarantees the system provides.
 
 ![Trust Boundaries](/images/dstack-cloud/trust-boundaries.png)
 
@@ -42,19 +42,12 @@ Understanding what is trusted, partially trusted, and untrusted is essential for
 
 ## Threat Categories
 
-### T1: Malicious Cloud Platform Operator
+### T1: Malicious Cloud Platform Operator or Compromised Host OS
 
-- **Attack:** Cloud provider attempts to read workload memory or extract keys.
+- **Attack:** Cloud provider or host OS administrator attempts to read workload memory or extract keys.
 - **Impact:** Data breach, key compromise.
-- **Mitigation:** TEE hardware encryption prevents memory access. Attestation proves hardware authenticity.
-- **Residual risk:** Side-channel attacks against TEE hardware (see Residual Risks).
-
-### T2: Compromised Host OS / Hypervisor
-
-- **Attack:** Attacker gains root access to the EC2 host and tries to read Enclave memory or modify Enclave code.
-- **Impact:** Same as T1.
-- **Mitigation:** Nitro Enclave memory is encrypted and inaccessible from the host. TDX provides similar isolation.
-- **Residual risk:** Hypervisor-level side-channels (speculative execution, etc.).
+- **Mitigation:** TEE hardware encryption prevents memory access on both GCP (TDX) and AWS (Nitro Enclave). Attestation proves hardware authenticity.
+- **Residual risk:** Microarchitectural side-channel attacks (speculative execution, etc.). See Residual Risks.
 
 ### T3: Malicious or Compromised Workload
 
@@ -116,13 +109,18 @@ These are risks that the current architecture does not fully mitigate:
 
 Before going to production, verify:
 
+**TEE and Attestation:**
 - [ ] dstack OS image is built from audited source code
 - [ ] All measurements (RTMR / OS_IMAGE_HASH) are registered on-chain
+- [ ] TLS certificates are valid and properly configured
+
+**Governance:**
 - [ ] Multisig signers are using hardware wallets
 - [ ] Signature threshold is ≥ 2/3
 - [ ] Timelock delay is appropriate for your risk profile
+
+**Operations:**
 - [ ] Multiple independent RPC providers are configured
-- [ ] TLS certificates are valid and properly configured
 - [ ] Monitoring and alerting are set up for attestation failures and governance events
 - [ ] Runbook exists for common failure scenarios
 

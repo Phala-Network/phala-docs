@@ -3,31 +3,33 @@ title: E2E Test Report
 description: End-to-end test report covering test coverage and pre-production validation results.
 ---
 
+import { Callout } from 'nextra/components'
+
 # E2E Test Report
 
-> **Note:** This document is an internal deliverable. It will be populated with test results as they become available.
+<Callout type="warning">
+**This document is a work in progress.** Test results will be populated as they become available.
+</Callout>
 
 ## Test Coverage
 
-### Overview
+Tests are being conducted across the following scenarios. Results will be added as each test completes.
 
 | Category | Status | Notes |
 |----------|--------|-------|
-| GCP CVM deployment | Pending | |
-| GCP KMS deployment + bootstrap | Pending | |
-| Nitro Enclave deployment | Pending | |
-| RA-TLS connection (GCP KMS → GCP workload) | Pending | |
-| RA-TLS connection (GCP KMS → Nitro workload) | Pending | |
-| getKey() key retrieval | Pending | |
-| On-chain measurement registration | Pending | |
-| On-chain measurement revocation | Pending | |
-| Governance flow (propose → approve → timelock → execute) | Pending | |
-| KMS bootstrap (Onboard → Finish) | Pending | |
-| Multi-node key replication | Pending | |
+| GCP CVM deployment | In progress | |
+| GCP KMS deployment + bootstrap | In progress | |
+| Nitro Enclave deployment | In progress | |
+| RA-TLS connection (GCP KMS → GCP workload) | In progress | |
+| RA-TLS connection (GCP KMS → Nitro workload) | In progress | |
+| getKey() key retrieval | In progress | |
+| On-chain measurement registration | In progress | |
+| On-chain measurement revocation | In progress | |
+| Governance flow (propose → approve → timelock → execute) | In progress | |
+| KMS bootstrap (Onboard → Finish) | In progress | |
+| Multi-node key replication | Planned | |
 
-## Pre-production Validation
-
-### Test Environment
+## Test Environment
 
 | Component | Version |
 |-----------|---------|
@@ -36,31 +38,6 @@ description: End-to-end test report covering test coverage and pre-production va
 | GCP zone | us-central1-a |
 | AWS region | us-east-1 |
 | Blockchain | Base Sepolia (testnet) |
-
-### Test Scenarios
-
-> To be populated with detailed test results.
-
-#### Scenario 1: GCP CVM + KMS Key Delivery
-
-- **Objective:** Deploy a workload on GCP, register measurements on-chain, and retrieve keys from KMS.
-- **Steps:** [TBD]
-- **Result:** [TBD]
-- **Issues:** [TBD]
-
-#### Scenario 2: Nitro Enclave + GCP KMS Key Delivery
-
-- **Objective:** Deploy a workload on AWS Nitro, register measurements on-chain, and retrieve keys from a GCP-hosted KMS.
-- **Steps:** [TBD]
-- **Result:** [TBD]
-- **Issues:** [TBD]
-
-#### Scenario 3: End-to-end Governance
-
-- **Objective:** Register new measurements through the full governance flow (propose → multisig → timelock → execute).
-- **Steps:** [TBD]
-- **Result:** [TBD]
-- **Issues:** [TBD]
 
 ## Known Limitations
 

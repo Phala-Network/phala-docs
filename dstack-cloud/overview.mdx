@@ -5,7 +5,9 @@ description: dstack-cloud is an extension of the dstack framework that enables d
 
 # dstack-cloud Overview
 
-dstack-cloud is an extension of the [dstack framework](https://github.com/Dstack-TEE/dstack) that enables deploying confidential Docker applications on **GCP Confidential VMs** and **AWS Nitro Enclaves**.
+dstack-cloud lets you run Docker applications inside hardware-encrypted Trusted Execution Environments (TEEs) on **GCP Confidential VMs** and **AWS Nitro Enclaves** — without owning specialized bare-metal servers.
+
+Built on the open-source [dstack framework](https://github.com/Dstack-TEE/dstack), it brings TEE security to mainstream cloud platforms. Your code and data stay encrypted in memory, even from the cloud provider.
 
 ## What is dstack
 
@@ -29,50 +31,32 @@ This means you can use the full dstack security model — hardware isolation, at
 
 ![How It Works](/images/dstack-cloud/architecture-overview-v2.png)
 
-1. You define your application in a `docker-compose.yaml` file (GCP) or a `Dockerfile` (AWS Nitro).
-2. `dstack-cloud deploy` builds a launch configuration and deploys a TEE environment.
+You define your application, and `dstack-cloud deploy` handles the rest: building a TEE environment, managing attestation, and delivering keys.
 
 ### On GCP:
 
-3. A **dstack CVM** — a Confidential Virtual Machine running dstack OS — is launched with the provided configuration.
-4. The CVM boots as a Confidential VM with Intel TDX enabled, then pulls your container images from the Docker registry.
-5. A **Guest Agent** inside the CVM handles attestation, key retrieval, and automatic disk encryption.
-6. Your application communicates with the Guest Agent via a Unix socket (`/var/run/dstack.sock`).
+1. `dstack-cloud deploy` creates a **Confidential Virtual Machine** running dstack OS with Intel TDX enabled.
+2. A **Guest Agent** inside the CVM handles attestation, key retrieval from KMS, and automatic disk encryption.
+3. Your application communicates with the Guest Agent via a Unix socket (`/var/run/dstack.sock`).
 
 ### On AWS Nitro:
 
-3. AWS Nitro CLI (`nitro-cli build-enclave`) converts your Dockerfile into an **Enclave Image File (EIF)** — using Enclave OS (AWS-provided), not dstack OS.
-4. The EIF runs as a Nitro Enclave inside an EC2 instance.
-5. **`dstack-util`** (packaged into the EIF) handles attestation and key retrieval from KMS — there is no Guest Agent.
-6. Your application decides how to use the key (e.g., encrypting disk, decrypting model weights).
+1. AWS Nitro CLI converts your Dockerfile into an **Enclave Image File (EIF)** using Enclave OS (AWS-provided).
+2. The EIF runs as a Nitro Enclave — there is no dstack OS and no Guest Agent.
+3. **`dstack-util`** inside the Enclave handles attestation and key retrieval from KMS. Your application decides how to use the key.
 
-> **Note:** GCP and Nitro have different architectures. See [Nitro Enclave Integration](nitro-enclave) for details.
+> The two platforms have different architectures. See [Nitro Enclave Integration](nitro-enclave) for a detailed comparison.
 
 ## Key Components
 
-### Components Shared Across Platforms
-
 | Component | Role |
 |-----------|------|
-| **dstack-cloud CLI** | Build and deployment tool |
+| **dstack-cloud CLI** | Build and deployment tool for both GCP and Nitro |
 | **dstack-kms** | Key Management Service running in its own TEE; verifies workloads and dispatches keys |
 | **Gateway** | Edge TLS termination, automatic ACME certificate provisioning, RA-TLS support |
-
-### GCP-Specific Components
-
-| Component | Role |
-|-----------|------|
-| **dstack CVM** | Confidential Virtual Machine running dstack OS with your containers inside |
-| **Guest Agent** | Process inside each CVM that handles attestation, key management, and automatic disk encryption |
-| **VMM** | Virtual Machine Monitor that parses Docker Compose and boots CVMs from reproducible OS images |
-
-### Nitro-Specific Components
-
-| Component | Role |
-|-----------|------|
-| **Enclave Image (EIF)** | Built by AWS Nitro CLI from a Dockerfile; runs inside a Nitro Enclave using Enclave OS (AWS-provided) |
-| **dstack-util** | Lightweight tool packaged into the EIF; handles attestation and key retrieval from KMS (replaces Guest Agent) |
-| **VSOCK Proxy** | Runs on the EC2 host; forwards network traffic between the Enclave and external services (KMS, RPC) |
+| **Guest Agent** (GCP only) | Process inside each CVM that handles attestation, key management, and automatic disk encryption |
+| **dstack-util** (Nitro only) | Lightweight tool packaged into the EIF; handles attestation and key retrieval from KMS |
+| **VSOCK Proxy** (Nitro only) | Runs on the EC2 host; forwards network traffic between the Enclave and external services |
 
 ## Typical Use Cases
 

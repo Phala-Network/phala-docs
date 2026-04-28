@@ -5,7 +5,7 @@ description: Deploy a dstack-kms (Key Management Service) instance on GCP as a C
 
 # Run a dstack-kms CVM on GCP
 
-This guide explains how to deploy a dstack-kms (Key Management Service) instance on GCP as a Confidential VM with Intel TDX, following the production on-chain governance workflow.
+Run your own dstack-kms instance on GCP so you have full control over key policy. This page covers the production deployment workflow: bootstrap the KMS, register its attestation on-chain, and verify it's serving keys correctly.
 
 > **Reference:** This guide is based on the [official deployment guide](https://github.com/Phala-Network/dstack-cloud-deployment-guide/blob/main/guide_EN.md).
 
@@ -41,45 +41,13 @@ This guide explains how to deploy a dstack-kms (Key Management Service) instance
 
 ## Step 1: Configure dstack-cloud
 
-```bash
-dstack-cloud config-edit
-```
-
-This creates/edits `~/.config/dstack-cloud/config.json`:
-
-```json
-{
-  "image_search_paths": ["/path/to/your/images"],
-  "gcp": {
-    "project": "your-gcp-project",
-    "zone": "us-central1-a",
-    "bucket": "gs://your-bucket-dstack"
-  }
-}
-```
-
-- **`image_search_paths`**: Directory where OS images are stored after `pull`.
-- **`bucket`**: GCS bucket for deployment artifacts.  
-  In practice, create explicitly if missing (see Step 6).
+Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-1-configure-dstack-cloud) to set up your global config and GCS bucket.
 
 ---
 
 ## Step 2: Pull the OS Images
 
-Download both image archives:
-
-```bash
-dstack-cloud pull https://github.com/Phala-Network/meta-dstack-cloud/releases/download/v0.6.0-test/dstack-cloud-0.6.0.tar.gz
-dstack-cloud pull https://github.com/Phala-Network/meta-dstack-cloud/releases/download/v0.6.0-test/dstack-cloud-0.6.0-uki.tar.gz
-```
-
-The internal image name remains `dstack-cloud-0.6.0`.
-
-Before deployment, verify:
-
-```bash
-ls -lh <image_search_paths>/dstack-cloud-0.6.0/disk.raw
-```
+Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-2-pull-the-os-image) to download the `dstack-cloud-0.6.0` images.
 
 > If `disk.raw` is missing, deployment may create a VM that cannot boot (UEFI loop: `Failed to load image`).
 

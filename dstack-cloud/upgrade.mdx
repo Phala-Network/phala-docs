@@ -5,7 +5,7 @@ description: Upgrade procedures for KMS images, CVM applications, and smart cont
 
 # Upgrade Procedures
 
-This guide covers upgrade procedures for dstack-cloud deployments: KMS images, CVM/Enclave applications, and smart contracts.
+Upgrading in a TEE environment is different from normal cloud upgrades: changing your Docker image or OS version changes the measurements, which means you need to go through governance before KMS will deliver keys to the new version. This page covers the upgrade procedures for KMS, CVMs/Enclaves, and smart contracts.
 
 ## Pre-upgrade Checklist
 
@@ -183,18 +183,16 @@ To rollback, follow the same procedure with the previous implementation address.
 
 ## Coordinated Upgrade: Application + Measurements + Contracts
 
-A full-stack upgrade requires careful coordination:
+A full-stack upgrade requires careful coordination because each step may depend on the previous one completing. The general order is:
 
-```
 1. Test new application + new KMS + new contracts in staging
-2. Deploy new contracts to mainnet (governance)
-3. Register new measurements on-chain (governance)
+2. Deploy new contracts to mainnet (through governance)
+3. Register new measurements on-chain (through governance)
 4. Wait for all governance actions to complete
 5. Deploy new KMS image to production
 6. Deploy new application CVMs to production
 7. Verify end-to-end key delivery
-8. (After verification) Optionally revoke old measurements
-```
+8. Optionally revoke old measurements after verification
 
 ## Downtime Considerations
 

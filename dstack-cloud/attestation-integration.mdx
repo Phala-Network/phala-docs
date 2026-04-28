@@ -5,12 +5,12 @@ description: How dstack-cloud integrates remote attestation mechanisms on GCP (T
 
 # Attestation Integration
 
+Remote attestation is how a TEE proves it's running genuine, unmodified code on real hardware. dstack-cloud integrates two different attestation mechanisms — Intel TDX on GCP and AWS NSM on Nitro — to give KMS confidence before dispatching keys.
+
 > For the fundamentals of dstack Remote Attestation, the RA-TLS protocol design, and ZT-TLS / ACME certificate management, refer to the official Phala documentation:
 >
 > - [TEE Attestation Guide](https://docs.phala.com/dstack/trust-center-technical)
 > - [TEE-Controlled Domain Certificates](https://docs.phala.com/dstack/design-documents/tee-controlled-domain-certificates)
->
-> This document explains **how dstack-cloud integrates attestation on different hardware platforms**.
 
 ## What Is Remote Attestation
 
@@ -127,15 +127,9 @@ These 3 PCR values are combined into a single `OS_IMAGE_HASH`, which is the uniq
 
 ## GCP vs. Nitro: Attestation Comparison
 
-| Aspect | GCP (TDX) | AWS Nitro |
-|--------|-----------|-----------|
-| **Attestation format** | TDX Quote | NSM Attestation Document |
-| **Signed by** | Intel TDX hardware | AWS Nitro Secure Module |
-| **Verification method** | Intel TCB recovery / DCAP QVL | AWS certificate chain |
-| **Measurement registers** | RTMR0-3 | PCR0-2 (3 values combined into OS_IMAGE_HASH) |
-| **Key measurement field** | `compose-hash` (in RTMR3) | `OS_IMAGE_HASH` (from PCRs) |
-| **Challenge data** | `reportData` in Quote | User data in Document |
-| **Boot measurement** | Automatic (hardware records full boot chain) | Automatic (NSM records at Enclave launch) |
+Both platforms generate hardware-signed attestations that KMS verifies before dispatching keys. The main differences are in the attestation format (TDX Quote vs. NSM Document), verification method (Intel DCAP QVL vs. AWS certificate chain), and how measurements are stored (RTMR registers vs. PCR values).
+
+For platform-specific details, see the sections above. For a broader architectural comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
 
 ## Measurements and On-chain Authorization
 

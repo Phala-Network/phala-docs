@@ -5,12 +5,12 @@ description: Understand KMS operating modes, key delivery flow, and GCP vs Nitro
 
 # KMS and Key Delivery
 
+KMS is the component that decides whether a workload is trustworthy enough to receive keys. This page explains the two operating modes (local vs. external KMS), the key delivery flow on each platform, and how on-chain smart contracts add an auditable authorization layer.
+
 > For the core design of dstack's Key Management System — including the Decentralized Root-of-Trust (DeRoT) protocol, MPC key generation, key derivation, and rotation — refer to the official Phala documentation:
 >
 > - [Key Management Protocol](https://docs.phala.com/dstack/design-documents/key-management-protocol)
 > - [Decentralized Root-of-Trust](https://docs.phala.com/dstack/design-documents/decentralized-root-of-trust)
->
-> This document explains how the KMS delivers keys in GCP and Nitro environments and the differences between operating modes.
 
 ## Operating Modes
 
@@ -85,14 +85,14 @@ The following describes the high-level key delivery flow:
 
 ## GCP vs. Nitro: Key Delivery Differences
 
-| Aspect | GCP (TDX) | AWS Nitro Enclave |
-|--------|-----------|-------------------|
-| **Attestation method** | TDX Quote (signed by TDX hardware) + TPM | NSM Attestation Document (signed by Nitro Secure Module) |
-| **Measurement location** | RTMR0-3 (Runtime Measurement Registers) | PCR0-3 (Platform Configuration Registers) |
-| **Key measurement field** | `compose-hash` in RTMR3 | `OS_IMAGE_HASH` |
-| **Communication with KMS** | Direct network connection (CVM has its own IP) | Via VSOCK proxy (Enclave cannot directly access the network) |
-| **KMS Bootstrap** | HTTP on first launch, then switches to HTTPS | HTTP on first launch, then switches to HTTPS |
-| **Persistent storage** | Available (disk-backed, Guest Agent handles encryption) | Not available (stateless Enclave; dstack-util provides keys, user manages encryption) |
+The key delivery flow is similar on both platforms, but the implementation details differ:
+
+- **Attestation format:** TDX Quote (GCP) vs. NSM Attestation Document (Nitro)
+- **Communication with KMS:** Direct network on GCP vs. VSOCK proxy on Nitro
+- **Key usage:** Guest Agent manages the full key lifecycle on GCP (including automatic disk encryption), while on Nitro `dstack-util` only retrieves the key — your application decides how to use it
+- **Persistent storage:** Available on GCP, not on Nitro (stateless Enclave)
+
+For a complete comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
 
 ### VSOCK Proxy (Nitro-specific)
 

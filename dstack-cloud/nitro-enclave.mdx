@@ -3,20 +3,20 @@ title: AWS Nitro Enclave Integration
 description: How AWS Nitro Enclaves work with dstack-cloud, including EIF, VSOCK proxy, and key architectural differences from GCP.
 ---
 
-# AWS Nitro Enclave Integration
-
 ## What Are Nitro Enclaves
 
-AWS Nitro Enclaves provide isolated compute environments on EC2 instances:
+AWS Nitro Enclaves provide process-level isolation on EC2: the host OS cannot read or write enclave memory, even with root access. dstack-cloud packages your application into an Enclave Image File (EIF) and uses `dstack-util` for attestation and key retrieval — replacing the Guest Agent used on GCP.
 
-- **Memory-isolated:** The host OS (EC2 instance) cannot read or write Enclave memory. Even administrators with root access on the host cannot access Enclave data.
-- **No persistent storage:** Every Enclave launch starts from a clean state. There is no disk I/O — the Enclave image is loaded into memory at launch and exists only while running.
-- **No external network access:** Enclaves communicate with the outside world through VSOCK (a socket interface to the host machine). A proxy on the host forwards network traffic.
-- **Cryptographic attestation:** AWS Nitro Secure Module (NSM) generates an Attestation Document that cryptographically proves the Enclave's identity and measurements.
+Key properties:
+
+- **Memory-isolated:** The host OS cannot read or write Enclave memory
+- **No persistent storage:** Every Enclave launch starts from a clean state
+- **No external network access:** Enclaves communicate through VSOCK (a socket interface to the host machine)
+- **Cryptographic attestation:** AWS Nitro Secure Module (NSM) generates an Attestation Document proving the Enclave's identity
 
 ## How dstack Uses Nitro Enclaves
 
-> **Important:** The Nitro Enclave integration differs from the GCP Confidential VM approach. On GCP, dstack-cloud deploys a **dstack CVM** (a full virtual machine running dstack OS with a Guest Agent). On AWS Nitro, the workload runs inside an **AWS Enclave OS image** — there is no Guest Agent and no dstack OS.
+The Nitro integration differs significantly from GCP. On GCP, dstack-cloud deploys a full virtual machine (dstack CVM) with a Guest Agent. On AWS Nitro, the workload runs inside an AWS Enclave OS image — there is no Guest Agent and no dstack OS.
 
 ![Nitro Enclave Architecture](/images/dstack-cloud/nitro-enclave-architecture-v2.png)
 

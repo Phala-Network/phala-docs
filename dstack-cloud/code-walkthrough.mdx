@@ -5,9 +5,24 @@ description: Code walkthrough and knowledge transfer materials for the dstack-cl
 
 # Code Walkthrough and KT Materials
 
+This page is an internal knowledge-transfer resource. It maps the codebase structure, traces the key request path from application to KMS, and highlights the files you'll need to understand when contributing to dstack-cloud.
+
 > **Note:** This document is an internal deliverable for new contributors and team members.
 
+## Guide for New Contributors
+
+If you're new to dstack-cloud, here's the recommended reading order:
+
+1. **Understand the architecture** — Read [overview](overview) first to get the big picture
+2. **Set up the development environment** — Follow the README in the repository root
+3. **Start with a simple workload** — Deploy a basic nginx container on GCP using the Quick Start
+4. **Explore the KMS** — Deploy KMS and observe the bootstrap flow
+5. **Read the attestation code** — Understand how measurements are generated and verified
+6. **Review the contracts** — Understand the governance model and on-chain authorization
+
 ## Repository Structure
+
+The codebase is organized into these key areas:
 
 ```
 dstack-cloud/
@@ -24,6 +39,8 @@ dstack-cloud/
 ```
 
 ## Core Request Paths
+
+Understanding how a key request flows through the system is the best way to learn the codebase. Here's what happens when an application asks KMS for a key:
 
 ### Key Request Flow
 
@@ -58,6 +75,8 @@ dstack-util (in Enclave)
 
 ### CVM Deployment Flow
 
+When you run `dstack-cloud deploy`, the CLI parses your configuration and orchestrates the creation of a TEE environment. The flow differs by platform:
+
 **GCP (dstack CVM):**
 ```
 dstack-cloud deploy
@@ -85,7 +104,7 @@ dstack-cloud deploy
 
 ## Attestation Module
 
-The attestation module handles hardware-specific attestation:
+The attestation module abstracts platform-specific hardware attestation behind a common interface. Each platform has its own module:
 
 | Platform | Module | Input | Output |
 |----------|--------|-------|--------|
@@ -95,6 +114,8 @@ The attestation module handles hardware-specific attestation:
 
 ## Key Files
 
+These are the files you'll spend the most time in when contributing:
+
 | File | Purpose |
 |------|---------|
 | `kms/src/main.rs` | KMS service entry point, RPC handlers, bootstrap logic |
@@ -103,15 +124,6 @@ The attestation module handles hardware-specific attestation:
 | `cli/src/main.rs` | CLI entry point, deploy/status/logs commands |
 | `contracts/contracts/DstackKms.sol` | KMS policy contract |
 | `contracts/contracts/DstackApp.sol` | Application contract |
-
-## Guide for New Contributors
-
-1. **Understand the architecture** — Read [/dstack-cloud/overview.mdx](/dstack-cloud/overview) first
-2. **Set up the development environment** — Follow the README in the repository root
-3. **Start with a simple workload** — Deploy a basic nginx container on GCP using the Quick Start
-4. **Explore the KMS** — Deploy KMS and observe the bootstrap flow
-5. **Read the attestation code** — Understand how measurements are generated and verified
-6. **Review the contracts** — Understand the governance model and on-chain authorization
 
 ## Resources
 

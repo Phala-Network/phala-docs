@@ -5,7 +5,7 @@ description: Create governance proposals, manage Multisig signing, and execute T
 
 # Governance Operations
 
-This guide explains how to perform common governance operations — creating proposals, approving transactions, and executing changes through the Multisig + Timelock system.
+Every governance action — registering measurements, revoking access, upgrading contracts — follows the same pattern: propose, collect signatures, wait for timelock, execute. This page walks through that pattern step by step.
 
 ## Prerequisites
 
@@ -31,8 +31,8 @@ All governance changes start as a transaction submitted to the GovernanceSafe.
 
 | Action | Contract | Function |
 |--------|----------|----------|
-| Register new measurement | DstackKms | `addMeasurement(bytes32)` |
-| Revoke measurement | DstackKms | `removeMeasurement(bytes32)` |
+| Register new measurement | DstackKms | `addOsImageHash(bytes32)` |
+| Revoke measurement | DstackKms | `removeOsImageHash(bytes32)` |
 | Update admin role | DstackKms | `setAdmin(address)` |
 | Update KMS reference | DstackApp | `setKms(address)` |
 | Upgrade contract implementation | Proxy | `upgradeTo(address)` |
@@ -116,7 +116,7 @@ After execution, the change takes effect immediately. KMS syncs the latest on-ch
 
 If you discover that a measurement is compromised:
 
-1. Draft a transaction to call `DstackKms.removeMeasurement(bytes32)` with the compromised hash
+1. Draft a transaction to call `DstackKms.removeOsImageHash(bytes32)` with the compromised hash
 2. Submit to the Safe for priority approval
 3. Collect signatures as quickly as possible
 4. **Wait for the timelock** — this cannot be bypassed

@@ -5,11 +5,13 @@ description: Set up monitoring, alerting, and dashboards for dstack-cloud deploy
 
 # Monitoring and Alerting
 
-This guide covers monitoring and alerting for dstack-cloud deployments, including dstack CVMs, dstack-kms instances, and on-chain governance.
+You can't secure what you can't see. This page covers the key metrics to watch, log collection patterns, and alert rules that help you catch attestation failures, governance anomalies, or KMS downtime before they become incidents.
 
 ## Key Metrics
 
 ### KMS Metrics
+
+These metrics tell you whether KMS is healthy and delivering keys promptly:
 
 | Metric | Description | Alert Threshold |
 |--------|-------------|-----------------|
@@ -21,6 +23,8 @@ This guide covers monitoring and alerting for dstack-cloud deployments, includin
 
 ### CVM / Enclave Metrics
 
+Track workload health and resource usage:
+
 | Metric | Description | Alert Threshold |
 |--------|-------------|-----------------|
 | **CVM uptime** | Percentage of time the CVM is running | < 99% |
@@ -30,6 +34,8 @@ This guide covers monitoring and alerting for dstack-cloud deployments, includin
 | **Memory usage** | CVM memory utilization | > 90% |
 
 ### Governance Metrics
+
+Governance metrics help you catch stalled proposals or signer inactivity:
 
 | Metric | Description | Alert Threshold |
 |--------|-------------|-----------------|
@@ -98,11 +104,10 @@ KMS logs are available through `dstack-cloud logs` when the KMS is deployed as a
 
 ### Integration with Datadog
 
+To integrate with Datadog, you'll need a Datadog agent on each host machine that collects custom metrics from dstack-cloud. The key metric namespaces are `dstack.cloud.cvm.*`, `dstack.cloud.kms.*`, and `dstack.cloud.governance.*`.
+
 1. Set up a Datadog agent on each host machine
-2. Configure custom metrics collection for:
-   - `dstack.cloud.cvm.status`
-   - `dstack.cloud.kms.request_latency`
-   - `dstack.cloud.kms.attestation_failures`
+2. Configure custom metrics collection for KMS, CVM, and governance events
 3. Create dashboards and monitors based on the metrics above
 
 ## Alert Rules
