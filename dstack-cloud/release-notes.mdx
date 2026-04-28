@@ -10,7 +10,7 @@ description: Release notes, version history, compatibility notes, and known issu
 ### Features
 
 - Initial release with support for GCP Confidential VMs and AWS Nitro Enclaves
-- dstack-cloud CLI for packaging Docker Compose apps into CVM images
+- dstack-cloud CLI for launching CVMs from Docker Compose configurations
 - KMS with two modes: Local Key Provider and standalone KMS
 - On-chain governance (DstackKms, DstackApp, Multisig + Timelock)
 - RA-TLS for secure KMS ↔ workload communication
@@ -21,8 +21,6 @@ description: Release notes, version history, compatibility notes, and known issu
 ### Compatibility Notes
 
 - Requires Intel TDX-capable GCP zones or Nitro Enclave-capable EC2 instances
-- Docker Compose format: standard `docker-compose.yaml` (v3+)
-- Blockchain: supports EVM-compatible chains (Base, Ethereum)
 
 ### Known Issues
 

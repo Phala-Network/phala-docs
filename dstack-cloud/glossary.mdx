@@ -47,8 +47,9 @@ Core terminology used in this documentation.
 
 | Term | Definition |
 |------|-----------|
-| **dstack SDK** | The open-source confidential computing framework. Provides libraries (Python, TypeScript, Rust, Go) for attestation, key retrieval, and storage encryption. [GitHub](https://github.com/Dstack-TEE/dstack) |
-| **dstack-cloud** | An extension of dstack SDK that enables deployment on GCP Confidential VMs and AWS Nitro Enclaves. Provides the `dstack-cloud` CLI. [GitHub](https://github.com/Phala-Network/dstack-cloud) |
+| **dstack** | The open-source confidential computing framework. Provides a CLI, KMS, attestation, and SDK libraries (Python, TypeScript, Rust, Go) for building confidential applications. [GitHub](https://github.com/Dstack-TEE/dstack) |
+| **dstack-sdk** | Client libraries (Python, TypeScript, Rust, Go) that applications use to interact with dstack features such as attestation, key retrieval, and storage encryption. Part of the dstack framework. |
+| **dstack-cloud** | An extension of dstack that enables deployment on GCP Confidential VMs and AWS Nitro Enclaves. Provides the `dstack-cloud` CLI. [GitHub](https://github.com/Phala-Network/dstack-cloud) |
 | **dstack-os** | The minimal operating system that runs inside each dstack CVM. Built from a reproducible Docker image. |
 | **Guest Agent** | A process that runs inside each dstack CVM alongside your application containers. Handles attestation, key retrieval from KMS, and storage encryption. Exposes a local API at `/var/run/dstack.sock`. |
 | **KMS (Key Management Service)** | A standalone service that runs in its own TEE. Verifies workload attestation and dispatches keys to authorized workloads. Also known as DeRoT (Decentralized Root-of-Trust). |

@@ -1,24 +1,24 @@
 ---
 title: dstack-cloud Overview
-description: dstack-cloud is an extension of the dstack SDK that enables deploying confidential Docker applications on GCP Confidential VMs and AWS Nitro Enclaves.
+description: dstack-cloud is an extension of the dstack framework that enables deploying confidential Docker applications on GCP Confidential VMs and AWS Nitro Enclaves.
 ---
 
 # dstack-cloud Overview
 
-dstack-cloud is an extension of the [dstack SDK](https://github.com/Dstack-TEE/dstack) that enables deploying confidential Docker applications on **GCP Confidential VMs** and **AWS Nitro Enclaves**.
+dstack-cloud is an extension of the [dstack framework](https://github.com/Dstack-TEE/dstack) that enables deploying confidential Docker applications on **GCP Confidential VMs** and **AWS Nitro Enclaves**.
 
-## What is dstack SDK
+## What is dstack
 
-dstack SDK is an open-source confidential computing framework originally designed to run on TDX BareMetal servers. It provides:
+dstack is an open-source confidential computing framework originally designed to run on TDX BareMetal servers. It provides:
 
 - Hardware-level memory encryption and isolation via TEE (Trusted Execution Environment)
 - A key management system (KMS) that delivers secrets exclusively to verified workloads
 - Remote attestation to prove that code is running in genuine TEE hardware
-- SDK libraries in Python, TypeScript, Rust, and Go for application integration
+- SDK libraries in Python, TypeScript, Rust, and Go for application integration (the **dstack-sdk**)
 
 ## What is dstack-cloud
 
-dstack-cloud extends dstack SDK to run on major cloud platforms. Instead of requiring bare-metal TDX hardware, it enables deployment on:
+dstack-cloud extends dstack to run on major cloud platforms. Instead of requiring bare-metal TDX hardware, it enables deployment on:
 
 - **GCP Confidential VMs** (Intel TDX)
 - **AWS Nitro Enclaves** (NSM)
@@ -30,12 +30,12 @@ This means you can use the full dstack security model — hardware isolation, at
 ![How It Works](/images/dstack-cloud/architecture-overview-v2.png)
 
 1. You define your application in a `docker-compose.yaml` file (GCP) or a `Dockerfile` (AWS Nitro).
-2. `dstack-cloud deploy` packages and deploys your application into a TEE environment.
+2. `dstack-cloud deploy` builds a launch configuration and deploys a TEE environment.
 
 ### On GCP:
 
-3. The containers are packaged into a **dstack CVM** — a Confidential Virtual Machine running dstack OS.
-4. The CVM runs as a Confidential VM with Intel TDX enabled.
+3. A **dstack CVM** — a Confidential Virtual Machine running dstack OS — is launched with the provided configuration.
+4. The CVM boots as a Confidential VM with Intel TDX enabled, then pulls your container images from the Docker registry.
 5. A **Guest Agent** inside the CVM handles attestation, key retrieval, and automatic disk encryption.
 6. Your application communicates with the Guest Agent via a Unix socket (`/var/run/dstack.sock`).
 
@@ -78,17 +78,7 @@ This means you can use the full dstack security model — hardware isolation, at
 
 ### AI Inference with Model Protection
 
-Deploy AI models (e.g., vLLM, Ollama) with model weights fully encrypted in memory. The cloud provider cannot access or copy your proprietary models.
-
-```yaml
-services:
-  vllm:
-    image: vllm/vllm-openai:latest
-    runtime: nvidia
-    command: --model Qwen/Qwen2.5-7B-Instruct
-    ports:
-      - "8000:8000"
-```
+Deploy AI models with model weights fully encrypted in memory. The cloud provider cannot access or copy your proprietary models.
 
 ### Sensitive Data Processing
 
@@ -110,7 +100,7 @@ Run smart contract backend services or trading bots with private keys that never
 - An AWS or GCP account with appropriate permissions
 - `dstack-cloud` CLI installed
 - A `docker-compose.yaml` defining your application
-- (Optional) [dstack SDK](https://github.com/Dstack-TEE/dstack/tree/master/sdk) integration for key retrieval from within your containers
+- (Optional) [dstack-sdk](https://github.com/Dstack-TEE/dstack/tree/master/sdk) integration for key retrieval from within your containers
 
 ## Next Steps
 
