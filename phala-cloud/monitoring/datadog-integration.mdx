@@ -1,0 +1,237 @@
+---
+description: Integrate Datadog with your CVM for metrics, logs, and alerting using a zero-code-change sidecar approach.
+title: Datadog Integration
+---
+
+## Overview
+
+Phala Cloud CVMs expose a Prometheus-compatible `/metrics` endpoint on TCP port `8090`, served by the built-in `dstack-guest-agent`. You can integrate Datadog by adding a Datadog Agent container as a sidecar in your Docker Compose file. No code changes to your application are needed.
+
+This guide covers:
+
+- **Metrics**: Collect guest-agent system metrics (CPU, memory, disk, uptime) via OpenMetrics check
+- **Logs**: Collect container stdout/stderr logs automatically
+- **Infrastructure**: Collect host-level metrics (CPU, memory, network, disk) out of the box
+
+## Prerequisites
+
+- A [Datadog](https://www.datadoghq.com/) account with an **API Key**
+- The Datadog **site** for your account (e.g., `us5.datadoghq.com`, `datadoghq.com`, `eu.datadoghq.com`)
+- Your CVM deployed with `--public-sysinfo` enabled (default: `true`)
+
+<Warning>
+Do not commit your Datadog API Key to version control. Use encrypted environment variables for production deployments.
+</Warning>
+
+## Step 1: Add Datadog Agent to Your Docker Compose
+
+Add a `datadog-agent` service to your `docker-compose.yml`:
+
+```yaml
+services:
+  # Your application service
+  my-app:
+    image: my-app:latest
+    ports:
+      - "80:80"
+
+  # Datadog Agent sidecar
+  datadog-agent:
+    image: registry.datadoghq.com/agent:7
+    network_mode: host
+    environment:
+      - DD_API_KEY=<YOUR_DATADOG_API_KEY>
+      - DD_SITE=<YOUR_DATADOG_SITE>        # e.g. us5.datadoghq.com
+      - DD_ENV=production
+      - DD_TAGS=env:production,service:my-cvm
+      # Enable log collection
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      # Exclude the agent itself from collection
+      - DD_CONTAINER_EXCLUDE=name:datadog-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      # Mount the OpenMetrics check config (see Step 2)
+      - /var/volatile/dstack/persistent/dd-conf/openmetrics.d:/etc/datadog-agent/conf.d/openmetrics.d:ro
+    pid: host
+    healthcheck:
+      test: ["CMD", "agent", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+```
+
+### Key Configuration Notes
+
+| Setting | Description |
+|---------|-------------|
+| `network_mode: host` | Required. The agent must be on the host network to access `dstack-guest-agent` on port `8090`. |
+| `DD_CONTAINER_EXCLUDE` | Prevents the agent from collecting its own logs and metrics. |
+| `DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL` | Enables automatic log collection from all containers. |
+| `pid: host` | Required for the agent to see host-level process metrics. |
+
+## Step 2: Configure OpenMetrics Check for Guest-Agent Metrics
+
+The Datadog Agent collects container logs and host metrics automatically. But to get the guest-agent's custom metrics (CPU model, memory details, disk usage, uptime), you need to tell the agent where to scrape them.
+
+The `dstack-guest-agent` exposes a Prometheus-compatible endpoint at `http://127.0.0.1:8090/metrics`. Create a local file `conf.d/openmetrics.d/conf.yaml` in your project:
+
+```yaml
+instances:
+  - openmetrics_endpoint: http://127.0.0.1:8090/metrics
+    namespace: "dstack"
+    metrics:
+      - ".*"
+    tags:
+      - service:dstack-guest-agent
+```
+
+The `namespace: "dstack"` prefix is added to all collected metrics. For example, `system_uptime` becomes `dstack.system_uptime` in Datadog.
+
+<Info>
+The `instances` block must be a **top-level key** in the YAML file. Do not nest it under `init_config` — this is the most common mistake and will silently prevent the check from loading.
+</Info>
+
+## Step 3: Deploy to CVM
+
+**Upload files before starting the CVM.** CVMs have a read-only filesystem except for `/var/volatile/dstack/persistent/`. All config files must go there.
+
+The deployment order matters:
+
+```bash
+# 1. Upload the OpenMetrics config to CVM persistent storage
+phala cp -r ./conf.d/openmetrics.d <cvm-id>:/var/volatile/dstack/persistent/dd-conf/openmetrics.d
+
+# 2. Deploy (or redeploy) the CVM with your docker-compose.yml
+phala deploy --cvm-id <cvm-id>
+```
+
+When the CVM starts, Docker Compose brings up the Datadog Agent sidecar. It reads the OpenMetrics config from the mounted volume and begins scraping guest-agent metrics immediately. **No SSH access is required for this flow**, which means it works on production CVMs where SSH is disabled.
+
+If you need to update the config on an already-running CVM (e.g., adding a new scrape target), you can upload the updated file and restart the agent via SSH:
+
+```bash
+# Only needed for hot-updating an already-running CVM
+phala ssh <cvm-id> -- "docker restart dstack-datadog-agent-1"
+```
+
+## Step 4: Verify
+
+### Check Agent Status
+
+If SSH is available, verify the agent is working correctly:
+
+```bash
+phala ssh <cvm-id> -- "docker exec dstack-datadog-agent-1 agent status"
+```
+
+Look for these in the output:
+
+- **openmetrics** check: `[OK]` with `Metric Samples: 20` per run
+- **Logs Agent**: `LogsSent > 0`
+- **container_collect_all**: `Status: OK`
+
+### Verify in Datadog Dashboard
+
+1. Open your Datadog dashboard at `<your-site>.datadoghq.com`
+2. Go to **Metrics > Explorer**
+3. Search for `dstack.system_uptime` to confirm guest-agent metrics are flowing
+4. Go to **Logs** and filter by `source:nginx` (or your service name) to confirm logs are flowing
+
+## Available Guest-Agent Metrics
+
+The `dstack-guest-agent` exposes 19 metrics at `/metrics`. All are prefixed with `dstack.` in Datadog.
+
+**System metrics:**
+
+| Metric | Description |
+|--------|-------------|
+| `system_os_name` | Operating system name (value: DStack) |
+| `system_os_version` | OS version |
+| `system_kernel_version` | Kernel version |
+| `system_cpu_model` | CPU model information |
+| `system_num_cpus` | Number of logical CPUs |
+| `system_uptime` | System uptime in seconds |
+| `system_load_average_1m` | 1-minute load average (scaled by 100) |
+| `system_load_average_5m` | 5-minute load average (scaled by 100) |
+| `system_load_average_15m` | 15-minute load average (scaled by 100) |
+
+**Memory metrics:**
+
+| Metric | Description |
+|--------|-------------|
+| `system_memory_total` | Total memory in bytes |
+| `system_memory_available` | Available memory in bytes |
+| `system_memory_used` | Used memory in bytes |
+| `system_memory_free` | Free memory in bytes |
+| `system_swap_total` | Total swap memory in bytes |
+| `system_swap_used` | Used swap memory in bytes |
+
+**Disk metrics:**
+
+| Metric | Description |
+|--------|-------------|
+| `disk_total_size` | Disk total size in bytes |
+| `disk_free_size` | Disk free size in bytes |
+| `disk_used_size` | Disk used size in bytes |
+| `disk_usage_percentage` | Disk usage percentage |
+
+<Warning>
+The load average metrics (`system_load_average_*`) are scaled by 100. For example, a value of `92` means `0.92` load average.
+</Warning>
+
+## Troubleshooting
+
+### Metrics: Only seeing default system metrics (e.g., `system.cpu.user`)
+
+The OpenMetrics check is not loading. This is almost always a YAML formatting issue in `conf.yaml`.
+
+The most common mistake is nesting `instances` under `init_config`. Make sure `instances` is a top-level key:
+
+```yaml
+# Correct
+instances:
+  - openmetrics_endpoint: http://127.0.0.1:8090/metrics
+    namespace: "dstack"
+
+# Wrong - shows "no valid instances" in agent logs
+init_config:
+  instances:
+    - openmetrics_endpoint: http://127.0.0.1:8090/metrics
+```
+
+### Logs: No logs appearing in Datadog
+
+The agent collects logs in tail mode, meaning it only picks up new entries produced after it starts. If your application has not generated any new log entries since the agent started, `Bytes Read` will be `0`.
+
+Try generating some traffic to your application. You should see `Bytes Read` increase and logs appear in the Datadog dashboard within a few seconds.
+
+If you disabled `DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL`, you need to add labels to each container you want to collect logs from:
+
+```yaml
+labels:
+  com.datadoghq.ad.logs: '[{"source": "my-app", "service": "my-app"}]'
+```
+
+### Guest-agent `/metrics` returns "Service not found"
+
+This means the CVM was deployed with `--no-public-sysinfo`, which disables the `/metrics` endpoint. Redeploy with `--public-sysinfo` (this is the default):
+
+```bash
+phala deploy --cvm-id <cvm-id> --public-sysinfo
+```
+
+### Cannot mount config file (read-only file system)
+
+CVMs have a read-only filesystem. The only writable directory is `/var/volatile/dstack/persistent/`. Place all config files there and mount from that path.
+
+## Next Steps
+
+- [Set up alerting with Incident.io or PagerDuty](https://docs.datadoghq.com/monitors/)
+- [Create custom dashboards](https://docs.datadoghq.com/dashboards/)
+- [Configure log pipelines for parsing](https://docs.datadoghq.com/logs/log_configuration/pipelines/)
+- [Enable APM tracing for your application](https://docs.datadoghq.com/tracing/)

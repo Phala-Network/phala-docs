@@ -509,6 +509,7 @@
                   "/phala-cloud/monitoring/public-logs",
                   "/phala-cloud/monitoring/serials-logs",
                   "/phala-cloud/monitoring/private-log-viewer",
+                  "/phala-cloud/monitoring/datadog-integration",
                   "/phala-cloud/troubleshooting/troubleshooting",
                   "/phala-cloud/troubleshooting/private-log-viewer",
                   "/phala-cloud/troubleshooting/debug-your-application",
