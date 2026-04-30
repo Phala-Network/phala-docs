@@ -1,0 +1,323 @@
+---
+title: Deploy On-chain KMS Smart Contracts
+description: Deploy DstackKms smart contracts and configure governance with Multisig and Timelock.
+---
+
+# Deploy On-chain KMS Smart Contracts
+
+Deploy the `DstackKms` smart contract to enforce that only authorized workloads can receive keys. This page covers the full contract deployment workflow, including the recommended Safe + Timelock governance setup for production.
+
+## Overview
+
+| Component | Required | Description |
+|-----------|----------|-------------|
+| **DstackKms** | Yes | Stores authorized workload measurements, admin roles, and KMS configuration |
+| **ERC1967Proxy** | Yes | Proxy contract for upgradeable DstackKms (UUPS pattern) |
+| **TimelockController** | Optional | Enforces a delay on governance actions |
+| **Safe (Multisig)** | Optional | Multi-signature wallet for governance |
+
+> **Note:** Safe and Timelock are **optional security enhancements**, not part of dstack. They are recommended for production but not required for development.
+
+## Governance Models
+
+### Model A: Direct Admin (Simplest)
+
+- Admin is a single EOA (externally owned account)
+- No multisig, no timelock
+- Governance actions execute immediately
+- Suitable for development and testing
+
+### Model B: Timelock Only
+
+- Admin is a TimelockController contract
+- Governance actions require a delay before execution
+- Anyone can execute after delay (or restricted to specific executors)
+- Suitable for simple production setups
+
+### Model C: Safe + Timelock (Recommended for Production)
+
+- Admin is a Safe multisig wallet
+- Timelock enforces a delay
+- Requires multi-party approval + delay period
+- Maximum security and transparency
+
+---
+
+## Prerequisites
+
+- [Foundry](https://book.getfoundry.sh/getting-started/installation) installed (`forge`, `cast`)
+- A wallet with funds for deployment gas
+  - Testnet: Use a faucet (e.g., [Base Sepolia faucet](https://www.alchemy.com/faucets/base-sepolia))
+  - Mainnet: Sufficient ETH for contract deployment
+- RPC endpoint for the target network
+
+---
+
+## Step 1: Set Up the Project
+
+```bash
+# Clone the dstack repository (contains KMS contracts)
+git clone https://github.com/Dstack-TEE/dstack.git
+cd dstack/kms/auth-eth/contracts
+
+# Install dependencies (OpenZeppelin)
+forge install OpenZeppelin/openzeppelin-contracts@v5.6.1 --no-git
+forge install OpenZeppelin/openzeppelin-contracts-upgradeable@v5.6.1 --no-git
+
+# Build contracts
+forge build
+```
+
+---
+
+## Step 2: Configure Environment
+
+Create a `.env` file:
+
+```bash
+# .env
+RPC_URL=https://sepolia.base.org
+PRIVATE_KEY=0x...
+```
+
+> **Security:** Never commit your private key. Add `.env` to `.gitignore`.
+
+---
+
+## Step 3: Deploy DstackKms (Basic, No Timelock)
+
+For development/testing, you can deploy DstackKms with direct EOA admin:
+
+```bash
+# Deploy DstackKms implementation
+KMS_IMPL=$(forge create src/DstackKms.sol:DstackKms \
+  --broadcast \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY | grep "Deployed to:" | tail -1 | cut -d' ' -f3)
+
+echo "DstackKms implementation: $KMS_IMPL"
+
+# Encode initializer calldata
+DEPLOYER=$(cast wallet address --private-key $PRIVATE_KEY)
+INIT_DATA=$(cast calldata "initialize(address,address)" $DEPLOYER $ZERO_ADDRESS)
+
+# Deploy ERC1967Proxy
+KMS_PROXY=$(forge create lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol:ERC1967Proxy \
+  --broadcast \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --constructor-args $KMS_IMPL $INIT_DATA | grep "Deployed to:" | tail -1 | cut -d' ' -f3)
+
+echo "DstackKms proxy: $KMS_PROXY"
+```
+
+> **Why ERC1967Proxy?** DstackKms uses UUPS upgradeable pattern. You must deploy a proxy to have a working upgradeable instance. The proxy is the actual application address.
+
+---
+
+## Step 4: Deploy with Timelock (Recommended for Production)
+
+### Timelock Configuration
+
+The timelock delay depends on your deployment environment:
+
+| Parameter | Testnet | Mainnet |
+|-----------|---------|---------|
+| **Timelock delay** | 1-4 hours | 24-72 hours |
+| **Safe signers** | 2-3 addresses | 5-7 addresses (from multiple organizations) |
+| **Safe threshold** | 2/3 | ≥ 2/3 |
+| **Executor role** | Open or EOA | Safe only (strict control) |
+| **Admin role** | EOA or 0x0 | 0x0 (self-managed by timelock) |
+
+### 4.1 Prepare Timelock Configuration
+
+```bash
+# Set environment variables
+export MIN_DELAY=86400              # 1 day in seconds (production: 2-3 days)
+export PROPOSER=0x...               # Address that can schedule operations (your Safe or EOA)
+export EXECUTOR=0x...               # Address that can execute operations (Safe, or 0x0 for open execution)
+export ADMIN=0x...                  # Admin address (can grant/revoke roles)
+```
+
+### 4.2 Deploy All Contracts
+
+```bash
+# Get deployer address
+DEPLOYER=$(cast wallet address --private-key $PRIVATE_KEY)
+
+# 1. Deploy DstackKms implementation
+KMS_IMPL=$(forge create src/DstackKms.sol:DstackKms \
+  --broadcast \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY | grep "Deployed to:" | tail -1 | cut -d' ' -f3)
+
+# 2. Encode initializer (owner = deployer initially)
+INIT_DATA=$(cast calldata "initialize(address,address)" $DEPLOYER $ZERO_ADDRESS)
+
+# 3. Deploy ERC1967Proxy
+KMS_PROXY=$(forge create lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol:ERC1967Proxy \
+  --broadcast \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --constructor-args $KMS_IMPL $INIT_DATA | grep "Deployed to:" | tail -1 | cut -d' ' -f3)
+
+# 4. Deploy TimelockController
+TIMELOCK=$(forge create lib/openzeppelin-contracts/contracts/governance/TimelockController.sol:TimelockController \
+  --broadcast \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --constructor-args $MIN_DELAY "[$PROPOSER]" "[$EXECUTOR]" $ADMIN | grep "Deployed to:" | tail -1 | cut -d' ' -f3)
+
+# 5. Transfer ownership to Timelock
+cast send $KMS_PROXY "transferOwnership(address)" $TIMELOCK \
+  --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY
+
+# 6. Verify ownership
+OWNER=$(cast call $KMS_PROXY "owner()(address)" --rpc-url $RPC_URL)
+
+echo "=== Deployment Result ==="
+echo "DstackKms implementation: $KMS_IMPL"
+echo "DstackKms proxy:          $KMS_PROXY"
+echo "TimelockController:       $TIMELOCK"
+echo "DstackKms owner:          $OWNER"
+```
+
+### 4.3 Understanding TimelockController Roles
+
+| Role | Description | Who Should Have It |
+|------|-------------|-------------------|
+| **Proposer** | Can schedule operations | Safe multisig or trusted EOA |
+| **Executor** | Can execute operations after delay | Safe, or `address(0)` for open execution |
+| **Admin** | Can grant/revoke roles | Should be `address(0)` after setup (self-managed by timelock) |
+
+---
+
+## Step 5: Configure Safe (Optional but Recommended)
+
+For production, use a Safe multisig as the proposer/executor:
+
+### 5.1 Create a Safe
+
+1. Go to [Safe web app](https://app.safe.global)
+2. Connect your wallet
+3. Create a new Safe on your target network
+4. Add signers (3-7 addresses recommended)
+5. Set threshold (≥ 2/3 of signers)
+
+### 5.2 Use Safe Address in Deployment
+
+When deploying the TimelockController, use your Safe address:
+
+```bash
+export PROPOSER=<SAFE_ADDRESS>
+export EXECUTOR=<SAFE_ADDRESS>
+export ADMIN=0x0000000000000000000000000000000000000000  # Let timelock manage itself
+```
+
+### 5.3 Governance Flow with Safe + Timelock
+
+1. **Draft transaction** — Use Safe web interface to create a transaction
+2. **Collect signatures** — Required signers approve
+3. **Schedule in timelock** — Safe calls `timelock.schedule()`
+4. **Wait for delay** — Wait the configured delay period
+5. **Execute** — Anyone (or only executor) calls `timelock.execute()`
+
+---
+
+## Step 6: Verify Deployment
+
+Verify on block explorer:
+
+```bash
+# Verify implementation
+forge verify-contract $KMS_IMPL src/DstackKms.sol:DstackKms \
+  --chain base-sepolia \
+  --verifier etherscan
+
+# Verify proxy
+forge verify-contract $KMS_PROXY lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol:ERC1967Proxy \
+  --chain base-sepolia \
+  --verifier etherscan \
+  --constructor-args $(cast abi-encode "constructor(address,bytes)" $KMS_IMPL $INIT_DATA)
+```
+
+Check on block explorer:
+- `DstackKms` owner is set to the TimelockController address
+- TimelockController has correct proposer/executor roles
+
+---
+
+## How to Execute Governance Actions (With Timelock)
+
+Once deployed, all `onlyOwner` operations must go through the timelock:
+
+### Schedule an Operation
+
+```bash
+# Example: Add an authorized measurement
+cast send $TIMELOCK "schedule(address,uint256,bytes,bytes32,bytes32,uint256)" \
+  $KMS_PROXY \
+  0 \
+  $(cast calldata "addKmsAggregatedMr(bytes32)" $YOUR_MEASUREMENT) \
+  0x0000000000000000000000000000000000000000000000000000000000000000 \
+  $(cast keccak "unique-operation-id") \
+  $MIN_DELAY \
+  --rpc-url $RPC_URL \
+  --private-key $PROPOSER_KEY
+```
+
+### Execute After Delay
+
+```bash
+# Wait for MIN_DELAY to pass, then:
+cast send $TIMELOCK "execute(address,uint256,bytes,bytes32,bytes32)" \
+  $KMS_PROXY \
+  0 \
+  $(cast calldata "addKmsAggregatedMr(bytes32)" $YOUR_MEASUREMENT) \
+  0x0000000000000000000000000000000000000000000000000000000000000000 \
+  $(cast keccak "unique-operation-id") \
+  --rpc-url $RPC_URL \
+  --private-key $EXECUTOR_KEY
+```
+
+---
+
+## All Governance-Protected Methods
+
+Once ownership is transferred to timelock, these methods require timelock governance:
+
+| Method | Purpose |
+|--------|---------|
+| `setKmsInfo` | Update KMS public key and attestation info |
+| `setKmsQuote` | Update KMS quote |
+| `setKmsEventlog` | Update KMS event log |
+| `setGatewayAppId` | Set gateway application ID |
+| `setAppImplementation` | Update app implementation address |
+| `addKmsAggregatedMr` | Authorize a KMS measurement |
+| `removeKmsAggregatedMr` | Revoke a KMS measurement |
+| `addKmsDevice` | Authorize a KMS device |
+| `removeKmsDevice` | Revoke a KMS device |
+| `addOsImageHash` | Authorize an OS image hash |
+| `removeOsImageHash` | Revoke an OS image hash |
+
+---
+
+## Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "Insufficient funds" | Get testnet ETH from faucet, or ensure mainnet wallet has enough ETH |
+| "Ownable: caller is not the owner" | Ownership already transferred to timelock. Use timelock.schedule/execute |
+| "Timelock: operation is not ready" | Wait for the delay period to pass before executing |
+| "Timelock: operation already scheduled" | Use a different salt (unique operation ID) |
+| Proxy verification fails | Use `cast abi-encode` to construct the constructor arguments |
+
+---
+
+## Next Steps
+
+- **[Register KMS Measurements](run-kms-on-gcp)** — Register KMS measurements before bootstrap
+- **[Register Workload Measurements](register-enclave-measurement)** — Authorize workloads to receive keys
+- **[Manage Governance](manage-governance)** — How to create proposals and execute governance actions
+- **[Concept: Governance](/dstack-cloud/governance)** — Understand the governance model

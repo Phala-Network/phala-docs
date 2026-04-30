@@ -1,0 +1,134 @@
+---
+title: KMS and Key Delivery
+description: Understand KMS operating modes, key delivery flow, and GCP vs Nitro differences in dstack-cloud deployments.
+---
+
+# KMS and Key Delivery
+
+KMS is the component that decides whether a workload is trustworthy enough to receive keys. This page explains the two operating modes (local vs. external KMS), the key delivery flow on each platform, and how on-chain smart contracts add an auditable authorization layer.
+
+> For the core design of dstack's Key Management System — including the Decentralized Root-of-Trust (DeRoT) protocol, MPC key generation, key derivation, and rotation — refer to the official Phala documentation:
+>
+> - [Key Management Protocol](https://docs.phala.com/dstack/design-documents/key-management-protocol)
+> - [Decentralized Root-of-Trust](https://docs.phala.com/dstack/design-documents/decentralized-root-of-trust)
+
+## Operating Modes
+
+dstack supports two KMS operating modes:
+
+### Local Key Provider
+
+Keys are generated and managed locally within each dstack CVM. No separate KMS service is needed.
+
+- **How it works:** The Guest Agent generates keys using hardware-rooted entropy (TPM on GCP, NSM on Nitro). Keys are sealed to the TEE and never leave the CVM.
+- **Use when:** Development, testing, or single-node deployments where key sharing between instances is not required.
+- **Limitation:** Keys cannot be shared across multiple CVMs. If you need the same key in different workloads, use KMS mode.
+
+### KMS Mode
+
+A standalone **dstack-kms** service runs in its own TEE (a dedicated dstack CVM). It verifies workload identity before dispatching keys.
+
+- **How it works:** When a dstack application CVM starts, it obtains a hardware attestation and sends it to KMS. KMS verifies the attestation and checks whether the workload is authorized. If verification passes, KMS dispatches the requested key.
+- **Use when:** Production deployments, multi-node setups, or when multiple CVM instances need access to the same keys.
+- **Requirement:** A dstack-kms instance must be deployed and running before application's CVM can request keys.
+
+### On-chain Smart Contracts (Security Enhancement)
+
+KMS mode can optionally integrate with on-chain smart contracts (`DstackKms`, `DstackApp`) to provide an additional layer of security:
+
+- On-chain contracts control which application CVM are authorized to receive keys (via registered measurements)
+- All authorization changes are visible on-chain — anyone can audit which measurements are approved
+- Changes follow a Multisig + Timelock process, preventing covert key policy modifications
+- This is a **security enhancement** to KMS mode, not a separate operating mode
+
+For details on governance, see [On-chain Governance Model](governance).
+
+## Key Delivery Flow (KMS Mode)
+
+The following describes the high-level key delivery flow:
+
+### GCP (dstack CVM with Guest Agent)
+
+1. **CVM Startup** — A dstack CVM boots and its Guest Agent obtains a TDX Quote from hardware.
+
+2. **Secure Channel** — The CVM establishes a secure connection with KMS using RA-TLS (Remote Attestation TLS). Both sides verify each other's attestation during the TLS handshake.
+
+3. **Attestation Verification** — KMS verifies the TDX Quote:
+   - Confirms the CVM is running in genuine TEE hardware
+   - Extracts the workload measurement (RTMR values)
+   - Checks whether the measurement matches an authorized value
+
+4. **On-chain Check** *(if on-chain contracts are configured)* — KMS queries the blockchain to verify that the workload's measurement is registered and authorized.
+
+5. **Key Dispatch** — If all checks pass, KMS derives the requested key and sends it to the CVM over the encrypted channel.
+
+6. **Key Usage** — The Guest Agent manages the key lifecycle. Your application retrieves the key via the dstack SDK (Python, TypeScript, Rust, or Go) by connecting to the Guest Agent at `/var/run/dstack.sock`. The Guest Agent can also automatically handle disk encryption.
+
+### AWS Nitro (Enclave with dstack-util)
+
+1. **Enclave Startup** — A Nitro Enclave launches from the EIF. `dstack-util` inside the Enclave obtains an NSM Attestation Document.
+
+2. **Secure Channel** — `dstack-util` establishes a connection with KMS through the VSOCK proxy on the host. The connection uses TLS (RA-TLS if available).
+
+3. **Attestation Verification** — KMS verifies the NSM Attestation Document:
+   - Confirms the Enclave is running on genuine Nitro hardware
+   - Extracts the PCR values (measurements)
+   - Checks whether the `OS_IMAGE_HASH` matches an authorized value
+
+4. **On-chain Check** *(if on-chain contracts are configured)* — KMS queries the blockchain to verify that the measurement is registered and authorized.
+
+5. **Key Dispatch** — If all checks pass, KMS derives the requested key and sends it back through the encrypted channel.
+
+6. **Key Usage** — `dstack-util` makes the key available to your application. **You decide how to use the key** — common patterns include encrypting model weights in memory, decrypting configuration secrets, or encrypting a RAM-disk. Unlike GCP, there is no automatic disk encryption on Nitro.
+
+> **Key difference:** On GCP, the Guest Agent manages the entire key lifecycle including automatic disk encryption. On Nitro, `dstack-util` only retrieves the key — your application is responsible for using it.
+
+## GCP vs. Nitro: Key Delivery Differences
+
+The key delivery flow is similar on both platforms, but the implementation details differ:
+
+- **Attestation format:** TDX Quote (GCP) vs. NSM Attestation Document (Nitro)
+- **Communication with KMS:** Direct network on GCP vs. VSOCK proxy on Nitro
+- **Key usage:** Guest Agent manages the full key lifecycle on GCP (including automatic disk encryption), while on Nitro `dstack-util` only retrieves the key — your application decides how to use it
+- **Persistent storage:** Available on GCP, not on Nitro (stateless Enclave)
+
+For a complete comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
+
+### VSOCK Proxy (Nitro-specific)
+
+On AWS Nitro, the Enclave cannot directly access the external network. A **VSOCK proxy** runs on the host EC2 instance to forward network requests:
+
+- `dstack-util` inside the Enclave sends requests to the VSOCK proxy
+- The proxy forwards them to the destination (KMS, RPC endpoints, etc.)
+- Responses are routed back through the proxy to the Enclave
+
+This means that on Nitro, you must deploy and configure a VSOCK proxy on the host machine before `dstack-util` can communicate with KMS or any external service.
+
+## KMS Bootstrap (First-time Setup)
+
+When a dstack-kms CVM starts for the first time, it enters **Onboard mode** (HTTP, unauthenticated). This is a one-time initialization process:
+
+1. Call `Onboard.Bootstrap` to generate the KMS key pair and obtain attestation info.
+2. Register the KMS attestation on-chain (if using on-chain contracts).
+3. Call `/finish` to complete initialization. KMS restarts and switches to HTTPS mode.
+
+After bootstrap, KMS operates in **Normal mode** and only accepts RA-TLS connections from verified workloads.
+
+> **Implementation:** The KMS bootstrap logic is implemented in the [dstack repository](https://github.com/Phala-Network/dstack).
+
+## Key Lifecycle
+
+The full key lifecycle is documented in the [Key Management Protocol](https://docs.phala.com/dstack/design-documents/key-management-protocol). At a high level:
+
+| Stage | Description |
+|-------|-------------|
+| **Generation** | Root keys are generated within the KMS TEE using hardware-rooted entropy |
+| **Derivation** | Application-specific keys are derived from root keys using KDF (Key Derivation Function) |
+| **Delivery** | Keys are delivered to verified CVMs over RA-TLS encrypted channels |
+| **Rotation** | Keys can be rotated by updating the derivation inputs; old keys are naturally phased out |
+| **Revocation** | Workloads can be de-authorized by revoking their on-chain measurement registration |
+
+## Next Steps
+
+- **[Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp)** — Deploy KMS on GCP
+- **[Deploy On-chain KMS Smart Contracts](/dstack-cloud/deploy-onchain-kms)** — Set up on-chain authorization

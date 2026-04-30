@@ -1,0 +1,242 @@
+---
+title: "Quick Start: Deploy Your First dstack App on GCP"
+description: Quick start tutorial to deploy your first dstack CVM on GCP in 15-25 minutes.
+---
+
+# Quick Start: Deploy Your First dstack App on GCP
+
+You'll have a Docker application running inside a hardware-encrypted Confidential VM on GCP within 25 minutes. This tutorial covers the full path: install the CLI, configure your project, deploy, and verify that attestation proves your workload runs in genuine TEE hardware.
+
+**Estimated time:** 15–25 minutes (first run).
+
+**What you will do:**
+
+1. Install `dstack-cloud` CLI
+2. Configure global GCP/KMS settings
+3. Create a project and define workload
+4. Deploy to GCP TDX CVM
+5. Verify workload access and runtime status
+
+---
+
+## Prerequisites
+
+Before you begin:
+
+- GCP project with Intel TDX quota in target zone (for example `us-central1-a`)
+- `gcloud` authenticated
+  ```bash
+  gcloud auth login
+  gcloud config set project YOUR_PROJECT_ID
+  ```
+- **Linux host** (required — `dstack-cloud deploy` uses FAT32 disk images, which don't work on macOS)
+- Docker installed
+- `gsutil`, `jq`, `mtools` (for `mcopy`), `dosfstools` (for `mkfs.fat`) — these are needed by the deploy process to build a shared disk image
+
+---
+
+## Step 1: Install dstack-cloud CLI
+
+```bash
+curl -fsSL -o ~/.local/bin/dstack-cloud \
+  https://raw.githubusercontent.com/Phala-Network/meta-dstack-cloud/main/scripts/bin/dstack-cloud
+chmod +x ~/.local/bin/dstack-cloud
+dstack-cloud --help
+```
+
+---
+
+## Step 2: Configure global settings
+
+```bash
+dstack-cloud config-edit
+```
+
+Use JSON config (`~/.config/dstack-cloud/config.json`):
+
+```json
+{
+  "services": {
+    "kms_urls": ["https://kms.tdxlab.dstack.org:12001"],
+    "gateway_urls": ["https://gateway.tdxlab.dstack.org:12002"],
+    "pccs_url": ""
+  },
+  "image_search_paths": ["/path/to/images"],
+  "gcp": {
+    "project": "YOUR_PROJECT_ID",
+    "zone": "us-central1-a",
+    "bucket": "gs://YOUR_BUCKET"
+  }
+}
+```
+
+If bucket does not exist:
+
+```bash
+gcloud storage buckets create gs://YOUR_BUCKET --project YOUR_PROJECT_ID --location us-central1
+```
+
+### Optional: configure external KMS
+
+If you already deployed your own KMS, replace `services.kms_urls`:
+
+```json
+"services": {
+  "kms_urls": ["https://YOUR_KMS_IP_OR_DOMAIN:12001"]
+}
+```
+
+---
+
+## Step 3: Pull OS image
+
+```bash
+dstack-cloud pull https://github.com/Phala-Network/meta-dstack-cloud/releases/download/v0.6.0-test/dstack-cloud-0.6.0.tar.gz
+dstack-cloud pull https://github.com/Phala-Network/meta-dstack-cloud/releases/download/v0.6.0-test/dstack-cloud-0.6.0-uki.tar.gz
+```
+
+Verify:
+
+```bash
+ls -lh /path/to/images/dstack-cloud-0.6.0/disk.raw
+```
+
+---
+
+## Step 4: Create project
+
+```bash
+dstack-cloud new my-first-app --os-image dstack-cloud-0.6.0 --instance-name dstack-first-app
+cd my-first-app
+```
+
+Project files include:
+
+```
+my-first-app/
+├── app.json            # Application metadata
+├── docker-compose.yaml # Your container definition
+├── .env                # Environment variables (encrypted)
+└── prelaunch.sh        # Optional pre-launch script (e.g., setup, data download)
+```
+
+---
+
+## Step 5: Configure app
+
+Edit `app.json` and set:
+
+- `gcp_config.project = "YOUR_PROJECT_ID"`
+- `gcp_config.zone = "us-central1-a"`
+- `gcp_config.bucket = "gs://YOUR_BUCKET"`
+
+Default key mode is `kms`. If you want no external KMS for a basic quick test, switch to:
+
+- `"key_provider": "tpm"`
+- `"gateway_enabled": false`
+- remove `.env` file and remove `env_file` field from `app.json`
+
+---
+
+## Step 6: Define workload
+
+Edit `docker-compose.yaml`:
+
+```yaml
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+```
+
+---
+
+## Step 7: Deploy
+
+```bash
+dstack-cloud deploy --delete
+```
+
+This will create a TDX CVM and start your workload.
+
+---
+
+## Step 8: Open firewall
+
+```bash
+dstack-cloud fw allow 8080
+```
+
+---
+
+## Step 9: Verify
+
+Check that the CVM is running and your workload is accessible:
+
+```bash
+dstack-cloud status
+# Expected: shows "RUNNING" with measurements (RTMR values)
+dstack-cloud logs --follow
+
+# Get attestation from your app
+curl https://app-abc123.your-gateway-domain.com/attestation
+
+# Verify using dstack-verifier
+dstack-verifier verify <attestation-data>
+```
+
+The attestation proves:
+- The workload runs in genuine Intel TDX hardware
+- The exact code and measurements match expectations
+- The boot chain integrity is verified via TDX + vTPM
+
+For detailed verification, see [Attestation Integration](/dstack-cloud/attestation-integration).
+
+**Test workload:**
+
+```bash
+curl http://<EXTERNAL_IP>:8080
+```
+
+If gateway is enabled, use the URL shown by `dstack-cloud status`.
+
+## Understanding What Happened
+
+When you deployed your application:
+
+1. **Confidential VM Created** — A GCP VM with Intel TDX was provisioned
+2. **dstack OS Booted** — A minimal, attested guest OS started inside the TEE
+3. **Automatic Disk Encryption** — All disk I/O is encrypted with keys managed by the Guest Agent
+4. **TEE Attestation** — The Guest Agent provides attestation proof via the TDX + vTPM mechanism
+5. **TLS Certificate** — Gateway automatically provisions ACME certificates for your domain
+
+### Key Delivery via KMS
+
+dstack uses an external **Key Management Service (dstack-kms)** to deliver keys to your confidential workloads. The KMS runs in its own TEE and only dispatches keys to workloads that pass attestation verification.
+
+---
+ 
+## Managing Your Deployment
+
+Your application now runs in a hardware-protected environment where even the cloud provider cannot access the memory or data.
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|---|---|
+| `Boot image ... not found` | verify image path and `disk.raw` existence |
+| VM UEFI boot loop | use valid UKI boot image (`-uki.tar.gz`) |
+| `.env found but KMS is not enabled` | remove `.env` and remove `env_file` in `app.json` |
+| Port not reachable | ensure firewall rule exists and container has started |
+| missing `gsutil` / `mcopy` / `mkfs.fat` | install required dependencies |
+
+---
+
+## Next steps
+
+- Detailed guide: [Run a Workload on GCP with Self-hosted KMS](/dstack-cloud/run-on-gcp)
+- External KMS flow: [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp)
+- Concepts: [Attestation Integration](/dstack-cloud/attestation-integration)

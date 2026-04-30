@@ -1,0 +1,161 @@
+---
+title: Monitoring and Alerting
+description: Set up monitoring, alerting, and dashboards for dstack-cloud deployments.
+---
+
+# Monitoring and Alerting
+
+You can't secure what you can't see. This page covers the key metrics to watch, log collection patterns, and alert rules that help you catch attestation failures, governance anomalies, or KMS downtime before they become incidents.
+
+## Key Metrics
+
+### KMS Metrics
+
+These metrics tell you whether KMS is healthy and delivering keys promptly:
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| **Key request success rate** | Percentage of key requests that succeed | < 99% |
+| **Key dispatch latency (p50/p99)** | Time from request to key delivery | p99 > 5s |
+| **Attestation verification success rate** | Percentage of attestation verifications that pass | < 99% |
+| **On-chain sync lag** | Time between on-chain state change and KMS picking it up | > 60s |
+| **KMS uptime** | Percentage of time KMS is reachable | < 99.9% |
+
+### CVM / Enclave Metrics
+
+Track workload health and resource usage:
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| **CVM uptime** | Percentage of time the CVM is running | < 99% |
+| **CVM boot time** | Time from deploy command to CVM ready | > 5 minutes |
+| **RA-TLS handshake success rate** | Percentage of successful RA-TLS connections | < 99% |
+| **Container restart count** | Number of container restarts within the CVM | > 0 |
+| **Memory usage** | CVM memory utilization | > 90% |
+
+### Governance Metrics
+
+Governance metrics help you catch stalled proposals or signer inactivity:
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| **Pending proposals** | Number of governance proposals awaiting execution | > 0 for > 24h |
+| **Signer participation rate** | Percentage of signers active in last 7 days | < 80% |
+| **Timelock queue depth** | Number of transactions in the timelock queue | > 3 |
+
+## Log Collection
+
+### dstack-cloud Logs
+
+Use the built-in log viewer:
+
+```bash
+# View recent logs
+dstack-cloud logs
+
+# Follow logs in real-time
+dstack-cloud logs --follow
+
+# View logs for a specific container
+dstack-cloud logs --container <container-name>
+```
+
+### KMS Logs
+
+KMS logs are available through `dstack-cloud logs` when the KMS is deployed as a dstack CVM. Key log patterns to monitor:
+
+| Log Pattern | Meaning |
+|-------------|---------|
+| `attestation verification failed` | A workload's attestation was rejected |
+| `measurement not authorized` | The workload's measurement is not registered on-chain |
+| `key dispatched` | A key was successfully delivered to a workload |
+| `on-chain sync completed` | KMS synced its on-chain state |
+| `RA-TLS handshake failed` | TLS connection with attestation failed |
+
+### Infrastructure Logs
+
+**GCP:**
+- Cloud Logging: `gcloud logging read "resource.type=gce_instance AND labels.instance_id=<INSTANCE_ID>"`
+- Serial port output for boot diagnostics
+
+**AWS Nitro:**
+- EC2 instance system logs
+- VSOCK proxy logs (if running as a systemd service)
+
+## Dashboard Configuration
+
+### Recommended Dashboard Panels
+
+1. **KMS Health**
+   - Request rate (requests/min)
+   - Success rate (%)
+   - Latency histogram (p50, p95, p99)
+   - Active connections
+
+2. **CVM Health**
+   - Number of running CVMs
+   - Per-CVM status (running/stopped/error)
+   - Boot time trend
+
+3. **Governance**
+   - Pending proposals count
+   - Recent governance transactions
+   - Signer activity heatmap
+
+### Integration with Datadog
+
+To integrate with Datadog, you'll need a Datadog agent on each host machine that collects custom metrics from dstack-cloud. The key metric namespaces are `dstack.cloud.cvm.*`, `dstack.cloud.kms.*`, and `dstack.cloud.governance.*`.
+
+1. Set up a Datadog agent on each host machine
+2. Configure custom metrics collection for KMS, CVM, and governance events
+3. Create dashboards and monitors based on the metrics above
+
+## Alert Rules
+
+### Critical Alerts (Page immediately)
+
+| Alert | Condition | Response |
+|-------|-----------|----------|
+| **KMS down** | KMS unreachable for > 2 minutes | Check CVM/Enclave status. Restart if needed. |
+| **Attestation failure spike** | > 10 attestation failures in 5 minutes | May indicate a compromised or misconfigured workload. Investigate immediately. |
+| **Governance: suspicious transaction** | New proposal to revoke critical measurements | Review the proposal. Alert all signers. |
+
+### Warning Alerts (Page during business hours)
+
+| Alert | Condition | Response |
+|-------|-----------|----------|
+| **High key dispatch latency** | p99 > 5s for > 10 minutes | Check KMS load. Scale if needed. |
+| **CVM restart loop** | CVM restarted > 3 times in 1 hour | Investigate container health. Check resource limits. |
+| **On-chain sync lag** | KMS on-chain state > 60s behind | Check RPC provider health. Switch to backup RPC. |
+| **VSOCK proxy failure** (Nitro) | VSOCK proxy process not running | Restart the proxy. Check host health. |
+
+### Info Alerts (Log only)
+
+| Alert | Condition |
+|-------|-----------|
+| **New governance proposal** | Any new proposal submitted to the Safe |
+| **CVM deployed** | New CVM deployment completed |
+| **Measurement registered** | New measurement added on-chain |
+
+## Escalation Policies
+
+| Severity | Escalation | Response Time |
+|----------|-----------|---------------|
+| **Critical** | Page on-call SRE + notify security team | 15 minutes |
+| **Warning** | Notify platform team via Slack/Teams | 2 hours |
+| **Info** | Log to incident channel | Next business day |
+
+Use [Incident.io](https://incident.io) or similar tools to manage incident lifecycle.
+
+## On-chain Monitoring
+
+Monitor the blockchain for governance activity:
+
+- **Safe Transaction Service:** Subscribe to the Safe's transaction feed for real-time notifications
+- **The Graph / Dune Analytics:** Query governance transaction history for reporting
+- **Block explorer alerts:** Set up watch-only notifications for DstackKms and DstackApp contract events
+
+## Next Steps
+
+- **[Runbook](runbook)** — Step-by-step troubleshooting for common incidents
+- **[Upgrade Procedures](upgrade)** — How to upgrade CVMs, KMS, and contracts

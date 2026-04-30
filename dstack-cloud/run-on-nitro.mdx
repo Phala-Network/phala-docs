@@ -1,0 +1,247 @@
+---
+title: Run a Workload on AWS Nitro
+description: Step-by-step guide to deploy a Docker application as a Nitro Enclave on AWS.
+---
+
+# Run a Workload on AWS Nitro
+
+Run a Docker application inside an AWS Nitro Enclave — one of the strongest isolation guarantees available in the public cloud. The host OS cannot read your enclave's memory, even with root access.
+
+> **Important:** On AWS Nitro, your workload runs inside an **AWS Enclave OS image** — not a dstack CVM. There is no Guest Agent. `dstack-util` is packaged into the Enclave for attestation and key retrieval. You control how keys are used (for example disk/data decryption in your app).
+
+## Prerequisites
+
+- AWS account permissions for EC2 + Nitro Enclaves
+- AWS CLI configured (`aws configure`)
+- Docker installed
+- Git + `gh` CLI (if using GitHub template/release flow)
+- The [dstack-nitro-enclave-app-template](https://github.com/Phala-Network/dstack-nitro-enclave-app-template) repository
+
+## Overview
+
+Deployment flow:
+
+1. Create app from template
+2. Replace KMS root CA certificate (**required before build**)
+3. Build EIF and get measurements
+4. Register OS_IMAGE_HASH on-chain
+5. Deploy/run on Nitro host and retrieve keys
+
+### Key Delivery via KMS
+
+On Nitro, `dstack-util` inside Enclave reaches KMS through host-side VSOCK proxy. KMS verifies Nitro attestation and policy before returning keys.
+
+**KMS Options**
+
+| Option | Description | When to Use |
+|--------|-------------|-------------|
+| **Phala Official KMS** | Managed KMS by Phala | Quick start/testing |
+| **Self-hosted KMS** | Your own dstack-kms | Production/compliance/full control |
+
+Self-hosted KMS can run on:
+- GCP TDX CVM — see [Run a dstack-kms CVM on GCP](run-kms-on-gcp)
+- Intel TDX bare metal
+
+---
+
+## Step 1: Create Your App from Template
+
+```bash
+gh repo create my-enclave-app \
+  --template Phala-Network/dstack-nitro-enclave-app-template \
+  --private
+
+git clone https://github.com/YOUR_USER/my-enclave-app.git
+cd my-enclave-app
+```
+
+---
+
+## Step 2: Replace KMS Root CA Certificate
+
+> ⚠️ Required. Template `app/root_ca.pem` is placeholder only.
+
+`root_ca.pem` is baked into image and affects measured hash.
+
+```bash
+# From your running KMS endpoint
+curl -sk https://<kms-domain>:12001/prpc/GetTempCaCert?json \
+  | jq -r .temp_ca_cert > app/root_ca.pem
+```
+
+> Use a **domain name** in KMS URL when possible. Avoid raw IP in production.
+
+If KMS CA rotates, rebuild EIF and re-register new image hash.
+
+---
+
+## Step 3: Configure and Build EIF
+
+### 3.1 Template Variables
+
+`app/entrypoint.sh` uses placeholders:
+
+```bash
+KMS_URL="__KMS_URL__"
+APP_ID="__APP_ID__"
+```
+
+Do not hardcode manually; pass via build inputs.
+
+### 3.2 Local Build
+
+```bash
+DSTACK_UTIL=/path/to/dstack-util \
+KMS_URL=https://your-kms-domain:12001 \
+APP_ID=0xYOUR_APP_ID \
+  ./scripts/build-eif.sh
+```
+
+or source build variant:
+
+```bash
+KMS_URL=https://your-kms-domain:12001 \
+APP_ID=0xYOUR_APP_ID \
+DSTACK_COMMIT=14963a2ccb0ec7bef8a496c1ac5ac40f5593145d \
+  ./scripts/build-eif.sh
+```
+
+### 3.3 GitHub Actions Build
+
+```bash
+git add .
+git commit -m "configure enclave app"
+git push origin main
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+### 3.4 Output
+
+`./output/`:
+
+- `enclave.eif`
+- `measurements.json`
+- `measurements.sigstore.json` (CI)
+
+Output includes:
+
+- `PCR0`, `PCR1`, `PCR2`
+- `OS_IMAGE_HASH = sha256(PCR0 || PCR1 || PCR2)`
+
+---
+
+## Step 4: Register OS_IMAGE_HASH On-chain
+
+Before key retrieval, register measured image hash.
+
+### Development
+
+```bash
+cd dstack/kms/auth-eth
+npx hardhat kms:add-image <OS_IMAGE_HASH> --network <network>
+```
+
+### Production
+
+Use governance/multisig/timelock flow. See [Register Workload Measurements](register-enclave-measurement).
+
+### App policy check (important)
+
+For successful `GetAppKey`, app policy must also allow your runtime attestation:
+
+- compose hash/image hash allowed (`app:add-hash`)
+- device policy satisfied (either `allowAnyDevice=true` or device explicitly added)
+
+Useful commands:
+
+```bash
+npx hardhat app:add-hash --app-id <APP_ID> <OS_IMAGE_HASH> --network <network>
+# Choose one:
+npx hardhat app:set-allow-any-device --app-id <APP_ID> true --network <network>
+# or
+npx hardhat app:add-device --app-id <APP_ID> <DEVICE_ID> --network <network>
+```
+
+---
+
+## Step 5: Deploy on EC2
+
+### 5.1 Launch Nitro-capable instance
+
+| Setting | Value |
+|---------|-------|
+| Instance type | `c5.xlarge` or larger (c5/m5/r5 families) |
+| AMI | Amazon Linux 2023 |
+| Nitro Enclaves | enabled |
+
+### 5.2 Install Nitro tooling
+
+```bash
+sudo yum install -y aws-nitro-enclaves-cli
+sudo systemctl enable nitro-enclaves-allocator.service
+sudo systemctl start nitro-enclaves-allocator.service
+```
+
+### 5.3 Allocator resources
+
+`/etc/nitro_enclaves/allocator.yaml`:
+
+```yaml
+memory_mib: 2048
+cpu_count: 2
+```
+
+```bash
+sudo systemctl restart nitro-enclaves-allocator.service
+```
+
+### 5.4 Run EIF
+
+```bash
+gh release download v0.1.0 -p 'enclave.eif'
+nitro-cli run-enclave --eif-path enclave.eif --cpu-count 2 --memory 2048
+```
+
+### 5.5 Verify
+
+```bash
+nitro-cli describe-enclaves
+nitro-cli console
+```
+
+---
+
+## Entrypoint Notes
+
+The template uses `dstack-util get-keys` and a VSOCK proxy for key retrieval. Keys are returned to `/var/run/dstack/keys.json` inside the enclave, or captured on the host via VSOCK in helper scripts.
+
+> **Important:** The KMS URL, APP_ID, and `root_ca.pem` are all baked into the enclave image and affect the measured hash. You must use the exact same inputs between `--show-mrs` preview and the real run — any difference produces a different `OS_IMAGE_HASH`.
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `Boot denied: OS image is not allowed` | register the exact runtime OS_IMAGE_HASH; ensure runtime build inputs match show-mrs inputs |
+| Raw IP in KMS URL causes TLS/SAN issues | use DNS name (`kms.example.com`), not bare IP |
+| `get_keys.sh` completes but key file is empty | treat as failure; inspect enclave console and KMS policy response |
+| `DEBUG_ENCLAVE=1` run cannot pass policy | expected for production validation; debug mode alters attestation behavior and should be used only for diagnostics |
+| `Insufficient CPUs available in the pool` | terminate leftover enclaves and adjust allocator CPU count |
+
+---
+
+## Differences from GCP
+
+Nitro and GCP take fundamentally different approaches. On GCP, the Guest Agent handles attestation, key management, and automatic disk encryption. On Nitro, `dstack-util` only retrieves the key — your application decides what to encrypt.
+
+For a full comparison, see the [overview](overview) and [KMS and Key Delivery](kms-and-key-delivery).
+
+---
+
+## Next Steps
+
+- [Register Workload Measurements](register-enclave-measurement)
+- [Run a dstack-kms on GCP](run-kms-on-gcp)
+- [Nitro Enclave concept](/dstack-cloud/nitro-enclave)

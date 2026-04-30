@@ -1,0 +1,166 @@
+---
+title: AWS Nitro Enclave Integration
+description: How AWS Nitro Enclaves work with dstack-cloud, including EIF, VSOCK proxy, and key architectural differences from GCP.
+---
+
+## What Are Nitro Enclaves
+
+AWS Nitro Enclaves provide process-level isolation on EC2: the host OS cannot read or write enclave memory, even with root access. dstack-cloud packages your application into an Enclave Image File (EIF) and uses `dstack-util` for attestation and key retrieval — replacing the Guest Agent used on GCP.
+
+Key properties:
+
+- **Memory-isolated:** The host OS cannot read or write Enclave memory
+- **No persistent storage:** Every Enclave launch starts from a clean state
+- **No external network access:** Enclaves communicate through VSOCK (a socket interface to the host machine)
+- **Cryptographic attestation:** AWS Nitro Secure Module (NSM) generates an Attestation Document proving the Enclave's identity
+
+## How dstack Uses Nitro Enclaves
+
+The Nitro integration differs significantly from GCP. On GCP, dstack-cloud deploys a full virtual machine (dstack CVM) with a Guest Agent. On AWS Nitro, the workload runs inside an AWS Enclave OS image — there is no Guest Agent and no dstack OS.
+
+![Nitro Enclave Architecture](/images/dstack-cloud/nitro-enclave-architecture-v2.png)
+
+On AWS Nitro, the flow is:
+
+1. You define your application in a `Dockerfile`
+2. AWS Nitro CLI (`nitro-cli build-enclave`) converts the Dockerfile into an **Enclave Image File (EIF)** — the Enclave OS image
+3. dstack packages **`dstack-util`** into the EIF. This tool handles attestation and key retrieval from KMS
+4. The Enclave runs your application code inside the AWS-provided Enclave OS — not dstack OS
+5. Inside the Enclave, `dstack-util` communicates with KMS through the VSOCK proxy on the host to obtain keys
+6. Your application decides how to use the key (e.g., encrypting disk in-memory, decrypting model weights, etc.)
+
+### Key Differences from GCP
+
+| Aspect | GCP (dstack CVM) | AWS Nitro (Enclave) |
+|--------|------------------|---------------------|
+| **OS inside TEE** | dstack OS (custom Linux with Guest Agent) | Enclave OS (provided by AWS) |
+| **Guest Agent** | Yes — handles attestation, key management, storage encryption | **No** — replaced by `dstack-util` |
+| **Disk encryption** | Automatic (Guest Agent handles it) | **User-managed** — `dstack-util` provides the key, your application decides what to encrypt |
+| **Image build** | dstack-cloud builds a CVM disk image | AWS Nitro CLI builds EIF from a Dockerfile |
+| **Application format** | `docker-compose.yaml` | `Dockerfile` (single container) |
+
+## Enclave Image (EIF) Build Process
+
+A Nitro Enclave is launched from an **Enclave Image File (EIF)**. The build process has two stages:
+
+### Stage 1: Build Docker Image
+
+First, build a Docker image from your Dockerfile:
+
+```bash
+docker build -t my-app -f Dockerfile .
+```
+
+Your Dockerfile should include your application and `dstack-util`.
+
+### Stage 2: Build EIF from Docker Image
+
+Then, convert the Docker image into an EIF using the Nitro CLI:
+
+```bash
+nitro-cli build-enclave --docker-uri my-app:latest \
+  --output-file my-app.eif
+```
+
+This command:
+- Uses the AWS-provided Enclave OS as the base
+- Packages your Docker image content into an EIF
+- Generates 3 PCR values (PCR0, PCR1, PCR2) that uniquely identify the image
+
+### Stage 3: Register OS_IMAGE_HASH
+
+The 3 PCR values are combined into a single `OS_IMAGE_HASH` for on-chain authorization:
+
+```bash
+# Example: combine PCRs into OS_IMAGE_HASH
+OS_IMAGE_HASH=$(sha256sum <<< "${PCR0}${PCR1}${PCR2}" | cut -d' ' -f1)
+```
+
+The `OS_IMAGE_HASH` must be registered via [governance](governance) before KMS will deliver keys to this Enclave.
+
+> **Note:** Any change to the Dockerfile, application code, or `dstack-util` version produces different PCR values and a different `OS_IMAGE_HASH`.
+
+### Automated Deployment
+
+In practice, these steps are automated by deployment scripts. See [Run a Workload on AWS Nitro](/dstack-cloud/run-on-nitro) for the full workflow using the `deploy_host.sh` and `get_keys.sh` scripts.
+
+## Key Retrieval with dstack-util
+
+On Nitro, `dstack-util` replaces the Guest Agent for key management. It is a lightweight tool that:
+
+- Obtains the Enclave's attestation document from NSM (Nitro Secure Module)
+- Sends the attestation to dstack-kms through the VSOCK proxy
+- Receives the requested key if the attestation is valid (and the measurement is authorized on-chain, when using on-chain KMS mode)
+- Makes the key available to your application (e.g., via stdout, file, or shared memory)
+
+> **Note:** Unlike GCP where the Guest Agent automatically handles disk encryption, on Nitro you are responsible for deciding how to use the key. Common patterns include encrypting model weights in memory, decrypting configuration secrets, or encrypting a RAM-disk.
+
+## Networking and Communication
+
+Nitro Enclaves have no direct network access. All communication goes through VSOCK:
+
+![VSOCK Communication](/images/dstack-cloud/vsock-communication-v2.png)
+
+- The Enclave communicates with the host via VSOCK (AF_VSOCK socket family)
+- A VSOCK proxy on the host forwards TCP connections to the outside world (including KMS)
+- The proxy must be started before the Enclave launches
+- If the proxy crashes, the Enclave loses external connectivity
+
+### VSOCK Proxy Setup
+
+The VSOCK proxy translates between VSOCK (Enclave↔Host) and TCP (Host↔Network):
+
+```bash
+# Example: forward Enclave VSOCK port 8000 to host TCP port 8000
+socat VSOCK-LISTEN:8000,reuseaddr,fork TCP:localhost:8000
+```
+
+dstack-cloud provides helper scripts and configuration for setting up the VSOCK proxy as part of the deployment process.
+
+## Resource Constraints
+
+Nitro Enclaves have static resource allocation:
+
+| Resource | Behavior |
+|----------|----------|
+| **CPU** | Allocated at launch (in vCPUs), cannot be changed during runtime |
+| **Memory** | Allocated at launch (in MB), cannot be changed during runtime |
+| **Maximum** | Depends on the host EC2 instance type |
+
+### Supported EC2 Instance Types
+
+Nitro Enclaves are supported on instances built on the AWS Nitro System. Common choices:
+
+| Instance Type | vCPUs | Memory | Notes |
+|--------------|-------|--------|-------|
+| `m5.xlarge` | 4 | 16 GB | General purpose |
+| `m5.2xlarge` | 8 | 32 GB | General purpose |
+| `c5.2xlarge` | 8 | 16 GB | Compute optimized |
+| `r5.2xlarge` | 8 | 64 GB | Memory optimized |
+
+Note: The EC2 instance must have Nitro Enclave support enabled in its Nitro configuration, and you must allocate enough CPU/memory to accommodate both the host OS and the Enclave.
+
+## When to Use Nitro vs. GCP
+
+Choose **AWS Nitro Enclaves** when:
+
+- Your existing infrastructure is on AWS
+- You need the strongest possible isolation (process-level, no host access)
+- Your workload fits within static resource limits
+- You don't need persistent disk storage or you want to do it with the key by yourself
+- You want full control over how keys are used (encryption strategy, key usage pattern)
+
+Choose **GCP Confidential VMs** when:
+
+- Your existing infrastructure is on GCP
+- You need automatic disk encryption managed by dstack-cloud
+- You need direct network access without a VSOCK proxy
+- You need persistent disk storage
+- You need elastic resource allocation
+- You prefer a more managed experience with the Guest Agent handling attestation and key lifecycle
+
+## Next Steps
+
+- **[Quick Start: Deploy on AWS Nitro](/dstack-cloud/get-started)** — Hands-on tutorial
+- **[Run a Workload on AWS Nitro](/dstack-cloud/run-on-nitro)** — Detailed deployment guide
+- **[Attestation Integration](attestation-integration)** — How attestation works on Nitro

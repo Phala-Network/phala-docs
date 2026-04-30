@@ -1,0 +1,267 @@
+---
+title: Troubleshooting Runbook
+description: Troubleshooting runbook for common dstack-cloud deployment issues.
+---
+
+# Troubleshooting Runbook
+
+When something breaks in a dstack-cloud deployment, the root cause usually falls into one of these categories: attestation mismatch, KMS unavailability, governance hold-up, or infrastructure issues. This runbook covers the most common failure modes and how to diagnose them.
+
+## RA-TLS Connection Failures
+
+### Symptoms
+- Workload logs show "RA-TLS handshake failed"
+- KMS logs show "connection from unverified peer"
+- Workload cannot obtain keys
+
+### Diagnosis
+```bash
+# Check workload logs
+dstack-cloud logs
+
+# Check KMS logs
+cd kms-prod
+dstack-cloud logs
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| Workload attestation invalid | Verify the workload's measurements match what is registered on-chain. Run `dstack-cloud status` to get current measurements. |
+| KMS attestation invalid | Verify KMS is running in a genuine TEE. Check `dstack-cloud status` for the KMS instance. |
+| Clock skew between workload and KMS | RA-TLS requires relatively synchronized clocks. Check NTP configuration on both sides. |
+| Certificate expired | Check that the RA-TLS certificates have not expired. Restart the CVM to regenerate. |
+
+## Attestation Verification Failures
+
+### Symptoms
+- KMS refuses to dispatch keys
+- Logs show "measurement not authorized" or "attestation verification failed"
+
+### Diagnosis
+```bash
+# Get current measurements
+dstack-cloud status
+# Note the RTMR3 / OS_IMAGE_HASH
+
+# Check on-chain authorization
+cast call <DstackKms_ADDRESS> \
+  "isAuthorized(bytes32)(bool)" \
+  0xYOUR_MEASUREMENT_HASH \
+  --rpc-url $RPC_URL
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| Measurement not registered on-chain | Register the measurement via governance. See [Register Workload Measurements](/dstack-cloud/register-enclave-measurement). |
+| Measurement changed after update | Application code or Docker image changed. Register the new measurement. |
+| KMS pointing to wrong contract | Verify `KMS_CONTRACT_ADDR` environment variable. |
+| RPC returns stale state | Check RPC provider health. Switch to a backup RPC endpoint. |
+
+## CVM / Enclave Startup Failures
+
+### Symptoms
+- `dstack-cloud deploy` succeeds but CVM exits immediately
+- `dstack-cloud status` shows "ERROR" or "STOPPED"
+
+### Diagnosis
+```bash
+# Check logs for the reason
+dstack-cloud logs
+
+# Check resource allocation (GCP)
+gcloud compute instances describe <INSTANCE_NAME>
+
+# Check resource allocation (Nitro)
+sudo amazon-nitro-enclaves-cli describe-enclaves
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| Insufficient memory | Allocate more memory. On GCP, use a larger machine type. On Nitro, increase `--memory` in `allocate-enclaves`. |
+| Invalid Docker image | Verify the image exists and is accessible. Use SHA256 digests for pinned images. |
+| Container crash loop | Check application logs. The container may have a runtime error. |
+| OS image incompatible | Ensure the OS image version matches the dstack-cloud CLI version. |
+
+### GCP-specific
+
+| Cause | Fix |
+|-------|-----|
+| Confidential VM quota exceeded | Request quota increase in GCP Console. |
+| VM not booting as TDX | Verify the VM has `confidential-compute: enabled` in GCP Console. |
+
+### Nitro-specific
+
+| Cause | Fix |
+|-------|-----|
+| Enclave image (EIF) too large | Reduce Docker image size. Use multi-stage builds. |
+| Nitro driver not installed | Install: `sudo apt-get install -y aws-nitro-enclaves-cli` |
+| Enclave resource limit exceeded | Run `allocate-enclaves` with higher values and retry. |
+
+## On-chain Authorization Failures
+
+### Symptoms
+- KMS logs show "workload not authorized"
+- Keys are not dispatched despite correct attestation
+
+### Diagnosis
+```bash
+# Check if measurement is authorized on-chain
+cast call <DstackKms_ADDRESS> "isAuthorized(bytes32)(bool)" 0xHASH --rpc-url $RPC_URL
+
+# Check DstackKms contract state
+cast call <DstackKms_ADDRESS> "owner()(address)" --rpc-url $RPC_URL
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| Measurement registered on wrong contract | Verify the KMS is configured to use the correct `DstackKms` address. |
+| Governance transaction not yet executed | Check the Safe for pending transactions. Wait for timelock. |
+| Measurement was revoked | Check the Safe transaction history. If revoked by mistake, re-register via governance. |
+
+## KMS Unavailable
+
+### Symptoms
+- Workloads cannot connect to KMS
+- `dstack-cloud status` shows KMS as stopped or unreachable
+
+### Diagnosis
+```bash
+# Check KMS status
+cd kms-prod
+dstack-cloud status
+
+# Check KMS logs
+dstack-cloud logs
+
+# Test connectivity
+curl -k https://<KMS_URL>:12001/health
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| KMS CVM stopped | Restart: `dstack-cloud start` |
+| KMS bootstrap not completed | Complete the bootstrap procedure. See [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp). |
+| Network issue | Verify firewall rules. Check VSOCK proxy on Nitro. |
+| KMS out of memory | Allocate more resources. Check `dstack-cloud logs` for OOM errors. |
+
+## Governance Transactions Stuck
+
+### Symptoms
+- Governance proposal not advancing
+- Transaction in Safe queue not executing
+
+### Diagnosis
+
+1. Check the Safe web interface for transaction status
+2. Check if the timelock has expired
+3. Verify the Safe has sufficient gas
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| Not enough signatures | Contact missing signers. If a signer is unavailable, consider adding a new signer (requires governance). |
+| Timelock not yet expired | Check the exact expiry time. Wait. |
+| Safe out of gas | Send ETH to the Safe address. |
+| Transaction will revert | Simulate the transaction before executing. The contract state may have changed since the proposal was created. Cancel and re-submit. |
+| Stale transaction in queue | Cancel the stale transaction through the Safe interface. Submit a new one. |
+
+## VSOCK Proxy Failures (Nitro-specific)
+
+### Symptoms
+- Enclave cannot reach KMS or external services
+- `dstack-cloud logs` shows network timeout errors
+
+### Diagnosis
+```bash
+# Check if socat is running
+ps aux | grep socat
+
+# Check VSOCK proxy logs
+journalctl -u vsock-proxy -f   # if running as systemd service
+
+# Test VSOCK connectivity from the host
+echo "test" | socat - VSOCK-CONNECT:1:8000
+```
+
+### Common Causes and Fixes
+
+| Cause | Fix |
+|-------|-----|
+| socat not running | Start the VSOCK proxy. Check `prelaunch.sh` for the proxy startup command. |
+| Wrong VSOCK port | Verify the VSOCK port matches between the Enclave and the proxy. |
+| socat crashed | Restart socat. Check system logs for crash reason. Consider running as a systemd service with auto-restart. |
+| Port conflict | Another process is using the same port. Change the proxy port configuration. |
+
+## Emergency Operations
+
+### Revoke a Compromised Measurement
+
+1. Draft a governance transaction to remove the measurement from `DstackKms`
+2. Request expedited approval from all signers
+3. Wait for the timelock (cannot be bypassed)
+4. Execute after the delay
+5. Verify the measurement is no longer authorized
+
+### KMS Key Compromise
+
+If the KMS root key may have been compromised:
+
+1. Stop the KMS immediately: `dstack-cloud stop`
+2. Audit all workloads that received keys from the compromised KMS
+3. Rotate affected application keys
+4. Deploy a new KMS instance with fresh measurements
+5. Register the new KMS measurements on-chain
+6. Revoke the old KMS measurements
+7. Restart workloads against the new KMS
+
+### Full System Recovery
+
+1. Stop all CVMs and KMS instances
+2. Verify blockchain state is consistent
+3. Redeploy from known-good configuration
+4. Re-register measurements if needed
+5. Verify end-to-end key delivery
+6. Review governance activity for suspicious transactions
+
+## Diagnostic Commands Cheat Sheet
+
+```bash
+# Check deployment status
+dstack-cloud status
+
+# View logs
+dstack-cloud logs
+dstack-cloud logs --follow
+dstack-cloud logs --container <name>
+
+# Check measurements
+dstack-cloud status | grep -E "measurement|hash|rtmr"
+
+# On-chain queries (using cast)
+cast call <ADDR> "isAuthorized(bytes32)(bool)" 0xHASH --rpc-url $RPC_URL
+cast call <ADDR> "owner()(address)" --rpc-url $RPC_URL
+
+# GCP diagnostics
+gcloud compute instances describe <NAME>
+gcloud logging read "resource.type=gce_instance"
+
+# Nitro diagnostics
+sudo amazon-nitro-enclaves-cli describe-enclaves
+sudo amazon-nitro-enclaves-cli allocate-enclaves --cpu-count 2 --memory 4096
+```
+
+## Next Steps
+
+- **[Monitoring and Alerting](monitoring-alerting)** — Set up proactive monitoring
+- **[Upgrade Procedures](upgrade)** — Upgrade versions to fix known issues

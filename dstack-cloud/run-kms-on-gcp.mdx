@@ -1,0 +1,267 @@
+---
+title: Run a dstack-kms CVM on GCP
+description: Deploy a dstack-kms (Key Management Service) instance on GCP as a Confidential VM with on-chain governance.
+---
+
+# Run a dstack-kms CVM on GCP
+
+Run your own dstack-kms instance on GCP so you have full control over key policy. This page covers the production deployment workflow: bootstrap the KMS, register its attestation on-chain, and verify it's serving keys correctly.
+
+> **Reference:** This guide is based on the [official deployment guide](https://github.com/Phala-Network/dstack-cloud-deployment-guide/blob/main/guide_EN.md).
+
+> **Platform Requirement:** `dstack-cloud deploy` must be run on **Linux**. macOS is not supported because the FAT32 shared disk image created by macOS `dosfstools` fails GCP image validation.
+
+---
+
+## Prerequisites
+
+- A GCP project with Confidential VM (TDX) quota
+- `gcloud` CLI installed and authenticated (`gcloud auth login`)
+- `gsutil` available in PATH (required by `dstack-cloud deploy` for GCS upload)
+- `docker` / `docker compose`
+- `node` + `npm` (for smart contract deployment)
+- `jq`
+- `mtools` (provides `mcopy`)
+- `dosfstools` (provides `mkfs.fat`)
+- **`dstack-cloud` CLI** installed:
+  ```bash
+  curl -fsSL -o ~/.local/bin/dstack-cloud \
+    https://raw.githubusercontent.com/Phala-Network/meta-dstack-cloud/main/scripts/bin/dstack-cloud
+  chmod +x ~/.local/bin/dstack-cloud
+  ```
+- **For on-chain governance mode:**
+  - A blockchain RPC endpoint (e.g., `https://sepolia.base.org`)
+  - A wallet with sufficient balance
+  - Deployed smart contracts (DstackKms, DstackApp) — see [Deploy On-chain KMS Smart Contracts](deploy-onchain-kms)
+  - You’ll need `KMS_CONTRACT_ADDR` and `APP_CONTRACT_ADDR` before KMS bootstrap/finish
+
+> **Note:** This guide uses pre-built KMS Docker images. If you need to build KMS from source or customize configuration, see the [official KMS build guide](https://github.com/Phala-Network/dstack-cloud/blob/master/docs/tutorials/kms-build-configuration.md).
+
+---
+
+## Step 1: Configure dstack-cloud
+
+Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-1-configure-dstack-cloud) to set up your global config and GCS bucket.
+
+---
+
+## Step 2: Pull the OS Images
+
+Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-2-pull-the-os-image) to download the `dstack-cloud-0.6.0` images.
+
+> If `disk.raw` is missing, deployment may create a VM that cannot boot (UEFI loop: `Failed to load image`).
+
+---
+
+## Step 3: Create a KMS Project
+
+```bash
+mkdir -p workshop-run
+dstack-cloud new workshop-run/kms-prod \
+  --os-image dstack-cloud-0.6.0 \
+  --key-provider tpm \
+  --instance-name dstack-kms
+
+cd workshop-run/kms-prod
+```
+
+Generated files include:
+
+- `app.json`
+- `docker-compose.yaml`
+- `prelaunch.sh`
+
+---
+
+## Step 4: Build or Select KMS Docker Image
+
+Use pre-built image or build your own:
+
+```bash
+# Option 1: Pre-built
+# KMS_IMAGE=cr.kvin.wang/dstack-kms:latest
+
+# Option 2: Build from source (from deployment-guide workshop repo)
+cd workshop/kms/builder
+./build-image.sh dstack-kms:latest
+docker push dstack-kms:latest
+```
+
+---
+
+## Step 5: Configure KMS Runtime
+
+Replace generated compose/prelaunch with KMS config.
+
+> The compose templates below come from:  
+> `Phala-Network/dstack-cloud-deployment-guide`  
+> Clone that repo first if you only cloned this docs repo.
+
+### Option A: Direct RPC
+
+```bash
+cp /path/to/dstack-cloud-deployment-guide/workshop/kms/docker-compose.direct.yaml docker-compose.yaml
+```
+
+Create `prelaunch.sh`:
+
+```bash
+cat > prelaunch.sh <<'EOF'
+#!/bin/sh
+cat > .env <<'ENVEOF'
+KMS_HTTPS_PORT=12001
+AUTH_HTTP_PORT=18000
+KMS_IMAGE=cr.kvin.wang/dstack-kms:latest
+ETH_RPC_URL=https://sepolia.base.org
+KMS_CONTRACT_ADDR=<YOUR_KMS_CONTRACT_ADDR>
+APP_CONTRACT_ADDR=<YOUR_APP_CONTRACT_ADDR>
+DSTACK_REPO=https://github.com/Phala-Network/dstack-cloud.git
+DSTACK_REF=14963a2ccb0ec7bef8a496c1ac5ac40f5593145d
+ENVEOF
+EOF
+chmod +x prelaunch.sh
+```
+
+### Option B: Light Client (Helios)
+
+```bash
+cp /path/to/dstack-cloud-deployment-guide/workshop/kms/docker-compose.light.yaml docker-compose.yaml
+```
+
+`prelaunch.sh` can stay the same unless your template requires different vars.
+
+---
+
+## Step 6: Deploy KMS CVM
+
+```bash
+dstack-cloud deploy --delete
+```
+
+If bucket does not exist, create explicitly first:
+
+```bash
+gcloud storage buckets create gs://<YOUR_BUCKET_NAME> \
+  --project <YOUR_PROJECT_ID> \
+  --location us-central1
+```
+
+---
+
+## Step 7: Open Firewall
+
+```bash
+dstack-cloud fw allow 12001
+dstack-cloud fw allow 18000
+```
+
+For light-client mode:
+
+```bash
+dstack-cloud fw allow 18545
+```
+
+Port notes:
+
+- `12001/tcp`: KMS API (**required**)
+- `18000/tcp`: auth-api debug endpoint (**optional**)
+- `18545/tcp`: helios RPC (light mode only)
+
+---
+
+## Step 8: Bootstrap (First-time)
+
+### 8.1 Check KMS endpoint
+
+```bash
+dstack-cloud status
+```
+
+### 8.2 Get attestation info
+
+```bash
+KMS_URL="http://<KMS_DOMAIN>:12001"
+curl -s "$KMS_URL/prpc/Onboard.GetAttestationInfo?json" | jq .
+```
+
+Capture:
+- `device_id`
+- `mr_aggregated`
+- `os_image_hash`
+
+### 8.3 Register measurements on-chain (required for on-chain mode)
+
+```bash
+npx hardhat kms:add-image 0x<os_image_hash> --network custom
+npx hardhat kms:add 0x<mr_aggregated> --network custom
+npx hardhat kms:add-device 0x<device_id> --network custom
+```
+
+> `device_id` must come from `Onboard.GetAttestationInfo` (not dummy serial-console value).
+
+### 8.4 Run bootstrap
+
+```bash
+curl -s "$KMS_URL/prpc/Onboard.Bootstrap?json" \
+  -d '{"domain":"<KMS_DOMAIN>"}' | tee bootstrap-info.json | jq .
+```
+
+### 8.5 Finish
+
+```bash
+curl "$KMS_URL/finish"
+sleep 5
+```
+
+---
+
+## Step 9: Verify
+
+```bash
+# Onboard mode check (before finish)
+curl -s "http://<KMS_DOMAIN>:12001/prpc/Onboard.GetAttestationInfo?json" | jq .
+
+# Normal mode check (after finish)
+curl -sk "https://<KMS_DOMAIN>:12001/prpc/GetMeta?json" -d '{}' | jq .
+```
+
+---
+
+## Common Issues
+
+| Issue | Solution |
+|---|---|
+| macOS image/shared-disk errors | Use Linux host for deploy |
+| `Boot image ... not found` | Ensure image search path is correct and `disk.raw` exists under `<path>/dstack-cloud-0.6.0/` |
+| VM `RUNNING` but 12001/18000 unreachable + serial shows `UEFI: Failed to load image` | Wrong boot image format/content. Ensure `disk.raw` comes from `dstack-cloud-0.6.0-uki.tar.gz` (do **not** rename `rootfs.img.parted.verity` as `disk.raw`) |
+| `gsutil` missing | Install Google Cloud SDK/gsutil and ensure in PATH |
+| `mcopy` missing | Install `mtools` |
+| `mkfs.fat` missing | Install `dosfstools` |
+| `missing field 'status'` from KMS flow | Usually indicates auth-eth / on-chain config mismatch (RPC/contract addresses/registrations). Verify `ETH_RPC_URL`, `KMS_CONTRACT_ADDR`, `APP_CONTRACT_ADDR`, and on-chain image/MR/device registration |
+| KMS port responds but APIs return 404 | Shared disk config stale/wrong; `dstack-cloud deploy --delete` |
+
+---
+
+## Cleanup
+
+```bash
+dstack-cloud stop
+dstack-cloud remove
+```
+
+Or manually:
+
+```bash
+gcloud compute instances delete dstack-kms --zone=us-central1-a
+gcloud compute images delete dstack-kms-boot
+gcloud compute images delete dstack-kms-shared
+```
+
+---
+
+## Next Steps
+
+- [Register Workload Measurements](register-enclave-measurement)
+- [KMS and Key Delivery](/dstack-cloud/kms-and-key-delivery)
+- [Attestation Integration](/dstack-cloud/attestation-integration)
+- [Deploy On-chain KMS Smart Contracts](deploy-onchain-kms)

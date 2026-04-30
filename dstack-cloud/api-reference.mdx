@@ -1,0 +1,195 @@
+---
+title: API Reference
+description: API reference for Guest Agent (Unix Socket), KMS Onboard API, and management endpoints.
+---
+
+# API Reference
+
+dstack-cloud exposes three API surfaces: the Guest Agent's Unix socket (for apps inside the CVM), the KMS RPC (for key delivery over RA-TLS), and the Onboard HTTP endpoints (for first-time KMS bootstrap).
+
+## Guest Agent API (Unix Socket)
+
+The Guest Agent runs inside each dstack CVM and provides local APIs via a Unix socket at `/var/run/dstack.sock`.
+
+### Get TDX Quote
+
+Obtain a TDX attestation quote from the hardware.
+
+**GCP (TDX) only.**
+
+```bash
+curl --unix-socket /var/run/dstack.sock \
+  "http://localhost/GetQuote?report_data=0x1234deadbeef"
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `report_data` | string (hex) | Optional challenge value (32 bytes). Used to prevent replay attacks. |
+
+**Response:**
+
+```json
+{
+  "quote": "<base64-encoded TDX Quote>",
+  "rtmr0": "...",
+  "rtmr1": "...",
+  "rtmr2": "...",
+  "rtmr3": "..."
+}
+```
+
+### Get NSM Attestation
+
+Obtain a Nitro Attestation Document from the NSM.
+
+**AWS Nitro only.**
+
+```bash
+curl --unix-socket /var/run/dstack.sock \
+  "http://localhost/GetAttestation?user_data=0x1234deadbeef"
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `user_data` | string (hex) | Optional challenge value. |
+
+**Response:**
+
+```json
+{
+  "document": "<base64-encoded NSM Attestation Document>"
+}
+```
+
+### Get Attestation (HTTP)
+
+External attestation endpoint, accessible via HTTPS.
+
+```bash
+curl https://your-app.example.com/attestation
+```
+
+**Response:** Full attestation data (Quote or Document) for external verification.
+
+---
+
+## KMS API
+
+The KMS exposes an RPC interface for key management. All communication uses RA-TLS — the KMS verifies the workload's attestation before processing any request.
+
+### getKey(name)
+
+Request a key from the KMS.
+
+```bash
+# Called from within the application via dstack SDK
+# Not directly callable via curl (requires RA-TLS handshake)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `name` | string | The name of the requested key. Keys are scoped per application. |
+
+**Returns:** The requested key as raw bytes.
+
+**Error Codes:**
+
+| Error | Description |
+|-------|-------------|
+| `UNAUTHORIZED` | Workload attestation verification failed. The workload is not running in a verified TEE. |
+| `MEASUREMENT_NOT_FOUND` | The workload's measurement is not registered on-chain. |
+| `KEY_NOT_FOUND` | No key exists for the requested name. |
+| `INTERNAL_ERROR` | KMS encountered an internal error. |
+
+### How Applications Use getKey
+
+Applications retrieve keys through the dstack SDK, which handles attestation and the RA-TLS connection automatically:
+
+**Python:**
+```python
+from dstack import DstackClient
+
+client = DstackClient()
+key = client.get_key("my-api-key")
+```
+
+**TypeScript:**
+```typescript
+import { DstackClient } from '@dstack/sdk';
+
+const client = new DstackClient();
+const key = await client.getKey("my-api-key");
+```
+
+**Rust:**
+```rust
+use dstack_sdk::DstackClient;
+
+let client = DstackClient::new()?;
+let key = client.get_key("my-api-key")?;
+```
+
+---
+
+## KMS Onboard API (HTTP, Bootstrap Only)
+
+These endpoints are only available during the first-time bootstrap (Onboard mode). After bootstrap is completed, KMS switches to RA-TLS-only mode.
+
+### Onboard.Bootstrap
+
+Generate the KMS key pair and obtain attestation information.
+
+```bash
+curl -s "http://<KMS_URL>:12001/prpc/Onboard.Bootstrap?json" \
+  -d '{"domain": "<KMS_DOMAIN>"}'
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `domain` | string | The domain name or IP address where KMS is accessible. Used in the attestation data. |
+
+**Response:**
+```json
+{
+  "publicKey": "...",
+  "attestation": "...",
+  "measurement": "..."
+}
+```
+
+### /finish
+
+Complete the bootstrap process. KMS restarts and switches to Normal mode (HTTPS + RA-TLS).
+
+```bash
+curl "http://<KMS_URL>:12001/finish"
+```
+
+**Response:** HTTP 200 on success.
+
+---
+
+## Docker Compose Volume for Guest Agent
+
+To access the Guest Agent from within a Docker container, mount the socket:
+
+```yaml
+services:
+  my-app:
+    image: my-app:latest
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+```
+
+## Next Steps
+
+- **[Configuration Reference](configuration)** — Configuration file formats
+- **[Glossary](glossary)** — Term definitions
