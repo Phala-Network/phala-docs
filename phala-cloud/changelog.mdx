@@ -5,6 +5,425 @@ rss: true
 noindex: true
 ---
 
+<Update label="April 27 - May 1, 2026" tags={["Workspace", "Billing", "KMS", "Admin", "Gateways"]} rss={{ title: "Workspace Abandonment & On-Chain KMS Clusters", description: "Abandoned workspace lockdown, on-chain KMS cluster relations, admin gateway surface, and global ApiErrorDialog" }}>
+
+  ## Workspace Suspension & Abandonment
+
+  - **Day-30 Abandonment**: Lock all mutating operations on workspaces that have been suspended for 30+ days; redirect/logout users on access and notify ops via Telegram.
+  - **Mutation Gating**: Every CVM mutating endpoint is now gated on workspace `billing_status` — suspended workspaces cannot start, restart, replicate, or update CVMs.
+  - **Settlement-Failure Suspension**: Post-paid teams are auto-suspended on settlement failure; state-change billing is skipped while suspended to avoid spurious charges.
+
+  ## On-Chain KMS
+
+  - **KMS Cluster Relations**: New cluster data relations with a `PHALA` sentinel for the platform's reserved cluster, plus an admin data-health view to surface drift.
+  - **Schema Cleanup**: Drop FK constraints and removed unused KMS admin endpoints in preparation for cluster-scoped management.
+
+  ## Admin: Gateways
+
+  - **Gateway Nodes Admin**: New admin surface to manage gateway clusters, certificates, DNS, ZeroTier membership, and routing policy from the dashboard.
+  - **Gateway Hosts View**: Support gateway v0.5.4 hosts view; allow duplicate gateway app mappings during cluster transitions.
+
+  ## Error Handling
+
+  - **Global ApiErrorDialog**: All CVM mutations now route errors through a stacked, deduplicated, opt-out-able dialog — including remaining CVM dialogs, network config, and the compose editor save path.
+
+</Update>
+
+<Update label="April 20-26, 2026" tags={["UI", "Billing", "GPU Rental", "Onboarding", "Admin"]} rss={{ title: "v3 Sidebar, Billing v2 Onboarding & GPU Rental Webhooks", description: "Stacked v3 navigation, command palette, billing v2 workspace+card-bind onboarding, GPU rental order webhooks" }}>
+
+  ## UI Redesign
+
+  - **v3 Stacked Sidebar**: New stacked sidebar navigation with global command palette and a refreshed design system across the dashboard.
+  - **Account Settings**: Settings split into profile / security / SSH keys subpages, inlined into the global sidebar.
+  - **CVM Networking Pages**: New networking pages with sidebar polish; toggle CVM ingress URLs between app-id and instance-id.
+
+  ## Billing v2 Onboarding
+
+  - **Payment-Gated Onboarding**: New users go through a payment-gated workspace + card-bind onboarding flow before they can deploy.
+  - **Welcome Promo**: First top-up of $1+ now grants a welcome promo credit.
+  - **Crypto UI Removed**: Coinbase, Square, and the mock payment provider have been retired; crypto top-up UI removed.
+  - **Legacy Cleanup**: 212 legacy suspended workspaces have been marked as abandoned for billing v2.
+
+  ## GPU Rental
+
+  - **Order Webhooks**: `gpu_rental.order` webhook events fire on activation and completion, with workspace UI surfacing and validation.
+  - **Slim Order API**: Order creation now uses a Redis-cached provision token for faster lookups.
+
+  ## Admin
+
+  - **Stripe Webhook Logs Viewer**: New per-workspace Stripe webhook logs page; LIKE substring search for customer matching.
+  - **Card Fingerprints**: Card-fingerprints section on user detail with toggle.
+  - **Deleted Accounts**: Deleted-accounts page with a Clear blocks button for testing flows.
+  - **Account Purge UI**: Pending removals section with grouped-list redesign.
+  - **Soft Delete**: Team soft delete + purge now anonymizes name/slug.
+
+</Update>
+
+<Update label="April 13-19, 2026" tags={["CVM", "Networking", "Apps", "Workspace Suspension", "Redpill"]} rss={{ title: "CVM Networking Backend, App Instances API & Workspace Suspension Phase 2", description: "source_cidrs ACLs, POST /apps/{id}/instances, workspace suspension lifecycle, and Redpill usage exports" }}>
+
+  ## CVM Networking
+
+  - **source_cidrs ACL**: Backend support for source-CIDR allowlists, `public_host`, and app-gateway metadata on CVMs.
+  - **App-Compose Endpoint**: New `app-compose.json` endpoint for retrieving the live compose document.
+  - **Public Host**: `public_host` exposed on the physical-nodes admin API.
+
+  ## Apps & Instances
+
+  - **POST /apps/&lcub;app_id&rcub;/instances**: Create app instances directly via the apps API (also exposed in JS SDK and CLI).
+  - **Confirm-Instance Page**: New page for the two-phase app instance flow.
+  - **Pending Updates**: Pending compose updates now show the originating instance name and a preview drawer.
+  - **`cvm.replica.pending_approval` Webhook**: Emitted for replica approval flows; CLI profile slug fix included.
+
+  ## Workspace Suspension Phase 2
+
+  - **Disk Billing**: Suspended workspaces continue to accrue disk billing; retention task runs hourly during the test window.
+  - **Dashboard Cards**: New admin dashboard cards expose suspension lifecycle state and visibility.
+  - **`suspended_at`**: `teams.suspended_at` column added for data-retention tracking.
+
+  ## Redpill
+
+  - **Year/Month Filter & Exports**: New monthly filter; CSV and Excel export for usage data.
+  - **All-Time Filter**: Fixed All-time button regression in usage filters.
+
+  ## Infrastructure
+
+  - **Node TCB Evaluation**: Periodic task evaluates node TCB and records results; admin UI gets detail, edit form, and sync.
+  - **Request ID Tracing**: Request IDs now propagate across nginx and the backend for cross-service log correlation.
+
+</Update>
+
+<Update label="April 6-12, 2026" tags={["KMS", "CVM", "GPU Rental", "Attestations"]} rss={{ title: "On-Chain KMS Compose Updates, Live TCB Evaluation & GPU Rental Decouple", description: "Compose updates for on-chain KMS apps, live early TCB evaluation, and admin GPU rental decouple action" }}>
+
+  ## On-Chain KMS
+
+  - **Compose Updates**: On-chain KMS CVMs now support compose updates with a pending-updates flow.
+  - **On-Chain KMS Sidebar**: App overview sidebar consolidates on-chain KMS state and pending updates via a unified `kms-info` API.
+  - **Pending-Updates Endpoint**: New endpoint exposes pending updates for on-chain KMS apps.
+  - **Per-Toggle TX**: Device allowlist toggles now send one transaction per change instead of using Multicall3 batching.
+
+  ## Apps & Projects
+
+  - **App Contract Metadata**: Migrated from CVMs to projects; frontend UX adapts based on contract owner type.
+  - **Voided Order Status**: New `voided` order status that is excluded from all flows.
+
+  ## GPU Rental Admin
+
+  - **Decouple Action**: Admin can now decouple a GPU rental order from its CVM; financial summary, runway column, and structured errors added.
+  - **Distinguish In-Use vs Unavailable**: `ERR-02-016` distinguishes "device in use" from "no resources" so users see the right message.
+
+  ## Live TCB Evaluation
+
+  - **App Attestations**: Live early TCB evaluation runs on app attestations and surfaces TCB identity fields for early-update diagnostics.
+
+  ## Other
+
+  - **Log Stream URLs**: `CVMInfo` now includes log stream URLs for direct linking from the API.
+  - **Teehouse RPC**: UI RPC calls now route through the cloud-api gateway for auth and `/api` prefix correctness.
+  - **dcap-qvl Python Module**: Replaced the dcap-qvl binary with a Python module for attestation verification.
+
+</Update>
+
+<Update label="March 30 - April 5, 2026" tags={["Billing", "CVM", "Networking", "Security"]} rss={{ title: "Billing v2 Modes, CVM Port Forwarding & XSS Hardening", description: "Prepaid/auto-topup/post-paid billing modes, CVM port forwarding auto-allocation, and platform-wide XSS hardening" }}>
+
+  ## Billing Modes v2
+
+  - **Three Modes**: Workspaces now choose between **prepaid**, **auto-topup**, or **post-paid** billing.
+  - **Proactive Auto-Topup**: Auto-topup fires when balance crosses the threshold, not on the next charge attempt.
+  - **Race Hardening**: Order-first pattern eliminates duplicate orders/credits from auto-topup webhook races; settlement refunds correctly restore debt.
+  - **Auto-Topup Task**: Now runs as an independent hourly task instead of being chained off payment completion.
+
+  ## CVM Port Forwarding
+
+  - **Auto-Allocation**: Port forwarding now auto-allocates and manages the firewall lifecycle alongside the CVM.
+  - **Port Mapping API**: `cvm_port_mappings` table + repository, route renames, workspace slug support, and stale-cache fixes.
+
+  ## CVM Operations
+
+  - **`in_progress` State**: Operations show `in_progress` with optimistic UI updates; auto-recovery for stale locks; user-initiated cancel.
+  - **Recent Operations**: Tables now show the operation's target state.
+  - **Empty Container Names**: Handle containers with empty names in `get_containers()`.
+
+  ## Security
+
+  - **XSS Hardening**: Platform-wide input validation and output sanitization across user-facing fields, including username in emails and registration.
+  - **Rate Limits**: Increased API rate limits and added an admin tier.
+  - **Admin Search**: Smoothed search typing across workspace / user / CVM admin pages.
+
+  ## Frontend
+
+  - **Next.js v16.2.1**: Frontend upgraded.
+
+</Update>
+
+<Update label="March 22-29, 2026" tags={["Webhooks", "CVM", "Networking", "Billing", "SDK"]} rss={{ title: "Two-Phase CVM Deploy with Webhooks & Batch is-allowed API", description: "Multisig-friendly two-phase deploy, webhook system, batch is-allowed API, and CVM port-mapping APIs" }}>
+
+  ## Two-Phase CVM Deploy
+
+  - **Multisig Support**: New two-phase deploy flow that lets multisig owners pre-stage compose hashes and approve on-chain before commit.
+  - **Webhook System**: Lifecycle events, hashed IDs, confirm-update UI, 429 handling, metadata edit, and `0x`-prefix / `compose_hash` auto-fill all delivered across five hardening rounds.
+  - **Production Hardening**: Webhook secret 2FA, SSRF protection, and SDK signature verification.
+
+  ## is-allowed API
+
+  - **Batch Endpoint**: New batch `is-allowed` endpoint with SDK support across JS, Python, and Go.
+  - **CVM URL Token**: Commit token can now be passed via URL query param.
+
+  ## CVM & Networking
+
+  - **Port Mapping API**: New `cvm_port_mappings` table, repository, and CRUD API.
+  - **Network Config**: Workspace-level network config toggle with restart and port-mapping fixes.
+  - **VMM v0.5.7**: Passthrough of `GuestEvent[]` and `shutdown_progress` from VMM v0.5.7; `UpdateVm` support with backward compat.
+  - **CvmHandle**: New methods for KMS / gateway URLs, ports, and events.
+
+  ## Billing & Admin
+
+  - **All Stripe Methods**: Top-up now accepts all Stripe payment methods.
+  - **N+1 Eliminated**: Eliminated N+1 queries in `enforce_billing_policy`.
+  - **Admin Filters**: Enhanced admin API filters; triggered_by, system stop times, and dispute timeline added.
+  - **PPID**: Quotes table now stores PPID; external proof-of-cloud PPIDs are supported.
+
+</Update>
+
+<Update label="March 15-21, 2026" tags={["CVM", "API", "KMS", "State Machine"]} rss={{ title: "Idempotent CVM Creation & Unified PATCH Endpoint", description: "Retry-safe CVM creation, unified PATCH /cvms/{id} endpoint, and KMS shim-based challenge-response auth" }}>
+
+  ## CVM API
+
+  - **Unified PATCH `/cvms/&lcub;cvm_id&rcub;`**: Single endpoint replaces several per-field PATCH endpoints.
+  - **Idempotent Creation**: CVM creation is now idempotent for retry safety ([#1041](https://github.com/Phala-Network/phala-cloud/issues/1041)).
+  - **v2 State Machine Only**: V1 Celery tasks removed — all CVM operations run through the v2 state machine with timeouts and a cancel endpoint.
+
+  ## On-Chain KMS
+
+  - **Shim-Based Auth**: Centralized KMS now uses a shim-based challenge-response auth flow.
+  - **DB-Backed PPID**: `proofOfCloud` unified to a DB-backed PPID lookup.
+  - **`is-allowed` API**: New endpoint for on-chain CVM deployment checks.
+
+  ## Anti-Fraud & Auth
+
+  - **Disposable Email Block**: `sharebot.net` added to disposable email blocklist; postmortems archive added.
+  - **OAuth Fixes**: Static OAuth routes restored after rewrite-priority regression caused a 405.
+
+</Update>
+
+<Update label="March 8-14, 2026" tags={["Billing", "KMS", "Monitoring", "AI"]} rss={{ title: "Phase 4 Billing Auto-Shutdown & KMS Inspect API", description: "Low-balance auto-shutdown, KMS inspect/whitelist APIs, public OS images, and teepod/node uptime monitoring" }}>
+
+  ## Billing Phase 4 Enforcement
+
+  - **Auto-Shutdown**: Low-balance warning and auto-shutdown when credit reaches threshold.
+  - **`has_paid` Deprecation**: Phase 1-3 deprecation of the legacy `has_paid` field; all queries now use type-based hybrid properties.
+  - **Auto-Settle Invoice Items**: Admin auto-settle for invoice items; null instance_id handling.
+
+  ## KMS
+
+  - **KMS Inspect API**: Real-time instance inspection for KMS-managed apps.
+  - **On-Chain Whitelist**: Multicall3-based on-chain whitelist queries; whitelist status surfaced on the contract detail page.
+  - **Public OS Images & KMS On-Chain API**: New endpoints; CLI pagination for OS images and legacy v0.3 hidden by default.
+
+  ## Monitoring
+
+  - **Outage Incidents**: New outage incident tracking for teepod and node uptime, with admin UI and minute-level granularity grouping.
+  - **Teepod Uptime**: New monitoring endpoints and admin UI for teepod uptime.
+
+  ## Auth & Captcha
+
+  - **Site Key + Turnstile**: Email/password flows enforce site key + Turnstile captcha.
+  - **Captcha Reuse**: Login captcha token reused across auth actions.
+
+</Update>
+
+<Update label="March 1-7, 2026" tags={["UI", "CVM", "Workspace", "Redpill", "Admin"]} rss={{ title: "CVM Scale & Machines Page, Workspace Homepage Redesign", description: "Replica scaling UI, redesigned workspace homepage, Redpill workspace-keyed connections, and admin email APIs" }}>
+
+  ## UI
+
+  - **CVM Scale & Machines**: New page for replica scaling and per-machine management.
+  - **Workspace Homepage**: Redesigned around `CvmCard` layout.
+  - **Account Layout**: Account routes migrated from `_auth` into a dedicated layout.
+  - **Confidential AI Page**: Migrated to workspace route; `connectRedpill` schema aligned with backend.
+
+  ## Redpill
+
+  - **Workspace-Keyed Connections**: Redpill connections are now scoped to workspace with snowflake `external_id`.
+  - **Post-Paid Mode**: Post-paid flag on connections; post-paid connections skip recharge entirely.
+  - **Usage Pages**: New workspace and admin usage pages, plus an admin Redpill dashboard.
+
+  ## Admin
+
+  - **Workspace UI Alignment**: Admin pages aligned with the workspace UI.
+  - **Email Sending APIs**: New APIs for sending email through Resend and Customer.io with attachment support.
+  - **Invoice Review Queue**: Admin invoice review queue + batch finalize; switched to draft → finalize flow.
+  - **GPU Rental Tab**: GPU rental orders tab on workspace admin detail.
+  - **Teehouse KMS**: Configurable RPC and visible TX errors in KMS on-chain flows.
+
+  ## Billing
+
+  - **Compute Usage Labels**: Invoice draft items now show explicit compute usage labels.
+  - **Period Credit**: Period credit consumed is subtracted from invoice amount.
+
+</Update>
+
+<Update label="February 22-28, 2026" tags={["SSH", "Anti-Fraud", "CVM", "Admin"]} rss={{ title: "SSH Key Inspect, GitHub Import & Suspicious Compose Detection", description: "SSH key inspect/import flows, suspicious compose anti-fraud, and instance-id backfill APIs" }}>
+
+  ## SSH Key Management
+
+  - **SSH Key Inspect**: New inspect endpoint with detailed key info.
+  - **GitHub Import**: Import public keys from a GitHub profile or sync from a linked GitHub account.
+
+  ## Anti-Fraud
+
+  - **Suspicious Compose Detection**: Detects suspicious compose patterns and alerts via Telegram.
+  - **Session & Input Validation**: Comprehensive session and input validation fixes across the anti-fraud module.
+
+  ## CVM
+
+  - **Instance-ID Backfill**: New API to backfill `instance_id` after running-state operations; auto-backfill on startup.
+  - **Explicit GHCR Provider**: CVM create form now supports an explicit GHCR registry provider.
+  - **Pre-Launch GHCR**: Manifest probe handles OCI index and per-registry docker login (v0.0.14).
+
+</Update>
+
+<Update label="February 15-21, 2026" tags={["KMS", "Component Hashes", "Redpill", "Admin"]} rss={{ title: "Component-Level Hashes & Redpill Recharge Observability", description: "Per-component hashes for compose+pre-launch and admin endpoints for Redpill recharge observability" }}>
+
+  ## KMS & Hashing
+
+  - **Component Hashes**: Add component-level hashes for `docker_compose` and `pre_launch_script`; KMS contract write paths use the new component hashes.
+
+  ## Redpill
+
+  - **Recharge Observability**: Admin endpoints for Redpill connection observability; recharge observability fields added to connections.
+  - **Reliability**: Redpill recharge task now registered with Celery workers; reduced log noise for transient API failures.
+
+</Update>
+
+<Update label="February 8-14, 2026" tags={["Attestations", "Auth", "Pre-Launch", "Customer.io"]} rss={{ title: "dcap-qvl Migration & Pre-Launch Image Verification", description: "Replace asn1+evidence-api with dcap-qvl, pre-launch image pre-pull verification, and Stripe partial refunds" }}>
+
+  ## Attestations
+
+  - **dcap-qvl**: Replaced the legacy `asn1` + `evidence-api` path with `dcap-qvl` for attestation verification.
+
+  ## Pre-Launch
+
+  - **Image Pre-Pull**: New pre-launch pre-pull verification step with GHCR access checks; correct compose path used for image discovery.
+
+  ## Auth
+
+  - **Site Key + Turnstile**: Enforced on email/password flows.
+
+  ## Billing
+
+  - **Stripe Partial Refunds**: Stripe-hosted invoice partial refunds are now handled correctly; surplus balance recovery added; invoice double-counting prevented.
+
+  ## Admin
+
+  - **Customer.io Audit & Repair**: New admin Customer.io audit and repair system with CIO lifecycle sync.
+
+</Update>
+
+<Update label="February 1-7, 2026" tags={["Workspace", "Billing", "CVM", "Apps"]} rss={{ title: "Workspace Billing Settings, App Revision Redeploy & Replica Rewrite", description: "Workspace billing settings page, app revision redeploy + replica rewrite, and credit balance check on CVM start" }}>
+
+  ## Workspace Billing
+
+  - **Billing Settings & Invoices Pages**: New workspace-level billing settings and invoices pages.
+  - **Workspace-Scoped Billing**: All billing operations scoped to workspace credit; user-level credit/billing deferred to workspace.
+  - **Credit Balance Check**: Credit balance now checked before CVM start and restart.
+
+  ## App Revision
+
+  - **Redeploy & Replica Rewrite**: App revisions can be redeployed; replica rewrite path delivered.
+  - **App Deployment Detail Drawer**: New drawer surfacing per-deployment details.
+
+  ## CVM Configuration
+
+  - **Configurable `public_tcbinfo`**: Now configurable; visibility settings wired through the create flow.
+  - **Hugepages / NUMA Pin**: `extra_specs` now stores hugepages / `pin_numa` as strings, read from instance type in preflight, and threaded through admin UI.
+
+  ## Admin
+
+  - **Unified CVM List**: Admin CVM list migrated to the `CVMInfo` schema with `compose_search`.
+  - **Pre-commit Hooks**: Added `prek` pre-commit hooks and CI integration.
+
+</Update>
+
+<Update label="January 24-31, 2026" tags={["Workspace", "Auth", "Billing", "Security"]} rss={{ title: "Workspace-Level Setup Billing & TanStack Router", description: "Workspace setup billing migration, default workspace, versioned auth endpoints, and security hardening" }}>
+
+  ## Workspace
+
+  - **Default Workspace**: New users get a default workspace on signup.
+  - **Workspace Nodes & Quotas API**: New endpoints expose nodes and quota state per workspace.
+  - **Setup Billing → Workspace**: Setup billing migrated to workspace-level card verification; team tier auto-upgrades/downgrades on setup.
+
+  ## Auth
+
+  - **Versioned Endpoints**: New versioned auth endpoints return workspace info on login.
+  - **Password Reset Hardening**: Password reset tokens are invalidated when the email changes.
+  - **Open Redirect Hardening**: `returnUrl` handling hardened to prevent open-redirect chains.
+
+  ## Frontend
+
+  - **TanStack Router**: Migration completed with full route definitions.
+
+  ## Billing
+
+  - **Order Services**: Order services migrated to the actions pattern; setup-billing flow extracted into actions + repositories.
+  - **Auto-Charge Fixes**: Only `invoice_settings.default_payment_method` is checked for auto-charge; `$1` verification charge is auto-refunded on save-intent failure.
+  - **CVM Tasks**: v2 polling tasks gain INFO-level phase logging for observability.
+
+  ## Nodes
+
+  - **PPID & Device ID**: `nodes` now expose `ppid` and `device_id`; schema version dispatch fixed.
+
+</Update>
+
+<Update label="January 17-23, 2026" tags={["API", "CVM", "Apps", "GPU Rental"]} rss={{ title: "Apps API Versioning & v2 Polling Tasks", description: "Apps API restructure with versioning, v2 polling for all CVM operations, and KMS info in provision response" }}>
+
+  ## API
+
+  - **Apps API Versioning**: Apps API restructured around versioning; legacy fields cleaned up.
+  - **API Token Refresh**: Tokens now track API version and support refresh.
+  - **KMS Info in Provision**: `kms_info` returned in provision response; compose hash stability improvements.
+
+  ## CVM Operations
+
+  - **v2 Polling Tasks**: All CVM operations now use v2 polling tasks (provision, start, stop, restart, delete, replicate).
+  - **GPU Resource Release**: GPU resources are released when the CVM stops or deletes from `exited` or `CVMNotExists` state.
+  - **Duplicate Name Reject**: `rename_cvm` now rejects duplicate names instead of warning.
+
+  ## OS Images
+
+  - **Teepod Sync**: `teepod os-images` sync API now returns a detailed response.
+
+</Update>
+
+<Update label="January 10-16, 2026" tags={["GPU Rental", "API", "Domain", "Stats", "Docs"]} rss={{ title: "Device-Level GPU Allocation & docs.phala.com Migration", description: "GPU rental device-level allocation safeguards, domain CAA verification, stats endpoints, and docs link migration" }}>
+
+  ## GPU Rental
+
+  - **Device-Level Safeguards**: GPU rental workflow improvements with device-level allocation safeguards.
+
+  ## Domain Diagnosis
+
+  - **CAA Records**: Custom domain verification now checks CAA records.
+
+  ## Stats API
+
+  - **`/stats/dstack_app`**: New endpoint for running apps data.
+  - **`/stats/entity_profile`**: New endpoint for entity profiles data.
+
+  ## API & Backend
+
+  - **Build Machine Info**: `build_machine_info` extracted as a module-level function.
+  - **Service Headers**: Centralized service-header injection across integrations.
+
+  ## Docs
+
+  - **`docs.phala.com`**: Migrated all in-product docs links to `docs.phala.com` with corrected paths.
+  - **SSH Copy**: Updated SSH-related links and copy throughout the dashboard.
+
+  ## Infrastructure
+
+  - **CI Image Tags**: Lowercase repository name for GHCR image tags; deps-only Docker image build workflow added.
+
+</Update>
+
 <Update label="January 5-9, 2026" tags={["AI Models", "Billing", "Invoicing", "Admin"]} rss={{ title: "New AI Models & Invoice Reconciliation", description: "New confidential AI models, credit balance application, and admin billing tools" }}>
 
   ## New Confidential AI Models
