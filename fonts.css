@@ -14,7 +14,7 @@
   src: url("/fonts/exa/ABCArizonaFlare-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -22,7 +22,7 @@
   src: url("/fonts/exa/ABCDiatype-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -30,7 +30,7 @@
   src: url("/fonts/exa/SuisseIntlMono-Regular-WebTrial.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: optional;
+  font-display: swap;
 }
 
 :root {
