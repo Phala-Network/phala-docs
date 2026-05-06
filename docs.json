@@ -1,9 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "colors": {
-    "dark": "#9FDC00",
-    "light": "#E8FF7A",
-    "primary": "#93c606"
+    "dark": "#cdfa50",
+    "light": "#cdfa50",
+    "primary": "#cdfa50"
   },
   "contextual": {
     "options": [
@@ -167,9 +167,19 @@
   },
   "name": "Phala",
   "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Phala-Network/phala-cloud"
+      },
+      {
+        "label": "Log in",
+        "href": "https://cloud.phala.com/login"
+      }
+    ],
     "primary": {
       "href": "https://cloud.phala.com",
-      "label": "Phala Cloud",
+      "label": "API Dashboard",
       "type": "button"
     }
   },
@@ -2100,7 +2110,7 @@
   "styling": {
     "codeblocks": "system"
   },
-  "theme": "maple",
+  "theme": "mint",
   "thumbnails": {
     "background": "/images/phala-docs-og.png"
   }

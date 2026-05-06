@@ -1,0 +1,646 @@
+/*
+ * Phala v3 — layout & component overrides for docs.phala.com (Mintlify)
+ *
+ * Source of truth: /Users/marvin/website-nextjs/docs/design-system/{tokens.json,DESIGN.md}
+ *
+ * Voice: schematic, Bauhaus + CLI lineage. Sharp corners, hairline borders,
+ * no shadows, monospaced metadata, generous negative space. Brand lime is
+ * reserved for proof / live / sealed / verified states — never body text.
+ *
+ * Companion to fonts.css (typography). Brand color is configured in
+ * docs.json (`colors.primary`) so Mintlify-generated active states share
+ * the same lime as our overrides here.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Tokens (mirrored from website-nextjs/docs/design-system/tokens.json)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Base scale — greige, OKLCH (warm gray with faint green hue) */
+  --base-50:  oklch(0.983  0.0034 145.55);
+  --base-100: oklch(0.9691 0.0037 146.57);
+  --base-200: oklch(0.9258 0.0048 147.01);
+  --base-300: oklch(0.869  0.0054 148);
+  --base-400: oklch(0.7067 0.0061 149.29);
+  --base-500: oklch(0.5535 0.0066 150.55);
+  --base-600: oklch(0.4449 0.0065 151.33);
+  --base-700: oklch(0.3731 0.0059 150.75);
+  --base-800: oklch(0.2731 0.0051 150.35);
+  --base-900: oklch(0.2123 0.0048 151.01);
+  --base-950: oklch(0.1386 0.0044 150.49);
+  --base-1000: oklch(0.0909 0.0041 150.95);
+
+  /* Primary lime scale */
+  --primary-300: #cdfa50;                         /* bright lime — fills, CTAs, dark-bg accents */
+  --primary-500: oklch(0.7708 0.2308 126.52);     /* mid green — card hover borders */
+  --primary-600: oklch(0.6514 0.1967 127.14);     /* darker green — icons + accents on light bg */
+  --primary-700: oklch(0.5343 0.1568 126.91);     /* olive — text/links on light bg */
+
+  /* Phala brand accents (hex per tokens.json) */
+  --phala-blue-50:  #f0f2ff;
+  --phala-blue-100: #d5dbf8;
+  --phala-blue-200: #bfc8f0;
+  --phala-blue-300: #aabbff;
+  --phala-blue-500: #6b80cc;
+  --phala-blue-900: #2d3250;
+
+  --phala-purple-300: #b88fd0;
+  --phala-purple-500: #7e3daf;
+
+  --phala-orange-300: #f5902c;
+
+  /* Surfaces (hex per tokens.json) */
+  --surface-marketing:       #f7f8f3;
+  --surface-marketing-cool:  #f0f1ec;
+  --surface-marketing-light: #fbfcf8;
+  --surface-trust-path:      #070908;
+  --surface-trust-card:      #101310;
+
+  /* Border radius — sharp by default; 4px on interactive surfaces only */
+  --radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Shape — sharp corners by default, 4px on interactive surfaces, no pill
+   ═══════════════════════════════════════════════════════════════════════ */
+
+button,
+a[role="button"],
+.btn,
+[class*="button"] {
+  border-radius: 4px !important;
+}
+
+[class*="Card"],
+[class*="Callout"],
+[class*="Note"],
+[class*="Warning"],
+[class*="Tip"],
+[class*="Info"],
+[class*="Frame"],
+[class*="Update"],
+pre,
+.code,
+.callout,
+.card {
+  border-radius: 0 !important;
+}
+
+[class*="badge"]:not([class*="dot"]),
+[class*="Badge"]:not([class*="Dot"]),
+[class*="pill"],
+[class*="Pill"] {
+  border-radius: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Elevation — hairline borders, NO box-shadow (color/border shifts only)
+   pre is intentionally excluded — Mintlify's outer .code-block wrapper
+   already provides the hairline border.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[class*="Card"]:not([class*="card-group"]),
+[class*="Callout"],
+[class*="Note"],
+[class*="Warning"],
+[class*="Tip"],
+[class*="Info"],
+[class*="Frame"],
+[class*="Update"],
+.callout,
+.card {
+  box-shadow: none !important;
+  border-width: 1px !important;
+}
+
+/* CardGroup wrapper: no border, no frame — only the individual cards have one */
+.card-group,
+[class*="card-group"] {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  gap: 1px !important; /* hairline gutter */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Buttons — 4px radius, no shadow. Scoped to real CTA buttons; generic
+   <button> (copy icon, search, theme toggle) only gets the radius reset.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+a[role="button"],
+.btn,
+button.button,
+button[data-component="button"] {
+  min-height: 44px;
+  padding-inline: 1rem;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  font-family: var(--v3-body, "ABCDiatype", "Trebuchet MS", Arial, sans-serif);
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: opacity 150ms ease, background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+a[role="button"]:hover,
+.btn:hover,
+button.button:hover,
+button[data-component="button"]:hover {
+  opacity: 0.9;
+  box-shadow: none !important;
+}
+
+button {
+  border-radius: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Sidebar — close to tabs, schematic hierarchy, sharp pill on active
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 1024px) {
+  #sidebar,
+  aside[id="sidebar"],
+  aside.sidebar,
+  [class*="sidebar-content"] {
+    padding-top: 1rem !important;
+  }
+}
+
+/* Group / category header — bold, foreground, separated by top margin */
+.sidebar-group-header {
+  font-family: var(--v3-body, "ABCDiatype", sans-serif) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  color: var(--base-800) !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.sidebar-group-header:first-child {
+  margin-top: 0 !important;
+}
+
+.dark .sidebar-group-header,
+[data-theme="dark"] .sidebar-group-header {
+  color: var(--base-100) !important;
+}
+
+/* Page links — small, muted, sharp 4px (no rounded-xl pill) */
+li[id^="/"] > a,
+li[data-title] > a,
+.sidebar-group li > a,
+.sidebar-group li > button {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  color: var(--base-600) !important;
+  border-radius: 4px !important;
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+/* Hover — primary-700 (darker lime) per v3 spec ("lime on light bg is too
+   pale — use primary-700 if you must"). */
+li[id^="/"] > a:hover,
+li[data-title] > a:hover,
+.sidebar-group li > a:hover,
+.sidebar-group li > button:hover {
+  color: var(--primary-700) !important;
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+li[id^="/"] > a:hover svg,
+li[data-title] > a:hover svg,
+.sidebar-group li > a:hover svg,
+.sidebar-group li > button:hover svg {
+  color: var(--primary-700) !important;
+  background-color: var(--primary-700) !important; /* mask-image SVGs */
+}
+
+/* Dark mode page links */
+.dark li[id^="/"] > a,
+.dark li[data-title] > a,
+[data-theme="dark"] li[id^="/"] > a {
+  color: var(--base-400) !important;
+}
+
+.dark li[id^="/"] > a:hover,
+.dark li[data-title] > a:hover,
+[data-theme="dark"] li[id^="/"] > a:hover {
+  color: var(--primary-300) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Active page link — neutral surface pill (NOT lime tint) per Exa style */
+li[data-active="true"] > a,
+a[aria-current="page"] {
+  background-color: var(--surface-marketing-cool) !important;
+  background-image: none !important;
+  color: var(--base-800) !important;
+  font-weight: 500 !important;
+  text-shadow: none !important;
+  border-radius: 4px !important;
+  --tw-bg-opacity: 1 !important;
+}
+
+li[data-active="true"] > a:hover {
+  background-color: var(--surface-marketing-cool) !important;
+  color: var(--base-800) !important;
+}
+
+.dark li[data-active="true"] > a,
+.dark a[aria-current="page"],
+[data-theme="dark"] li[data-active="true"] > a {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--base-100) !important;
+}
+
+/* Top tab strip active — primary-700 (darker lime) */
+.nav-tabs-item[data-active="true"],
+a.nav-tabs-item[data-active="true"] {
+  color: var(--primary-700) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Right-side TOC ("On this page") — show on lg+ instead of xl+
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  #table-of-contents-layout {
+    display: flex !important;
+  }
+}
+
+#table-of-contents-layout {
+  border-left: 1px solid var(--base-200);
+  padding-left: 1.25rem !important;
+}
+
+.dark #table-of-contents-layout,
+[data-theme="dark"] #table-of-contents-layout {
+  border-left-color: var(--base-800);
+}
+
+/* TOC heading "On this page" — eyebrow style.
+   Scoped to the toggle <button> only — earlier broader selector was matching
+   every <a> in the items (since each has font-medium + text-gray-* classes)
+   and rendering them tiny+uppercase+mono. */
+#table-of-contents > button {
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace) !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--base-600) !important;
+}
+
+.toc-item > a {
+  font-size: 13px !important;
+  color: var(--base-600) !important;
+}
+.toc-item > a:hover {
+  color: var(--base-800) !important;
+}
+.toc-item.is-active > a,
+.toc-item[data-active="true"] > a,
+.toc a[aria-current="true"] {
+  color: var(--primary-700) !important;
+  font-weight: 500 !important;
+}
+
+.toc-item[data-depth="1"] {
+  padding-left: 1rem;
+}
+
+.dark .toc-item > a,
+[data-theme="dark"] .toc-item > a {
+  color: var(--base-400) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Page breadcrumb eyebrow — Mintlify renders parent-group name as
+   <div class="eyebrow text-primary">…</div> above the H1. text-primary
+   resolves to bright #cdfa50 which is unreadable on light bg. Route
+   through the darker primary-600 lime per v3 spec.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.eyebrow,
+.eyebrow.text-primary,
+[class*="eyebrow"][class*="text-primary"] {
+  color: var(--primary-600) !important;
+}
+
+.dark .eyebrow,
+.dark .eyebrow.text-primary,
+[data-theme="dark"] .eyebrow {
+  color: var(--primary-300) !important; /* bright lime stays on dark bg */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Layout
+   ═══════════════════════════════════════════════════════════════════════ */
+
+main,
+article,
+[class*="content"],
+[class*="Content"] {
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Type rhythm — display weight 400 large, generous body line-height
+   ═══════════════════════════════════════════════════════════════════════ */
+
+h1 {
+  font-size: clamp(38px, 5vw, 68px);
+  line-height: 0.98;
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: clamp(30px, 2.8vw, 46px);
+  line-height: 1.08;
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+p,
+li {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* Inline code — hairline border, mono, slightly tinted */
+:not(pre) > code {
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace);
+  font-size: 0.92em;
+  border: 1px solid var(--base-200);
+  border-radius: 2px;
+  padding: 1px 5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Code blocks — single sharp frame, blue-tinted surface
+   Mintlify nests two boxes (.code-block + .code-block-background); we
+   collapse them visually by overriding both radii to 0 + overflow hidden.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+pre {
+  border-radius: 0 !important;
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.code-block,
+div[class~="code-block"],
+.code-group,
+div[class~="code-group"] {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.code-block-background,
+[class*="code-block-background"],
+.code-group {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background-color: var(--phala-blue-50) !important;
+}
+
+.code-block-background,
+[class*="code-block-background"] {
+  border: 0 !important;
+}
+
+.dark .code-block-background,
+.dark .code-group,
+[data-theme="dark"] .code-block-background,
+[data-theme="dark"] .code-group {
+  background-color: var(--surface-trust-card) !important;
+}
+
+/* CodeGroup language tab — active state uses --primary-600 (darker lime)
+   for both label color + underline so it's readable on phala-blue-50 surface */
+.code-group [role="tab"][data-state="active"],
+.code-group [role="tab"][aria-selected="true"] {
+  color: var(--primary-600) !important;
+}
+
+.code-group [role="tab"][data-state="active"] > div:first-child {
+  color: var(--primary-600) !important;
+}
+
+/* The lime underline beneath the active tab */
+.code-group [role="tab"][data-state="active"] > div.absolute,
+.code-group [role="tab"][data-state="active"] > div[class*="absolute"][class*="bottom"] {
+  background-color: var(--primary-600) !important;
+  border-radius: 0 !important;
+}
+
+/* Dark mode keeps brighter lime — primary-300 reads fine on dark surface */
+.dark .code-group [role="tab"][data-state="active"],
+[data-theme="dark"] .code-group [role="tab"][data-state="active"] {
+  color: var(--primary-300) !important;
+}
+.dark .code-group [role="tab"][data-state="active"] > div.absolute,
+[data-theme="dark"] .code-group [role="tab"][data-state="active"] > div.absolute {
+  background-color: var(--primary-300) !important;
+}
+
+/* Hide Mintlify's empty fade-overlay sliver — we don't use collapse-fade */
+[data-fade-overlay] {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Cards — sharp, hairline, NO ring shadow halos
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.card {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+.card:hover {
+  box-shadow: none !important;
+  border-color: var(--primary-600) !important; /* darker lime hover border, readable on light bg */
+}
+
+/* Card icons — Mintlify uses bg-primary on masked SVGs (mask-image trick).
+   On light bg, primary-300 lime is too pale. Route icons through primary-600. */
+.card svg.bg-primary,
+.card svg[class*="bg-primary"]:not([class*="primary-light"]),
+.card .text-primary {
+  background-color: var(--primary-600) !important;
+  color: var(--primary-600) !important;
+}
+
+/* Dark mode keeps the brighter lime — readable on dark surface */
+.dark .card svg.bg-primary,
+.dark .card svg[class*="bg-primary"],
+[data-theme="dark"] .card svg.bg-primary {
+  background-color: var(--primary-300) !important;
+  color: var(--primary-300) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Callouts (Note / Warning / Info / Tip)
+   Schematic look: sharp corners, single colored left bar, no full border,
+   foreground body text. Tip uses phala-blue-300 highlight surface.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.callout {
+  border-radius: 0 !important;
+  background-color: var(--card, #ffffff) !important;
+  border-width: 0 !important;
+  border-left: 4px solid var(--phala-blue-500) !important;
+  padding: 1rem 1.25rem !important;
+  box-shadow: none !important;
+}
+
+.callout[data-callout-type="warning"] {
+  border-left-color: var(--phala-orange-300) !important;
+}
+
+.callout[data-callout-type="info"] {
+  border-left-color: var(--phala-blue-500) !important;
+}
+
+.callout[data-callout-type="tip"] {
+  background-color: var(--phala-blue-300) !important;
+  border-left-color: var(--phala-blue-500) !important;
+}
+
+/* All callouts: foreground body text on tint */
+.callout [data-component-part="callout-content"],
+.callout [data-component-part="callout-content"] * {
+  color: var(--base-800) !important;
+}
+
+/* Leading <strong> (single-word label) → mono uppercase eyebrow */
+.callout [data-component-part="callout-content"] > span:first-child > strong:only-child {
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--base-600) !important;
+}
+
+/* Mintlify wraps warning body in <strong> — undo that */
+.callout[data-callout-type="warning"] [data-component-part="callout-content"] strong {
+  font-weight: 400;
+}
+
+/* Tone down callout icons — small, muted */
+.callout [data-component-part="callout-icon"] svg {
+  color: var(--base-600) !important;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Navbar primary CTA — v3 token (lime fill + black text)
+   The CTA lives in <nav>, not <header>. The visible fill is on an inner
+   absolutely-positioned <span> that Mintlify layers behind the text.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+a[href*="cloud.phala.com"] > span.absolute,
+a[href*="cloud.phala.com"] > span[class*="absolute"][class*="inset-0"] {
+  background-color: var(--primary-300) !important;
+  background-image: none !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+a[href*="cloud.phala.com"] span[class*="text-white"],
+a[href*="cloud.phala.com"] .z-10 {
+  color: #000 !important; /* primary-foreground per v3 token */
+}
+
+a[href*="cloud.phala.com"] span[class*="text-white"] ~ svg,
+a[href*="cloud.phala.com"] svg.text-white\/90,
+a[href*="cloud.phala.com"] svg[class*="text-white"],
+a[href*="cloud.phala.com"] svg path {
+  color: #000 !important;
+  stroke: #000 !important;
+}
+
+a[href*="cloud.phala.com"][target="_blank"] {
+  font-family: var(--v3-body, "ABCDiatype", sans-serif);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+a[href*="cloud.phala.com"]:hover > span[class*="absolute"] {
+  opacity: 0.9 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Mintlify <Update> block — eyebrow-styled date label
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[class*="Update"] [class*="label"],
+[class*="update"] [class*="label"],
+[class*="UpdateLabel"],
+[class*="changelog"] h2,
+[class*="Changelog"] h2 {
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Tables — hairline grid, no zebra, mono uppercase headers
+   ═══════════════════════════════════════════════════════════════════════ */
+
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--base-200);
+}
+
+th,
+td {
+  border: 1px solid var(--base-200);
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+th {
+  font-family: var(--v3-mono, "SuisseIntlMono", monospace);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
