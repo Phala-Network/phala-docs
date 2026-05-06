@@ -6,15 +6,27 @@
  *   - ABCDiatype         body, UI, navigation, h3
  *   - SuisseIntlMono     code, eyebrows, status pills
  *
- * Source of truth: website-nextjs/src/app/globals.css + theme/typography.css
+ * FOUT mitigation strategy:
+ *   1. font-display: block on the real fonts — hides text up to 3s while
+ *      the woff2 loads; eliminates the visible swap from fallback to web
+ *      font. On cached navigations the wait is imperceptible.
+ *   2. Metric-matched fallback @font-faces (`size-adjust`, `ascent-override`,
+ *      etc.) so if the block period does expire to the fallback, the
+ *      fallback occupies the same space — no layout shift, no jolt.
+ *
+ * Metric values are starting estimates from comparable display-serif and
+ * humanist-sans pairings. Tune by eye against the live site if anything
+ * looks off (the most likely culprit is `size-adjust`).
  */
+
+/* ─── Real webfonts ─────────────────────────────────────────────────── */
 
 @font-face {
   font-family: "ABCArizonaFlare";
   src: url("/fonts/exa/ABCArizonaFlare-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -22,7 +34,7 @@
   src: url("/fonts/exa/ABCDiatype-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -30,13 +42,55 @@
   src: url("/fonts/exa/SuisseIntlMono-Regular-WebTrial.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: swap;
+  font-display: block;
 }
 
+/* ─── Metric-matched local fallbacks ─────────────────────────────────── */
+/*
+ * These wrap the system fallback font and adjust its metrics so it occupies
+ * the same vertical/horizontal space as the real webfont. When the block
+ * period times out (or before the woff2 finishes downloading on a cold
+ * connection), the page renders with these — visually nearly identical
+ * footprint to the real webfont, so when the swap eventually happens
+ * there's no layout shift.
+ */
+
+@font-face {
+  font-family: "ABCArizonaFlare Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  size-adjust: 94%;
+  ascent-override: 95%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "ABCDiatype Fallback";
+  src: local("Trebuchet MS"), local("Arial");
+  size-adjust: 97%;
+  ascent-override: 92%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "SuisseIntlMono Fallback";
+  src: local("SFMono-Regular"), local("Consolas"), local("Menlo"),
+    local("Liberation Mono");
+  size-adjust: 100%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+/* ─── Font-family stacks ─────────────────────────────────────────────── */
+
 :root {
-  --v3-heading: "ABCArizonaFlare", Georgia, serif;
-  --v3-body: "ABCDiatype", "Trebuchet MS", Arial, sans-serif;
-  --v3-mono: "SuisseIntlMono", "SFMono-Regular", Consolas, monospace;
+  --v3-heading: "ABCArizonaFlare", "ABCArizonaFlare Fallback", Georgia, serif;
+  --v3-body: "ABCDiatype", "ABCDiatype Fallback", "Trebuchet MS", Arial,
+    sans-serif;
+  --v3-mono: "SuisseIntlMono", "SuisseIntlMono Fallback", "SFMono-Regular",
+    Consolas, monospace;
 }
 
 body,
