@@ -2098,7 +2098,7 @@
       "distribution": "global",
       "keywords": "Phala Cloud, TEE, Trusted Execution Environment, Confidential Computing, Confidential AI, GPU TEE, Intel TDX, dstack, blockchain, privacy-preserving computing, secure cloud, attestation",
       "language": "en",
-      "og:image": "https://docs.phala.com/images/phala-docs-og.png",
+      "og:image": "https://raw.githubusercontent.com/Phala-Network/phala-docs/main/images/phala-docs-og.png",
       "og:image:alt": "Phala Cloud — Confidential Computing & GPU TEE for AI",
       "og:image:width": "1200",
       "og:image:height": "630",
@@ -2110,7 +2110,7 @@
       "twitter:card": "summary_large_image",
       "twitter:creator": "@PhalaNetwork",
       "twitter:site": "@PhalaNetwork",
-      "twitter:image": "https://docs.phala.com/images/phala-docs-og.png",
+      "twitter:image": "https://raw.githubusercontent.com/Phala-Network/phala-docs/main/images/phala-docs-og.png",
       "twitter:title": "Phala Cloud Documentation — Confidential AI on TEE",
       "twitter:description": "Deploy confidential AI applications on Phala Cloud with hardware-level privacy via Intel TDX, NVIDIA H100 GPU TEE, and verifiable attestation."
     }
