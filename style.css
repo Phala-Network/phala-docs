@@ -341,6 +341,47 @@ a.nav-tabs-item[data-active="true"] {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   API parameter contrast — Mintlify renders parameter names and metadata
+   such as "model", "string", and "required" with primary lime classes.
+   Brand lime is too pale on light backgrounds, so route generated content
+   accents through darker lime while preserving bright lime in dark mode.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+article .text-primary,
+article [class~="text-primary"],
+article [class*="text-primary"]:not([class*="dark:"]),
+main .text-primary,
+main [class~="text-primary"] {
+  color: var(--primary-700) !important;
+}
+
+article .bg-primary,
+article [class~="bg-primary"],
+article [class*="bg-primary"]:not([class*="dark:"]),
+main .bg-primary,
+main [class~="bg-primary"] {
+  background-color: var(--primary-700) !important;
+}
+
+.dark article .text-primary,
+.dark article [class~="text-primary"],
+[data-theme="dark"] article .text-primary,
+[data-theme="dark"] article [class~="text-primary"],
+.dark main .text-primary,
+[data-theme="dark"] main .text-primary {
+  color: var(--primary-300) !important;
+}
+
+.dark article .bg-primary,
+.dark article [class~="bg-primary"],
+[data-theme="dark"] article .bg-primary,
+[data-theme="dark"] article [class~="bg-primary"],
+.dark main .bg-primary,
+[data-theme="dark"] main .bg-primary {
+  background-color: var(--primary-300) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    Layout
    ═══════════════════════════════════════════════════════════════════════ */
 
