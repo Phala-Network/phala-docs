@@ -42,41 +42,73 @@ response = requests.get(
 )
 report = response.json()
 
-# You get key pieces:
-# - nvidia_payload: GPU verification data
-# - intel_quote: CPU verification data
-# - signing_address: For signature verification
-# - signing_algo: "ecdsa" or "ed25519"
+# Response shape depends on the provider backing the model.
 ```
 
-The report gives you NVIDIA's hardware verification data for each GPU, Intel's TEE verification data for the CPU, a signing address you'll use later to verify signatures, and the signing algorithm used by this TEE instance.
+The report gives you Intel TDX evidence, optional NVIDIA GPU evidence, signing key information, and software measurement data. The exact shape depends on the provider:
+
+- **Phala / NearAI two-layer format**: `gateway_attestation` plus `model_attestations`.
+- **Chutes format**: `attestation_type: "chutes"` plus `all_attestations`.
+- **Flat format**: older Phala-native responses expose fields such as `intel_quote`, `nvidia_payload`, and `signing_address` at the top level.
+
+Use [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) for the endpoint schema.
+
+### Select the attestation to verify
+
+For Phala and NearAI two-layer responses, verify both the gateway attestation and the model attestation when both are present. The gateway protects routing and request handling; the model attestation protects the inference runtime.
+
+```python
+def get_attestations(report):
+    attestations = []
+
+    if "gateway_attestation" in report:
+        attestations.append(("gateway", report["gateway_attestation"]))
+
+    for item in report.get("model_attestations", []):
+        attestations.append(("model", item))
+
+    for item in report.get("all_attestations", []):
+        attestations.append(("model", item))
+
+    if "intel_quote" in report:
+        attestations.append(("model", report))
+
+    return attestations
+
+attestations = get_attestations(report)
+assert attestations, "No attestation evidence found"
+```
 
 ### Verify NVIDIA GPU attestation
 
-Now let's verify your NVIDIA GPUs are genuine. You'll send the `nvidia_payload` from your report to NVIDIA's own attestation service. Why NVIDIA's service? Because only NVIDIA can confirm their hardware is authentic - they built secret keys into each chip during manufacturing.
+Now verify NVIDIA GPUs when GPU evidence is present. Phala-style responses expose `nvidia_payload`; Chutes-style responses expose `gpu_evidence`.
 
 ```python
 import json
 import base64
 
-# Parse and verify GPU payload nonce
-gpu_payload = json.loads(report["nvidia_payload"])
-assert gpu_payload["nonce"].lower() == request_nonce.lower()
+for name, attestation in attestations:
+    if "nvidia_payload" not in attestation:
+        continue
 
-# Send to NVIDIA's Remote Attestation Service
-response = requests.post(
-    "https://nras.attestation.nvidia.com/v3/attest/gpu",
-    json=gpu_payload
-)
-result = response.json()
+    # Parse and verify GPU payload nonce
+    gpu_payload = json.loads(attestation["nvidia_payload"])
+    assert gpu_payload["nonce"].lower() == request_nonce.lower()
 
-# Decode the JWT verdict
-jwt_token = result[0][1]
-payload_b64 = jwt_token.split(".")[1]
-padded = payload_b64 + "=" * ((4 - len(payload_b64) % 4) % 4)
-verdict_data = json.loads(base64.urlsafe_b64decode(padded))
+    # Send to NVIDIA's Remote Attestation Service
+    response = requests.post(
+        "https://nras.attestation.nvidia.com/v3/attest/gpu",
+        json=gpu_payload
+    )
+    result = response.json()
 
-assert verdict_data["x-nvidia-overall-att-result"] == True
+    # Decode the JWT verdict
+    jwt_token = result[0][1]
+    payload_b64 = jwt_token.split(".")[1]
+    padded = payload_b64 + "=" * ((4 - len(payload_b64) % 4) % 4)
+    verdict_data = json.loads(base64.urlsafe_b64decode(padded))
+
+    assert verdict_data["x-nvidia-overall-att-result"] == True
 ```
 
 The GPU payload must use the same nonce you generated. NVIDIA returns a JWT with `x-nvidia-overall-att-result: True` for verified authentic hardware.
@@ -86,14 +118,26 @@ The GPU payload must use the same nonce you generated. NVIDIA returns a JWT with
 For Intel CPUs, you'll verify the TDX quote using Phala's verification service. This service decodes and validates Intel's cryptographic proof.
 
 ```python
-# Verify Intel TDX quote
-response = requests.post(
-    "https://cloud-api.phala.com/api/v1/attestations/verify",
-    json={"hex": report["intel_quote"]}
-)
-intel_result = response.json()
+import base64
+import re
 
-assert intel_result["quote"]["verified"] == True
+def quote_to_hex(quote):
+    value = quote.removeprefix("0x")
+    if re.fullmatch(r"[0-9a-fA-F]+", value):
+        return value
+    return base64.b64decode(value).hex()
+
+for name, attestation in attestations:
+    if "intel_quote" not in attestation:
+        continue
+
+    response = requests.post(
+        "https://cloud-api.phala.com/api/v1/attestations/verify",
+        json={"hex": quote_to_hex(attestation["intel_quote"])}
+    )
+    intel_result = response.json()
+
+    assert intel_result["quote"]["verified"] == True
 ```
 
 This confirms the CPU is genuine Intel hardware running in TDX mode. The `intel_result` contains the decoded quote data we'll use next, including `reportdata` and `mrconfig` fields.
@@ -112,8 +156,8 @@ report_data_hex = intel_result["quote"]["body"]["reportdata"]
 report_data = bytes.fromhex(report_data_hex.removeprefix("0x"))
 
 # Parse signing address based on algorithm
-signing_address = report["signing_address"]
-signing_algo = report.get("signing_algo", "ecdsa")
+signing_address = attestation["signing_address"]
+signing_algo = attestation.get("signing_algo", "ecdsa")
 
 if signing_algo == "ecdsa":
     # ECDSA: 20-byte Ethereum address
@@ -155,7 +199,7 @@ Next, verify your application code hasn't been modified. The TEE measures the en
 from hashlib import sha256
 
 # Extract compose manifest from attestation
-tcb_info = report["info"]["tcb_info"]
+tcb_info = attestation["info"]["tcb_info"]
 if isinstance(tcb_info, str):
     tcb_info = json.loads(tcb_info)
 

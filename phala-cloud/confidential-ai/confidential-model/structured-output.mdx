@@ -25,7 +25,7 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "model": "phala/deepseek-chat-v3-0324",
+        "model": "phala/gpt-oss-20b",
         "messages": [
             {"role": "user", "content": "What is the weather like in Los Angeles?"},
         ],
@@ -79,8 +79,8 @@ print(info)
 
 Confidential AI supports structured output for the following models:
 
-- `phala/deepseek-chat-v3-0324`
 - `phala/gemma-3-27b-it`
 - `phala/gpt-oss-20b`
 - `phala/gpt-oss-120b`
-- `phala/qwen2.5-vl-72b-instruct`
+- `phala/qwen3.5-27b`
+- `phala/qwen3-vl-30b-a3b-instruct`

@@ -1,0 +1,108 @@
+---
+title: Embeddings
+description: Create vector embeddings with OpenAI-compatible embedding models.
+---
+
+## Endpoint
+
+```bash
+POST https://api.redpill.ai/v1/embeddings
+```
+
+Generate vector embeddings for retrieval, semantic search, clustering, and similarity workloads.
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Embedding model ID.
+
+  Examples: `qwen/qwen3-embedding-8b`, `sentence-transformers/all-minilm-l6-v2`.
+</ParamField>
+
+<ParamField body="input" type="string | array" required>
+  Input text or list of inputs to embed.
+</ParamField>
+
+<ParamField body="encoding_format" type="string">
+  Embedding encoding format. Common values are `float` and `base64`.
+</ParamField>
+
+<ParamField body="dimensions" type="integer">
+  Requested output dimensions, when supported by the selected model.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+curl https://api.redpill.ai/v1/embeddings \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Confidential AI keeps inference data private."
+  }'
+```
+
+```python Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="<API_KEY>",
+    base_url="https://api.redpill.ai/v1",
+)
+
+response = client.embeddings.create(
+    model="qwen/qwen3-embedding-8b",
+    input="Confidential AI keeps inference data private.",
+)
+
+vector = response.data[0].embedding
+print(len(vector))
+```
+
+```typescript TypeScript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "<API_KEY>",
+  baseURL: "https://api.redpill.ai/v1",
+});
+
+const response = await client.embeddings.create({
+  model: "qwen/qwen3-embedding-8b",
+  input: "Confidential AI keeps inference data private.",
+});
+
+console.log(response.data[0].embedding.length);
+```
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "object": "embedding",
+      "index": 0,
+      "embedding": [0.0023, -0.0015, 0.0042]
+    }
+  ],
+  "model": "qwen/qwen3-embedding-8b",
+  "usage": {
+    "prompt_tokens": 8,
+    "total_tokens": 8
+  }
+}
+```
+
+## Common Models
+
+| Model | Dimensions | Context | Notes |
+|-------|------------|---------|-------|
+| `qwen/qwen3-embedding-8b` | 4096 | 32K | Large confidential embedding model |
+| `sentence-transformers/all-minilm-l6-v2` | 384 | 512 | Low-cost compact embedding model |
+
+Use [List Embedding Models](/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models) for the live embedding catalog.

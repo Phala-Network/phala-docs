@@ -1,0 +1,109 @@
+---
+title: Request Signature
+description: Fetch a cryptographic signature for a Confidential AI response.
+---
+
+## Endpoint
+
+```bash
+GET https://api.redpill.ai/v1/signature/{request_id}?model={model}&signing_algo={algo}
+```
+
+Use this endpoint after a chat completion request. The signature proves a specific response was signed by a TEE key. Bind that key to fresh attestation evidence before treating the response as fully verified.
+
+## Parameters
+
+<ParamField path="request_id" type="string" required>
+  The `id` returned by `POST /v1/chat/completions`.
+</ParamField>
+
+<ParamField query="model" type="string" required>
+  The model ID used for the original request.
+</ParamField>
+
+<ParamField query="signing_algo" type="string">
+  Signature algorithm. Common values include `ecdsa`, `ecdsa-p256`, and `rsa`; use the algorithm supported by the model response.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+RESPONSE=$(curl -s https://api.redpill.ai/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <API_KEY>" \
+  -d '{"model":"phala/qwen3.5-27b","messages":[{"role":"user","content":"hello"}]}')
+
+REQUEST_ID=$(echo "$RESPONSE" | jq -r '.id')
+
+curl "https://api.redpill.ai/v1/signature/$REQUEST_ID?model=phala/qwen3.5-27b" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+```python Python
+import requests
+
+chat_response = requests.post(
+    "https://api.redpill.ai/v1/chat/completions",
+    headers={
+        "Authorization": "Bearer <API_KEY>",
+        "Content-Type": "application/json",
+    },
+    json={
+        "model": "phala/qwen3.5-27b",
+        "messages": [{"role": "user", "content": "hello"}],
+    },
+)
+
+request_id = chat_response.json()["id"]
+
+signature_response = requests.get(
+    f"https://api.redpill.ai/v1/signature/{request_id}",
+    params={"model": "phala/qwen3.5-27b"},
+    headers={"Authorization": "Bearer <API_KEY>"},
+)
+
+signature_data = signature_response.json()
+```
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "text": "phala/qwen3.5-27b:116478638341bd2b...:3d0b2a2df73dc93a...",
+  "signature": "0xee817b30e13ec3c320997ec37076a600e194dc64...",
+  "signing_address": "0x56d070df1c6be444b007839ef9cf67cec7c12b8b",
+  "signing_algo": "ecdsa"
+}
+```
+
+## Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `text` | Signed text. Format is either `request_hash:response_hash` or `model:request_hash:response_hash` |
+| `signature` | Signature over `text` |
+| `signing_address` | TEE signing address or public key |
+| `signing_algo` | Signature algorithm used |
+
+<Note>
+When `text` has three colon-separated parts, the first part is the model name used inside the signing path. It may differ from the alias you sent if the gateway rewrote the model ID internally.
+</Note>
+
+## Bind to Attestation
+
+For production verification, use the returned `signing_address` to fetch fresh attestation evidence:
+
+```bash
+NONCE=$(openssl rand -hex 32)
+
+curl "https://api.redpill.ai/v1/attestation/report?model=phala/qwen3.5-27b&nonce=$NONCE&signing_address=$SIGNING_ADDRESS" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+The response is verified only when:
+
+1. The request and response hashes in `text` match the bytes you sent and received.
+2. The signature is valid for `text`.
+3. The attestation report binds the same `signing_address` to genuine TEE evidence and your fresh nonce.

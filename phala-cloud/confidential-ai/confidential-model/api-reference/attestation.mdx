@@ -1,0 +1,165 @@
+---
+title: Attestation Report
+description: Fetch TEE attestation evidence for a Confidential AI model.
+---
+
+## Endpoint
+
+```bash
+GET https://api.redpill.ai/v1/attestation/report?model={model_id}&nonce={nonce}&signing_address={address}
+```
+
+The attestation report proves a model endpoint is backed by TEE hardware and provides the evidence needed for hardware, software, and signer binding checks.
+
+<Warning>
+Always include a fresh random `nonce` when fetching attestations for security-sensitive verification. A nonce prevents replay of an older valid attestation.
+</Warning>
+
+## Parameters
+
+<ParamField query="model" type="string" required>
+  Model ID to attest.
+
+  Examples: `phala/qwen3.5-27b`, `phala/qwen-2.5-7b-instruct`, `openai/gpt-oss-120b`, `z-ai/glm-5`.
+</ParamField>
+
+<ParamField query="nonce" type="string">
+  Fresh 32-byte random value encoded as 64 hex characters. The nonce is embedded in the TEE report data.
+</ParamField>
+
+<ParamField query="signing_address" type="string">
+  Ethereum address or public key used to filter attestations in multi-server deployments. Use this when binding a response signature to a specific TEE signer.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+NONCE=$(openssl rand -hex 32)
+
+curl "https://api.redpill.ai/v1/attestation/report?model=phala/qwen3.5-27b&nonce=$NONCE" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+```python Python
+import secrets
+import requests
+
+nonce = secrets.token_hex(32)
+
+response = requests.get(
+    "https://api.redpill.ai/v1/attestation/report",
+    params={
+        "model": "phala/qwen3.5-27b",
+        "nonce": nonce,
+    },
+    headers={"Authorization": "Bearer <API_KEY>"},
+)
+
+attestation = response.json()
+```
+</CodeGroup>
+
+## Response Formats
+
+The response format depends on the provider behind the model.
+
+### Phala / NearAI Two-Layer Format
+
+Models may return separate gateway and model attestations:
+
+```json
+{
+  "gateway_attestation": {
+    "signing_address": "0x...",
+    "signing_algo": "ecdsa",
+    "intel_quote": "hex-encoded-tdx-quote",
+    "event_log": [],
+    "report_data": "...",
+    "request_nonce": "...",
+    "info": {
+      "vm_config": "..."
+    }
+  },
+  "model_attestations": [
+    {
+      "model_name": "phala/qwen3.5-27b",
+      "signing_address": "0x...",
+      "signing_algo": "ecdsa",
+      "intel_quote": "hex-encoded-tdx-quote",
+      "nvidia_payload": "{...json gpu attestation...}",
+      "event_log": [],
+      "info": {
+        "tcb_info": "{...app_compose...}",
+        "vm_config": "..."
+      }
+    }
+  ]
+}
+```
+
+### Chutes Format
+
+Some models return Chutes-style instance attestations:
+
+```json
+{
+  "attestation_type": "chutes",
+  "nonce": "...",
+  "all_attestations": [
+    {
+      "instance_id": "uuid",
+      "nonce": "...",
+      "intel_quote": "base64-encoded-tdx-quote",
+      "gpu_evidence": [
+        { "certificate": "...", "evidence": "...", "arch": "HOPPER" }
+      ],
+      "e2e_pubkey": "..."
+    }
+  ]
+}
+```
+
+### Flat Format
+
+Older Phala-native responses may expose fields at the top level:
+
+```json
+{
+  "signing_address": "0x...",
+  "signing_algo": "ecdsa",
+  "request_nonce": "...",
+  "intel_quote": "hex-encoded-tdx-quote",
+  "nvidia_payload": "{...}",
+  "info": {
+    "tcb_info": "{\"app_compose\":\"...\"}"
+  }
+}
+```
+
+## Important Fields
+
+| Field | Description |
+|-------|-------------|
+| `signing_address` | Address or key used by the TEE to sign responses |
+| `signing_algo` | Signature algorithm, commonly `ecdsa` |
+| `request_nonce` / `nonce` | Nonce included in the attestation |
+| `intel_quote` | Intel TDX quote for CPU TEE verification |
+| `nvidia_payload` | NVIDIA GPU attestation payload |
+| `event_log` | Boot event log for software stack verification |
+| `info.vm_config` | VM configuration evidence |
+| `info.tcb_info.app_compose` | Docker Compose application evidence |
+| `gateway_attestation` | Gateway TEE attestation |
+| `model_attestations` | One or more model runtime attestations |
+| `all_attestations` | Provider-specific list of model instance attestations |
+
+## Verification Flow
+
+1. Generate a fresh nonce.
+2. Fetch an attestation report for the exact model.
+3. Verify the Intel TDX quote.
+4. Verify GPU evidence when `nvidia_payload` or `gpu_evidence` is present.
+5. Confirm the report data binds the nonce and expected signing address.
+6. Verify application measurements such as compose hash and image provenance when available.
+
+For a walkthrough, see [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
