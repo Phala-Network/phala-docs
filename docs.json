@@ -2,8 +2,8 @@
   "$schema": "https://mintlify.com/docs.json",
   "colors": {
     "dark": "#cdfa50",
-    "light": "#cdfa50",
-    "primary": "#cdfa50"
+    "light": "#527a08",
+    "primary": "#527a08"
   },
   "contextual": {
     "options": [
