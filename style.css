@@ -355,6 +355,11 @@ main [class~="text-primary"] {
   color: var(--primary-700) !important;
 }
 
+html:not(.dark) body:not(.dark) :is(main, article) [class*="cdfa50"],
+html:not(.dark) body:not(.dark) :is(main, article) [style*="cdfa50" i] {
+  color: var(--primary-700) !important;
+}
+
 article .bg-primary,
 article [class~="bg-primary"],
 article [class*="bg-primary"]:not([class*="dark:"]),
