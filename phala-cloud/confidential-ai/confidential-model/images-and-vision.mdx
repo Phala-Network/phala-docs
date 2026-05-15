@@ -24,7 +24,7 @@ client = OpenAI(
     api_key="<API_KEY>",
 )
 response = client.chat.completions.create(
-    model="phala/gemma-3-27b-it",
+    model="phala/qwen3-vl-30b-a3b-instruct",
     messages=[{
         "role": "user",
         "content": [
@@ -60,4 +60,5 @@ The overall impression is of a cute and peaceful scene with baby pandas enjoying
 ### Supported Models for Image Analysis
 
 - `phala/gemma-3-27b-it`
-- `phala/qwen2.5-vl-72b-instruct`
+- `phala/qwen3-vl-30b-a3b-instruct`
+- `phala/qwen2.5-vl-72b-instruct` (legacy alias)

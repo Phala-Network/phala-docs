@@ -433,6 +433,17 @@
                     "pages": [
                       "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
                       "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+                      {
+                        "group": "API Reference",
+                        "pages": [
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions",
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/signature",
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings",
+                          "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
+                        ]
+                      },
                       "/phala-cloud/confidential-ai/confidential-model/tool-calling",
                       "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
                       "/phala-cloud/confidential-ai/confidential-model/structured-output",

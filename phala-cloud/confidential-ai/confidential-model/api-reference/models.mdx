@@ -1,0 +1,98 @@
+---
+title: List Models
+description: List available Confidential AI models, providers, modalities, context windows, and pricing metadata.
+---
+
+## Endpoints
+
+```bash
+GET https://api.redpill.ai/v1/models
+GET https://api.redpill.ai/v1/models/phala
+```
+
+Use the live model catalog before hardcoding model IDs. The catalog returns model IDs, context windows, pricing, providers, modalities, and TEE metadata when available.
+
+## Examples
+
+<CodeGroup>
+```bash All Models
+curl https://api.redpill.ai/v1/models \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+```bash Phala Models
+curl https://api.redpill.ai/v1/models/phala \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+```python Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="<API_KEY>",
+    base_url="https://api.redpill.ai/v1",
+)
+
+models = client.models.list()
+for model in models.data:
+    print(model.id)
+```
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "data": [
+    {
+      "id": "phala/qwen3.5-27b",
+      "name": "Qwen3.5 27B",
+      "created": 1677652288,
+      "description": "Qwen model running through Phala GPU TEE infrastructure",
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000030",
+        "completion": "0.00000240"
+      },
+      "providers": ["phala"],
+      "metadata": {
+        "tee": true,
+        "appid": "..."
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": ["text"],
+        "output_modalities": ["text"]
+      }
+    }
+  ]
+}
+```
+
+## Model Object Fields
+
+| Field | Description |
+|-------|-------------|
+| `id` | Model identifier for API calls |
+| `name` | Human-readable model name |
+| `description` | Model or provider description |
+| `context_length` | Maximum context window |
+| `pricing.prompt` | Input token price per token; multiply by 1,000,000 for per-million-token pricing |
+| `pricing.completion` | Output token price per token; multiply by 1,000,000 for per-million-token pricing |
+| `providers` | Infrastructure providers such as `phala`, `near-ai`, `tinfoil`, or `chutes` |
+| `metadata.tee` | Whether the model is marked as a TEE model |
+| `metadata.appid` | Present when the model supports the attestation flow |
+| `architecture.input_modalities` | Supported input types, such as `text` or `image` |
+| `architecture.output_modalities` | Supported output types, such as `text` or `embeddings` |
+
+## Find Verifiable TEE Models
+
+Filter for models that expose TEE provider metadata:
+
+```bash
+curl https://api.redpill.ai/v1/models \
+  -H "Authorization: Bearer <API_KEY>" | \
+  jq '.data[] | select(.metadata.tee == true or any(.providers[]?; test("phala|near-ai|tinfoil|chutes"))) | {id, providers, appid: .metadata.appid}'
+```
+
+For production verification, test [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) with the exact model ID before relying on it in your application.

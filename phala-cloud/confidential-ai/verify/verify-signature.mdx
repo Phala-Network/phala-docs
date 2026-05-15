@@ -18,7 +18,7 @@ import requests
 
 # After getting AI response with chat_id
 chat_id = ai_response["id"]
-model = "phala/deepseek-chat-v3-0324"  # or your model
+model = "phala/qwen3.5-27b"  # or your model
 
 # Fetch the signature
 sig_response = requests.get(
@@ -28,16 +28,17 @@ sig_response = requests.get(
 signature_data = sig_response.json()
 
 # signature_data contains:
-# - text: "request_hash:response_hash"
+# - text: "request_hash:response_hash" or "model:request_hash:response_hash"
 # - signature: The ECDSA or Ed25519 signature
 # - signing_address: The address that signed this response
+# - signing_algo: The signature algorithm
 ```
 
-The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response, separated by a colon. The `signature` is the cryptographic proof from the TEE. The `signing_address` identifies which TEE instance signed this response.
+The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response. Some responses include the model name first, so the format is either `request_hash:response_hash` or `model:request_hash:response_hash`. The `signature` is the cryptographic proof from the TEE. The `signing_address` identifies which TEE instance signed this response.
 
 ## Verify request and response hashes
 
-Confirm the hashes in the `text` field match your actual request and response. The `text` field format is `request_hash:response_hash`.
+Confirm the hashes in the `text` field match your actual request and response. Hashes are byte-sensitive, so production verifiers should hash the exact serialized request body and response body sent over the wire.
 
 ```python
 from hashlib import sha256
@@ -53,9 +54,13 @@ response_body = '{"id": "...", "choices": [...], ...}'     # Full response JSON
 request_hash = sha256_text(request_body_json)
 response_hash = sha256_text(response_body)
 
-# Parse the signed hashes
-hashed_text = signature_data["text"]
-request_hash_server, response_hash_server = hashed_text.split(":")
+# Parse the signed hashes.
+# Format can be either request_hash:response_hash or model:request_hash:response_hash.
+parts = signature_data["text"].split(":")
+if len(parts) == 3:
+    signed_model, request_hash_server, response_hash_server = parts
+else:
+    request_hash_server, response_hash_server = parts
 
 # Verify they match
 assert request_hash == request_hash_server
@@ -109,19 +114,27 @@ attestation_response = requests.get(
 )
 attestation_report = attestation_response.json()
 
-# If using multi-server deployment, filter for matching signing address
-if "all_attestations" in attestation_report:
-    attestation = next(
-        item for item in attestation_report["all_attestations"]
-        if item["signing_address"].lower() == signing_address.lower()
-    )
-else:
-    attestation = attestation_report
+def find_attestation_for_signer(report, signing_address):
+    candidates = []
+    if "gateway_attestation" in report:
+        candidates.append(report["gateway_attestation"])
+    candidates.extend(report.get("model_attestations", []))
+    candidates.extend(report.get("all_attestations", []))
+    if "signing_address" in report:
+        candidates.append(report)
+
+    for item in candidates:
+        if item.get("signing_address", "").lower() == signing_address.lower():
+            return item
+
+    raise ValueError("No attestation found for signing address")
+
+attestation = find_attestation_for_signer(attestation_report, signing_address)
 
 print(f"Found attestation for: {attestation['signing_address']}")
 ```
 
-In multi-server deployments, the response may include `all_attestations` array containing attestations from multiple backend servers. You filter by `signing_address` to find the one matching your signature.
+In multi-server or two-layer deployments, the response may include several attestations. Filter by `signing_address` to find the one matching your response signature.
 
 ### Verify the attestation
 
@@ -142,7 +155,7 @@ This gives you an independent third-party verification that the signature is val
 
 ## Complete example
 
-For a full implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/signature_verifier.py).
+For a full raw Python implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/signature_verifier.py).
 
 This script demonstrates the complete flow:
 1. Send chat completion request (streaming or non-streaming)

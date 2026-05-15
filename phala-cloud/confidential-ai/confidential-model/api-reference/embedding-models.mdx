@@ -1,0 +1,83 @@
+---
+title: List Embedding Models
+description: List embedding-capable models available through the Confidential AI API.
+---
+
+## Endpoint
+
+```bash
+GET https://api.redpill.ai/v1/embeddings/models
+```
+
+Returns models designed for vector embeddings. Use this endpoint when selecting embedding models for retrieval, RAG, clustering, or similarity search.
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+curl https://api.redpill.ai/v1/embeddings/models \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.redpill.ai/v1/embeddings/models",
+    headers={"Authorization": "Bearer <API_KEY>"},
+)
+
+for model in response.json()["data"]:
+    print(model["id"])
+```
+
+```typescript TypeScript
+const response = await fetch("https://api.redpill.ai/v1/embeddings/models", {
+  headers: {
+    Authorization: "Bearer <API_KEY>",
+  },
+});
+
+const models = await response.json();
+for (const model of models.data) {
+  console.log(model.id);
+}
+```
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "qwen/qwen3-embedding-8b",
+      "name": "Qwen3 Embedding 8B",
+      "created": 1704067200,
+      "input_modalities": ["text"],
+      "output_modalities": ["embeddings"],
+      "context_length": 32768,
+      "max_output_length": 4096,
+      "pricing": {
+        "prompt": "0.00000001",
+        "completion": "0"
+      },
+      "description": "Embedding model for semantic search and retrieval"
+    }
+  ]
+}
+```
+
+## Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `id` | Model identifier for `POST /v1/embeddings` |
+| `name` | Human-readable model name |
+| `input_modalities` | Input types accepted by the model |
+| `output_modalities` | Output types produced by the model |
+| `context_length` | Maximum input context length |
+| `max_output_length` | Embedding dimensions or max output size |
+| `pricing.prompt` | Input price per token |
+| `description` | Model description and use case |

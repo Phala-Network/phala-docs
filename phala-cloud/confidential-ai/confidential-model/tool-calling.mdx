@@ -47,7 +47,7 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
   ],
   "tool_choice": "auto",
   "stream": false,
-  "model": "phala/qwen3-coder"
+  "model": "phala/gpt-oss-20b"
 }'
 ```
 
@@ -57,7 +57,7 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
   "id": "chatcmpl-28f745c2b7ee44f2ba36a8b4b409c74a",
   "object": "chat.completion",
   "created": 1754381277,
-  "model": "qwen/qwen3-coder",
+  "model": "phala/gpt-oss-20b",
   "choices": [
     {
       "index": 0,
@@ -152,7 +152,7 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
     ],
     "tool_choice": "auto",
     "stream": false,
-    "model": "phala/qwen3-coder"
+    "model": "phala/gpt-oss-20b"
   }'
 ```
 
@@ -163,7 +163,7 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
   "id": "chatcmpl-a46eff3d335c42c39bbe4ea69fc97462",
   "object": "chat.completion",
   "created": 1754381325,
-  "model": "qwen/qwen3-coder",
+  "model": "phala/gpt-oss-20b",
   "choices": [
     {
       "index": 0,
@@ -198,6 +198,7 @@ curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
 
 ## Supported Models
 
-- phala/deepseek-chat-v3-0324
-- phala/qwen3-coder
-- phala/llama-3.3-70b-instruct
+- `phala/gpt-oss-20b`
+- `phala/qwen3.5-27b`
+- `qwen/qwen3-coder-next`
+- `qwen/qwen3-coder-480b-a35b-instruct`

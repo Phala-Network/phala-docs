@@ -1,0 +1,157 @@
+---
+title: Chat Completions
+description: Create OpenAI-compatible chat completion responses with Confidential AI models.
+---
+
+## Endpoint
+
+```bash
+POST https://api.redpill.ai/v1/chat/completions
+```
+
+Creates a response for a chat conversation. Use the same OpenAI-compatible request shape you already use with the OpenAI SDK, then set the base URL to `https://api.redpill.ai/v1`.
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Model ID to use for completion.
+
+  Examples: `phala/qwen3.5-27b`, `phala/gemma-3-27b-it`, `z-ai/glm-5`, `openai/gpt-oss-120b`.
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Conversation messages. Each message includes `role` and `content`.
+
+  ```json
+  [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Explain GPU TEE in one paragraph."}
+  ]
+  ```
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature. Typical range is `0` to `2`.
+</ParamField>
+
+<ParamField body="max_tokens" type="integer">
+  Maximum number of output tokens for most open models and GPU TEE models.
+</ParamField>
+
+<ParamField body="max_completion_tokens" type="integer">
+  Maximum output tokens for newer OpenAI reasoning models that do not accept `max_tokens`.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Set to `true` to receive server-sent event chunks.
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Function/tool definitions that supported models can call.
+</ParamField>
+
+<ParamField body="tool_choice" type="string | object">
+  Controls whether the model may call tools. Common values are `auto`, `none`, or a specific tool selection object.
+</ParamField>
+
+<ParamField body="response_format" type="object">
+  Requests structured output from supported models, including JSON schema mode.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+curl https://api.redpill.ai/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <API_KEY>" \
+  -d '{
+    "model": "phala/qwen3.5-27b",
+    "messages": [
+      {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
+    ]
+  }'
+```
+
+```python Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="<API_KEY>",
+    base_url="https://api.redpill.ai/v1",
+)
+
+response = client.chat.completions.create(
+    model="phala/qwen3.5-27b",
+    messages=[
+        {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
+    ],
+)
+
+print(response.choices[0].message.content)
+```
+
+```typescript TypeScript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "<API_KEY>",
+  baseURL: "https://api.redpill.ai/v1",
+});
+
+const response = await client.chat.completions.create({
+  model: "phala/qwen3.5-27b",
+  messages: [
+    { role: "user", content: "What privacy guarantees does GPU TEE provide?" },
+  ],
+});
+
+console.log(response.choices[0].message.content);
+```
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "id": "chatcmpl-123",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "phala/qwen3.5-27b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "GPU TEE protects inference by..."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 16,
+    "completion_tokens": 48,
+    "total_tokens": 64
+  }
+}
+```
+
+The `id` field is the request ID. Use it with [Request Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) when you need cryptographic proof for this specific response.
+
+## Feature Notes
+
+- Streaming uses the same `stream: true` option as the OpenAI API.
+- Vision models accept multimodal `content` arrays with `image_url` entries.
+- Tool calling uses OpenAI-compatible `tools`, `tool_choice`, assistant `tool_calls`, and tool response messages.
+- Structured output uses `response_format` on supported models.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="List Models" icon="list" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models">
+    Discover available Confidential AI models and capabilities
+  </Card>
+  <Card title="Verify Responses" icon="signature" href="/phala-cloud/confidential-ai/confidential-model/api-reference/signature">
+    Fetch the signature for a chat completion response
+  </Card>
+</CardGroup>

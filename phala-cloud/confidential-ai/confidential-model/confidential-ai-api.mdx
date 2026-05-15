@@ -24,24 +24,27 @@ Once you get the API Key, you can start making requests to the Confidential AI A
 
 ## Make Your Secure Request
 
-Replace `<API_KEY>` with your actual API key in the examples below. We use DeepSeek V3 0324 model as an example, but you can choose any other available models.
+Replace `<API_KEY>` with your actual API key. The examples below use `phala/qwen3.5-27b`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
 
 <CodeGroup>
-```bash Python
+```python Python
 # Install OpenAI SDK: `pip3 install openai`
 
 from openai import OpenAI
 
-client = OpenAI(api_key="<API_KEY>", base_url="https://api.redpill.ai/v1")
+client = OpenAI(
+    api_key="<API_KEY>",
+    base_url="https://api.redpill.ai/v1",
+)
 
 response = client.chat.completions.create(
-    model="phala/deepseek-chat-v3-0324",
+    model="phala/qwen3.5-27b",
     messages=[
         {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": "What is your model name?"},
     ],
-    stream=True
 )
+
 print(response.choices[0].message.content)
 ```
 
@@ -49,14 +52,13 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-    baseURL: 'https://api.redpill.ai/v1',
-    apiKey: '<API_KEY>',
-  },
+  baseURL: 'https://api.redpill.ai/v1',
+  apiKey: '<API_KEY>',
 });
 
 async function main() {
   const completion = await client.chat.completions.create({
-    model: 'phala/deepseek-chat-v3-0324',
+    model: 'phala/qwen3.5-27b',
     messages: [
       {
         role: 'user',
@@ -87,59 +89,97 @@ curl -X 'POST' \
       "role": "user"
     }
   ],
-  "stream": true,
-  "model": "phala/deepseek-chat-v3-0324"
+  "model": "phala/qwen3.5-27b"
 }'
 ```
 </CodeGroup>
 
 ### Available Models
 
-We support [14+ models](https://redpill.ai/models) running in GPU TEE from multiple providers. Click the **GPU TEE** checkbox to see all options.
+Confidential AI models are available through several GPU TEE providers. The live catalog is authoritative; query it before hardcoding model IDs:
+
+```bash
+curl https://api.redpill.ai/v1/models \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+To list Phala-backed models only:
+
+```bash
+curl https://api.redpill.ai/v1/models/phala \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+The following table reflects the current model families added in the RedPill model catalog update. Pricing and availability can change; use the API response for production routing.
 
 #### Phala Provider
 
-| Model | Model ID | Context | Pricing (per 1M tokens) |
-|-------|----------|---------|-------------------------|
-| DeepSeek V3 0324 | `deepseek/deepseek-chat-v3-0324` | 163K | $0.28 / $1.14 |
-| Qwen2.5 VL 72B Instruct | `qwen/qwen2.5-vl-72b-instruct` | 65K | $0.59 / $0.59 |
-| Google Gemma 3 27B | `google/gemma-3-27b-it` | 53K | $0.11 / $0.40 |
-| OpenAI GPT OSS 120B | `openai/gpt-oss-120b` | 131K | $0.10 / $0.49 |
-| OpenAI GPT OSS 20B | `openai/gpt-oss-20b` | 131K | $0.04 / $0.15 |
-| Qwen2.5 7B Instruct | `qwen/qwen-2.5-7b-instruct` | 32K | $0.04 / $0.10 |
-| Sentence Transformers all-MiniLM-L6-v2 | `sentence-transformers/all-minilm-l6-v2` | 512 | $0.000005 |
+| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
+|----------|---------|----------|--------------------------------------|
+| `phala/qwen3.5-27b` | 262K | Text | $0.30 / $2.40 |
+| `phala/qwen3-vl-30b-a3b-instruct` | 128K | Vision + Text | $0.20 / $0.70 |
+| `qwen/qwen3-embedding-8b` | 32K | Embeddings | $0.01 / $0 |
+| `phala/gemma-3-27b-it` | 53K | Vision + Text | $0.11 / $0.40 |
+| `phala/glm-4.7-flash` | 202K | Text | $0.10 / $0.43 |
+| `phala/gpt-oss-20b` | 131K | Text | $0.04 / $0.15 |
+| `phala/qwen-2.5-7b-instruct` | 32K | Text | $0.04 / $0.10 |
+| `phala/qwen2.5-vl-72b-instruct` | 128K | Vision + Text | $0.40 / $1.20 |
+| `phala/uncensored-24b` | 32K | Text | $0.20 / $0.90 |
+| `sentence-transformers/all-minilm-l6-v2` | 512 | Embeddings | $0.005 / $0 |
+
+<Note>
+`phala/qwen2.5-vl-72b-instruct` is a legacy alias that may route to `phala/qwen3-vl-30b-a3b-instruct`. Prefer the canonical ID returned by `/v1/models`.
+</Note>
 
 #### NearAI Provider
 
-| Model | Model ID | Context | Pricing (per 1M tokens) |
-|-------|----------|---------|-------------------------|
-| DeepSeek V3.1 | `deepseek/deepseek-chat-v3.1` | 163K | $1.00 / $2.50 |
-| Qwen3 30B A3B Instruct | `qwen/qwen3-30b-a3b-instruct-2507` | 262K | $0.15 / $0.45 |
-| Z.AI GLM 4.6 | `z-ai/glm-4.6` | 202K | $0.75 / $2.00 |
+| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
+|----------|---------|----------|--------------------------------------|
+| `z-ai/glm-5` | 203K | Text | $1.20 / $3.50 |
+| `deepseek/deepseek-chat-v3.1` | 164K | Text | $1.05 / $3.10 |
+| `openai/gpt-oss-120b` | 131K | Text | $0.10 / $0.49 |
+| `qwen/qwen3-30b-a3b-instruct-2507` | 262K | Text | $0.15 / $0.55 |
+| `z-ai/glm-4.7` | 131K | Text | $0.85 / $3.30 |
+
+#### Chutes Provider
+
+| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
+|----------|---------|----------|--------------------------------------|
+| `z-ai/glm-5.1` | 203K | Text | $1.21 / $4.20 |
+| `moonshotai/kimi-k2.6` | 262K | Text + Image | $1.09 / $4.60 |
+| `qwen/qwen3.5-397b-a17b` | 262K | Text | $0.55 / $3.50 |
+| `qwen/qwen3-coder-next` | 262K | Text | $0.18 / $1.20 |
+| `minimax/minimax-m2.5` | 197K | Text | $0.20 / $1.38 |
+| `xiaomi/mimo-v2-flash` | 262K | Text | $0.10 / $0.30 |
+| `deepseek/deepseek-v3.2` | 164K | Text | $0.32 / $0.48 |
+| `moonshotai/kimi-k2.5` | 262K | Text + Image | $0.60 / $3.00 |
 
 #### Tinfoil Provider
 
-| Model | Model ID | Context | Pricing (per 1M tokens) |
-|-------|----------|---------|-------------------------|
-| DeepSeek R1 0528 | `deepseek/deepseek-r1-0528` | 163K | $2.00 / $2.00 |
-| Qwen3 Coder 480B A35B | `qwen/qwen3-coder-480b-a35b-instruct` | 262K | $2.00 / $2.00 |
-| Qwen3 VL 30B A3B | `qwen/qwen3-vl-30b-a3b-instruct` | 262K | $2.00 / $2.00 |
-| Meta Llama 3.3 70B Instruct | `meta-llama/llama-3.3-70b-instruct` | 131K | $2.00 / $2.00 |
+| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
+|----------|---------|----------|--------------------------------------|
+| `qwen/qwen3-coder-480b-a35b-instruct` | 262K | Text | $2.00 / $2.00 |
+| `moonshotai/kimi-k2-thinking` | 262K | Text | $2.00 / $2.00 |
+| `deepseek/deepseek-r1-0528` | 163K | Text | $2.00 / $2.00 |
+| `meta-llama/llama-3.3-70b-instruct` | 131K | Text | $2.00 / $2.00 |
 
 <Note>
-All models run in GPU TEEs with hardware attestation. Pricing shows input/output token costs. Browse the full list at [redpill.ai/models](https://redpill.ai/models).
+TEE provider presence and attestation support are not identical for every provider and model. For production verification, test [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) with the exact model ID you plan to use.
 </Note>
 
 ## Verify Your AI is Running Securely
 
-Once you finished your secure request, every response comes with cryptographic proof that it ran in a secure TEE. This proof is generated by the TEE. ensures the response is secure and trustworthy. Click [Verify](/phala-cloud/confidential-ai/verify/overview) to learn how to verify your AI is running securely.
+After you make a request, use [Request Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) to fetch the signature for that response. Then fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) with the returned `signing_address` to bind the response to TEE evidence.
 
 ## Next Steps
 
-There are some advanced features you could use with Confidential AI API.
+Use the API reference and feature guides for the next step:
 
-- [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) help you call tools from your AI models.
-- [Images and Vision](/phala-cloud/confidential-ai/confidential-model/images-and-vision) help you use images and vision models in Confidential AI.
-- [Structured Output](/phala-cloud/confidential-ai/confidential-model/structured-output) help you get structured output from your AI models.
-- [Streaming](/phala-cloud/confidential-ai/confidential-model/streaming) help you get streaming response from your AI models.
-- [Playground](/phala-cloud/confidential-ai/confidential-model/playground) help you play with Confidential AI models in a private environment.
+- [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions) documents the core request and response shape.
+- [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) shows how to discover models programmatically.
+- [Embeddings](/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings) covers embedding model calls.
+- [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) helps you call tools from your AI models.
+- [Images and Vision](/phala-cloud/confidential-ai/confidential-model/images-and-vision) helps you use image-capable models.
+- [Structured Output](/phala-cloud/confidential-ai/confidential-model/structured-output) helps you get JSON responses.
+- [Streaming](/phala-cloud/confidential-ai/confidential-model/streaming) helps you consume streaming responses.
+- [Playground](/phala-cloud/confidential-ai/confidential-model/playground) helps you test models in a private environment.
