@@ -13,26 +13,50 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 
 ## Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `model` | string | Yes | Model ID to use for completion. Examples: `phala/qwen3.5-27b`, `phala/gemma-3-27b-it`, `z-ai/glm-5`, `openai/gpt-oss-120b`. |
-| `messages` | array | Yes | Conversation messages. Each message includes `role` and `content`. |
-| `temperature` | number | No | Sampling temperature. Typical range is `0` to `2`. |
-| `max_tokens` | integer | No | Maximum number of output tokens for most open models and GPU TEE models. |
-| `max_completion_tokens` | integer | No | Maximum output tokens for newer OpenAI reasoning models that do not accept `max_tokens`. |
-| `stream` | boolean | No | Set to `true` to receive server-sent event chunks. |
-| `tools` | array | No | Function/tool definitions that supported models can call. |
-| `tool_choice` | string or object | No | Controls whether the model may call tools. Common values are `auto`, `none`, or a specific tool selection object. |
-| `response_format` | object | No | Requests structured output from supported models, including JSON schema mode. |
+<ParamField body="model" type="string" required>
+  Model ID to use for completion.
 
-Example `messages` value:
+  Examples: `phala/qwen3.5-27b`, `phala/gemma-3-27b-it`, `z-ai/glm-5`, `openai/gpt-oss-120b`.
+</ParamField>
 
-```json
-[
-  {"role": "system", "content": "You are a helpful assistant."},
-  {"role": "user", "content": "Explain GPU TEE in one paragraph."}
-]
-```
+<ParamField body="messages" type="array" required>
+  Conversation messages. Each message includes `role` and `content`.
+
+  ```json
+  [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Explain GPU TEE in one paragraph."}
+  ]
+  ```
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature. Typical range is `0` to `2`.
+</ParamField>
+
+<ParamField body="max_tokens" type="integer">
+  Maximum number of output tokens for most open models and GPU TEE models.
+</ParamField>
+
+<ParamField body="max_completion_tokens" type="integer">
+  Maximum output tokens for newer OpenAI reasoning models that do not accept `max_tokens`.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Set to `true` to receive server-sent event chunks.
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Function/tool definitions that supported models can call.
+</ParamField>
+
+<ParamField body="tool_choice" type="string | object">
+  Controls whether the model may call tools. Common values are `auto`, `none`, or a specific tool selection object.
+</ParamField>
+
+<ParamField body="response_format" type="object">
+  Requests structured output from supported models, including JSON schema mode.
+</ParamField>
 
 ## Examples
 

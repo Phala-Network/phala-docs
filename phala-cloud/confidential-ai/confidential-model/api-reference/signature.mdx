@@ -13,11 +13,17 @@ Use this endpoint after a chat completion request. The signature proves a specif
 
 ## Parameters
 
-| Parameter | Location | Type | Required | Description |
-|-----------|----------|------|----------|-------------|
-| `request_id` | Path | string | Yes | The `id` returned by `POST /v1/chat/completions`. |
-| `model` | Query | string | Yes | The model ID used for the original request. |
-| `signing_algo` | Query | string | No | Signature algorithm. Common values include `ecdsa`, `ecdsa-p256`, and `rsa`; use the algorithm supported by the model response. |
+<ParamField path="request_id" type="string" required>
+  The `id` returned by `POST /v1/chat/completions`.
+</ParamField>
+
+<ParamField query="model" type="string" required>
+  The model ID used for the original request.
+</ParamField>
+
+<ParamField query="signing_algo" type="string">
+  Signature algorithm. Common values include `ecdsa`, `ecdsa-p256`, and `rsa`; use the algorithm supported by the model response.
+</ParamField>
 
 ## Examples
 
