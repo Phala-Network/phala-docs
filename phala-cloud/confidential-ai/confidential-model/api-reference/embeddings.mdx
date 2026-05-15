@@ -13,23 +13,12 @@ Generate vector embeddings for retrieval, semantic search, clustering, and simil
 
 ## Request Body
 
-<ParamField body="model" type="string" required>
-  Embedding model ID.
-
-  Examples: `qwen/qwen3-embedding-8b`, `sentence-transformers/all-minilm-l6-v2`.
-</ParamField>
-
-<ParamField body="input" type="string | array" required>
-  Input text or list of inputs to embed.
-</ParamField>
-
-<ParamField body="encoding_format" type="string">
-  Embedding encoding format. Common values are `float` and `base64`.
-</ParamField>
-
-<ParamField body="dimensions" type="integer">
-  Requested output dimensions, when supported by the selected model.
-</ParamField>
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model` | string | Yes | Embedding model ID. Examples: `qwen/qwen3-embedding-8b`, `sentence-transformers/all-minilm-l6-v2`. |
+| `input` | string or array | Yes | Input text or list of inputs to embed. |
+| `encoding_format` | string | No | Embedding encoding format. Common values are `float` and `base64`. |
+| `dimensions` | integer | No | Requested output dimensions, when supported by the selected model. |
 
 ## Examples
 

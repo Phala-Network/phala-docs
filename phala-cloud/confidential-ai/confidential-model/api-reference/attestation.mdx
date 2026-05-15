@@ -17,19 +17,11 @@ Always include a fresh random `nonce` when fetching attestations for security-se
 
 ## Parameters
 
-<ParamField query="model" type="string" required>
-  Model ID to attest.
-
-  Examples: `phala/qwen3.5-27b`, `phala/qwen-2.5-7b-instruct`, `openai/gpt-oss-120b`, `z-ai/glm-5`.
-</ParamField>
-
-<ParamField query="nonce" type="string">
-  Fresh 32-byte random value encoded as 64 hex characters. The nonce is embedded in the TEE report data.
-</ParamField>
-
-<ParamField query="signing_address" type="string">
-  Ethereum address or public key used to filter attestations in multi-server deployments. Use this when binding a response signature to a specific TEE signer.
-</ParamField>
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `model` | string | Yes | Model ID to attest. Examples: `phala/qwen3.5-27b`, `phala/qwen-2.5-7b-instruct`, `openai/gpt-oss-120b`, `z-ai/glm-5`. |
+| `nonce` | string | No | Fresh 32-byte random value encoded as 64 hex characters. The nonce is embedded in the TEE report data. |
+| `signing_address` | string | No | Ethereum address or public key used to filter attestations in multi-server deployments. Use this when binding a response signature to a specific TEE signer. |
 
 ## Examples
 
