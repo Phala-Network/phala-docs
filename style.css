@@ -286,10 +286,14 @@ a.nav-tabs-item[data-active="true"] {
 }
 
 /* TOC heading "On this page" — eyebrow style.
-   Scoped to the toggle <button> only — earlier broader selector was matching
-   every <a> in the items (since each has font-medium + text-gray-* classes)
-   and rendering them tiny+uppercase+mono. */
-#table-of-contents > button {
+   Mintlify wraps the toggle button in an <h2>, so we must reset both the h2
+   font-size (otherwise it renders at ~46px) and the button itself. */
+#table-of-contents h2 {
+  font-size: 11px !important;
+  margin: 0 !important;
+}
+#table-of-contents > button,
+#table-of-contents h2 button {
   font-family: var(--v3-mono, "SuisseIntlMono", monospace) !important;
   font-size: 11px !important;
   font-weight: 400 !important;
