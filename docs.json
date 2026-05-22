@@ -390,6 +390,17 @@
                           "/phala-cloud/phala-cloud-cli/config/list",
                           "/phala-cloud/phala-cloud-cli/config/set"
                         ]
+                      },
+                      {
+                        "group": "docker",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/docker",
+                          "/phala-cloud/phala-cloud-cli/docker/login",
+                          "/phala-cloud/phala-cloud-cli/docker/build",
+                          "/phala-cloud/phala-cloud-cli/docker/push",
+                          "/phala-cloud/phala-cloud-cli/docker/generate",
+                          "/phala-cloud/phala-cloud-cli/docker/run"
+                        ]
                       }
                     ]
                   }
@@ -977,7 +988,7 @@
       "source": "/phala-cloud/references/phala-cloud-cli/phala/config"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
       "source": "/phala-cloud/references/phala-cloud-cli/phala/docker"
     },
     {
@@ -1073,7 +1084,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/create-cvm/create-with-private-docker-image"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
       "source": "/phala-cloud/references/tee-cloud-cli/phala/docker"
     },
     {
@@ -1085,7 +1096,7 @@
       "source": "/phala-cloud/phala-cloud-user-guides/advanced-deployment-options"
     },
     {
-      "destination": "/phala-cloud/phala-cloud-cli/overview",
+      "destination": "/phala-cloud/phala-cloud-cli/docker",
       "source": "/phala-cloud/references/tee-cloud-cli"
     },
     {
