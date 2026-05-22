@@ -13,11 +13,7 @@ Create a minimal config with just a CVM name:
 name = "my-awesome-app"
 ```
 
-Or generate one interactively:
-
-```bash
-phala init
-```
+Create `phala.toml` manually in your project root. The current CLI reads this file but does not generate it for you.
 
 ## CVM Identifier
 
@@ -116,6 +112,6 @@ name = "my-production-api"
 
 **CVM not found** — Verify the name matches: `phala cvms list`. Check you're in the right workspace.
 
-**File not found** — Run `phala init` or ensure you're in the correct directory.
+**File not found** — Create `phala.toml` in your project root or ensure you're in the correct directory.
 
 **Validation errors** — Names must be 5–63 chars, lowercase, starting with a letter. UUIDs must be valid v4 format. Ports must be positive integers.

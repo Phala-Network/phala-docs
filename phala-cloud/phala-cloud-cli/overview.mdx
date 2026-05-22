@@ -89,11 +89,12 @@ These commands are deprecated and will be removed in a future release.
 |---------|-------------|
 | `auth` | [`login`](/phala-cloud/phala-cloud-cli/login), [`logout`](/phala-cloud/phala-cloud-cli/logout), [`status`](/phala-cloud/phala-cloud-cli/status) |
 | [`config`](/phala-cloud/phala-cloud-cli/config) | Profile-based credentials (`~/.phala-cloud/credentials.json`) |
-| [`docker`](/phala-cloud/phala-cloud-cli/docker) | Standard `docker` CLI for build/push |
 | `cvms create` | [`deploy`](/phala-cloud/phala-cloud-cli/deploy) |
 | `cvms upgrade` | [`deploy --cvm-id <id>`](/phala-cloud/phala-cloud-cli/deploy) |
 | `cvms logs` | [`logs`](/phala-cloud/phala-cloud-cli/logs) |
 | `cvms serial-logs` | [`logs --serial`](/phala-cloud/phala-cloud-cli/logs) |
+
+The old `phala docker` command family has been removed. Use the standard Docker CLI to build and push images, then deploy with `phala deploy`.
 
 Deprecated `deploy` options:
 
