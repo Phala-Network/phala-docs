@@ -76,7 +76,7 @@ The 3 PCR values are combined into a single `OS_IMAGE_HASH` for on-chain authori
 OS_IMAGE_HASH=$(sha256sum <<< "${PCR0}${PCR1}${PCR2}" | cut -d' ' -f1)
 ```
 
-The `OS_IMAGE_HASH` must be registered via [governance](governance) before KMS will deliver keys to this Enclave.
+The `OS_IMAGE_HASH` must be registered via [governance](/dstack-cloud/governance) before KMS will deliver keys to this Enclave.
 
 > **Note:** Any change to the Dockerfile, application code, or `dstack-util` version produces different PCR values and a different `OS_IMAGE_HASH`.
 
@@ -163,4 +163,4 @@ Choose **GCP Confidential VMs** when:
 
 - **[Quick Start: Deploy on AWS Nitro](/dstack-cloud/get-started)** — Hands-on tutorial
 - **[Run a Workload on AWS Nitro](/dstack-cloud/run-on-nitro)** — Detailed deployment guide
-- **[Attestation Integration](attestation-integration)** — How attestation works on Nitro
+- **[Attestation Integration](/dstack-cloud/attestation-integration)** — How attestation works on Nitro

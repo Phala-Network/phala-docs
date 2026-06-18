@@ -54,6 +54,7 @@ jobs:
       - name: 🛡️ Check RedPill Confidential AI docs sync
         env:
           REDPILL_DOCS_V2_REPO: tmp/redpill-docs-v2
+          REDPILL_DOCS_V2_TOKEN: ${{ secrets.REDPILL_DOCS_V2_TOKEN }}
         run: |
           echo "::group::🛡️ Checking RedPill Confidential AI docs sync"
           .scripts/check-redpill-confidential-ai-sync.sh

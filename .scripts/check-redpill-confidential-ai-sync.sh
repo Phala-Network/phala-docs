@@ -26,6 +26,7 @@ Options:
 Environment:
   REDPILL_DOCS_V2_REPO    Local clone path. Defaults to ../redpill-docs-v2.
   REDPILL_DOCS_V2_URL     Clone URL. Defaults to https://github.com/redpill-ai/redpill-docs-v2.
+  REDPILL_DOCS_V2_TOKEN   Optional GitHub token for private redpill-ai/redpill-docs-v2 access.
   REDPILL_SYNC_REPORT     Report path. Defaults to tmp/redpill-confidential-ai-sync.md.
 EOF
 }
@@ -60,13 +61,40 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+clone_url="$REMOTE_URL"
+if [[ -n "${REDPILL_DOCS_V2_TOKEN:-}" && "$REMOTE_URL" == https://github.com/* ]]; then
+  clone_url="${REMOTE_URL/https:\/\/github.com\//https:\/\/x-access-token:${REDPILL_DOCS_V2_TOKEN}@github.com/}"
+fi
+
+skip_without_credentials() {
+  mkdir -p "$(dirname "$REPORT_FILE")"
+  cat > "$REPORT_FILE" <<EOF
+# RedPill Confidential AI Sync
+
+Status: skipped
+
+The RedPill docs-v2 repository could not be fetched from CI. Configure the
+\`REDPILL_DOCS_V2_TOKEN\` secret with read access to \`redpill-ai/redpill-docs-v2\`
+to make this check enforce upstream drift automatically.
+EOF
+  cat "$REPORT_FILE"
+  if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+    exit 0
+  fi
+  exit 1
+}
+
 if [[ ! -d "$SOURCE_REPO/.git" ]]; then
   echo "Missing RedPill docs-v2 clone: $SOURCE_REPO"
   echo "Cloning $REMOTE_URL ..."
-  git clone "$REMOTE_URL" "$SOURCE_REPO" --quiet
+  if ! git clone "$clone_url" "$SOURCE_REPO" --quiet; then
+    skip_without_credentials
+  fi
 fi
 
-git -C "$SOURCE_REPO" fetch origin main --quiet
+if ! git -C "$SOURCE_REPO" fetch origin main --quiet; then
+  skip_without_credentials
+fi
 
 PINNED="$(tr -d '[:space:]' < "$PIN_FILE")"
 REMOTE="$(git -C "$SOURCE_REPO" rev-parse origin/main)"

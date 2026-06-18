@@ -129,7 +129,7 @@ These 3 PCR values are combined into a single `OS_IMAGE_HASH`, which is the uniq
 
 Both platforms generate hardware-signed attestations that KMS verifies before dispatching keys. The main differences are in the attestation format (TDX Quote vs. NSM Document), verification method (Intel DCAP QVL vs. AWS certificate chain), and how measurements are stored (RTMR registers vs. PCR values).
 
-For platform-specific details, see the sections above. For a broader architectural comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
+For platform-specific details, see the sections above. For a broader architectural comparison, see [AWS Nitro Enclave Integration](/dstack-cloud/nitro-enclave).
 
 ## Measurements and On-chain Authorization
 
@@ -162,6 +162,6 @@ For more details, see the [dstack-cloud Verification Guide](https://github.com/P
 
 ## Next Steps
 
-- **[Security Model](security-model)** — Trust boundaries and security guarantees
+- **[Security Model](/dstack-cloud/security-model)** — Trust boundaries and security guarantees
 - **[Register Workload Measurements](/dstack-cloud/register-enclave-measurement)** — How to register measurements on-chain
 - **[Runbook](/dstack-cloud/runbook)** — Troubleshooting attestation failures

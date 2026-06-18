@@ -39,7 +39,7 @@ On Nitro, `dstack-util` inside Enclave reaches KMS through host-side VSOCK proxy
 | **Self-hosted KMS** | Your own dstack-kms | Production/compliance/full control |
 
 Self-hosted KMS can run on:
-- GCP TDX CVM — see [Run a dstack-kms CVM on GCP](run-kms-on-gcp)
+- GCP TDX CVM — see [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp)
 - Intel TDX bare metal
 
 ---
@@ -144,7 +144,7 @@ npx hardhat kms:add-image <OS_IMAGE_HASH> --network <network>
 
 ### Production
 
-Use governance/multisig/timelock flow. See [Register Workload Measurements](register-enclave-measurement).
+Use governance/multisig/timelock flow. See [Register Workload Measurements](/dstack-cloud/register-enclave-measurement).
 
 ### App policy check (important)
 
@@ -236,12 +236,12 @@ The template uses `dstack-util get-keys` and a VSOCK proxy for key retrieval. Ke
 
 Nitro and GCP take fundamentally different approaches. On GCP, the Guest Agent handles attestation, key management, and automatic disk encryption. On Nitro, `dstack-util` only retrieves the key — your application decides what to encrypt.
 
-For a full comparison, see the [overview](overview) and [KMS and Key Delivery](kms-and-key-delivery).
+For a full comparison, see the [overview](/dstack-cloud/overview) and [KMS and Key Delivery](/dstack-cloud/kms-and-key-delivery).
 
 ---
 
 ## Next Steps
 
-- [Register Workload Measurements](register-enclave-measurement)
-- [Run a dstack-kms on GCP](run-kms-on-gcp)
+- [Register Workload Measurements](/dstack-cloud/register-enclave-measurement)
+- [Run a dstack-kms on GCP](/dstack-cloud/run-kms-on-gcp)
 - [Nitro Enclave concept](/dstack-cloud/nitro-enclave)

@@ -41,7 +41,7 @@ KMS mode can optionally integrate with on-chain smart contracts (`DstackKms`, `D
 - Changes follow a Multisig + Timelock process, preventing covert key policy modifications
 - This is a **security enhancement** to KMS mode, not a separate operating mode
 
-For details on governance, see [On-chain Governance Model](governance).
+For details on governance, see [On-chain Governance Model](/dstack-cloud/governance).
 
 ## Key Delivery Flow (KMS Mode)
 
@@ -92,7 +92,7 @@ The key delivery flow is similar on both platforms, but the implementation detai
 - **Key usage:** Guest Agent manages the full key lifecycle on GCP (including automatic disk encryption), while on Nitro `dstack-util` only retrieves the key — your application decides how to use it
 - **Persistent storage:** Available on GCP, not on Nitro (stateless Enclave)
 
-For a complete comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
+For a complete comparison, see [AWS Nitro Enclave Integration](/dstack-cloud/nitro-enclave).
 
 ### VSOCK Proxy (Nitro-specific)
 
