@@ -291,12 +291,12 @@ a.nav-tabs-item[data-active="true"] {
 #table-of-contents-layout #table-of-contents > :first-child:not(nav):not(ul):not(ol),
 #table-of-contents-layout > :first-child:not(:has(#table-of-contents)):not(nav):not(ul):not(ol),
 #table-of-contents-layout > :first-child > :first-child:not(#table-of-contents):not(nav):not(ul):not(ol) {
-  font-family: var(--v3-mono, "SuisseIntlMono", monospace) !important;
-  font-size: 11px !important;
-  line-height: 1rem !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif) !important;
+  font-size: 14px !important;
+  line-height: 1.25rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
   color: var(--base-600) !important;
 }
 
@@ -312,6 +312,9 @@ a.nav-tabs-item[data-active="true"] {
 
 .toc-item > a {
   font-size: 13px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif) !important;
   color: var(--base-600) !important;
 }
 .toc-item > a:hover {
