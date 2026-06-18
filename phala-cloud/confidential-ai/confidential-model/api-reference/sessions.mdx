@@ -44,9 +44,9 @@ curl "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
 {
   "api_version": "aci/1",
   "session_id": "as_3681736b33b9b8191216968e37e350bfa1e4fd8d5d192bbebf4c17c0d4edf344",
-  "provider": "near-ai",
-  "endpoint": "https://cloud-api.near.ai",
-  "verifier_id": "private-ai-verifier/near-ai-gateway/v1",
+  "provider": "phala",
+  "endpoint": "https://inference.phala.com",
+  "verifier_id": "private-ai-verifier/phala-gateway/v1",
   "established_at": 1781588840,
   "expires_at": 1781589140,
   "channel_binding": [{ "type": "tls_spki_sha256", "value": "..." }],
@@ -64,7 +64,7 @@ curl "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
 Use the query form to inspect current sessions for a provider or model before sending prompts:
 
 ```bash
-curl "https://inference.phala.com/v1/aci/sessions?provider=near-ai" \
+curl "https://inference.phala.com/v1/aci/sessions?provider=phala" \
   -H "Authorization: Bearer <API_KEY>"
 ```
 

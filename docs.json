@@ -221,6 +221,16 @@
                 ]
               },
               {
+                "group": "GPU CVM",
+                "pages": [
+                  "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
+                  "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+                  "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
+                  "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting",
+                  "/phala-cloud/confidential-ai/benchmark"
+                ]
+              },
+              {
                 "group": "Phala Cloud CLI",
                 "pages": [
                   "/phala-cloud/phala-cloud-cli/overview",
@@ -736,11 +746,18 @@
       {
         "icon": "shield-check",
         "pages": [
-          "/phala-cloud/confidential-ai/overview",
           {
-            "group": "API Access",
+            "group": "Confidential AI",
             "pages": [
-              "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
+              "/phala-cloud/confidential-ai/overview",
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
+                  "/phala-cloud/confidential-ai/confidential-model/playground",
+                  "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations"
+                ]
+              },
               {
                 "group": "API Reference",
                 "pages": [
@@ -757,51 +774,39 @@
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
                 ]
               },
-              "/phala-cloud/confidential-ai/confidential-model/tool-calling",
-              "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
-              "/phala-cloud/confidential-ai/confidential-model/structured-output",
-              "/phala-cloud/confidential-ai/confidential-model/streaming",
-              "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
-              "/phala-cloud/confidential-ai/confidential-model/error-handling",
-              "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations",
-              "/phala-cloud/confidential-ai/confidential-model/playground"
+              {
+                "group": "Guides",
+                "pages": [
+                  "/phala-cloud/confidential-ai/confidential-model/tool-calling",
+                  "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
+                  "/phala-cloud/confidential-ai/confidential-model/structured-output",
+                  "/phala-cloud/confidential-ai/confidential-model/streaming",
+                  "/phala-cloud/confidential-ai/confidential-model/error-handling"
+                ]
+              },
+              {
+                "group": "Verification",
+                "pages": [
+                  "/phala-cloud/confidential-ai/verify/overview",
+                  "/phala-cloud/confidential-ai/verify/verify-attestation",
+                  "/phala-cloud/confidential-ai/verify/verify-signature",
+                  "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
+                  "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims"
+                ]
+              },
+              {
+                "group": "Security Model",
+                "pages": [
+                  "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
+                  "/phala-cloud/confidential-ai/confidential-model/channel-binding",
+                  "/phala-cloud/confidential-ai/confidential-model/providers",
+                  "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
+                  "/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source"
+                ]
+              },
+              "/phala-cloud/confidential-ai/faqs"
             ]
-          },
-          {
-            "group": "Security Model",
-            "pages": [
-              "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
-              "/phala-cloud/confidential-ai/confidential-model/channel-binding",
-              "/phala-cloud/confidential-ai/confidential-model/providers",
-              "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims",
-              "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
-              "/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source"
-            ]
-          },
-          {
-            "group": "Dedicated Models",
-            "pages": [
-              "/phala-cloud/confidential-ai/confidential-gpu/model-template"
-            ]
-          },
-          {
-            "group": "GPU TEE",
-            "pages": [
-              "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
-              "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
-              "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting"
-            ]
-          },
-          {
-            "group": "Verify",
-            "pages": [
-              "/phala-cloud/confidential-ai/verify/overview",
-              "/phala-cloud/confidential-ai/verify/verify-attestation",
-              "/phala-cloud/confidential-ai/verify/verify-signature"
-            ]
-          },
-          "/phala-cloud/confidential-ai/benchmark",
-          "/phala-cloud/confidential-ai/faqs"
+          }
         ],
         "tab": "Confidential AI"
       },

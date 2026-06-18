@@ -1,6 +1,6 @@
 ---
 title: List Models
-description: List available Confidential AI models, providers, modalities, context windows, and pricing metadata.
+description: List available Confidential AI models, modalities, context windows, and pricing metadata.
 ---
 
 ## Endpoints
@@ -10,7 +10,7 @@ GET https://inference.phala.com/v1/models
 GET https://inference.phala.com/v1/models/phala
 ```
 
-Use the live model catalog before hardcoding model IDs. The catalog returns model IDs, context windows, pricing, providers, modalities, supported parameters, and whether a model can be served confidentially.
+Use the live model catalog before hardcoding model IDs. The catalog returns model IDs, context windows, pricing, serving metadata, modalities, supported parameters, and whether a model can be served confidentially.
 
 ## Examples
 
@@ -78,7 +78,7 @@ for model in models.data:
 | `max_output_length` | Maximum output length |
 | `pricing.prompt` | Input token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.completion` | Output token price per token; multiply by 1,000,000 for per-million-token pricing |
-| `providers` | Infrastructure providers such as `phala`, `near-ai`, `tinfoil`, or `chutes` |
+| `providers` | Serving routes available for the model. Use `/v1/models/phala` when you only want Phala-backed models. |
 | `input_modalities` | Supported input types, such as `text` or `image` |
 | `output_modalities` | Supported output types, such as `text` or `embeddings` |
 | `supported_parameters` | Request parameters accepted by the model |

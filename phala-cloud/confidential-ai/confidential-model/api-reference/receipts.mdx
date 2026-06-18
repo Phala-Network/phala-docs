@@ -68,12 +68,12 @@ curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
   "served_at": 1781588857,
   "event_log": [
     { "seq": 0, "type": "request.received", "body_hash": "sha256:111d08a5..." },
-    { "seq": 2, "type": "route.selected", "target_route_id": "near-ai:qwen/qwen3-30b-a3b-instruct-2507" },
+    { "seq": 2, "type": "route.selected", "target_route_id": "phala/qwen3.5-27b" },
     {
       "seq": 5,
       "type": "upstream.verified",
-      "provider": "near-ai",
-      "model_id": "Qwen/Qwen3.6-35B-A3B-FP8",
+      "provider": "phala",
+      "model_id": "phala/qwen3.5-27b",
       "result": "verified",
       "required": true,
       "session_id": "as_3681736b..."
