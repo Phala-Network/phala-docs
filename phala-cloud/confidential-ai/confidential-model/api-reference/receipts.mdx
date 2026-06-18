@@ -1,0 +1,107 @@
+---
+title: Get Receipt
+description: Fetch the signed receipt for a response, including the transparency event log.
+api: "GET /aci/receipts/{id}"
+---
+
+## Endpoint
+
+```bash
+GET https://inference.phala.com/v1/aci/receipts/{id}
+```
+
+This endpoint returns the canonical per-response proof. The receipt binds request and response hashes to the attested gateway and is signed by a key from the attestation report's published keyset.
+
+Use the `x-receipt-id` header from an inference response, or use the response `id`.
+
+## Parameters
+
+<ParamField path="id" type="string" required>
+  Receipt id (`rcpt-...`) or response id from `POST /v1/chat/completions`.
+</ParamField>
+
+## Example
+
+```bash
+curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+## Response
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `api_version` | string | ACI version token, for example `aci/1`. |
+| `receipt_id` | string | Receipt id. |
+| `chat_id` | string | Chat or response id. |
+| `workload_id` | string | Must match the attestation report you verified. |
+| `workload_keyset_digest` | string | Must match the attestation report you verified. |
+| `endpoint` | string | Route served, for example `/v1/chat/completions`. |
+| `method` | string | HTTP method. |
+| `served_at` | number | Unix timestamp. |
+| `event_log` | array | Ordered transparency events. |
+| `signature` | string | Signature over the receipt by a key in the attested keyset. |
+
+### `event_log` entries
+
+| Event | Key fields |
+| --- | --- |
+| `request.received` | `body_hash` |
+| `middleware.forwarded` | `body_hash` |
+| `route.selected` | `target_route_id` |
+| `request.forwarded` | `body_hash` |
+| `transparency.request_modified` | Present when forwarded body differs from the received body. |
+| `upstream.verified` | `provider`, `model_id`, `result`, `required`, `session_id`, `channel_bindings`, `claims` |
+| `response.received` | `cleartext_hash` |
+| `transparency.response_modified` | Present when returned body differs from the provider response. |
+| `response.returned` | `cleartext_hash`, `wire_hash` |
+
+```json
+{
+  "api_version": "aci/1",
+  "receipt_id": "rcpt-e0eefe63b3673e2a5984951f",
+  "chat_id": "d3ad808b20a444c29e798db35f112033",
+  "workload_id": "sha256:3def476b...",
+  "workload_keyset_digest": "sha256:3eff0836...",
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "served_at": 1781588857,
+  "event_log": [
+    { "seq": 0, "type": "request.received", "body_hash": "sha256:111d08a5..." },
+    { "seq": 2, "type": "route.selected", "target_route_id": "near-ai:qwen/qwen3-30b-a3b-instruct-2507" },
+    {
+      "seq": 5,
+      "type": "upstream.verified",
+      "provider": "near-ai",
+      "model_id": "Qwen/Qwen3.6-35B-A3B-FP8",
+      "result": "verified",
+      "required": true,
+      "session_id": "as_3681736b..."
+    },
+    { "seq": 7, "type": "response.returned", "wire_hash": "sha256:07703fb4..." }
+  ],
+  "signature": "..."
+}
+```
+
+## Verifying the Receipt
+
+1. Fetch and verify a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
+2. Confirm `workload_id` and `workload_keyset_digest` match the attestation report.
+3. Verify `signature` under a `receipt_signing_keys` entry from the attested keyset.
+4. Confirm `request.received.body_hash` matches the request body you sent.
+5. Confirm `response.returned.wire_hash` matches the response bytes you received.
+6. Read `upstream.verified`. For a confidential response, `result` is `verified`, `required` is `true`, and `session_id` points to an attested session.
+
+See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature) for the full walkthrough.
+
+## Legacy Alias
+
+`GET /v1/signature/{id}` returns this same receipt inside a compatibility envelope for older clients.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Attestation Report" icon="microchip" href="/phala-cloud/confidential-ai/confidential-model/api-reference/attestation" />
+  <Card title="Get Session" icon="link" href="/phala-cloud/confidential-ai/confidential-model/api-reference/sessions" />
+</CardGroup>

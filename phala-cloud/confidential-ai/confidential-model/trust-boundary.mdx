@@ -1,0 +1,42 @@
+---
+title: Trust Boundary
+description: Understand what the attested gateway protects, what routed models expose, and where plaintext is visible.
+---
+
+Confidential computing is precise: it proves specific facts, not a generic promise that everything is private. Use this page to decide what data belongs on a confidential model, a routed model, or a custom GPU TEE deployment.
+
+## What the Gateway Protects
+
+- **Gateway identity**: Verify the gateway is a specific workload running in a genuine TEE with [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
+- **Per-response integrity**: Verify a signed [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) that binds request and response hashes to the attested gateway.
+- **No body retention in receipts**: Receipts store hashes and verification facts, not prompt or response bodies.
+- **Confidential upstreams**: For confidential responses, the gateway verifies the upstream provider and enforces channel binding before forwarding.
+
+## What It Does Not Protect
+
+- **Plain TLS is visible inside the attested gateway**: TLS terminates inside the TEE. E2EE adds field-level encryption to a gateway key, but it still decrypts inside that verified gateway.
+- **Routed models expose prompts to third parties**: For routed models, the gateway forwards to an un-attested provider. The receipt records that the upstream was not verified.
+- **The gateway cannot make arbitrary upstreams confidential**: A provider is confidential only when the gateway has a provider-specific verifier and an enforceable binding.
+- **Receipts are not a permanent public log**: Treat receipt availability as operational retention, not immutable public storage.
+
+## Where Plaintext Exists
+
+| Stage | Who can see plaintext |
+| --- | --- |
+| Client to gateway | TLS protects the connection. With E2EE, selected fields are encrypted to the gateway's attested key. |
+| Inside gateway TEE | The attested gateway, after TLS termination or E2EE decryption. |
+| Gateway to confidential upstream | The verified, channel-bound upstream enclave. |
+| Gateway to routed upstream | The third-party provider over ordinary TLS. |
+
+## Choosing a Model
+
+- Use a confidential response when the upstream model provider must be attested. Confirm it from the receipt: `upstream.verified.result` is `verified` and `required` is `true`.
+- Add [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption) when you want field-level encryption to a key from the attested gateway keyset.
+- Use a routed model only when you accept that the upstream provider sees the prompt.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Providers" icon="server" href="/phala-cloud/confidential-ai/confidential-model/providers" />
+  <Card title="Channel Binding" icon="lock" href="/phala-cloud/confidential-ai/confidential-model/channel-binding" />
+</CardGroup>

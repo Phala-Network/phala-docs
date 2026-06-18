@@ -425,53 +425,6 @@
                 ]
               },
               {
-                "group": "Confidential AI",
-                "pages": [
-                  "/phala-cloud/confidential-ai/overview",
-                  {
-                    "group": "Models",
-                    "pages": [
-                      "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
-                      "/phala-cloud/confidential-ai/confidential-gpu/model-template",
-                      {
-                        "group": "API Reference",
-                        "pages": [
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions",
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/signature",
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings",
-                          "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
-                        ]
-                      },
-                      "/phala-cloud/confidential-ai/confidential-model/tool-calling",
-                      "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
-                      "/phala-cloud/confidential-ai/confidential-model/structured-output",
-                      "/phala-cloud/confidential-ai/confidential-model/streaming",
-                      "/phala-cloud/confidential-ai/confidential-model/playground"
-                    ]
-                  },
-                  {
-                    "group": "GPU TEE",
-                    "pages": [
-                      "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
-                      "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
-                      "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting"
-                    ]
-                  },
-                  {
-                    "group": "Verify",
-                    "pages": [
-                      "/phala-cloud/confidential-ai/verify/overview",
-                      "/phala-cloud/confidential-ai/verify/verify-attestation",
-                      "/phala-cloud/confidential-ai/verify/verify-signature"
-                    ]
-                  },
-                  "/phala-cloud/confidential-ai/benchmark",
-                  "/phala-cloud/confidential-ai/faqs"
-                ]
-              },
-              {
                 "group": "Onchain KMS",
                 "pages": [
                   "/phala-cloud/key-management/key-management-protocol",
@@ -779,6 +732,78 @@
           }
         ],
         "tab": "Phala Cloud"
+      },
+      {
+        "icon": "shield-check",
+        "pages": [
+          "/phala-cloud/confidential-ai/overview",
+          {
+            "group": "API Access",
+            "pages": [
+              "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
+              {
+                "group": "API Reference",
+                "pages": [
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/responses",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/messages",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/completions",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/sessions",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/signature",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
+                ]
+              },
+              "/phala-cloud/confidential-ai/confidential-model/tool-calling",
+              "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
+              "/phala-cloud/confidential-ai/confidential-model/structured-output",
+              "/phala-cloud/confidential-ai/confidential-model/streaming",
+              "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
+              "/phala-cloud/confidential-ai/confidential-model/error-handling",
+              "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations",
+              "/phala-cloud/confidential-ai/confidential-model/playground"
+            ]
+          },
+          {
+            "group": "Security Model",
+            "pages": [
+              "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
+              "/phala-cloud/confidential-ai/confidential-model/channel-binding",
+              "/phala-cloud/confidential-ai/confidential-model/providers",
+              "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims",
+              "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
+              "/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source"
+            ]
+          },
+          {
+            "group": "Dedicated Models",
+            "pages": [
+              "/phala-cloud/confidential-ai/confidential-gpu/model-template"
+            ]
+          },
+          {
+            "group": "GPU TEE",
+            "pages": [
+              "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
+              "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
+              "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting"
+            ]
+          },
+          {
+            "group": "Verify",
+            "pages": [
+              "/phala-cloud/confidential-ai/verify/overview",
+              "/phala-cloud/confidential-ai/verify/verify-attestation",
+              "/phala-cloud/confidential-ai/verify/verify-signature"
+            ]
+          },
+          "/phala-cloud/confidential-ai/benchmark",
+          "/phala-cloud/confidential-ai/faqs"
+        ],
+        "tab": "Confidential AI"
       },
       {
         "icon": "terminal",
@@ -2110,19 +2135,19 @@
       "keywords": "Phala Cloud, TEE, Trusted Execution Environment, Confidential Computing, Confidential AI, GPU TEE, Intel TDX, dstack, blockchain, privacy-preserving computing, secure cloud, attestation",
       "language": "en",
       "og:image": "https://raw.githubusercontent.com/Phala-Network/phala-docs/main/images/phala-docs-og.png",
-      "og:image:alt": "Phala Cloud — Confidential Computing & GPU TEE for AI",
+      "og:image:alt": "Phala Cloud \u2014 Confidential Computing & GPU TEE for AI",
       "og:image:width": "1200",
       "og:image:height": "630",
       "og:site_name": "Phala Docs",
       "og:type": "website",
-      "og:title": "Phala Cloud Documentation — Confidential AI on TEE",
+      "og:title": "Phala Cloud Documentation \u2014 Confidential AI on TEE",
       "og:description": "Deploy confidential AI applications on Phala Cloud with hardware-level privacy via Intel TDX, NVIDIA H100 GPU TEE, and verifiable attestation.",
       "robots": "index, follow",
       "twitter:card": "summary_large_image",
       "twitter:creator": "@PhalaNetwork",
       "twitter:site": "@PhalaNetwork",
       "twitter:image": "https://raw.githubusercontent.com/Phala-Network/phala-docs/main/images/phala-docs-og.png",
-      "twitter:title": "Phala Cloud Documentation — Confidential AI on TEE",
+      "twitter:title": "Phala Cloud Documentation \u2014 Confidential AI on TEE",
       "twitter:description": "Deploy confidential AI applications on Phala Cloud with hardware-level privacy via Intel TDX, NVIDIA H100 GPU TEE, and verifiable attestation."
     }
   },

@@ -1,0 +1,84 @@
+---
+title: Messages
+description: Create a model response using the Anthropic Messages API format through the attested Confidential AI gateway.
+api: "POST /messages"
+---
+
+Creates a model response using the Anthropic Messages request and response format. Requests are served through the attested gateway and return an `x-receipt-id` header for verification.
+
+## Endpoint
+
+```bash
+POST https://inference.phala.com/v1/messages
+```
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Model id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+</ParamField>
+
+<ParamField body="max_tokens" type="integer" required>
+  Maximum number of tokens to generate.
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Conversation turns. Each item has a `role` (`user` or `assistant`) and `content`.
+</ParamField>
+
+<ParamField body="system" type="string">
+  System prompt, sent as a top-level field.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Stream the response as server-sent events.
+</ParamField>
+
+## Example
+
+```bash
+curl https://inference.phala.com/v1/messages \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "anthropic/claude-sonnet-4.5",
+    "max_tokens": 100,
+    "messages": [
+      {"role": "user", "content": "Say hello in three words."}
+    ]
+  }'
+```
+
+## Response
+
+```json
+{
+  "id": "msg_01ABC...",
+  "type": "message",
+  "role": "assistant",
+  "model": "anthropic/claude-sonnet-4.5",
+  "content": [
+    { "type": "text", "text": "Hello, howdy, hi!" }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": { "input_tokens": 14, "output_tokens": 8 }
+}
+```
+
+Read assistant text from `content[].text` on blocks with `type: "text"`. `stop_reason` is usually `end_turn`, `max_tokens`, `stop_sequence`, or `tool_use`.
+
+## Verification
+
+Use the response `x-receipt-id` header with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). A confidential response has `upstream.verified.result = verified` and `required = true`.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Responses" icon="arrow-right-arrow-left" href="/phala-cloud/confidential-ai/confidential-model/api-reference/responses" />
+  <Card title="Trust Boundary" icon="shield-halved" href="/phala-cloud/confidential-ai/confidential-model/trust-boundary" />
+</CardGroup>

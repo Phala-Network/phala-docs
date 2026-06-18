@@ -1,0 +1,78 @@
+---
+title: Compliance and Open Source
+description: Understand the technical controls, source provenance, and audit evidence behind Confidential AI.
+---
+
+Phala Confidential AI is designed so privacy and integrity claims can be checked with technical evidence: attestation reports, source provenance, signed receipts, and provider verification records.
+
+<Note>
+Read [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary) first. The gateway is attested and receipts do not retain request bodies, but plaintext is visible inside the attested gateway after TLS termination or E2EE decryption.
+</Note>
+
+## Technical Controls
+
+| Control | How Confidential AI provides it |
+| --- | --- |
+| Data isolation | Gateway and confidential providers run in TEEs. |
+| Hardware-backed identity | The gateway publishes an attestation report with a TEE quote. |
+| Per-response auditability | Receipts bind request and response hashes to the attested workload. |
+| No body retention in receipts | Receipts store hashes and facts, not prompt or response text. |
+| Confidential upstreams | For confidential responses, the upstream is verified and channel-bound before forwarding. |
+| Encryption in transit | TLS for all requests, with optional [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption). |
+
+## Regulatory Fit
+
+| Requirement | How the architecture helps |
+| --- | --- |
+| Data minimization | Gateway receipts avoid storing request and response bodies. |
+| Confidential processing | TEE isolation and attestation provide verifiable runtime identity. |
+| Audit evidence | Attestation reports, receipts, sessions, and source provenance can be retained by the customer. |
+| Provider separation | Receipts distinguish confidential upstreams from routed third-party providers. |
+
+For regulated data, use confidential responses and verify `upstream.verified.result = verified`, `required = true`, and the provider claims your policy requires.
+
+## Source Provenance
+
+Every gateway attestation report includes `attestation.source_provenance`:
+
+```json
+{
+  "repo_url": "https://github.com/Dstack-TEE/private-ai-gateway.git",
+  "repo_commit": "9d45c7e3d48d2f74c31cd85f1fb5c6cee1435ef3",
+  "image_digest": null,
+  "image_provenance": null
+}
+```
+
+Use these fields to compare the running workload against the source release you are willing to trust.
+
+## Relevant Repositories
+
+<CardGroup cols={2}>
+  <Card title="private-ai-gateway" icon="server" href="https://github.com/Dstack-TEE/private-ai-gateway">
+    ACI gateway, attestation reports, receipts, and provider verification.
+  </Card>
+  <Card title="dstack" icon="cube" href="https://github.com/Dstack-TEE/dstack">
+    TEE runtime and KMS used for workload identity and quote generation.
+  </Card>
+</CardGroup>
+
+## What to Audit
+
+- Attestation report generation and nonce binding.
+- Keyset endorsement and receipt signing keys.
+- Provider verification and channel binding.
+- Receipt event log construction.
+- Fail-closed behavior when confidential upstream verification is required.
+- Source provenance and image provenance for production releases.
+
+## Enterprise Documentation
+
+Compliance reports, enterprise security reviews, DPAs, BAAs, and certification scope can change over time. Request current documents from Phala through your account or enterprise support channel.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Attestation Report" icon="microchip" href="/phala-cloud/confidential-ai/confidential-model/api-reference/attestation" />
+  <Card title="Receipts and Sessions" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions" />
+</CardGroup>

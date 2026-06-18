@@ -6,7 +6,7 @@ description: Create vector embeddings with OpenAI-compatible embedding models.
 ## Endpoint
 
 ```bash
-POST https://api.redpill.ai/v1/embeddings
+POST https://inference.phala.com/v1/embeddings
 ```
 
 Generate vector embeddings for retrieval, semantic search, clustering, and similarity workloads.
@@ -35,7 +35,7 @@ Generate vector embeddings for retrieval, semantic search, clustering, and simil
 
 <CodeGroup>
 ```bash cURL
-curl https://api.redpill.ai/v1/embeddings \
+curl https://inference.phala.com/v1/embeddings \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -49,7 +49,7 @@ from openai import OpenAI
 
 client = OpenAI(
     api_key="<API_KEY>",
-    base_url="https://api.redpill.ai/v1",
+    base_url="https://inference.phala.com/v1",
 )
 
 response = client.embeddings.create(
@@ -66,7 +66,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   apiKey: "<API_KEY>",
-  baseURL: "https://api.redpill.ai/v1",
+  baseURL: "https://inference.phala.com/v1",
 });
 
 const response = await client.embeddings.create({

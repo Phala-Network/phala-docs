@@ -1,168 +1,138 @@
 ---
-description: Learn how to verify the integrity of your Confidential AI API requests.
-title: Integrity Proof
+description: Learn how to verify a Confidential AI response with the gateway attestation report and signed receipt.
+title: Verify a Response
 ---
 
-## Why integrity proof matters
+## What the receipt proves
 
-Every Confidential AI response comes with a cryptographic signature. This signature proves the AI output came from verified TEE hardware and nobody tampered with it along the way.
+Every Confidential AI response includes a signed receipt id in the `x-receipt-id` header. The receipt is an ordered transparency event log. It records request and response hashes, the selected route, upstream verification status, and the signature that binds the record to the attested gateway keyset.
 
-The signature cryptographically binds the request and response to the TEE's signing key. Any modification to the AI's response or injected fake data will break the signature verification. Without this check, you're trusting the transport layer. With it, you have end-to-end cryptographic proof from the TEE itself.
+For a confidential response, the receipt's `upstream.verified` event shows `result: verified`, `required: true`, and a `session_id`. That session records the verified upstream security context and channel binding.
 
-## Get the signature
+## Prerequisites
 
-After you make an AI request, you'll get a `chat_id` in the response. Use it to fetch the cryptographic signature:
-
-```python
-import requests
-
-# After getting AI response with chat_id
-chat_id = ai_response["id"]
-model = "phala/qwen3.5-27b"  # or your model
-
-# Fetch the signature
-sig_response = requests.get(
-    f"https://api.redpill.ai/v1/signature/{chat_id}?model={model}",
-    headers={"Authorization": f"Bearer {api_key}"}
-)
-signature_data = sig_response.json()
-
-# signature_data contains:
-# - text: "request_hash:response_hash" or "model:request_hash:response_hash"
-# - signature: The ECDSA or Ed25519 signature
-# - signing_address: The address that signed this response
-# - signing_algo: The signature algorithm
+```bash
+export API_KEY="<API_KEY>"
+export BASE="https://inference.phala.com"
 ```
 
-The response gives you everything needed for verification. The `text` field contains hashes of your request and the AI's response. Some responses include the model name first, so the format is either `request_hash:response_hash` or `model:request_hash:response_hash`. The `signature` is the cryptographic proof from the TEE. The `signing_address` identifies which TEE instance signed this response.
+You need `curl`, `jq`, and a SHA-256 tool. On Linux use `sha256sum`; on macOS use `shasum -a 256`.
 
-## Verify request and response hashes
+## 1. Fetch a fresh gateway attestation
 
-Confirm the hashes in the `text` field match your actual request and response. Hashes are byte-sensitive, so production verifiers should hash the exact serialized request body and response body sent over the wire.
+```bash
+export NONCE="$(openssl rand -hex 16)"
 
-```python
-from hashlib import sha256
-
-def sha256_text(text: str):
-    """Calculate SHA256 hash of text"""
-    return sha256(text.encode()).hexdigest()
-
-# Calculate hashes of your original request and response
-request_body_json = '{"model": "...", "messages": [...]}'  # Your request JSON
-response_body = '{"id": "...", "choices": [...], ...}'     # Full response JSON
-
-request_hash = sha256_text(request_body_json)
-response_hash = sha256_text(response_body)
-
-# Parse the signed hashes.
-# Format can be either request_hash:response_hash or model:request_hash:response_hash.
-parts = signature_data["text"].split(":")
-if len(parts) == 3:
-    signed_model, request_hash_server, response_hash_server = parts
-else:
-    request_hash_server, response_hash_server = parts
-
-# Verify they match
-assert request_hash == request_hash_server
-assert response_hash == response_hash_server
-print("Request and response hashes verified")
+curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
+  -H "Authorization: Bearer $API_KEY" \
+  -o report.json
 ```
 
-This ensures the data wasn't modified or swapped after signing. The signature covers these exact hashes.
+Verify the report as described in [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation). The receipt checks below assume you trust the attested keyset from this report.
 
-## Verify signature
+## 2. Make a request and capture the receipt id
 
-Now verify that the signature actually came from a TEE. You'll recover the signing address from the signature, then fetch and verify the attestation for that specific address.
+```bash
+curl -s -D headers.txt "$BASE/v1/chat/completions" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"phala/qwen3.5-27b",
+       "messages":[{"role":"user","content":"Explain attestation in one sentence."}]}' \
+  -o response.json
 
-### Recover signing address from signature
-
-For ECDSA signatures (most common), recover the Ethereum address:
-
-```python
-from eth_account.messages import encode_defunct
-from eth_account import Account
-
-# Recover the address that created this signature
-message = encode_defunct(text=signature_data["text"])
-recovered_address = Account.recover_message(
-    message,
-    signature=signature_data["signature"]
-)
-
-# Verify it matches the claimed signing address
-signing_address = signature_data["signing_address"]
-assert recovered_address.lower() == signing_address.lower()
-print(f"Signature valid from: {signing_address}")
+export RECEIPT_ID="$(grep -i '^x-receipt-id' headers.txt | tr -d '\r' | awk '{print $2}')"
+echo "receipt: $RECEIPT_ID"
 ```
 
-For Ed25519 signatures, the verification process differs - check the signing algorithm in your attestation response.
+Keep `response.json`; the receipt commits to the exact response bytes.
 
-### Fetch attestation for signing address
+## 3. Fetch the signed receipt
 
-Now fetch a fresh attestation for this specific signing address. This proves the signing key belongs to verified TEE hardware:
+```bash
+curl -s "$BASE/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer $API_KEY" \
+  -o receipt.json
 
-```python
-import secrets
-
-# Generate fresh nonce for attestation
-nonce = secrets.token_hex(32)
-
-# Fetch attestation for this signing address
-attestation_response = requests.get(
-    f"https://api.redpill.ai/v1/attestation/report?model={model}&nonce={nonce}&signing_address={signing_address}",
-    headers={"Authorization": f"Bearer {api_key}"}
-)
-attestation_report = attestation_response.json()
-
-def find_attestation_for_signer(report, signing_address):
-    candidates = []
-    if "gateway_attestation" in report:
-        candidates.append(report["gateway_attestation"])
-    candidates.extend(report.get("model_attestations", []))
-    candidates.extend(report.get("all_attestations", []))
-    if "signing_address" in report:
-        candidates.append(report)
-
-    for item in candidates:
-        if item.get("signing_address", "").lower() == signing_address.lower():
-            return item
-
-    raise ValueError("No attestation found for signing address")
-
-attestation = find_attestation_for_signer(attestation_report, signing_address)
-
-print(f"Found attestation for: {attestation['signing_address']}")
+jq '{receipt_id, workload_id, workload_keyset_digest, endpoint}' receipt.json
 ```
 
-In multi-server or two-layer deployments, the response may include several attestations. Filter by `signing_address` to find the one matching your response signature.
+## 4. Match the receipt to the attested gateway
 
-### Verify the attestation
+```bash
+test "$(jq -r .workload_id report.json)" = "$(jq -r .workload_id receipt.json)" \
+  && test "$(jq -r .workload_keyset_digest report.json)" = "$(jq -r .workload_keyset_digest receipt.json)" \
+  && echo "workload matches" || echo "MISMATCH"
+```
 
-Finally, verify this attestation using all the checks from [Verify Attestation](./verify-attestation):
-- Verify Intel TDX quote
-- Verify report data binds the signing address and nonce
-- Verify NVIDIA GPU attestation
-- Verify Docker compose manifest and mr_config
-- Verify Sigstore build provenance
+If these values do not match, the receipt is not bound to the attestation report you verified.
 
-When all checks pass, you've proven end-to-end that your AI response came from verified TEE hardware running verified software.
+## 5. Check the response hash
 
-## Verify using Etherscan (optional)
+The `response.returned.wire_hash` event must match the bytes you received.
 
-Want to double-check visually? Use [Etherscan's signature tool](https://etherscan.io/verifiedSignatures). Enter the `signing_address` from your attestation report, paste the `text` field from the signature response, and add the `signature` value. Click verify and Etherscan will confirm everything matches.
+```bash
+# Linux:
+RESP_HASH="sha256:$(sha256sum response.json | awk '{print $1}')"
 
-This gives you an independent third-party verification that the signature is valid.
+# macOS alternative:
+# RESP_HASH="sha256:$(shasum -a 256 response.json | awk '{print $1}')"
 
-## Complete example
+RECEIPT_RESP_HASH="$(jq -r '.event_log[] | select(.type=="response.returned") | .wire_hash' receipt.json)"
 
-For a full raw Python implementation that verifies both attestation and signatures, see the [signature verifier example](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/signature_verifier.py).
+echo "received: $RESP_HASH"
+echo "receipt:  $RECEIPT_RESP_HASH"
+test "$RESP_HASH" = "$RECEIPT_RESP_HASH" && echo "response hash matches"
+```
 
-This script demonstrates the complete flow:
-1. Send chat completion request (streaming or non-streaming)
-2. Fetch signature for the response
-3. Verify request and response hashes match
-4. Recover signing address from ECDSA signature
-5. Fetch fresh attestation for that signing address
-6. Verify full attestation (TDX quote, GPU, report data, compose manifest, Sigstore)
+The receipt also contains `request.received.body_hash`. In production, hash the exact request body bytes you sent and compare them to that event.
 
-You've now verified both the TEE environment (attestation) and individual AI responses (signatures). Your Confidential AI setup is fully verified and trustworthy.
+## 6. Verify the receipt signature
+
+The receipt signature covers the canonical receipt bytes. Verify it under one of the `receipt_signing_keys` entries from `attestation.workload_keyset`.
+
+```bash
+# Conceptual:
+# verifier check-receipt --attestation report.json --receipt receipt.json
+```
+
+A receipt signed by a key outside the attested keyset is not bound to the verified gateway and must fail verification.
+
+## 7. Confirm the upstream was confidential
+
+```bash
+jq '.event_log[] | select(.type=="upstream.verified")
+    | {provider, model_id, result, required, session_id}' receipt.json
+```
+
+Interpretation:
+
+- Confidential response: `result` is `verified`, `required` is `true`, and `session_id` is present.
+- Routed response: `result` is `failed`, `required` is `false`, and no `session_id` is present. The gateway was attested, but the upstream provider was not.
+
+To inspect the immutable upstream security context:
+
+```bash
+SESSION_ID="$(jq -r '.event_log[] | select(.type=="upstream.verified") | .session_id' receipt.json)"
+
+curl -s "$BASE/v1/aci/sessions/$SESSION_ID" \
+  -H "Authorization: Bearer $API_KEY" | \
+  jq '{session_id, provider, endpoint, channel_binding, claims}'
+```
+
+## Legacy signature endpoint
+
+Older clients may call `GET /v1/signature/{id}`. It returns the same receipt inside a compatibility envelope:
+
+```bash
+curl -s "$BASE/v1/signature/$RECEIPT_ID" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+New clients should use `GET /v1/aci/receipts/{id}` directly.
+
+## What a passing verification proves
+
+- The gateway is a specific reviewed workload in a genuine TEE.
+- The receipt is signed by a key in the attested gateway keyset.
+- The response you received is exactly the response the gateway signed.
+- For a confidential model response, the upstream provider was verified and channel-bound before forwarding.

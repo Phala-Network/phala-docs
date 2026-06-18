@@ -1,0 +1,58 @@
+---
+title: Completions
+description: Create a legacy text completion through the attested Confidential AI gateway.
+api: "POST /completions"
+---
+
+<Warning>
+This endpoint is legacy. Use [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions) or [Responses](/phala-cloud/confidential-ai/confidential-model/api-reference/responses) for new applications.
+</Warning>
+
+## Endpoint
+
+```bash
+POST https://inference.phala.com/v1/completions
+```
+
+## Request
+
+```json
+{
+  "model": "gpt-3.5-turbo-instruct",
+  "prompt": "Say this is a test",
+  "max_tokens": 7,
+  "temperature": 0
+}
+```
+
+## Response
+
+```json
+{
+  "id": "cmpl-123",
+  "object": "text_completion",
+  "created": 1677652288,
+  "model": "gpt-3.5-turbo-instruct",
+  "choices": [
+    {
+      "text": "\n\nThis is a test.",
+      "index": 0,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 5,
+    "completion_tokens": 7,
+    "total_tokens": 12
+  }
+}
+```
+
+Like other inference endpoints, raw HTTP responses include `x-receipt-id` for verification.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Chat Completions" icon="comments" href="/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions" />
+  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
+</CardGroup>

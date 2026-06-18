@@ -1,0 +1,52 @@
+---
+title: Confidential Providers
+description: Understand which upstream providers can serve confidential responses and what each verifier attests.
+---
+
+A confidential response is served by an upstream provider whose enclave the gateway verifies before forwarding your prompt. The receipt is the authoritative record for a specific response: read `upstream.verified.provider`, `result`, `required`, `session_id`, `channel_bindings`, and `claims`.
+
+Provider coverage changes over time. Use this page as the current verification model, and use receipts for per-response truth.
+
+## Providers and Bindings
+
+| Provider | TEE | Channel binding |
+| --- | --- | --- |
+| Phala | Intel TDX + NVIDIA confidential computing GPU | `tls_spki_sha256` |
+| NEAR AI | Intel TDX + NVIDIA confidential computing GPU | `tls_spki_sha256` |
+| Chutes | Intel TDX + NVIDIA confidential computing GPU | `e2ee_public_key_sha256` |
+| Tinfoil | AMD SEV-SNP or Intel TDX + NVIDIA confidential computing GPU | `tls_spki_sha256` |
+
+`tls_spki_sha256` pins the HTTPS connection to a verified TLS key. `e2ee_public_key_sha256` encrypts the provider-facing request to a verified enclave key.
+
+## Claim Coverage
+
+| Claim | Phala | NEAR AI | Chutes | Tinfoil |
+| --- | --- | --- | --- | --- |
+| `tee_attested` | Hardware-proven | Hardware-proven | Hardware-proven | Hardware-proven |
+| `tcb_up_to_date` | Tri-state | Tri-state | Tri-state | Tri-state |
+| `serving_software_known_good` | Unknown | Unknown | Unknown | Verifier-derived |
+| `gpu_attested` | Verifier-derived | Unknown | Verifier-derived | Unknown |
+| `model_weights_provenance` | Unknown | Unknown | Unknown | Unknown |
+
+## How to Read This
+
+- `tee_attested` is the baseline hardware claim. A confidential response should assert it with hardware-backed evidence.
+- `tcb_up_to_date` is tri-state. A stale TCB is recorded as refuted, not hidden.
+- `serving_software_known_good` means the verifier can connect software measurements to known source or build provenance.
+- `gpu_attested` proves GPU attestation evidence was verified and nonce-bound. It is supplemental; the session gate is still the verified and bound upstream channel.
+- `model_weights_provenance` is not generally proven today. Treat `Unknown` as not proven.
+
+## Router-Backed Providers
+
+Some providers front many models behind one verified gateway. In that case, the attested session belongs to the verified provider channel, and the served model is recorded on the receipt. Do not infer provider security from the model id alone.
+
+## Routed Providers
+
+OpenAI, Anthropic, and other generic routed providers may be available through the same API. These requests still pass through the attested Phala gateway, but the upstream provider is not attested. The receipt records `result: failed` and `required: false` for `upstream.verified`.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/tcb-and-claims" />
+  <Card title="Receipts and Sessions" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions" />
+</CardGroup>

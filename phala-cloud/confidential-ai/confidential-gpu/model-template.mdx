@@ -126,15 +126,16 @@ For TEE verification, your instance exposes attestation endpoints:
 
 ```bash
 # Get attestation report
+NONCE=$(openssl rand -hex 16)
 curl -H "Authorization: Bearer sk-your-api-key" \
-  "https://<base_url>/v1/attestation/report?model=MODEL_NAME"
+  "https://<base_url>/v1/aci/attestation?nonce=$NONCE"
 
-# Get signature for a chat completion
+# Get the signed receipt for a chat completion
 curl -H "Authorization: Bearer sk-your-api-key" \
-  "https://<base_url>/v1/signature/{chat_completion_id}?model=MODEL_NAME&signing_algo=ecdsa"
+  "https://<base_url>/v1/aci/receipts/{receipt_id_or_chat_completion_id}"
 ```
 
-See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation) and [Verify Signature](/phala-cloud/confidential-ai/verify/verify-signature) for how to use these endpoints to confirm your requests were processed inside a TEE.
+See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation) and [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature) for how to use these endpoints to confirm your requests were processed inside a TEE.
 
 ## Managing your instance
 

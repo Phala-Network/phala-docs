@@ -1,0 +1,115 @@
+---
+title: Error Handling
+description: Handle Confidential AI API errors, retries, unsupported parameters, and upstream failures.
+---
+
+## Error Response Format
+
+Errors return a JSON body with an `error` object and an HTTP status code:
+
+```json
+{
+  "error": {
+    "message": "Invalid API key provided",
+    "type": "authentication_error",
+    "code": null,
+    "param": null
+  }
+}
+```
+
+The `type` field is the machine-readable discriminator.
+
+| `type` | Meaning |
+| --- | --- |
+| `authentication_error` | Missing or invalid API key. |
+| `invalid_request_error` | Malformed request body or unsupported parameter. |
+| `model_not_found` | The requested model id is unavailable. |
+| `upstream_error` | The upstream provider failed or timed out. |
+
+## Status Codes
+
+| Status | Meaning |
+| --- | --- |
+| `400` | Bad request, unknown model, or invalid parameter. |
+| `401` | Missing or invalid API key. |
+| `403` | Forbidden, for example insufficient credits. |
+| `429` | Rate limited. |
+| `500` | Gateway server error. |
+| `502` | Upstream provider unavailable. |
+| `503` | Service temporarily unavailable. |
+
+## SDK Handling
+
+```python
+import os
+import time
+from openai import OpenAI, AuthenticationError, RateLimitError, APIError
+
+client = OpenAI(
+    base_url="https://inference.phala.com/v1",
+    api_key=os.environ["API_KEY"],
+)
+
+try:
+    response = client.chat.completions.create(
+        model="phala/qwen3.5-27b",
+        messages=[{"role": "user", "content": "Hello"}],
+    )
+except AuthenticationError:
+    print("Invalid API key")
+except RateLimitError:
+    print("Rate limited; retry with backoff")
+except APIError as e:
+    print(f"API error {e.status_code}: {e.message}")
+```
+
+## Retry Policy
+
+Retry only transient errors:
+
+- Retry `429`, `500`, `502`, and `503` with exponential backoff.
+- Do not retry `400` or `401` until you fix the request or key.
+- If a confidential upstream verification fails, treat it as a failed security condition, not a normal retry loop, unless the API response documents it as transient.
+
+```python
+from openai import RateLimitError, APIError
+
+def with_retry(call, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return call()
+        except (RateLimitError, APIError) as e:
+            status = getattr(e, "status_code", 500)
+            if status in (429, 500, 502, 503) and attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            raise
+```
+
+## Common Cases
+
+<AccordionGroup>
+  <Accordion title="Invalid API key">
+    Confirm the `Authorization: Bearer <API_KEY>` header, check for whitespace, and create a fresh key from the Phala dashboard if needed.
+  </Accordion>
+  <Accordion title="Unknown model">
+    List valid model ids with [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models). Do not assume a model id exists until it appears in the catalog.
+  </Accordion>
+  <Accordion title="Unsupported parameter">
+    Some models support `max_tokens`; others require `max_completion_tokens`. Check `supported_parameters` in `/v1/models`.
+  </Accordion>
+  <Accordion title="Rate limited">
+    Back off and retry. For sustained high volume, use dedicated models or dedicated GPU TEE capacity.
+  </Accordion>
+  <Accordion title="Upstream unavailable">
+    Retry after backoff or choose another model. For sensitive prompts, confirm the replacement model returns `upstream.verified.result = verified`.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+- Branch on HTTP status and `error.type`, not message text.
+- Keep API keys in environment variables or a secret manager.
+- Never log request bodies for sensitive prompts.
+- Verify `x-receipt-id` when the response is security-sensitive.

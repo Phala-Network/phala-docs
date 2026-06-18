@@ -1,0 +1,75 @@
+---
+title: TCB and Claims
+description: Interpret typed claims in receipts and attested sessions, including source, status, and TCB freshness.
+---
+
+Confidential responses carry typed claims about the upstream that served the request. Claims appear in the receipt's `upstream.verified.claims` and in the attested session referenced by `session_id`.
+
+A claim is not just a boolean. It has a status, a source, and often a reason.
+
+```json
+{
+  "tee_attested": {
+    "status": "asserted",
+    "source": "hardware_proven",
+    "reason": "verified TEE quote and bound request channel"
+  }
+}
+```
+
+## Claim Status
+
+| Status | Meaning |
+| --- | --- |
+| `asserted` | Evidence backs this claim. |
+| `refuted` | Evidence contradicts this claim, such as a stale TCB. |
+| `unknown` | The verifier did not establish this claim. Treat it as not proven. |
+
+## Claim Source
+
+| Source | Assurance |
+| --- | --- |
+| `hardware_proven` | Comes from verified TEE quote or collateral. |
+| `verifier_derived` | Computed by the verifier from checked evidence. |
+| `provider_asserted` | Published by the provider, not independently proven. |
+| `operator_asserted` | Declared by the gateway operator. |
+
+## Common Claims
+
+| Claim | Meaning |
+| --- | --- |
+| `tee_attested` | A genuine CPU TEE was verified and bound to the channel. |
+| `tcb_up_to_date` | The platform Trusted Computing Base is current. |
+| `os_known_good` | The OS or platform image maps to reviewed source or known measurements. |
+| `serving_software_known_good` | Serving software maps to reviewed source or build provenance. |
+| `gpu_attested` | NVIDIA confidential-computing GPU evidence was verified and nonce-bound. |
+| `model_weights_provenance` | Model weights and quantization match a reviewed provenance chain. |
+
+## TCB Freshness
+
+`tcb_up_to_date` is intentionally tri-state:
+
+- Up-to-date evidence asserts the claim.
+- Stale evidence refutes the claim and records the stale status.
+- Missing evidence leaves the claim `unknown`.
+
+Your verifier policy decides whether a refuted TCB is acceptable. The receipt's job is to expose the fact.
+
+## GPU Attestation
+
+`gpu_attested` proves a confidential-computing GPU attestation was verified for the provider's evidence. It does not by itself prove model weights, serving software, or CPU-to-GPU binding for every provider. Read it as supplemental evidence unless your policy says otherwise.
+
+## Suggested Policy
+
+1. Require `tee_attested: asserted` from `hardware_proven`.
+2. Require `upstream.verified.result = verified` and `required = true` for sensitive prompts.
+3. Treat `unknown` as not proven.
+4. Decide whether to reject `tcb_up_to_date: refuted`.
+5. Use `serving_software_known_good` and `gpu_attested` to increase assurance when available.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Providers" icon="server" href="/phala-cloud/confidential-ai/confidential-model/providers" />
+  <Card title="Get Session" icon="link" href="/phala-cloud/confidential-ai/confidential-model/api-reference/sessions" />
+</CardGroup>
