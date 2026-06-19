@@ -7,7 +7,7 @@ description: Step-by-step guide to deploy a Docker application as a Nitro Enclav
 
 Run a Docker application inside an AWS Nitro Enclave — one of the strongest isolation guarantees available in the public cloud. The host OS cannot read your enclave's memory, even with root access.
 
-> **Important:** On AWS Nitro, your workload runs inside an **AWS Enclave OS image** — not a dstack CVM. There is no Guest Agent. `dstack-util` is packaged into the Enclave for attestation and key retrieval. You control how keys are used (for example disk/data decryption in your app).
+> **Important:** On AWS Nitro, your workload runs inside an **AWS Enclave OS image** — not a dstack CVM. The Guest Agent is not available. `dstack-util` is packaged into the Enclave for attestation and key retrieval. You control how keys are used (for example disk/data decryption in your app).
 
 ## Prerequisites
 

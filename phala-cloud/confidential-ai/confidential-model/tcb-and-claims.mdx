@@ -3,7 +3,7 @@ title: TCB and Claims
 description: Interpret typed claims in receipts and attested sessions, including source, status, and TCB freshness.
 ---
 
-Confidential responses carry typed claims about the upstream that served the request. Claims appear in the receipt's `upstream.verified.claims` and in the attested session referenced by `session_id`.
+Confidential responses carry typed claims about the upstream that served the request, including TCB (Trusted Computing Base) freshness. Claims appear in the receipt's `upstream.verified.claims` and in the attested session referenced by `session_id`.
 
 A claim is not just a boolean. It has a status, a source, and often a reason.
 

@@ -45,7 +45,7 @@ Check that:
 | `attestation.tee_type` | TEE technology, for example `tdx`. |
 | `attestation.evidence.quote` | Hardware-signed TDX quote. This is the root of trust. |
 | `attestation.report_data` | Value bound into the quote, committing to the nonce and keyset. |
-| `attestation.workload_keyset` | Workload identity, receipt signing keys, E2EE public keys, TLS keys, and keyset epoch. |
+| `attestation.workload_keyset` | Workload identity, receipt signing keys, E2EE (end-to-end encryption) public keys, TLS keys, and keyset epoch. |
 | `attestation.keyset_endorsement` | Signature over the keyset under the workload identity key. |
 | `attestation.source_provenance` | Source repo, commit, image digest, and image provenance when available. |
 | `attestation.freshness` | Fetch and expiry timestamps. |

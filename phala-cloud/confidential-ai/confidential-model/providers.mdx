@@ -23,7 +23,7 @@ The enforced binding appears on the response receipt and on the attested session
 Each verified session carries typed claims. Coverage depends on the serving environment and verifier, so clients should evaluate the claims required by their own policy instead of assuming every model has the same evidence.
 
 - `tee_attested` is the baseline hardware claim. A confidential response should assert it with hardware-backed evidence.
-- `tcb_up_to_date` is tri-state. A stale TCB is recorded as refuted, not hidden.
+- `tcb_up_to_date` is tri-state. A stale TCB (Trusted Computing Base) is recorded as refuted, not hidden.
 - `serving_software_known_good` means the verifier can connect software measurements to known source or build provenance.
 - `gpu_attested` proves GPU attestation evidence was verified and nonce-bound. It is supplemental; the session gate is still the verified and bound upstream channel.
 - `model_weights_provenance` is not generally proven today. Treat `Unknown` as not proven.

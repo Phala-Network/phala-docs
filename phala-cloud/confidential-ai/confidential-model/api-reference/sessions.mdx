@@ -36,7 +36,7 @@ curl "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
 | `established_at` | number | Verification time as Unix seconds. |
 | `expires_at` | number | Retention deadline as Unix seconds. |
 | `identity` | object | Verified upstream identity keys when available. |
-| `channel_binding` | array | Enforced binding, such as a TLS SPKI digest or E2EE public key. |
+| `channel_binding` | array | Enforced binding, such as a TLS SPKI digest or E2EE (end-to-end encryption) public key. |
 | `claims` | object | Typed claims about the upstream TEE. |
 | `evidence` | object | Byte-preserving evidence checked by the verifier. |
 

@@ -14,7 +14,7 @@ Confidential computing is precise: it proves specific facts, not a generic promi
 
 ## What It Does Not Protect
 
-- **Plain TLS is visible inside the attested gateway**: TLS terminates inside the TEE. E2EE adds field-level encryption to a gateway key, but it still decrypts inside that verified gateway.
+- **Plain TLS is visible inside the attested gateway**: TLS terminates inside the TEE. E2EE (end-to-end encryption) adds field-level encryption to a gateway key, but it still decrypts inside that verified gateway.
 - **Routed models expose prompts to third parties**: For routed models, the gateway forwards to an un-attested provider. The receipt records that the upstream was not verified.
 - **The gateway cannot make arbitrary upstreams confidential**: A provider is confidential only when the gateway has a provider-specific verifier and an enforceable binding.
 - **Receipts are not a permanent public log**: Treat receipt availability as operational retention, not immutable public storage.
