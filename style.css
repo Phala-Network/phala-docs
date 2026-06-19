@@ -286,8 +286,15 @@ a.nav-tabs-item[data-active="true"] {
 }
 
 /* TOC heading "On this page" — eyebrow style.
+   Mintlify wraps the toggle button in an <h2>, so we must reset the h2
+   font-size (otherwise it renders at ~46px) and the button itself.
    Scope this to the TOC header row so item links keep their normal casing. */
+#table-of-contents h2 {
+  font-size: 14px !important;
+  margin: 0 !important;
+}
 #table-of-contents > button,
+#table-of-contents h2 button,
 #table-of-contents-layout #table-of-contents > :first-child:not(nav):not(ul):not(ol),
 #table-of-contents-layout > :first-child:not(:has(#table-of-contents)):not(nav):not(ul):not(ol),
 #table-of-contents-layout > :first-child > :first-child:not(#table-of-contents):not(nav):not(ul):not(ol) {
