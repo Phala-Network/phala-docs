@@ -21,7 +21,7 @@ from openai import OpenAI
 
 client = OpenAI(
     api_key="<API_KEY>",
-    base_url="https://api.redpill.ai/v1",
+    base_url="https://inference.phala.com/v1",
 )
 
 stream = client.chat.completions.create(
@@ -45,7 +45,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   apiKey: "<API_KEY>",
-  baseURL: "https://api.redpill.ai/v1",
+  baseURL: "https://inference.phala.com/v1",
 });
 
 const stream = await client.chat.completions.create({
@@ -63,7 +63,7 @@ for await (const chunk of stream) {
 </CodeGroup>
 
 <Accordion title="Sample output of streaming request">
-```
+```text
 HelloHello
 ```
 </Accordion>

@@ -6,7 +6,7 @@ description: List embedding-capable models available through the Confidential AI
 ## Endpoint
 
 ```bash
-GET https://api.redpill.ai/v1/embeddings/models
+GET https://inference.phala.com/v1/embeddings/models
 ```
 
 Returns models designed for vector embeddings. Use this endpoint when selecting embedding models for retrieval, RAG, clustering, or similarity search.
@@ -15,7 +15,7 @@ Returns models designed for vector embeddings. Use this endpoint when selecting 
 
 <CodeGroup>
 ```bash cURL
-curl https://api.redpill.ai/v1/embeddings/models \
+curl https://inference.phala.com/v1/embeddings/models \
   -H "Authorization: Bearer <API_KEY>"
 ```
 
@@ -23,7 +23,7 @@ curl https://api.redpill.ai/v1/embeddings/models \
 import requests
 
 response = requests.get(
-    "https://api.redpill.ai/v1/embeddings/models",
+    "https://inference.phala.com/v1/embeddings/models",
     headers={"Authorization": "Bearer <API_KEY>"},
 )
 
@@ -32,7 +32,7 @@ for model in response.json()["data"]:
 ```
 
 ```typescript TypeScript
-const response = await fetch("https://api.redpill.ai/v1/embeddings/models", {
+const response = await fetch("https://inference.phala.com/v1/embeddings/models", {
   headers: {
     Authorization: "Bearer <API_KEY>",
   },

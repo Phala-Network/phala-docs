@@ -20,7 +20,7 @@ Replace `<API_KEY>` with your actual API key in the examples below.
 ```python
 from openai import OpenAI
 client = OpenAI(
-    base_url="https://api.redpill.ai/v1",
+    base_url="https://inference.phala.com/v1",
     api_key="<API_KEY>",
 )
 response = client.chat.completions.create(
@@ -44,7 +44,7 @@ print(response.choices[0].message.content)
 
 <Accordion title="Sample output of image analysis request">
 
-```
+```text
 Here's what I see in the image:
 
 *   **Giant Pandas:** There are four young giant pandas in the image. They are black and white and appear to be playful.

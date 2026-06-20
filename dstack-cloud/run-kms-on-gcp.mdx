@@ -32,7 +32,7 @@ Run your own dstack-kms instance on GCP so you have full control over key policy
 - **For on-chain governance mode:**
   - A blockchain RPC endpoint (e.g., `https://sepolia.base.org`)
   - A wallet with sufficient balance
-  - Deployed smart contracts (DstackKms, DstackApp) — see [Deploy On-chain KMS Smart Contracts](deploy-onchain-kms)
+  - Deployed smart contracts (DstackKms, DstackApp) — see [Deploy On-chain KMS Smart Contracts](/dstack-cloud/deploy-onchain-kms)
   - You’ll need `KMS_CONTRACT_ADDR` and `APP_CONTRACT_ADDR` before KMS bootstrap/finish
 
 > **Note:** This guide uses pre-built KMS Docker images. If you need to build KMS from source or customize configuration, see the [official KMS build guide](https://github.com/Phala-Network/dstack-cloud/blob/master/docs/tutorials/kms-build-configuration.md).
@@ -41,13 +41,13 @@ Run your own dstack-kms instance on GCP so you have full control over key policy
 
 ## Step 1: Configure dstack-cloud
 
-Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-1-configure-dstack-cloud) to set up your global config and GCS bucket.
+Follow the same steps as [Run a Workload on GCP](/dstack-cloud/run-on-gcp#step-1-configure-dstack-cloud) to set up your global config and GCS bucket.
 
 ---
 
 ## Step 2: Pull the OS Images
 
-Follow the same steps as [Run a Workload on GCP](run-on-gcp#step-2-pull-the-os-image) to download the `dstack-cloud-0.6.0` images.
+Follow the same steps as [Run a Workload on GCP](/dstack-cloud/run-on-gcp#step-2-pull-the-os-image) to download the `dstack-cloud-0.6.0` images.
 
 > If `disk.raw` is missing, deployment may create a VM that cannot boot (UEFI loop: `Failed to load image`).
 
@@ -261,7 +261,7 @@ gcloud compute images delete dstack-kms-shared
 
 ## Next Steps
 
-- [Register Workload Measurements](register-enclave-measurement)
+- [Register Workload Measurements](/dstack-cloud/register-enclave-measurement)
 - [KMS and Key Delivery](/dstack-cloud/kms-and-key-delivery)
 - [Attestation Integration](/dstack-cloud/attestation-integration)
-- [Deploy On-chain KMS Smart Contracts](deploy-onchain-kms)
+- [Deploy On-chain KMS Smart Contracts](/dstack-cloud/deploy-onchain-kms)

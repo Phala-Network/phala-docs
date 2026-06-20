@@ -16,7 +16,9 @@ Key properties:
 
 ## How dstack Uses Nitro Enclaves
 
-The Nitro integration differs significantly from GCP. On GCP, dstack-cloud deploys a full virtual machine (dstack CVM) with a Guest Agent. On AWS Nitro, the workload runs inside an AWS Enclave OS image — there is no Guest Agent and no dstack OS.
+The Nitro integration differs significantly from GCP. On GCP, dstack-cloud deploys a full virtual machine (dstack CVM) with a Guest Agent.
+
+On AWS Nitro, the workload runs inside an AWS Enclave OS image — there is no Guest Agent and no dstack OS.
 
 ![Nitro Enclave Architecture](/images/dstack-cloud/nitro-enclave-architecture-v2.png)
 
@@ -76,7 +78,7 @@ The 3 PCR values are combined into a single `OS_IMAGE_HASH` for on-chain authori
 OS_IMAGE_HASH=$(sha256sum <<< "${PCR0}${PCR1}${PCR2}" | cut -d' ' -f1)
 ```
 
-The `OS_IMAGE_HASH` must be registered via [governance](governance) before KMS will deliver keys to this Enclave.
+The `OS_IMAGE_HASH` must be registered via [governance](/dstack-cloud/governance) before KMS will deliver keys to this Enclave.
 
 > **Note:** Any change to the Dockerfile, application code, or `dstack-util` version produces different PCR values and a different `OS_IMAGE_HASH`.
 
@@ -90,7 +92,7 @@ On Nitro, `dstack-util` replaces the Guest Agent for key management. It is a lig
 
 - Obtains the Enclave's attestation document from NSM (Nitro Secure Module)
 - Sends the attestation to dstack-kms through the VSOCK proxy
-- Receives the requested key if the attestation is valid (and the measurement is authorized on-chain, when using on-chain KMS mode)
+- Receives the requested key if the attestation is valid (and the measurement is authorized on-chain, when using On-chain KMS mode)
 - Makes the key available to your application (e.g., via stdout, file, or shared memory)
 
 > **Note:** Unlike GCP where the Guest Agent automatically handles disk encryption, on Nitro you are responsible for deciding how to use the key. Common patterns include encrypting model weights in memory, decrypting configuration secrets, or encrypting a RAM-disk.
@@ -163,4 +165,4 @@ Choose **GCP Confidential VMs** when:
 
 - **[Quick Start: Deploy on AWS Nitro](/dstack-cloud/get-started)** — Hands-on tutorial
 - **[Run a Workload on AWS Nitro](/dstack-cloud/run-on-nitro)** — Detailed deployment guide
-- **[Attestation Integration](attestation-integration)** — How attestation works on Nitro
+- **[Attestation Integration](/dstack-cloud/attestation-integration)** — How attestation works on Nitro

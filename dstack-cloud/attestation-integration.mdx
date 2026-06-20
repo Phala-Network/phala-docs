@@ -7,14 +7,14 @@ description: How dstack-cloud integrates remote attestation mechanisms on GCP (T
 
 Remote attestation is how a TEE proves it's running genuine, unmodified code on real hardware. dstack-cloud integrates two different attestation mechanisms — Intel TDX on GCP and AWS NSM on Nitro — to give KMS confidence before dispatching keys.
 
-> For the fundamentals of dstack Remote Attestation, the RA-TLS protocol design, and ZT-TLS / ACME certificate management, refer to the official Phala documentation:
+> For the fundamentals of dstack remote attestation, the RA-TLS (Remote Attestation TLS) protocol design, and ZT-TLS / ACME certificate management, refer to the official Phala documentation:
 >
 > - [TEE Attestation Guide](https://docs.phala.com/dstack/trust-center-technical)
 > - [TEE-Controlled Domain Certificates](https://docs.phala.com/dstack/design-documents/tee-controlled-domain-certificates)
 
 ## What Is Remote Attestation
 
-Remote Attestation is the process by which a TEE proves its identity and integrity to an external party. The proof contains:
+Remote attestation is the process by which a TEE proves its identity and integrity to an external party. The proof contains:
 
 1. **Hardware signature** — Confirms the workload is running in genuine TEE hardware (not emulated)
 2. **Workload measurements** — Cryptographic hash of the code and configuration running inside the TEE
@@ -56,7 +56,7 @@ When a dstack CVM starts on GCP, the Guest Agent performs the following steps:
 
 The key innovation is the **qualifying data binding**:
 
-```
+```text
 tpm_quote.qualifying_data = sha256(tdx_quote)
 ```
 
@@ -70,7 +70,7 @@ This creates a cryptographic link between the two independent attestation mechan
 The verifier (e.g., KMS) performs dual verification:
 
 **TDX Verification:**
-1. Retrieve TDX collateral and verify quote signature using Intel's TCB info
+1. Retrieve TDX collateral and verify quote signature using Intel's TCB (Trusted Computing Base) info
 2. Verify TCB status (debug mode disabled, mr_signer_seam valid)
 3. Replay runtime events and compare RTMR3 with quote's RTMR3
 4. Verify `report_data` matches expected value
@@ -129,7 +129,7 @@ These 3 PCR values are combined into a single `OS_IMAGE_HASH`, which is the uniq
 
 Both platforms generate hardware-signed attestations that KMS verifies before dispatching keys. The main differences are in the attestation format (TDX Quote vs. NSM Document), verification method (Intel DCAP QVL vs. AWS certificate chain), and how measurements are stored (RTMR registers vs. PCR values).
 
-For platform-specific details, see the sections above. For a broader architectural comparison, see [AWS Nitro Enclave Integration](nitro-enclave).
+For platform-specific details, see the sections above. For a broader architectural comparison, see [AWS Nitro Enclave Integration](/dstack-cloud/nitro-enclave).
 
 ## Measurements and On-chain Authorization
 
@@ -162,6 +162,6 @@ For more details, see the [dstack-cloud Verification Guide](https://github.com/P
 
 ## Next Steps
 
-- **[Security Model](security-model)** — Trust boundaries and security guarantees
+- **[Security Model](/dstack-cloud/security-model)** — Trust boundaries and security guarantees
 - **[Register Workload Measurements](/dstack-cloud/register-enclave-measurement)** — How to register measurements on-chain
 - **[Runbook](/dstack-cloud/runbook)** — Troubleshooting attestation failures

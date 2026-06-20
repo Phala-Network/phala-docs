@@ -1,64 +1,62 @@
 ---
 title: Overview
-description: Learn how to verify your AI workloads run in genuine TEE hardware with attestations and get integrity proof that your requests and responses are untampered.
+description: Learn how to verify Confidential AI gateway attestation, signed receipts, and upstream provider verification.
 ---
 
 ## Why verification matters
 
-Verification ensures your AI workloads run securely in genuine TEE hardware. You get cryptographic proof that:
+Confidential AI verification answers two questions:
 
-- **Hardware is authentic** - GPUs and CPUs are from trusted vendors and running in secure TEE mode
-- **Software is untampered** - The entire software stack from OS to application code is verified
-- **Responses are trustworthy** - Every AI response comes with proof it ran in a secure TEE
+- **Who served my request?** The gateway attestation report proves the API was served by a specific workload running in a genuine TEE.
+- **What happened to my request?** The signed receipt binds your request and response hashes to that attested workload and records whether the upstream model provider was verified.
 
-The verification process follows these steps:
+For confidential responses, the receipt also shows that the upstream provider was verified and channel-bound before your prompt was forwarded. For routed responses, the gateway is still attested, but the upstream provider is not.
+
+## Verification workflow
 
 <Steps>
-  <Step title="TEE Hardware Stack">
-    Verify the physical hardware stack, including CPU and GPU, is genuine and running in a secure TEE. Confirm the signing key is cryptographically bound to the hardware.
+  <Step title="Fetch gateway attestation">
+    Generate a fresh nonce and call `GET /v1/aci/attestation`. Verify the TEE quote, keyset endorsement, freshness, and source provenance.
   </Step>
-  <Step title="TEE Software Stack">
-    Verify that the software stack, including operating system, Docker compose configuration, container build provenance, network end-to-end encryption, and distributed root-of-trust, is secure and trustworthy.
+  <Step title="Make an inference request">
+    Call an OpenAI-compatible endpoint such as `POST /v1/chat/completions` and capture the `x-receipt-id` header.
   </Step>
-  <Step title="Integrity Proof">
-    Verify the integrity of request and response content through cryptographic signatures.
+  <Step title="Fetch the signed receipt">
+    Call `GET /v1/aci/receipts/{id}`. Confirm the receipt's `workload_id` and `workload_keyset_digest` match the attestation report.
+  </Step>
+  <Step title="Verify hashes and upstream status">
+    Check request and response hashes, verify the receipt signature against the attested keyset, and read `upstream.verified`.
   </Step>
 </Steps>
 
-Here's how the verification workflow looks:
-
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontSize': '25px', 'fontFamily': 'arial', 'lineWidth': '3px' }}}%%
 flowchart TD
-  subgraph Attestation [Verify Attestation]
-    direction TB
-    A0[Generate Nonce] ==> A1[Get Attestation]
-    A1 ==> A2[Verify TEE Hardware Stack]
-    A2 ==> A3[Verify Report Data Binding]
-    A3 ==> A4[Verify TEE Software Stack]
-  end
-  subgraph Signature [Verify Integrity]
-    S1[Get Signature] ==> S2[Verify Request/Response Hashes]
-    S2 ==> S3[Recover Signing Address]
-    S3 ==> S4[Verify Attestation for Address]
-  end
-  Request[Secure Request] ==> Attestation
-  Request ==> Signature
+  A[Generate nonce] --> B[GET /v1/aci/attestation]
+  B --> C[Verify TEE quote and keyset]
+  C --> D[POST /v1/chat/completions]
+  D --> E[Read x-receipt-id]
+  E --> F[GET /v1/aci/receipts/id]
+  F --> G[Match workload id and keyset digest]
+  G --> H[Verify receipt signature and hashes]
+  H --> I[Read upstream.verified]
 ```
 
-### How the trust chain works
+## What a passing verification proves
 
-These verification steps create a complete security chain:
+- The gateway is a genuine TEE workload with a known identity.
+- The receipt was signed by a key published in the attested gateway keyset.
+- The response bytes you received match the response hash in the receipt.
+- For a confidential response, the upstream provider was verified and the request channel was bound before forwarding.
 
-- **Fresh Nonce** prevents replay attacks - ensures attestations are generated fresh for your request
-- **TEE Hardware Stack** establishes the physical foundation - genuine NVIDIA GPUs and Intel CPUs with TEE enabled
-- **Report Data Binding** proves the signing key belongs to the TEE - signing address and nonce are cryptographically embedded in hardware-signed attestation
-- **TEE Software Stack** extends trust to the software layer - verified OS, exact Docker compose configuration, and container build provenance
-- **Integrity Proof** ensures data authenticity - cryptographic signatures prove responses came from the verified TEE
+## Canonical and legacy endpoints
 
-Together, they guarantee your AI workloads run securely across the entire system with end-to-end cryptographic proof.
+| Purpose | Canonical endpoint | Legacy alias |
+| --- | --- | --- |
+| Gateway attestation | `GET /v1/aci/attestation?nonce=` | `GET /v1/attestation/report` |
+| Per-response proof | `GET /v1/aci/receipts/{id}` | `GET /v1/signature/{id}` |
+| Upstream security context | `GET /v1/aci/sessions/{session_id}` | None |
 
-Click the cards below to learn more about details.
+Use the canonical `/v1/aci/*` endpoints for new integrations.
 
 <CardGroup cols={2}>
   <Card
@@ -67,15 +65,15 @@ Click the cards below to learn more about details.
     title="Verify Attestation"
     arrow="true"
   >
-    Learn how to verify hardware authenticity, report data binding, operating system integrity, Docker compose configuration, container build provenance, network end-to-end encryption, and distributed root-of-trust
+    Understand the attestation report, nonce binding, gateway keyset, and source provenance.
   </Card>
 
   <Card
-    icon="signature"
+    icon="receipt"
     href="/phala-cloud/confidential-ai/verify/verify-signature"
-    title="Integrity Proof"
+    title="Verify a Response"
     arrow="true"
   >
-    Learn how to verify cryptographic signatures to ensure request and response integrity
+    Verify a signed receipt, response hashes, and confidential upstream status.
   </Card>
 </CardGroup>

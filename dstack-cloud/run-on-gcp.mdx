@@ -72,7 +72,7 @@ gcloud storage buckets create gs://YOUR_BUCKET_NAME --project YOUR_PROJECT_ID --
 | **Phala Official KMS** | Use managed KMS endpoints in `services.kms_urls` | Quick start, testing |
 | **Self-hosted KMS** | Use your own KMS endpoint in `services.kms_urls` | Production, compliance, full control |
 
-For Self-hosted KMS, point `services.kms_urls` to your deployed KMS URL (see [Run a dstack-kms CVM on GCP](run-kms-on-gcp) for how to set one up).
+For Self-hosted KMS, point `services.kms_urls` to your deployed KMS URL (see [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp) for how to set one up).
 
 If you run with key provider `tpm`/`none` (no external KMS), remove `.env` in project and remove `env_file` from `app.json`.
 
@@ -238,6 +238,6 @@ dstack-cloud remove
 
 ## Next Steps
 
-- [Run a dstack-kms CVM on GCP](run-kms-on-gcp)
+- [Run a dstack-kms CVM on GCP](/dstack-cloud/run-kms-on-gcp)
 - [Attestation Integration](/dstack-cloud/attestation-integration)
-- [Run a Workload on AWS Nitro](run-on-nitro)
+- [Run a Workload on AWS Nitro](/dstack-cloud/run-on-nitro)

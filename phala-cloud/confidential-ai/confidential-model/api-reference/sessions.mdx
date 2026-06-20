@@ -1,0 +1,91 @@
+---
+title: Get Session
+description: Fetch the immutable attested-session record behind a confidential response.
+api: "GET /aci/sessions/{session_id}"
+---
+
+## Endpoints
+
+```bash
+GET https://inference.phala.com/v1/aci/sessions/{session_id}
+GET https://inference.phala.com/v1/aci/sessions?provider={provider}&model={model}
+```
+
+An attested session is the verified security context behind a confidential response. A receipt's `upstream.verified.session_id` references the session used for that response.
+
+## Get One Session
+
+<ParamField path="session_id" type="string" required>
+  The `as_...` id from a receipt's `upstream.verified.session_id`.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+### Response
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `api_version` | string | ACI version token. |
+| `session_id` | string | `as_<sha256>` content hash of the verified material. |
+| `provider` | string | Upstream provider or route name. |
+| `endpoint` | string | Verified upstream origin. |
+| `verifier_id` | string | Verifier that produced the result. |
+| `established_at` | number | Verification time as Unix seconds. |
+| `expires_at` | number | Retention deadline as Unix seconds. |
+| `identity` | object | Verified upstream identity keys when available. |
+| `channel_binding` | array | Enforced binding, such as a TLS SPKI digest or E2EE (end-to-end encryption) public key. |
+| `claims` | object | Typed claims about the upstream TEE. |
+| `evidence` | object | Byte-preserving evidence checked by the verifier. |
+
+```json
+{
+  "api_version": "aci/1",
+  "session_id": "as_3681736b33b9b8191216968e37e350bfa1e4fd8d5d192bbebf4c17c0d4edf344",
+  "provider": "phala",
+  "endpoint": "https://inference.phala.com",
+  "verifier_id": "private-ai-verifier/phala-gateway/v1",
+  "established_at": 1781588840,
+  "expires_at": 1781589140,
+  "channel_binding": [{ "type": "tls_spki_sha256", "value": "..." }],
+  "claims": {
+    "tee_attested": { "status": "Asserted", "source": "HardwareProven", "reason": "verified TDX quote" },
+    "tcb_up_to_date": { "status": "Asserted", "source": "HardwareProven" },
+    "gpu_attested": { "status": "Unknown" }
+  },
+  "evidence": { "digest": "sha256:...", "data": "data:application/json;base64,..." }
+}
+```
+
+## List Sessions
+
+Use the query form to inspect current sessions for a provider or model before sending prompts:
+
+```bash
+curl "https://inference.phala.com/v1/aci/sessions?provider=phala" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+The response is a JSON array of session records.
+
+## Typed Claims
+
+Each claim carries a `status`, a `source`, and a reason when available.
+
+| Source | Meaning |
+| --- | --- |
+| `HardwareProven` | Comes from the verified TEE quote or collateral. |
+| `VerifierDerived` | Computed by the verifier from verified evidence. |
+| `ProviderAsserted` | Published by the provider, not independently proven. |
+| `OperatorAsserted` | Declared by the gateway operator. |
+
+The common claim set includes `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_known_good`, `gpu_attested`, and `model_weights_provenance`. A claim that is not established is `Unknown`, not a silent pass.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
+  <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+</CardGroup>

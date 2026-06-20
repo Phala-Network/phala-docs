@@ -15,11 +15,11 @@ If you update your application code, Docker images, or the base image version, t
 
 ### Two Layers of On-chain Registration
 
-There are two distinct registration flows in the dstack ecosystem:
+The dstack ecosystem has two distinct registration flows:
 
 | Registration Type | What Gets Registered | Purpose | Where to Find |
 |-------------------|---------------------|---------|---------------|
-| **KMS Registration** | KMS's `mrAggregated` (GCP) or public key | Proves KMS runs in a genuine TEE | [Run dstack-kms on GCP](run-kms-on-gcp) Step 8 |
+| **KMS Registration** | KMS's `mrAggregated` (GCP) or public key | Proves KMS runs in a genuine TEE | [Run dstack-kms on GCP](/dstack-cloud/run-kms-on-gcp) Step 8 |
 | **Workload Registration** (this guide) | Workload's `compose-hash` or `OS_IMAGE_HASH` | Authorizes workload to receive keys from KMS | This document |
 
 **This guide covers workload registration** — the process of registering your application's measurement so that KMS will dispatch keys to it. This applies to:
@@ -69,7 +69,7 @@ The measurement is the `OS_IMAGE_HASH`, calculated as `sha256(PCR0 || PCR1 || PC
 ```
 
 The script outputs:
-```
+```text
 PCR0: <hash>
 PCR1: <hash>
 PCR2: <hash>
@@ -202,6 +202,6 @@ Follow the same governance flow (multisig → timelock → execute).
 
 ## Next Steps
 
-- **[Manage Governance](manage-governance)** — Other governance operations
+- **[Manage Governance](/dstack-cloud/manage-governance)** — Other governance operations
 - **[Concept: Attestation Integration](/dstack-cloud/attestation-integration)** — How measurements are generated
 - **[Concept: KMS and Key Delivery](/dstack-cloud/kms-and-key-delivery)** — How KMS uses measurements

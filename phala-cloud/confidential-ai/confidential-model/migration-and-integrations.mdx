@@ -1,0 +1,157 @@
+---
+title: Migration and Integrations
+description: Connect existing OpenAI-compatible clients, OpenRouter-style apps, LangChain, Vercel AI SDK, observability tools, and desktop clients to Confidential AI.
+---
+
+Phala Confidential AI is OpenAI-compatible. Most integrations require changing only the base URL and API key:
+
+```text
+https://inference.phala.com/v1
+```
+
+After migration, responses can be verified with `x-receipt-id`, [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation), and [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts).
+
+## Migrate from OpenAI
+
+```python
+from openai import OpenAI
+
+# Before
+openai_client = OpenAI(api_key="sk-...")
+
+# After
+phala_client = OpenAI(
+    api_key="YOUR_PHALA_API_KEY",
+    base_url="https://inference.phala.com/v1",
+)
+```
+
+Everything else stays familiar: chat completions, streaming, tool calling, vision, structured output, and embeddings use OpenAI-compatible request shapes.
+
+## Migrate from OpenRouter
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://inference.phala.com/v1",
+    api_key="YOUR_PHALA_API_KEY",
+)
+```
+
+Model ids use the provider/model format returned by `/v1/models`. Use `is_tee: true` to find models that can be served confidentially, then verify the actual response receipt.
+
+## OpenAI SDK
+
+<CodeGroup>
+```python Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_PHALA_API_KEY",
+    base_url="https://inference.phala.com/v1",
+)
+
+response = client.chat.completions.create(
+    model="phala/qwen3.5-27b",
+    messages=[{"role": "user", "content": "Explain TEE privacy."}],
+)
+
+print(response.choices[0].message.content)
+```
+
+```typescript TypeScript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.API_KEY,
+  baseURL: "https://inference.phala.com/v1",
+});
+
+const response = await client.chat.completions.create({
+  model: "phala/qwen3.5-27b",
+  messages: [{ role: "user", content: "Explain TEE privacy." }],
+});
+```
+</CodeGroup>
+
+## LangChain
+
+```python
+from langchain_openai import ChatOpenAI
+
+chat = ChatOpenAI(
+    model="phala/qwen3.5-27b",
+    api_key="YOUR_PHALA_API_KEY",
+    base_url="https://inference.phala.com/v1",
+)
+
+response = chat.invoke("Explain confidential inference in one paragraph.")
+print(response.content)
+```
+
+## Vercel AI SDK
+
+```typescript
+import { generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+
+const phala = createOpenAI({
+  apiKey: process.env.API_KEY,
+  baseURL: "https://inference.phala.com/v1",
+});
+
+const { text } = await generateText({
+  model: phala("phala/qwen3.5-27b"),
+  prompt: "Explain attestation.",
+});
+```
+
+## Langfuse
+
+```python
+import os
+from langfuse.openai import OpenAI
+
+os.environ["LANGFUSE_PUBLIC_KEY"] = "pk-lf-..."
+os.environ["LANGFUSE_SECRET_KEY"] = "sk-lf-..."
+os.environ["LANGFUSE_HOST"] = "https://cloud.langfuse.com"
+
+client = OpenAI(
+    api_key="YOUR_PHALA_API_KEY",
+    base_url="https://inference.phala.com/v1",
+)
+```
+
+<Warning>
+Observability tools may store prompts, responses, metadata, or traces. For sensitive data, configure redaction or self-hosting before sending production traffic.
+</Warning>
+
+## Coding Assistants and Desktop Clients
+
+For tools that support an OpenAI-compatible provider, use:
+
+| Setting | Value |
+| --- | --- |
+| Provider type | OpenAI compatible |
+| Base URL | `https://inference.phala.com/v1` |
+| API key | Your Phala API key |
+| Model | Any id from `/v1/models` |
+
+This works for tools such as Continue, Cline-compatible assistants, Cherry Studio, and other clients that let you set an OpenAI-compatible base URL.
+
+## Migration Checklist
+
+- [ ] Create a Phala API key.
+- [ ] Change the base URL to `https://inference.phala.com/v1`.
+- [ ] List models with `GET /v1/models`.
+- [ ] Use `is_tee: true` for confidential-capable models.
+- [ ] Capture `x-receipt-id` in raw HTTP responses when you need verification.
+- [ ] Verify one representative response before production rollout.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="On-demand API" icon="bolt" href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api" />
+  <Card title="Error Handling" icon="triangle-alert" href="/phala-cloud/confidential-ai/confidential-model/error-handling" />
+</CardGroup>

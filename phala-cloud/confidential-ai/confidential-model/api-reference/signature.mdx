@@ -1,109 +1,72 @@
 ---
-title: Request Signature
-description: Fetch a cryptographic signature for a Confidential AI response.
+title: Signature
+description: Use the legacy receipt wrapper for older Confidential AI clients.
+api: "GET /signature/{id}"
 ---
+
+`GET /v1/signature/{id}` is a legacy compatibility endpoint. It returns the same proof as the canonical [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) endpoint, but wrapped in the older `text`, `signature`, and `signing_address` envelope.
+
+New integrations should use `GET /v1/aci/receipts/{id}`.
 
 ## Endpoint
 
 ```bash
-GET https://api.redpill.ai/v1/signature/{request_id}?model={model}&signing_algo={algo}
+GET https://inference.phala.com/v1/signature/{id}
 ```
-
-Use this endpoint after a chat completion request. The signature proves a specific response was signed by a TEE key. Bind that key to fresh attestation evidence before treating the response as fully verified.
 
 ## Parameters
 
-<ParamField path="request_id" type="string" required>
-  The `id` returned by `POST /v1/chat/completions`.
+<ParamField path="id" type="string" required>
+  Receipt id (`rcpt-...`) or response id from `POST /v1/chat/completions`.
 </ParamField>
 
-<ParamField query="model" type="string" required>
-  The model ID used for the original request.
-</ParamField>
+## Example
 
-<ParamField query="signing_algo" type="string">
-  Signature algorithm. Common values include `ecdsa`, `ecdsa-p256`, and `rsa`; use the algorithm supported by the model response.
-</ParamField>
-
-## Examples
-
-<CodeGroup>
-```bash cURL
-RESPONSE=$(curl -s https://api.redpill.ai/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <API_KEY>" \
-  -d '{"model":"phala/qwen3.5-27b","messages":[{"role":"user","content":"hello"}]}')
-
-REQUEST_ID=$(echo "$RESPONSE" | jq -r '.id')
-
-curl "https://api.redpill.ai/v1/signature/$REQUEST_ID?model=phala/qwen3.5-27b" \
+```bash
+curl "https://inference.phala.com/v1/signature/$RECEIPT_OR_RESPONSE_ID" \
   -H "Authorization: Bearer <API_KEY>"
 ```
-
-```python Python
-import requests
-
-chat_response = requests.post(
-    "https://api.redpill.ai/v1/chat/completions",
-    headers={
-        "Authorization": "Bearer <API_KEY>",
-        "Content-Type": "application/json",
-    },
-    json={
-        "model": "phala/qwen3.5-27b",
-        "messages": [{"role": "user", "content": "hello"}],
-    },
-)
-
-request_id = chat_response.json()["id"]
-
-signature_response = requests.get(
-    f"https://api.redpill.ai/v1/signature/{request_id}",
-    params={"model": "phala/qwen3.5-27b"},
-    headers={"Authorization": "Bearer <API_KEY>"},
-)
-
-signature_data = signature_response.json()
-```
-</CodeGroup>
 
 ## Response
 
+| Field | Description |
+| --- | --- |
+| `api_version` | ACI version token, for example `aci/1`. |
+| `signing_algo` | Signature algorithm, for example `ecdsa`. |
+| `signing_address` | Address that signed `text`. |
+| `text` | `"<request body hash>:<response hash>"`. |
+| `signature` | Signature over `text`. |
+| `receipt` | Full receipt object, identical to the canonical `/v1/aci/receipts/{id}` response. |
+
 ```json
 {
-  "text": "phala/qwen3.5-27b:116478638341bd2b...:3d0b2a2df73dc93a...",
-  "signature": "0xee817b30e13ec3c320997ec37076a600e194dc64...",
-  "signing_address": "0x56d070df1c6be444b007839ef9cf67cec7c12b8b",
-  "signing_algo": "ecdsa"
+  "api_version": "aci/1",
+  "signing_algo": "ecdsa",
+  "signing_address": "0xffb22d95...",
+  "text": "111d08a5...:07703fb4...",
+  "signature": "0xd0cd266a...",
+  "receipt": {
+    "receipt_id": "rcpt-...",
+    "event_log": ["..."],
+    "signature": "..."
+  }
 }
 ```
 
-## Response Fields
+## Verification
 
-| Field | Description |
-|-------|-------------|
-| `text` | Signed text. Format is either `request_hash:response_hash` or `model:request_hash:response_hash` |
-| `signature` | Signature over `text` |
-| `signing_address` | TEE signing address or public key |
-| `signing_algo` | Signature algorithm used |
+For new clients, verify the `receipt` object directly:
 
-<Note>
-When `text` has three colon-separated parts, the first part is the model name used inside the signing path. It may differ from the alias you sent if the gateway rewrote the model ID internally.
-</Note>
+1. Fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
+2. Confirm `receipt.workload_id` and `receipt.workload_keyset_digest` match the report.
+3. Verify `receipt.signature` under a `receipt_signing_keys` entry from the attested keyset.
+4. Confirm the request and response hashes in `receipt.event_log` match the bytes you sent and received.
 
-## Bind to Attestation
+For legacy clients that verify the wrapper, also verify `signature` over `text`, then bind `signing_address` back to a fresh attestation report.
 
-For production verification, use the returned `signing_address` to fetch fresh attestation evidence:
+## Related
 
-```bash
-NONCE=$(openssl rand -hex 32)
-
-curl "https://api.redpill.ai/v1/attestation/report?model=phala/qwen3.5-27b&nonce=$NONCE&signing_address=$SIGNING_ADDRESS" \
-  -H "Authorization: Bearer <API_KEY>"
-```
-
-The response is verified only when:
-
-1. The request and response hashes in `text` match the bytes you sent and received.
-2. The signature is valid for `text`.
-3. The attestation report binds the same `signing_address` to genuine TEE evidence and your fresh nonce.
+<CardGroup cols={2}>
+  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
+  <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+</CardGroup>

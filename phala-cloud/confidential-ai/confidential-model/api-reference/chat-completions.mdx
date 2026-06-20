@@ -6,10 +6,10 @@ description: Create OpenAI-compatible chat completion responses with Confidentia
 ## Endpoint
 
 ```bash
-POST https://api.redpill.ai/v1/chat/completions
+POST https://inference.phala.com/v1/chat/completions
 ```
 
-Creates a response for a chat conversation. Use the same OpenAI-compatible request shape you already use with the OpenAI SDK, then set the base URL to `https://api.redpill.ai/v1`.
+Creates a response for a chat conversation. Use the same OpenAI-compatible request shape you already use with the OpenAI SDK, then set the base URL to `https://inference.phala.com/v1`.
 
 ## Request Body
 
@@ -62,7 +62,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 
 <CodeGroup>
 ```bash cURL
-curl https://api.redpill.ai/v1/chat/completions \
+curl https://inference.phala.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <API_KEY>" \
   -d '{
@@ -78,7 +78,7 @@ from openai import OpenAI
 
 client = OpenAI(
     api_key="<API_KEY>",
-    base_url="https://api.redpill.ai/v1",
+    base_url="https://inference.phala.com/v1",
 )
 
 response = client.chat.completions.create(
@@ -96,7 +96,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   apiKey: "<API_KEY>",
-  baseURL: "https://api.redpill.ai/v1",
+  baseURL: "https://inference.phala.com/v1",
 });
 
 const response = await client.chat.completions.create({
@@ -136,7 +136,13 @@ console.log(response.choices[0].message.content);
 }
 ```
 
-The `id` field is the request ID. Use it with [Request Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) when you need cryptographic proof for this specific response.
+Raw HTTP responses include verification headers. Use `x-receipt-id` with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) when you need cryptographic proof for this specific response. The response `id` can also be used as a receipt lookup id.
+
+| Header | Meaning |
+| --- | --- |
+| `x-receipt-id` | Signed receipt id for this response. |
+| `x-aci-identity` | Attested gateway workload identity. |
+| `x-aci-keyset-digest` | Digest of the attested gateway keyset. |
 
 ## Feature Notes
 
@@ -151,7 +157,7 @@ The `id` field is the request ID. Use it with [Request Signature](/phala-cloud/c
   <Card title="List Models" icon="list" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models">
     Discover available Confidential AI models and capabilities
   </Card>
-  <Card title="Verify Responses" icon="signature" href="/phala-cloud/confidential-ai/confidential-model/api-reference/signature">
-    Fetch the signature for a chat completion response
+  <Card title="Verify Responses" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts">
+    Fetch the receipt for a chat completion response
   </Card>
 </CardGroup>

@@ -18,7 +18,7 @@ Here we provide a simple example of tool calling.
 Use following request to create a function named `get_weather`.
 
 ```bash
-curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
+curl -s -X POST  'https://inference.phala.com/v1/chat/completions' \
   -H 'Authorization: Bearer sk-xx' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -107,7 +107,7 @@ Extract the tool id from the response, and in this example it would be `chatcmpl
 Use the tool id extracted from previouse request to call the tool.
 
 ```bash
-curl -s -X POST  'https://api.redpill.ai/v1/chat/completions' \
+curl -s -X POST  'https://inference.phala.com/v1/chat/completions' \
   -H 'Authorization: Bearer sk-xx' \
   -H 'Content-Type: application/json' \
   -d '{

@@ -1,0 +1,85 @@
+---
+title: Responses
+description: Create a model response using the Responses API format through the attested Confidential AI gateway.
+api: "POST /responses"
+---
+
+Creates a model response using the Responses API request and response format. Like other inference endpoints, requests are served through the attested gateway and return an `x-receipt-id` header for verification.
+
+## Endpoint
+
+```bash
+POST https://inference.phala.com/v1/responses
+```
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Model id, for example `phala/qwen3.5-27b` or another id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+</ParamField>
+
+<ParamField body="input" type="string | array" required>
+  Input prompt. This can be a string or an array of input items.
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Tool definitions the model may call.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature.
+</ParamField>
+
+<ParamField body="top_p" type="number">
+  Nucleus sampling.
+</ParamField>
+
+## Example
+
+```bash
+curl https://inference.phala.com/v1/responses \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "phala/qwen3.5-27b",
+    "input": "Explain attestation in one sentence."
+  }'
+```
+
+## Response
+
+```json
+{
+  "id": "resp_023cda4f5e268c44006a30f3e0b6f4819b87536574ae6ecd14",
+  "object": "response",
+  "status": "completed",
+  "model": "phala/qwen3.5-27b",
+  "output": [
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        { "type": "output_text", "text": "Attestation proves which trusted workload served a request.", "annotations": [] }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 10,
+    "total_tokens": 22
+  }
+}
+```
+
+Read assistant text from `output[].content[].text` on `message` items. Reasoning models may also return `reasoning` items.
+
+## Verification
+
+Capture `x-receipt-id` from the HTTP response and verify it with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). The receipt proves the response bytes and records whether the upstream provider was verified.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Chat Completions" icon="comments" href="/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions" />
+  <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+</CardGroup>

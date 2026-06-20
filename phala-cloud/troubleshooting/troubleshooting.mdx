@@ -70,7 +70,7 @@ If this doesn't work, contact support for assistance.
 
 ### exec format error
 
-```
+```text
 exec /usr/local/bin/docker-entrypoint.sh: exec format error
 ```
 
@@ -93,7 +93,7 @@ services:
 
 ### TEE socket error - "No such file or directory" for dstack.sock
 
-```
+```text
 Error: /var/run/dstack.sock: No such file or directory
 ```
 
@@ -122,8 +122,8 @@ You can safely ignore this error. This is a [known issue](https://github.com/Dst
 By default, Phala Cloud only exposes **HTTPS/TLS ports** to the public internet.
 
 **For TCP services (SSH, databases, etc.):**
-- Use [TCP port forwarding](/phala-cloud/networking/expose-service-to-internet) with TLS wrapping
-- See the [TCP services guide](/phala-cloud/networking/expose-service-to-internet#tcp-services)
+- Use [TCP port forwarding](/phala-cloud/networking/expose-http-service) with TLS wrapping
+- See the [TCP services guide](/phala-cloud/networking/expose-tcp-service)
 
 **For DNS servers:**
 Running a DNS server on Phala Cloud is possible but requires workarounds since UDP port 53 cannot be directly exposed. Consider running DNS on a separate server and connecting to your TEE backend.

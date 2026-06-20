@@ -1,5 +1,5 @@
 ---
-description: This overview introduces Confidential AI, running AI models with hardware-level privacy in GPU TEEs. Explain how to use Confidential AI to inference LLMs, deploy custom models, and run AI workloads with verifiable attestation and near-native performance.
+description: Use Confidential AI through an OpenAI-compatible API, dedicated model deployments, or custom GPU TEE infrastructure, with attestation reports and signed receipts you can verify.
 title: Overview
 ---
 
@@ -10,9 +10,11 @@ title: Overview
 
 ## Why Confidential AI?
 
-Traditional cloud AI deployments expose your models and data to the cloud provider. Confidential AI runs inference, training, and fine-tuning inside GPU TEEs — the cloud provider cannot access your models or data. You get cryptographic proof that execution happened in a trusted environment.
+Traditional cloud AI deployments ask you to trust the platform operator and the upstream model provider. Phala Confidential AI runs inference through an attested gateway and verified TEE providers, then gives you cryptographic evidence for each response.
 
-Phala Cloud offers two ways to run confidential AI workloads: pre-deployed **Models** (API or Dedicated) for quick integration, or **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
+The on-demand API is OpenAI-compatible and served through an Attested Confidential Inference (ACI) gateway. Every response includes a signed receipt, and the gateway publishes an attestation report that proves which TEE workload served the request. Confidential model responses additionally show, in the receipt, that the upstream provider was verified and channel-bound before your prompt was forwarded.
+
+Phala Cloud offers pre-deployed **Models** (API or Dedicated) for quick integration, and **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
 
 <Columns cols={2}>
   <Card
@@ -53,7 +55,7 @@ Phala Cloud offers two ways to run confidential AI workloads: pre-deployed **Mod
 
 ### Models: API and Dedicated
 
-**API Access** provides pre-deployed LLMs with OpenAI-compatible APIs for quick integration. Pay per request with no infrastructure to manage. Start with [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
+**API Access** provides pre-deployed models through an OpenAI-compatible API at `https://inference.phala.com/v1`. Pay per request with no infrastructure to manage. Start with [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
 For advanced API features, explore [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) to enable LLMs to interact with external tools and APIs securely within TEE.
 
@@ -64,10 +66,11 @@ For advanced API features, explore [Tool Calling](/phala-cloud/confidential-ai/c
 For complete infrastructure control beyond pre-deployed models, use [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) to rent dedicated GPU servers. Run any workload including custom models for inference, training, or fine-tuning. Configure GPU, CPU, RAM, and storage to match your exact needs.
 
 
-### Verify Attestation and Signature
-To ensure your workloads run securely in TEE, you can [Verify Attestation](./verify-attestation) to check the TEE hardware, operating system, source code, and distributed root-of-trust attestations. 
+### Verify Attestation and Receipts
 
-Then you can [Verify Signature](./verify-signature) to confirm the integrity of your Confidential AI API requests and responses.
+To verify the API path, fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) from `GET /v1/aci/attestation`. It proves the gateway workload identity, TEE quote, source provenance, and public keyset used to sign receipts.
+
+Then use the response `x-receipt-id` header to fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). The receipt binds request and response hashes to the attested workload and records whether the upstream provider was verified. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature) for the full flow.
 
 ### Benchmark
 
@@ -80,7 +83,7 @@ Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions a
 ## What makes Phala Cloud Confidential AI Different?
 
 - **Drop-in compatibility**: OpenAI-compatible API with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
-- **Verifiable security**: Hardware-enforced privacy with cryptographic attestation proving execution in genuine TEE environments
+- **Verifiable security**: Gateway attestation, signed per-response receipts, and upstream verification events you can check yourself
 - **Flexible deployment**: Choose from API access (pay per request), dedicated models (hourly dedicated GPU), or GPU TEE (full infrastructure control)
 
 ## Open Source Foundation

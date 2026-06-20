@@ -286,24 +286,42 @@ a.nav-tabs-item[data-active="true"] {
 }
 
 /* TOC heading "On this page" — eyebrow style.
-   Mintlify wraps the toggle button in an <h2>, so we must reset both the h2
-   font-size (otherwise it renders at ~46px) and the button itself. */
+   Mintlify wraps the toggle button in an <h2>, so we must reset the h2
+   font-size (otherwise it renders at ~46px) and the button itself.
+   Scope this to the TOC header row so item links keep their normal casing. */
 #table-of-contents h2 {
-  font-size: 11px !important;
+  font-size: 14px !important;
   margin: 0 !important;
 }
 #table-of-contents > button,
-#table-of-contents h2 button {
-  font-family: var(--v3-mono, "SuisseIntlMono", monospace) !important;
-  font-size: 11px !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
+#table-of-contents h2 button,
+#table-of-contents-layout #table-of-contents > :first-child:not(nav):not(ul):not(ol),
+#table-of-contents-layout > :first-child:not(:has(#table-of-contents)):not(nav):not(ul):not(ol),
+#table-of-contents-layout > :first-child > :first-child:not(#table-of-contents):not(nav):not(ul):not(ol) {
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif) !important;
+  font-size: 14px !important;
+  line-height: 1.25rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
   color: var(--base-600) !important;
+}
+
+#table-of-contents-layout #table-of-contents > :first-child:not(nav):not(ul):not(ol) :is(span, div, p, h2, h3, h4, h5, h6),
+#table-of-contents-layout > :first-child:not(:has(#table-of-contents)):not(nav):not(ul):not(ol) :is(span, div, p, h2, h3, h4, h5, h6),
+#table-of-contents-layout > :first-child > :first-child:not(#table-of-contents):not(nav):not(ul):not(ol) :is(span, div, p, h2, h3, h4, h5, h6) {
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: inherit !important;
+  color: inherit !important;
+  line-height: inherit !important;
 }
 
 .toc-item > a {
   font-size: 13px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif) !important;
   color: var(--base-600) !important;
 }
 .toc-item > a:hover {

@@ -1,277 +1,103 @@
 ---
 title: Attestation
-description: Learn how to verify cryptographic proof your AI workloads run in genuine TEE hardware with verified software
+description: Learn how to verify the ACI gateway attestation report for Confidential AI.
 ---
 
-## Why attestation matters
+## What the attestation report proves
 
-When you verify attestation, you prove your AI runs on real TEE hardware with authentic software. This gives you cryptographic proof that your hardware comes from NVIDIA or Intel, not some counterfeit supplier. You also confirm the software hasn't been tampered with and your workloads stay protected.
+The attestation report is the gateway's proof of identity. It proves the API is served by a specific workload running inside a genuine TEE and publishes the public keys used to sign receipts and support end-to-end encryption.
 
-## Verify TEE hardware stack
+Fetch it before trusting receipts:
 
-Let's start by verifying your hardware is genuine. You need to check both GPUs and CPUs because TEE protection requires both to work together. If either one fails verification, your entire security model breaks down.
+```bash
+export API_KEY="<API_KEY>"
+export BASE="https://inference.phala.com"
+export NONCE="$(openssl rand -hex 16)"
 
-First, you'll generate a fresh nonce to ensure attestation freshness. Then you'll verify NVIDIA GPUs are real and running in TEE mode. Next you'll check Intel CPUs have TEE protections enabled and verify the report data binds the signing key and nonce. Finally, you'll confirm the cryptographic features actually work.
-
-Here's a [Python example](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/attestation_verifier.py) that walks through the entire verification process.
-
-### Generate fresh nonce
-
-Before fetching the attestation, generate a random nonce. This nonce gets embedded in the TEE's cryptographic proof, ensuring the attestation was generated fresh for your request and not replayed from an old attestation.
-
-```python
-import secrets
-
-# Generate a random 32-byte nonce (64 hex characters)
-request_nonce = secrets.token_hex(32)
+curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
+  -H "Authorization: Bearer $API_KEY" \
+  -o report.json
 ```
 
-Without the nonce, you'd have no way to prove the attestation is fresh. An attacker could replay an old valid attestation from compromised hardware.
+## What to inspect first
 
-### Get the attestation report
-
-Now fetch the attestation report with your nonce. This report contains all the cryptographic proofs you need.
-
-```python
-import requests
-
-# Fetch attestation report with nonce
-response = requests.get(
-    f"https://api.redpill.ai/v1/attestation/report?model={model}&nonce={request_nonce}",
-    headers={"Authorization": f"Bearer {api_key}"}
-)
-report = response.json()
-
-# Response shape depends on the provider backing the model.
+```bash
+jq '{api_version, workload_id, workload_keyset_digest,
+     report_data: .attestation.report_data,
+     stale_after: .attestation.freshness.stale_after,
+     provenance: .attestation.source_provenance}' report.json
 ```
 
-The report gives you Intel TDX evidence, optional NVIDIA GPU evidence, signing key information, and software measurement data. The exact shape depends on the provider:
+Check that:
 
-- **Phala / NearAI two-layer format**: `gateway_attestation` plus `model_attestations`.
-- **Chutes format**: `attestation_type: "chutes"` plus `all_attestations`.
-- **Flat format**: older Phala-native responses expose fields such as `intel_quote`, `nvidia_payload`, and `signing_address` at the top level.
+- `api_version` is `aci/1`.
+- `attestation.freshness.stale_after` is in the future.
+- `workload_id` and `workload_keyset_digest` are present; receipts must cite the same values.
+- `attestation.source_provenance` matches the gateway release you trust.
+- `attestation.report_data` is bound to your nonce and the published keyset.
 
-Use [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) for the endpoint schema.
+## What the report contains
 
-### Select the attestation to verify
+| Field | What it proves |
+| --- | --- |
+| `workload_id` | Stable identity of the gateway workload. |
+| `workload_keyset_digest` | Digest over the published keyset. Receipts cite this value. |
+| `attestation.tee_type` | TEE technology, for example `tdx`. |
+| `attestation.evidence.quote` | Hardware-signed TDX quote. This is the root of trust. |
+| `attestation.report_data` | Value bound into the quote, committing to the nonce and keyset. |
+| `attestation.workload_keyset` | Workload identity, receipt signing keys, E2EE (end-to-end encryption) public keys, TLS keys, and keyset epoch. |
+| `attestation.keyset_endorsement` | Signature over the keyset under the workload identity key. |
+| `attestation.source_provenance` | Source repo, commit, image digest, and image provenance when available. |
+| `attestation.freshness` | Fetch and expiry timestamps. |
+| `service_capabilities` | Runtime capabilities such as supported E2EE versions. |
 
-For Phala and NearAI two-layer responses, verify both the gateway attestation and the model attestation when both are present. The gateway protects routing and request handling; the model attestation protects the inference runtime.
+## Verification steps
 
-```python
-def get_attestations(report):
-    attestations = []
+### 1. Verify the TEE quote
 
-    if "gateway_attestation" in report:
-        attestations.append(("gateway", report["gateway_attestation"]))
+Verify `attestation.evidence.quote` against Intel DCAP collateral and confirm the quote's report data matches `attestation.report_data`.
 
-    for item in report.get("model_attestations", []):
-        attestations.append(("model", item))
+You can use Phala's public verification service for TDX quote decoding:
 
-    for item in report.get("all_attestations", []):
-        attestations.append(("model", item))
+```bash
+jq -r '.attestation.evidence.quote' report.json > quote.txt
 
-    if "intel_quote" in report:
-        attestations.append(("model", report))
-
-    return attestations
-
-attestations = get_attestations(report)
-assert attestations, "No attestation evidence found"
+curl -s https://cloud-api.phala.com/api/v1/attestations/verify \
+  -H "Content-Type: application/json" \
+  -d "{\"hex\":\"$(cat quote.txt)\"}"
 ```
 
-### Verify NVIDIA GPU attestation
+For local verification, use an Intel DCAP verifier such as [dcap-qvl](https://github.com/Phala-Network/dcap-qvl). For manual inspection, paste the quote into the [TEE Attestation Explorer](https://proof.t16z.com/).
 
-Now verify NVIDIA GPUs when GPU evidence is present. Phala-style responses expose `nvidia_payload`; Chutes-style responses expose `gpu_evidence`.
+### 2. Verify nonce and keyset binding
 
-```python
-import json
-import base64
+The quote's report data must commit to the nonce you generated and to the gateway keyset. This prevents replay and proves the receipt-signing keys belong to the attested workload.
 
-for name, attestation in attestations:
-    if "nvidia_payload" not in attestation:
-        continue
+At a high level, your verifier should:
 
-    # Parse and verify GPU payload nonce
-    gpu_payload = json.loads(attestation["nvidia_payload"])
-    assert gpu_payload["nonce"].lower() == request_nonce.lower()
+1. Canonicalize the `workload_keyset`.
+2. Recompute the expected keyset digest.
+3. Confirm the quote report data binds that digest and your `NONCE`.
+4. Confirm `workload_keyset_digest` matches the recomputed digest.
 
-    # Send to NVIDIA's Remote Attestation Service
-    response = requests.post(
-        "https://nras.attestation.nvidia.com/v3/attest/gpu",
-        json=gpu_payload
-    )
-    result = response.json()
+### 3. Verify the keyset endorsement
 
-    # Decode the JWT verdict
-    jwt_token = result[0][1]
-    payload_b64 = jwt_token.split(".")[1]
-    padded = payload_b64 + "=" * ((4 - len(payload_b64) % 4) % 4)
-    verdict_data = json.loads(base64.urlsafe_b64decode(padded))
+Verify `attestation.keyset_endorsement` under `attestation.workload_keyset.workload_identity`. This ties the receipt signing keys and E2EE keys to the attested workload identity.
 
-    assert verdict_data["x-nvidia-overall-att-result"] == True
-```
+Receipts are only valid when their signatures verify under a key from `attestation.workload_keyset.receipt_signing_keys`.
 
-The GPU payload must use the same nonce you generated. NVIDIA returns a JWT with `x-nvidia-overall-att-result: True` for verified authentic hardware.
+### 4. Check freshness and provenance
 
-### Verify Intel TDX CPU attestation
+`attestation.freshness.stale_after` must be in the future when you verify. In production, compare `attestation.source_provenance.repo_url`, `repo_commit`, and image provenance against the release or source code you are willing to trust.
 
-For Intel CPUs, you'll verify the TDX quote using Phala's verification service. This service decodes and validates Intel's cryptographic proof.
+### 5. Handle multi-instance deployments
 
-```python
-import base64
-import re
+The top-level `attestation` is the instance that answered your request. `all_attestations` lists other instances behind the same service. When verifying a receipt, match the receipt's `workload_id` and `workload_keyset_digest` against the attestation for the instance that signed it.
 
-def quote_to_hex(quote):
-    value = quote.removeprefix("0x")
-    if re.fullmatch(r"[0-9a-fA-F]+", value):
-        return value
-    return base64.b64decode(value).hex()
+## Legacy compatibility
 
-for name, attestation in attestations:
-    if "intel_quote" not in attestation:
-        continue
-
-    response = requests.post(
-        "https://cloud-api.phala.com/api/v1/attestations/verify",
-        json={"hex": quote_to_hex(attestation["intel_quote"])}
-    )
-    intel_result = response.json()
-
-    assert intel_result["quote"]["verified"] == True
-```
-
-This confirms the CPU is genuine Intel hardware running in TDX mode. The `intel_result` contains the decoded quote data we'll use next, including `reportdata` and `mrconfig` fields.
-
-For manual verification, you can paste the `intel_quote` value into the [TEE Attestation Explorer](https://proof.t16z.com/) to see decoded details about TDX version and security features. You can also verify the quote locally using our open source Intel DCAP verifier [dcap-qvl](https://github.com/Phala-Network/dcap-qvl).
-
-### Verify report data binding
-
-Now verify that the TDX report data cryptographically binds the signing key and your nonce to the hardware. The first 64 bytes of TDX `reportdata` contain:
-- Bytes 0-31: Signing address (ECDSA or Ed25519 public key)
-- Bytes 32-63: Your request nonce
-
-```python
-# Extract report data from verified quote
-report_data_hex = intel_result["quote"]["body"]["reportdata"]
-report_data = bytes.fromhex(report_data_hex.removeprefix("0x"))
-
-# Parse signing address based on algorithm
-signing_address = attestation["signing_address"]
-signing_algo = attestation.get("signing_algo", "ecdsa")
-
-if signing_algo == "ecdsa":
-    # ECDSA: 20-byte Ethereum address
-    signing_address_bytes = bytes.fromhex(signing_address.removeprefix("0x"))
-else:
-    # Ed25519: 32-byte public key
-    signing_address_bytes = bytes.fromhex(signing_address)
-
-# Verify report data contains signing address and nonce
-embedded_address = report_data[:32]
-embedded_nonce = report_data[32:64]
-
-assert embedded_address == signing_address_bytes.ljust(32, b"\x00")
-assert embedded_nonce.hex() == request_nonce
-```
-
-This verification proves that:
-1. The signing key was generated inside the TEE (it's embedded in hardware-attested report data)
-2. The attestation is fresh (it contains your unique nonce)
-3. The signing address you'll use for signature verification actually belongs to this TEE instance
-
-## Verify TEE software stack
-
-Your hardware checks out. Now you need to verify the software running on that hardware is exactly what you expect.
-
-The software verification detects supply chain attacks where someone modifies the OS, injects malicious code, or breaks the chain of trust between hardware and application. You'll verify each layer - OS, application code, and cryptographic keys - to ensure the entire stack is authentic.
-
-### 1. Verify operating system integrity
-
-First, check the OS hasn't been tampered with. The TEE measures every byte of the operating system when it boots, creating a cryptographic fingerprint. You'll compare this fingerprint against known good values.
-
-Follow [this verification process](https://github.com/Phala-Network/dstack-verifier/blob/95689c41/src/verification/osVerification.ts#L13-L27) to measure the OS image and compare it with TCB (Trusted Computing Base) values. The TCB values come from the [dstack-os reproducible build result](https://github.com/Dstack-TEE/meta-dstack?tab=readme-ov-file#reproducible-build-the-guest-image), and represent a clean, unmodified system. If even one byte changes, the fingerprint won't match.
-
-### 2. Verify Docker compose manifest
-
-Next, verify your application code hasn't been modified. The TEE measures the entire Docker Compose configuration and embeds the hash in the TDX quote's `mr_config` field.
-
-```python
-from hashlib import sha256
-
-# Extract compose manifest from attestation
-tcb_info = attestation["info"]["tcb_info"]
-if isinstance(tcb_info, str):
-    tcb_info = json.loads(tcb_info)
-
-app_compose = tcb_info["app_compose"]
-compose_hash = sha256(app_compose.encode()).hexdigest()
-
-# Verify mr_config matches compose hash
-mr_config = intel_result["quote"]["body"]["mrconfig"]
-expected_mr_config = "0x01" + compose_hash
-
-assert mr_config.lower().startswith(expected_mr_config.lower())
-
-# View the Docker Compose content
-docker_compose = json.loads(app_compose)["docker_compose_file"]
-print(docker_compose)
-```
-
-This verification proves the exact Docker Compose configuration running inside the TEE. The `mr_config` measurement is part of the TDX quote that Intel's hardware signed, so you know this configuration hasn't been modified after TEE boot.
-
-### 3. Verify build provenance
-
-Finally, verify the container images in your Docker Compose were built from expected source repositories. The verification extracts all container image digests and checks their Sigstore provenance.
-
-```python
-import re
-
-# Extract all @sha256:xxx image digests from compose
-digests = set(re.findall(r'@sha256:([0-9a-f]{64})', docker_compose))
-
-# Check Sigstore provenance for each image
-for digest in digests:
-    sigstore_url = f"https://search.sigstore.dev/?hash=sha256:{digest}"
-    response = requests.head(sigstore_url, timeout=10)
-
-    if response.status_code < 400:
-        print(f"✓ {sigstore_url}")
-    else:
-        print(f"✗ {sigstore_url} (HTTP {response.status_code})")
-```
-
-When Sigstore links return HTTP 200, you can visit them to:
-- Verify the container was built from the expected GitHub repository
-- Review the GitHub Actions workflow that built the image
-- Audit the build provenance and supply chain metadata
-
-This proves the containers running in your TEE were built from known source code through verified build processes.
-
-### 4. Verify distributed root-of-trust
-
-The KMS ties everything together - hardware, OS, and application. It's the distributed system that manages all cryptographic operations and decides which applications can boot.
-
-The KMS generates two root keys when it first boots: one for signing TLS certificates and another for deriving application-specific keys. These keys never leave the TEE. The [KMS Verifier code](https://github.com/Phala-Network/dstack-verifier/blob/95689c415cad165033c700979cd26225c56c8d1c/src/verifiers/kmsVerifier.ts#L27) shows how to verify the KMS itself runs in a verified TEE and that its keys haven't been tampered with.
-
-### 5. Verify network end-to-end encryption
-
-Finally, verify that all network traffic stays encrypted and under TEE control. The TEE generates its own TLS keys internally - they never exist outside the secure enclave. This means even if someone compromises the host system, they can't intercept your traffic.
-
-For more details, your can check the docs of [Domain Attestation](/phala-cloud/networking/domain-attestation).
-
-## Complete verification example
-
-For a complete Python script that performs all the verifications above, see the [attestation verifier](https://github.com/Phala-Network/private-ml-sdk/blob/main/vllm-proxy/verifiers/attestation_verifier.py).
-
-This script handles:
-- Generating fresh nonce for attestation
-- Fetching the attestation report from Confidential AI API
-- Verifying NVIDIA GPUs through their attestation service
-- Verifying Intel TDX quote
-- Validating report data binds signing address and nonce
-- Verifying Docker compose manifest matches mr_config
-- Checking Sigstore provenance for all container images
+`GET /v1/attestation/report` remains available for older clients. It returns the gateway attestation in a compatibility response shape and may include top-level signer fields such as `signing_address`. New integrations should use `GET /v1/aci/attestation`.
 
 ## Next step
 
-Hardware and software stack verified! Now [verify integrity proof](./verify-signature) to ensure your AI outputs are authentic.
+After you verify the gateway report, [verify a response](/phala-cloud/confidential-ai/verify/verify-signature) by checking a signed receipt.

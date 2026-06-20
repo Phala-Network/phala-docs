@@ -1,0 +1,44 @@
+---
+title: Provider Verification
+description: Understand how Confidential AI verifies upstream serving environments without relying on a static provider list.
+---
+
+A confidential response is served by an upstream provider whose enclave the gateway verifies before forwarding your prompt. The receipt is the authoritative record for a specific response: read `upstream.verified.provider`, `result`, `required`, `session_id`, `channel_bindings`, and `claims`.
+
+Provider and model coverage changes over time. Do not treat documentation as a provider allowlist. Use the live model catalog to discover available models, and use receipts for per-response truth.
+
+## Binding Methods
+
+Confidential AI can bind a verified upstream session in more than one way:
+
+| Binding | Meaning |
+| --- | --- |
+| `tls_spki_sha256` | Pins the provider-facing HTTPS connection to a verified TLS key. |
+| `e2ee_public_key_sha256` | Encrypts the provider-facing request to a verified enclave key. |
+
+The enforced binding appears on the response receipt and on the attested session referenced by that receipt.
+
+## Claim Coverage
+
+Each verified session carries typed claims. Coverage depends on the serving environment and verifier, so clients should evaluate the claims required by their own policy instead of assuming every model has the same evidence.
+
+- `tee_attested` is the baseline hardware claim. A confidential response should assert it with hardware-backed evidence.
+- `tcb_up_to_date` is tri-state. A stale TCB (Trusted Computing Base) is recorded as refuted, not hidden.
+- `serving_software_known_good` means the verifier can connect software measurements to known source or build provenance.
+- `gpu_attested` proves GPU attestation evidence was verified and nonce-bound. It is supplemental; the session gate is still the verified and bound upstream channel.
+- `model_weights_provenance` is not generally proven today. Treat `Unknown` as not proven.
+
+## Router-Backed Serving
+
+Some serving environments front many models behind one verified gateway. In that case, the attested session belongs to the verified provider channel, and the served model is recorded on the receipt. Do not infer provider security from the model id alone.
+
+## Routed Responses
+
+Routed responses still pass through the attested Phala gateway, but the upstream serving environment is not attested. The receipt records `result: failed` and `required: false` for `upstream.verified`.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/tcb-and-claims" />
+  <Card title="Receipts and Sessions" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions" />
+</CardGroup>

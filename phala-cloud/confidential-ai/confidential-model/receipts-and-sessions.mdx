@@ -1,0 +1,72 @@
+---
+title: Receipts and Sessions
+description: Learn how per-response receipts and attested sessions prove what happened to a Confidential AI request.
+---
+
+Receipts and sessions are the two response-level artifacts you use after verifying the gateway attestation report.
+
+- A **receipt** is the signed record for one response.
+- A **session** is the immutable verified security context for a confidential upstream channel.
+
+## Receipt Lifecycle
+
+Every inference response includes `x-receipt-id`. Fetch it with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts):
+
+```bash
+curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+The receipt records ordered events with hashes and facts, not prompt text.
+
+| Event | What it records |
+| --- | --- |
+| `request.received` | Hash of the request body observed by the gateway. |
+| `route.selected` | Selected backend route. |
+| `request.forwarded` | Hash of the provider-facing request. |
+| `upstream.verified` | Provider verification result, channel binding, claims, and `session_id`. |
+| `response.received` | Hash of the provider response before post-processing. |
+| `response.returned` | Hash of the final wire response. |
+
+## What a Receipt Proves
+
+A verified receipt proves:
+
+1. The receipt was signed by a key in the attested gateway keyset.
+2. `workload_id` and `workload_keyset_digest` match the attestation report.
+3. The returned response bytes match `response.returned.wire_hash`.
+4. The upstream verification result for that response is recorded.
+
+## Streaming Responses
+
+For streaming, `x-receipt-id` can arrive before the stream ends. Fetch the receipt after the stream completes because `response.returned.wire_hash` covers the full response body.
+
+## Attested Sessions
+
+When the gateway verifies a confidential upstream, it records an attested session. A receipt references it from `upstream.verified.session_id`.
+
+A session captures:
+
+- Verified upstream identity and endpoint.
+- Enforced channel binding.
+- Typed claims and reasons.
+- Evidence digest and evidence payload.
+
+The `session_id` is content-addressed. If the verified material changes, the session id changes.
+
+## Trace a Response
+
+```text
+response -> x-receipt-id
+receipt  -> upstream.verified.session_id
+session  -> provider identity, binding, claims, evidence
+```
+
+For most applications, the receipt has enough data to decide whether a response was confidential. Fetch the session when you need deeper audit evidence.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/tcb-and-claims" />
+</CardGroup>

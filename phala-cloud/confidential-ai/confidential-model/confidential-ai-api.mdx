@@ -1,13 +1,13 @@
 ---
-description: Get started quickly with pre-deployed models running in GPU TEE with OpenAI-compatible interface. Pay per request.
+description: Make your first OpenAI-compatible Confidential AI request through Phala, then confirm it was served through an attested gateway.
 title: On-demand API
 ---
 
 ## Overview
 
-On-demand Confidential AI API provides a secure, OpenAI-compatible interface for running AI models in TEE on GPU hardware. Pay per request with no infrastructure management. This enables developers to integrate AI applications with hardware-level privacy protection, ensuring user data remain confidential during inference. Browse [available confidential AI models](https://phala.com/confidential-ai-models) for your application.
+On-demand Confidential AI API provides an OpenAI-compatible interface for confidential inference. Requests go through Phala's ACI gateway at `https://inference.phala.com/v1`. The gateway runs in a TEE, publishes an attestation report, and signs a per-response receipt that you can verify.
 
-For dedicated GPU resources with hourly pricing, see [Dedicated Models](/phala-cloud/confidential-ai/confidential-gpu/model-template). Both options use the same API with identical features - the only difference is billing and resource allocation.
+For dedicated GPU resources with hourly pricing, see [Dedicated Models](/phala-cloud/confidential-ai/confidential-gpu/model-template). Both options use the same API surface; billing and resource allocation are the main differences.
 
 
 ## Prerequisites
@@ -22,7 +22,7 @@ Navigate to **Dashboard** → **Confidential AI API** and click **Enable**. Then
 
 Once you get the API Key, you can start making requests to the Confidential AI API.
 
-## Make Your Secure Request
+## Make Your First Request
 
 Replace `<API_KEY>` with your actual API key. The examples below use `phala/qwen3.5-27b`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
 
@@ -34,7 +34,7 @@ from openai import OpenAI
 
 client = OpenAI(
     api_key="<API_KEY>",
-    base_url="https://api.redpill.ai/v1",
+    base_url="https://inference.phala.com/v1",
 )
 
 response = client.chat.completions.create(
@@ -52,7 +52,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://api.redpill.ai/v1',
+  baseURL: 'https://inference.phala.com/v1',
   apiKey: '<API_KEY>',
 });
 
@@ -74,7 +74,7 @@ main();
 
 ```bash CLI
 curl -X 'POST' \
-  'https://api.redpill.ai/v1/chat/completions' \
+  'https://inference.phala.com/v1/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer <API_KEY>' \
@@ -94,25 +94,45 @@ curl -X 'POST' \
 ```
 </CodeGroup>
 
-### Available Models
+The response is a standard OpenAI chat completion. In raw HTTP responses, Phala also returns verification headers:
 
-Confidential AI models are available through several GPU TEE providers. The live catalog is authoritative; query it before hardcoding model IDs:
+| Header | Meaning |
+| --- | --- |
+| `x-receipt-id` | Receipt id for this response. Use it with `GET /v1/aci/receipts/{id}`. |
+| `x-aci-identity` | Attested gateway workload identity. |
+| `x-aci-keyset-digest` | Digest of the gateway keyset used for receipt verification. |
+
+## Confirm the Response Was Attested
+
+Fetch the receipt with the `x-receipt-id` header:
 
 ```bash
-curl https://api.redpill.ai/v1/models \
+curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer <API_KEY>" | \
+  jq '.event_log[] | select(.type=="upstream.verified") | {provider, result, required, session_id}'
+```
+
+For a confidential response, `result` is `verified` and `required` is `true`. To verify the gateway identity and receipt signature end to end, follow [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+
+## Available Models
+
+The live catalog is authoritative; query it before hardcoding model IDs:
+
+```bash
+curl https://inference.phala.com/v1/models \
   -H "Authorization: Bearer <API_KEY>"
 ```
 
 To list Phala-backed models only:
 
 ```bash
-curl https://api.redpill.ai/v1/models/phala \
+curl https://inference.phala.com/v1/models/phala \
   -H "Authorization: Bearer <API_KEY>"
 ```
 
-The following table reflects the current model families added in the RedPill model catalog update. Pricing and availability can change; use the API response for production routing.
+Pricing and availability can change; use the API response for production routing.
 
-#### Phala Provider
+### Phala Models
 
 | Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
 |----------|---------|----------|--------------------------------------|
@@ -131,45 +151,15 @@ The following table reflects the current model families added in the RedPill mod
 `phala/qwen2.5-vl-72b-instruct` is a legacy alias that may route to `phala/qwen3-vl-30b-a3b-instruct`. Prefer the canonical ID returned by `/v1/models`.
 </Note>
 
-#### NearAI Provider
-
-| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
-|----------|---------|----------|--------------------------------------|
-| `z-ai/glm-5` | 203K | Text | $1.20 / $3.50 |
-| `deepseek/deepseek-chat-v3.1` | 164K | Text | $1.05 / $3.10 |
-| `openai/gpt-oss-120b` | 131K | Text | $0.10 / $0.49 |
-| `qwen/qwen3-30b-a3b-instruct-2507` | 262K | Text | $0.15 / $0.55 |
-| `z-ai/glm-4.7` | 131K | Text | $0.85 / $3.30 |
-
-#### Chutes Provider
-
-| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
-|----------|---------|----------|--------------------------------------|
-| `z-ai/glm-5.1` | 203K | Text | $1.21 / $4.20 |
-| `moonshotai/kimi-k2.6` | 262K | Text + Image | $1.09 / $4.60 |
-| `qwen/qwen3.5-397b-a17b` | 262K | Text | $0.55 / $3.50 |
-| `qwen/qwen3-coder-next` | 262K | Text | $0.18 / $1.20 |
-| `minimax/minimax-m2.5` | 197K | Text | $0.20 / $1.38 |
-| `xiaomi/mimo-v2-flash` | 262K | Text | $0.10 / $0.30 |
-| `deepseek/deepseek-v3.2` | 164K | Text | $0.32 / $0.48 |
-| `moonshotai/kimi-k2.5` | 262K | Text + Image | $0.60 / $3.00 |
-
-#### Tinfoil Provider
-
-| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
-|----------|---------|----------|--------------------------------------|
-| `qwen/qwen3-coder-480b-a35b-instruct` | 262K | Text | $2.00 / $2.00 |
-| `moonshotai/kimi-k2-thinking` | 262K | Text | $2.00 / $2.00 |
-| `deepseek/deepseek-r1-0528` | 163K | Text | $2.00 / $2.00 |
-| `meta-llama/llama-3.3-70b-instruct` | 131K | Text | $2.00 / $2.00 |
-
 <Note>
-TEE provider presence and attestation support are not identical for every provider and model. For production verification, test [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) with the exact model ID you plan to use.
+TEE provider presence and confidential serving are not identical for every provider and model. Use `is_tee` from `/v1/models` to find models that can be served confidentially, then verify the actual response with its `x-receipt-id`.
 </Note>
 
 ## Verify Your AI is Running Securely
 
-After you make a request, use [Request Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) to fetch the signature for that response. Then fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) with the returned `signing_address` to bind the response to TEE evidence.
+Before trusting receipts, fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation). Then fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) for a response and verify that its `workload_id` and `workload_keyset_digest` match the report.
+
+The legacy [Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) endpoint remains available for older clients, but new integrations should use `GET /v1/aci/receipts/{id}`.
 
 ## Next Steps
 
@@ -177,6 +167,7 @@ Use the API reference and feature guides for the next step:
 
 - [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions) documents the core request and response shape.
 - [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) shows how to discover models programmatically.
+- [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) documents the canonical per-response proof.
 - [Embeddings](/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings) covers embedding model calls.
 - [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) helps you call tools from your AI models.
 - [Images and Vision](/phala-cloud/confidential-ai/confidential-model/images-and-vision) helps you use image-capable models.
