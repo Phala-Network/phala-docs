@@ -46,34 +46,44 @@ Update your `docker-compose.yml` to include the dstack-ingress container:
 ```yaml
 services:
   dstack-ingress:
-    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
+    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
     ports:
       - "443:443"
     environment:
       - DOMAIN=api.mycompany.com  # Your custom domain
-      - TARGET_ENDPOINT=http://app:80  # Your app's internal endpoint
+      - TARGET_ENDPOINT=app:80  # Your app's internal endpoint
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
+      - /var/run/tappd.sock:/var/run/tappd.sock
       - cert-data:/etc/letsencrypt
+      - evidences:/evidences
     restart: unless-stopped
 
   app:
     image: your-app:latest  # Your application
+    volumes:
+      - evidences:/evidences:ro
     # No ports exposed here - dstack-ingress handles external access
 
 volumes:
   cert-data:  # Persistent storage for SSL certificates
+  evidences:  # Generated attestation evidence files
 ```
 
 Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal endpoint. `TARGET_ENDPOINT` tells dstack-ingress where to forward incoming traffic:
 
-- `http://app:80` - Forward to service named "app" on port 80
-- `http://api:3000` - Forward to service named "api" on port 3000
+- `app:80` - Forward to service named "app" on port 80
+- `api:3000` - Forward to service named "api" on port 3000
+- `http://app:80` and `grpc://app:50051` are also accepted, but the protocol prefix is stripped before proxying
 - Use the service name from docker-compose, not localhost
+
+<Note>
+`dstack-ingress` is a HAProxy-based L4/TCP proxy. It terminates TLS and forwards the TCP stream to `TARGET_ENDPOINT`; it does not apply Nginx-style HTTP redirects, header rules, body limits, or buffering settings. Put HTTP-specific behavior in your application or in a separate HTTP proxy behind `TARGET_ENDPOINT` if needed.
+</Note>
 
 ## Step 3: Configure Environment Variables
 
@@ -104,7 +114,7 @@ Deploy your updated docker-compose.yml through the dashboard. The first deployme
 
 1. Configures DNS records
 2. Requests SSL certificate from Let's Encrypt
-3. Sets up the reverse proxy
+3. Starts the HAProxy TCP proxy
 
 ## Step 5: Verify
 
@@ -114,60 +124,54 @@ After deployment, you can:
 2. **Check certificate**: Your browser should show a valid Let's Encrypt certificate
 3. **Verify evidence**: Visit `https://api.mycompany.com/evidences/` to see attestation data
 
-## Multiple Services with Custom Domains
+## Multiple Custom Domains
 
-You can use multiple custom domains in one deployment. Note that you need to explicitly set the listen port for each service.
+You can route multiple custom domains from one ingress container by using `DOMAINS` and `ROUTING_MAP`:
 
 ```yaml
 services:
-  # API with custom domain
-  api-ingress:
-    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
+  ingress:
+    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
     ports:
       - "443:443"
     environment:
-      - DOMAIN=api.mycompany.com
-      - TARGET_ENDPOINT=http://api:8080
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - SET_CAA=true
-      - PORT=443 # Explicitly set the listen port
+      DNS_PROVIDER: cloudflare
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      GATEWAY_DOMAIN: _.${DSTACK_GATEWAY_DOMAIN}
+      SET_CAA: true
+      DOMAINS: |
+        app.mycompany.com
+        api.mycompany.com
+      ROUTING_MAP: |
+        app.mycompany.com=frontend:3000
+        api.mycompany.com=api:8080
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
-      - api-cert-data:/etc/letsencrypt
-
-  # Frontend with custom domain  
-  web-ingress:
-    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
-    ports:
-      - "444:444"  # Different host port
-    environment:
-      - DOMAIN=app.mycompany.com
-      - TARGET_ENDPOINT=http://frontend:3000
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - SET_CAA=true
-      - PORT=444 # Explicitly set the listen port
-    volumes:
-      - /var/run/dstack.sock:/var/run/dstack.sock
-      - web-cert-data:/etc/letsencrypt
+      - /var/run/tappd.sock:/var/run/tappd.sock
+      - cert-data:/etc/letsencrypt
+      - evidences:/evidences
+    restart: unless-stopped
 
   api:
     image: my-api:latest
+    volumes:
+      - evidences:/evidences:ro
   
   frontend:
     image: my-frontend:latest
+    volumes:
+      - evidences:/evidences:ro
 
 volumes:
-  api-cert-data:
-  web-cert-data:
+  cert-data:
+  evidences:
 ```
 
 ## Why We Pin Infrastructure Images
 
 The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
+
 - **Auditability**: Anyone can verify the exact infrastructure code handling domains
 - **Immutability**: The ingress behavior never changes unexpectedly
 - **Security**: Prevents infrastructure image substitution
@@ -176,6 +180,7 @@ The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
 ## Security Features
 
 When `SET_CAA=true` is enabled:
+
 - CAA records restrict certificate issuance to the TEE managed Let's Encrypt account
 - Only certificates requested from within your TEE can be issued
 - Certificate transparency logs can be monitored for unauthorized certificates
@@ -184,13 +189,16 @@ When `SET_CAA=true` is enabled:
 **Cloudflare Users**: Cloudflare automatically overrides CAA records at the apex domain (e.g., `example.com`). This prevents domain attestation from working correctly.
 
 **Solution options:**
+
 1. **Use a subdomain** (recommended): Deploy to `app.example.com` instead of `example.com`
 2. **Disable Cloudflare's CAA management**: See [Cloudflare CAA documentation](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/#caa-records-added-by-cloudflare)
 
 **To verify your CAA record is working:**
+
 ```bash
 dig @1.1.1.1 +short CAA your-domain.com
 ```
+
 Should return the Let's Encrypt account URI with `validationmethods=dns-01;accounturi=...`
 </Warning>
 
@@ -200,7 +208,7 @@ Should return the Let's Encrypt account URI with `validationmethods=dns-01;accou
 
 Look for dstack-ingress container logs in the dashboard:
 
-```
+```text
 Successfully received certificate.
 Generated evidences successfully
 Next renewal check in 12 hours
