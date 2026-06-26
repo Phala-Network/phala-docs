@@ -15,6 +15,7 @@ description: Quick lookup for URL patterns, environment variables, and configura
 | `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `deadbeef111111111111111111111111-22.dstack-prod5.phala.network` |
 
 **Default Port Behaviors:**
+
 - No port specified = routes to port 80 for HTTP or port 443 for TLS passthrough
 - All external connections use port 443 regardless of internal port
 - `{app-id}` is auto-generated on deployment
@@ -35,22 +36,28 @@ You can use these variables in your docker-compose file:
 The variables you can change to config networking features.
 
 ### SSH Access
+
 | Variable | Type | Purpose |
 |----------|------|---------|
 | `DSTACK_ROOT_PASSWORD` | string | Root password (dev images only) |
 | `DSTACK_ROOT_PUBLIC_KEY` | string | SSH public key (dev images only) |
 
 ### Custom Domains
+
 | Variable | Required | Type | Purpose |
 |----------|----------|------|---------|
-| `DOMAIN` | Yes | string | Custom domain name |
-| `TARGET_ENDPOINT` | Yes | string | `http://service:port` or `grpc://service:port` |
+| `DOMAIN` | Conditional | string | Single custom domain name; use `DOMAINS` for multi-domain mode |
+| `DOMAINS` | Conditional | string | Multiple custom domain names, one per line |
+| `TARGET_ENDPOINT` | Conditional | string | Backend address for single-domain mode, such as `app:80`; protocol prefixes like `http://` and `grpc://` are accepted and stripped |
+| `ROUTING_MAP` | Conditional | string | Multi-domain routing entries, one `domain=service:port` entry per line |
 | `GATEWAY_DOMAIN` | Yes | string | `_.${DSTACK_GATEWAY_DOMAIN}` |
 | `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
 | `SET_CAA` | No | boolean | Enable CAA records (default: false) |
 | `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
+| `ALPN` | No | string | TLS ALPN protocols, such as `h2` for gRPC custom domains |
 
 ### DNS Provider Credentials
+
 | Provider | Variables | Required Permissions |
 |----------|-----------|---------------------|
 | Cloudflare | `CLOUDFLARE_API_TOKEN` | Zone:Read, DNS:Edit |
@@ -71,11 +78,12 @@ The variables you can change to config networking features.
 
 | Component | Image | Hash |
 |-----------|-------|------|
-| Custom domains | `dstacktee/dstack-ingress:20250924` | `sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32` |
+| Custom domains | `dstacktee/dstack-ingress:2.2` | `sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0` |
 
 ## Rate Limits
 
 ### DNS Providers
+
 | Provider | API Limits | Certificate Speed |
 |----------|------------|-------------------|
 | Cloudflare | 1200 req/5min | 1-2 minutes |
@@ -83,9 +91,9 @@ The variables you can change to config networking features.
 | Namecheap | 50 req/hour | 5-15 minutes |
 
 ### Let's Encrypt
+
 | Limit | Rate |
 |-------|------|
 | Certificates per domain | 50/week |
 | Duplicate certificates | 5/week |
 | Failed validations | 5/hour per hostname |
-

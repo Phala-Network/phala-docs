@@ -148,6 +148,7 @@ const response = await client.chat.completions.create({
 });
 console.log(response.choices[0].message.content);
 ```
+
 </CodeGroup>
 
 You can also check the available models and server health:
@@ -212,25 +213,29 @@ Expose your model API on your own domain by adding dstack-ingress to your Docker
 ```yaml
 services:
   dstack-ingress:
-    image: dstacktee/dstack-ingress:20250924@sha256:40429d78060ef3066b5f93676bf3ba7c2e9ac47d4648440febfdda558aed4b32
+    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
     ports:
       - "443:443"
     environment:
       - DOMAIN=ai.mycompany.com
-      - TARGET_ENDPOINT=http://vllm:8000
+      - TARGET_ENDPOINT=vllm:8000
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
+      - /var/run/tappd.sock:/var/run/tappd.sock
       - cert-data:/etc/letsencrypt
+      - evidences:/evidences
 
   vllm:
+    image: vllm/vllm-openai:v0.8.5
     # ... your vLLM config from above
 
 volumes:
   cert-data:
+  evidences:
 ```
 
 See [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain) for the full guide including DNS provider configuration and troubleshooting.
