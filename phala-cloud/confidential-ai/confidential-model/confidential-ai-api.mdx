@@ -148,6 +148,10 @@ Pricing and availability can change; use the API response for production routing
 TEE provider presence and confidential serving are not identical for every provider and model. Use `is_tee` from `/v1/models` to find models that can be served confidentially, then verify the actual response with its `x-receipt-id`.
 </Note>
 
+<Note>
+Confidential inference and zero data retention are separate properties. `is_tee` constrains who can read memory during execution. `zdr` constrains whether the upstream stores prompt or completion content after serving. Use [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters) and `provider: {"zdr": true}` when retention is part of your policy.
+</Note>
+
 ## Verify Your AI is Running Securely
 
 Before trusting receipts, fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation). Then fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) for a response and verify that its `workload_id` and `workload_keyset_digest` match the report.
@@ -166,4 +170,5 @@ Use the API reference and feature guides for the next step:
 - [Images and Vision](/phala-cloud/confidential-ai/confidential-model/images-and-vision) helps you use image-capable models.
 - [Structured Output](/phala-cloud/confidential-ai/confidential-model/structured-output) helps you get JSON responses.
 - [Streaming](/phala-cloud/confidential-ai/confidential-model/streaming) helps you consume streaming responses.
+- [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention) helps you route requests only to serving routes that do not retain prompt or completion content.
 - [Playground](/phala-cloud/confidential-ai/confidential-model/playground) helps you test models in a private environment.

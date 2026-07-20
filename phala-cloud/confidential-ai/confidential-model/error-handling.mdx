@@ -25,6 +25,7 @@ The `type` field is the machine-readable discriminator.
 | `authentication_error` | Missing or invalid API key. |
 | `invalid_request_error` | Malformed request body or unsupported parameter. |
 | `model_not_found` | The requested model id is unavailable. |
+| `not_found_error` | The model exists but no serving route can satisfy the request constraints, for example `provider: {"zdr": true}`. |
 | `upstream_error` | The upstream provider failed or timed out. |
 
 ## Status Codes
@@ -95,6 +96,9 @@ def with_retry(call, max_retries=3):
   </Accordion>
   <Accordion title="Unknown model">
     List valid model ids with [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models). Do not assume a model id exists until it appears in the catalog.
+  </Accordion>
+  <Accordion title="No zero-data-retention route">
+    A request with `provider: {"zdr": true}` returns `404` when the selected model has no available zero-data-retention route. Query [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters) before sending sensitive prompts that require this property.
   </Accordion>
   <Accordion title="Unsupported parameter">
     Some models support `max_tokens`; others require `max_completion_tokens`. Check `supported_parameters` in `/v1/models`.

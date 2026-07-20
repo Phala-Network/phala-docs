@@ -58,6 +58,20 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
   Requests structured output from supported models, including JSON schema mode.
 </ParamField>
 
+<ParamField body="provider" type="object">
+  Routing constraints for this request. Fields are applied together, and the request is served only by a route that satisfies all of them.
+
+  **`zdr`** (boolean): set `true` to route only to providers that operate under zero data retention, meaning they do not retain prompt or completion content after serving the request. `false`, or omitting the field, applies no retention constraint.
+
+  ```json
+  {"provider": {"zdr": true}}
+  ```
+
+  If no route for the model satisfies the constraint, the request returns `404` and no prompt is sent. The constraint is enforced for the whole request, including failover, so a retry cannot fall back to a route that does not satisfy it.
+
+  Find models that can satisfy `zdr` ahead of time with [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters). See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+</ParamField>
+
 ## Examples
 
 <CodeGroup>

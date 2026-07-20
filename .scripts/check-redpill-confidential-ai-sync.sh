@@ -2,10 +2,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE_REPO="${REDPILL_DOCS_V2_REPO:-"$ROOT/../redpill-docs-v2"}"
+SOURCE_REPO="${REDPILL_DOCS_REPO:-${REDPILL_DOCS_V2_REPO:-"$ROOT/../redpill-docs-1"}}"
 PIN_FILE="$ROOT/.scripts/redpill-docs-v2.pin"
 REPORT_FILE="${REDPILL_SYNC_REPORT:-"$ROOT/tmp/redpill-confidential-ai-sync.md"}"
-REMOTE_URL="${REDPILL_DOCS_V2_URL:-https://github.com/redpill-ai/redpill-docs-v2}"
+REMOTE_URL="${REDPILL_DOCS_URL:-${REDPILL_DOCS_V2_URL:-https://github.com/redpill-ai/redpill-docs}}"
 UPDATE_PIN=0
 FAIL_ON_CHANGE=1
 
@@ -13,20 +13,23 @@ usage() {
   cat <<'EOF'
 Usage: .scripts/check-redpill-confidential-ai-sync.sh [options]
 
-Checks whether Phala Confidential AI docs are synced to the pinned RedPill docs-v2 commit.
+Checks whether Phala Confidential AI docs are synced to the pinned RedPill docs commit.
 
 Options:
   --update-pin       Write the latest fetched RedPill origin/main commit to .scripts/redpill-docs-v2.pin.
                     Use this only after Phala docs have been updated and reviewed.
   --no-fail          Report drift but exit 0.
-  --source PATH      Use a specific local redpill-docs-v2 clone.
+  --source PATH      Use a specific local redpill-docs clone.
   --report PATH      Write the markdown drift report to PATH.
   -h, --help         Show this help.
 
 Environment:
-  REDPILL_DOCS_V2_REPO    Local clone path. Defaults to ../redpill-docs-v2.
-  REDPILL_DOCS_V2_URL     Clone URL. Defaults to https://github.com/redpill-ai/redpill-docs-v2.
-  REDPILL_DOCS_V2_TOKEN   Optional GitHub token for private redpill-ai/redpill-docs-v2 access.
+  REDPILL_DOCS_REPO       Local clone path. Defaults to ../redpill-docs-1.
+  REDPILL_DOCS_URL        Clone URL. Defaults to https://github.com/redpill-ai/redpill-docs.
+  REDPILL_DOCS_TOKEN      Optional GitHub token for private RedPill docs access.
+  REDPILL_DOCS_V2_REPO    Backward-compatible alias for REDPILL_DOCS_REPO.
+  REDPILL_DOCS_V2_URL     Backward-compatible alias for REDPILL_DOCS_URL.
+  REDPILL_DOCS_V2_TOKEN   Backward-compatible alias for REDPILL_DOCS_TOKEN.
   REDPILL_SYNC_REPORT     Report path. Defaults to tmp/redpill-confidential-ai-sync.md.
 EOF
 }
@@ -62,8 +65,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 clone_url="$REMOTE_URL"
-if [[ -n "${REDPILL_DOCS_V2_TOKEN:-}" && "$REMOTE_URL" == https://github.com/* ]]; then
-  clone_url="${REMOTE_URL/https:\/\/github.com\//https:\/\/x-access-token:${REDPILL_DOCS_V2_TOKEN}@github.com/}"
+REDPILL_TOKEN="${REDPILL_DOCS_TOKEN:-${REDPILL_DOCS_V2_TOKEN:-}}"
+if [[ -n "$REDPILL_TOKEN" && "$REMOTE_URL" == https://github.com/* ]]; then
+  clone_url="${REMOTE_URL/https:\/\/github.com\//https:\/\/x-access-token:${REDPILL_TOKEN}@github.com/}"
 fi
 
 skip_without_credentials() {
@@ -73,8 +77,8 @@ skip_without_credentials() {
 
 Status: skipped
 
-The RedPill docs-v2 repository could not be fetched from CI. Configure the
-\`REDPILL_DOCS_V2_TOKEN\` secret with read access to \`redpill-ai/redpill-docs-v2\`
+The RedPill docs repository could not be fetched from CI. Configure the
+\`REDPILL_DOCS_TOKEN\` secret with read access to the RedPill docs repository
 to make this check enforce upstream drift automatically.
 EOF
   cat "$REPORT_FILE"
@@ -85,7 +89,7 @@ EOF
 }
 
 if [[ ! -d "$SOURCE_REPO/.git" ]]; then
-  echo "Missing RedPill docs-v2 clone: $SOURCE_REPO"
+  echo "Missing RedPill docs clone: $SOURCE_REPO"
   echo "Cloning $REMOTE_URL ..."
   if ! git clone "$clone_url" "$SOURCE_REPO" --quiet; then
     skip_without_credentials
@@ -100,11 +104,11 @@ PINNED="$(tr -d '[:space:]' < "$PIN_FILE")"
 REMOTE="$(git -C "$SOURCE_REPO" rev-parse origin/main)"
 mkdir -p "$(dirname "$REPORT_FILE")"
 
-echo "Pinned RedPill docs-v2 commit: $PINNED"
-echo "Remote RedPill docs-v2 commit: $REMOTE"
+echo "Pinned RedPill docs commit: $PINNED"
+echo "Remote RedPill docs commit: $REMOTE"
 
 if [[ "$PINNED" == "$REMOTE" ]]; then
-  echo "Phala Confidential AI docs are pinned to the latest fetched RedPill docs-v2 main."
+  echo "Phala Confidential AI docs are pinned to the latest fetched RedPill docs main."
   cat > "$REPORT_FILE" <<EOF
 # RedPill Confidential AI Sync
 
@@ -178,6 +182,9 @@ map_target() {
     guides/streaming.mdx)
       echo "phala-cloud/confidential-ai/confidential-model/streaming.mdx"
       ;;
+    guides/zero-data-retention.mdx)
+      echo "phala-cloud/confidential-ai/confidential-model/zero-data-retention.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/models.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/embeddings.mdx"
+      ;;
     api-reference/chat-completions.mdx)
       echo "phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions.mdx"
       ;;
@@ -213,6 +220,7 @@ CHANGES="$(git -C "$SOURCE_REPO" diff --name-status "$PINNED..origin/main" -- \
   guides/function-calling.mdx \
   guides/vision.mdx \
   guides/streaming.mdx \
+  guides/zero-data-retention.mdx \
   guides/migration-from-openai.mdx \
   guides/migration-from-openrouter.mdx \
   guides/integrations \
@@ -282,7 +290,7 @@ fi
 
 if [[ "$FAIL_ON_CHANGE" -eq 1 ]]; then
   echo
-  echo "RedPill docs-v2 has changed. Update Phala Confidential AI docs, then run:"
+  echo "RedPill docs has changed. Update Phala Confidential AI docs, then run:"
   echo "  .scripts/check-redpill-confidential-ai-sync.sh --update-pin"
   exit 1
 fi

@@ -11,13 +11,13 @@ python3 .scripts/validate-redirects.py
 
 When a new page is added, we should always update used\_links to include it.
 
-## RedPill docs-v2 sync
+## RedPill docs sync
 
 ```bash
 .scripts/check-redpill-confidential-ai-sync.sh
 ```
 
-Checks the local `../redpill-docs-v2` clone against the pinned upstream commit in `.scripts/redpill-docs-v2.pin`, clones the repo if missing, and writes a drift report to `tmp/redpill-confidential-ai-sync.md`.
+Checks the local `../redpill-docs-1` clone against the pinned upstream commit in `.scripts/redpill-docs-v2.pin`, clones the repo if missing, and writes a drift report to `tmp/redpill-confidential-ai-sync.md`.
 
 When RedPill docs change:
 

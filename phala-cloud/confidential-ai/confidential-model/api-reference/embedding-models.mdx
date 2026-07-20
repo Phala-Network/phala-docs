@@ -11,6 +11,21 @@ GET https://inference.phala.com/v1/embeddings/models
 
 Returns models designed for vector embeddings. Use this endpoint when selecting embedding models for retrieval, RAG, clustering, or similarity search.
 
+## Query Parameters
+
+<ParamField query="zdr" type="string">
+  Set to `true` to return only embedding models that can be served under zero data retention.
+
+  `true` is the only accepted value. Any other value returns `400`. Omit the parameter to list the full embedding catalog.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/embeddings/models?zdr=true" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+Response entries have the same shape as the unfiltered catalog. There is no `zdr` field on a model object.
+
 ## Examples
 
 <CodeGroup>

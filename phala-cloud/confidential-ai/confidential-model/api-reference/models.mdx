@@ -11,6 +11,34 @@ GET https://inference.phala.com/v1/models
 
 Use the live model catalog before hardcoding model IDs. The catalog returns model IDs, context windows, pricing, serving metadata, modalities, supported parameters, and whether a model can be served confidentially.
 
+## Query Parameters
+
+<ParamField query="zdr" type="string">
+  Set to `true` to return only models that can be served under zero data retention, meaning the upstream serving route does not retain prompt or completion content.
+
+  A model is included when at least one route that can serve it operates under zero data retention. Listing a model here means a request for it with `provider: {"zdr": true}` can be routed. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
+  `true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter to list the full catalog.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/models?zdr=true" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+Response entries have the same shape as the unfiltered catalog. There is no `zdr` field on a model object: the filter is the way to read this property.
+
+An invalid value returns `400`:
+
+```json
+{
+  "error": {
+    "message": "Invalid 'zdr' query parameter. The only accepted value is 'true'; omit it for unfiltered results.",
+    "type": "invalid_request_error"
+  }
+}
+```
+
 ## Examples
 
 <CodeGroup>
@@ -88,3 +116,15 @@ curl https://inference.phala.com/v1/models \
 ```
 
 `is_tee: true` means the model can be served confidentially. The receipt remains the per-response proof: read the `x-receipt-id` header, then verify it with [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) and [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts).
+
+## Find Zero-Data-Retention Models
+
+`is_tee` and `zdr` describe different properties. `is_tee` says a model can run inside a verified TEE, which constrains who can read memory during execution. Zero data retention says the upstream serving route does not keep prompt or completion content after serving the request. Filter for it with the query parameter rather than inferring it from `is_tee`:
+
+```bash
+curl -s "https://inference.phala.com/v1/models?zdr=true" \
+  -H "Authorization: Bearer <API_KEY>" | \
+  jq -r '.data[].id'
+```
+
+To route a request under the same constraint, send `provider: {"zdr": true}` in the request body. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
