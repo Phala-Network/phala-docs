@@ -7,6 +7,8 @@ A confidential response is served by an upstream provider whose enclave the gate
 
 Provider and model coverage changes over time. Do not treat documentation as a provider allowlist. Use the live model catalog to discover available models, and use receipts for per-response truth.
 
+Zero data retention is a separate property from provider verification. It means the provider does not keep prompt or completion content after serving a request. To request that property for a specific request, send `provider: {"zdr": true}`. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
 ## Binding Methods
 
 Confidential AI can bind a verified upstream session in more than one way:

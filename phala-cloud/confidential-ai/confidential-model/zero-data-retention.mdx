@@ -1,0 +1,103 @@
+---
+title: Zero Data Retention
+description: Restrict requests to serving routes that do not retain prompt or completion content, and list models that support that constraint.
+---
+
+Zero data retention (ZDR) means the upstream serving route that handles your request does not keep the prompt or completion after returning it. Use it when a prompt carries data you cannot leave on a third party's disk.
+
+Two API surfaces implement ZDR:
+
+- [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters) lists the models a ZDR request can reach.
+- `provider: {"zdr": true}` in a request body restricts routing for that request.
+
+The two agree by construction. A model listed under `?zdr=true` is one that `provider: {"zdr": true}` can route.
+
+## Route a request under zero data retention
+
+Add the `provider` block to a chat completion request:
+
+```bash
+curl https://inference.phala.com/v1/chat/completions \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "<MODEL_ID>",
+    "messages": [{"role": "user", "content": "Summarize this contract clause."}],
+    "provider": {"zdr": true}
+  }'
+```
+
+If no route for that model operates under zero data retention, the request fails before the prompt is sent:
+
+```json
+{
+  "error": {
+    "message": "No zero-data-retention providers are available for the selected model.",
+    "type": "not_found_error"
+  }
+}
+```
+
+The status is `404`. This is a fail-closed check: the gateway does not fall back to a non-ZDR route, and failover retries stay inside the ZDR set.
+
+Setting `"zdr": false`, or omitting the field, applies no retention constraint and behaves like a request with no `provider` block.
+
+## List models you can use
+
+```bash
+curl -s "https://inference.phala.com/v1/models?zdr=true" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq -r '.data[].id'
+```
+
+Embedding models have their own catalog, which takes the same parameter:
+
+```bash
+curl -s "https://inference.phala.com/v1/embeddings/models?zdr=true" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq -r '.data[].id'
+```
+
+`true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter for the full catalog. Rejecting other values is deliberate: a typo cannot silently return an unfiltered list that looks filtered.
+
+A model object has no `zdr` field. The filter is how you read this property, so query the filtered catalog rather than inspecting individual model objects.
+
+## ZDR is different from confidential inference
+
+These are different properties and you may need either, or both.
+
+| | What it constrains | How to select it | How to verify it |
+| --- | --- | --- | --- |
+| Confidential inference (`is_tee`) | Who can read memory while the model runs. The upstream is attested and the channel is bound before the prompt is sent. | `is_tee: true` on a model object | The per-response [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) records `upstream.verified.result`. |
+| Zero data retention (`zdr`) | Whether the upstream stores prompt and completion content after serving. | `?zdr=true`, `provider: {"zdr": true}` | Provider contract and published policy. |
+
+The distinction matters because a TEE constrains execution, not storage. A provider could run a model inside an enclave and still write request logs to disk.
+
+<Warning>
+Do not infer ZDR from `is_tee`. Filter with `?zdr=true` when you need the retention property, and route with `provider: {"zdr": true}` when a specific request must stay inside the ZDR set.
+</Warning>
+
+Zero data retention is a property of the upstream serving route, backed by its contract or published policy. It is not proven by the attestation report or the receipt, which cover workload identity and response integrity. Confidential inference is the property the receipt proves. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+
+## Gateway retention
+
+The gateway does not store request or response bodies for ZDR or non-ZDR requests. Receipts hold hashes and verification facts, not content. See [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary).
+
+Setting `zdr` changes which upstream route serves the request. It does not change gateway behavior.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="List Models" icon="list" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models">
+    The `zdr` query parameter and model object fields.
+  </Card>
+  <Card title="Chat Completions" icon="message" href="/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions">
+    The `provider` routing block.
+  </Card>
+  <Card title="Provider Verification" icon="server" href="/phala-cloud/confidential-ai/confidential-model/providers">
+    How upstream serving environments are verified.
+  </Card>
+  <Card title="Compliance and Open Source" icon="scale" href="/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source">
+    How retention maps to compliance requirements.
+  </Card>
+</CardGroup>

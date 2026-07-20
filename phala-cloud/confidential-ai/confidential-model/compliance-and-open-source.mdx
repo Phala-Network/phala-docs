@@ -17,6 +17,7 @@ Read [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boun
 | Hardware-backed identity | The gateway publishes an attestation report with a TEE quote. |
 | Per-response auditability | Receipts bind request and response hashes to the attested workload. |
 | No body retention in receipts | Receipts store hashes and facts, not prompt or response text. |
+| Upstream zero data retention | `provider: {"zdr": true}` restricts routing to providers that do not retain prompt or completion content. Enforced fail-closed, including on failover. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention). |
 | Confidential upstreams | For confidential responses, the upstream is verified and channel-bound before forwarding. |
 | Encryption in transit | TLS for all requests, with optional [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption). |
 
@@ -24,7 +25,8 @@ Read [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boun
 
 | Requirement | How the architecture helps |
 | --- | --- |
-| Data minimization | Gateway receipts avoid storing request and response bodies. |
+| Data minimization | Gateway receipts avoid storing request and response bodies. Request `zdr` to extend the constraint to the upstream provider. |
+| Storage limitation | Zero-data-retention providers do not keep prompt or completion content after serving a request. |
 | Confidential processing | TEE isolation and attestation provide verifiable runtime identity. |
 | Audit evidence | Attestation reports, receipts, sessions, and source provenance can be retained by the customer. |
 | Provider separation | Receipts distinguish confidential upstreams from routed third-party providers. |
