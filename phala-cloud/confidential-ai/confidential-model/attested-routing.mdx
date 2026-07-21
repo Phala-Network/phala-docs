@@ -25,7 +25,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "phala/qwen3.6-35b-a3b-uncensored",
+    "model": "z-ai/glm-5.2",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {"aci_verified": true}
   }'
@@ -57,7 +57,7 @@ A request that requires an attested upstream cannot also opt out of the attestat
 List the sessions that can serve your model. The unfiltered list covers every upstream the gateway has verified, so filter it: a session belonging to another upstream will never match your request.
 
 ```bash
-curl -s "https://inference.phala.com/v1/aci/sessions?model=phala/qwen3.6-35b-a3b-uncensored" \
+curl -s "https://inference.phala.com/v1/aci/sessions?model=z-ai/glm-5.2" \
   -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.sessions[] | "\(.session_id)  \(.upstream_name)  \(.endpoint)"'
 ```
@@ -73,7 +73,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "phala/qwen3.6-35b-a3b-uncensored",
+    "model": "z-ai/glm-5.2",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {
       "aci_verified": true,
@@ -87,7 +87,7 @@ Listing several ids means any one of them may serve the request. If none of them
 ```json
 {
   "error": {
-    "message": "upstream verification failed: none of the requested attested sessions is available for model phala/qwen3.6-35b-a3b-uncensored",
+    "message": "upstream verification failed: none of the requested attested sessions is available for model z-ai/glm-5.2",
     "type": "service_unavailable"
   }
 }
@@ -164,15 +164,15 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
 {
   "seq": 5,
   "type": "upstream.verified",
-  "upstream_name": "phala-86",
+  "upstream_name": "phala-120",
   "provider_type": "phala-direct",
-  "model_id": "phala/qwen3.6-35b-a3b-uncensored",
-  "url_origin": "https://qwen3-6-35b-a3b-uncensored.use1.phala.com",
+  "model_id": "z-ai/glm-5.2",
+  "url_origin": "https://glm-5-2.usc1.phala.com",
   "verifier_id": "private-ai-verifier/phala-direct/v1",
   "result": "verified",
   "required": true,
-  "session_id": "as_941d3d5f...",
-  "channel_bindings": [{"type": "tls_spki_sha256", "origin": "https://qwen3-6-35b-a3b-uncensored.use1.phala.com", "spki_sha256": "4088be15..."}],
+  "session_id": "as_8317766f...",
+  "channel_bindings": [{"type": "tls_spki_sha256", "origin": "https://glm-5-2.usc1.phala.com", "spki_sha256": "f55e21b2..."}],
   "provider_claims": {"trust_boundary": "phala-dstack-cvm", "evidence_scope": "model_instance"}
 }
 ```
