@@ -34,6 +34,16 @@ POST https://inference.phala.com/v1/responses
   Nucleus sampling.
 </ParamField>
 
+<ParamField body="provider" type="object">
+  Routing constraints for this request, applied together. `zdr` restricts routing to providers that do not retain content; `aci_verified` restricts it to an upstream verified inside the TEE; `aci_session_ids` pins it to specific attested channels.
+
+  ```json
+  {"provider": {"aci_verified": true}}
+  ```
+
+  If no provider satisfies the constraints the request fails before the prompt is sent, and failover retries stay inside the allowed set. Field reference: [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions#body-provider). See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing) and [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+</ParamField>
+
 ## Example
 
 ```bash

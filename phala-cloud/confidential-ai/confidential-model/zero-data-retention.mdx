@@ -14,7 +14,7 @@ The two agree by construction. A model listed under `?zdr=true` is one that `pro
 
 ## Route a request under zero data retention
 
-Add the `provider` block to a chat completion request:
+Add the `provider` block to the request. Every inference endpoint accepts it: `/v1/chat/completions`, `/v1/messages`, `/v1/responses`, `/v1/embeddings`, and `/v1/completions`.
 
 ```bash
 curl https://inference.phala.com/v1/chat/completions \

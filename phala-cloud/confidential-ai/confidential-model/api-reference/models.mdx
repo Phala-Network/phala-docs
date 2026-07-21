@@ -26,6 +26,21 @@ curl "https://inference.phala.com/v1/models?zdr=true" \
   -H "Authorization: Bearer <API_KEY>"
 ```
 
+<ParamField query="tee" type="string">
+  Set to `true` to return only models that are offered confidentially, meaning the model object carries `is_tee: true`.
+
+  This filter reports a model's own capability. It does not promise that a given request will reach an attested provider, which depends on the deployment serving it. To require attestation for a request, send `provider: {"aci_verified": true}`. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
+
+  `true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter to list the full catalog.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/models?tee=true" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+Both filters compose. Combining them returns models that satisfy each constraint.
+
 Response entries have the same shape as the unfiltered catalog. There is no `zdr` field on a model object: the filter is the way to read this property.
 
 An invalid value returns `400`:
@@ -110,12 +125,12 @@ for model in models.data:
 Filter for models that can be served confidentially:
 
 ```bash
-curl https://inference.phala.com/v1/models \
+curl "https://inference.phala.com/v1/models?tee=true" \
   -H "Authorization: Bearer <API_KEY>" | \
-  jq -r '.data[] | select(.is_tee == true) | .id'
+  jq -r '.data[].id'
 ```
 
-`is_tee: true` means the model can be served confidentially. The receipt remains the per-response proof: read the `x-receipt-id` header, then verify it with [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) and [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts).
+`is_tee: true` means the model can be served confidentially. To require attestation for a specific request rather than reading the catalog flag, use [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing). The receipt remains the per-response proof: read the `x-receipt-id` header, then verify it with [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) and [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts).
 
 ## Find Zero-Data-Retention Models
 

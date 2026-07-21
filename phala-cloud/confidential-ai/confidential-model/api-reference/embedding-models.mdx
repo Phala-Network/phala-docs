@@ -24,6 +24,17 @@ curl "https://inference.phala.com/v1/embeddings/models?zdr=true" \
   -H "Authorization: Bearer <API_KEY>"
 ```
 
+<ParamField query="tee" type="string">
+  Set to `true` to return only embedding models that are offered confidentially, meaning the model carries `is_tee: true`. To require attestation for a specific request, send `provider: {"aci_verified": true}`. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
+
+  `true` is the only accepted value. Any other value returns `400`. Omit the parameter to list the full embedding catalog.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/embeddings/models?tee=true" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
 Response entries have the same shape as the unfiltered catalog. There is no `zdr` field on a model object.
 
 ## Examples

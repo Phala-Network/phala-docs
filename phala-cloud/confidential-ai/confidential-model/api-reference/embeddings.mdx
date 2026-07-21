@@ -32,9 +32,9 @@ Generate vector embeddings for retrieval, semantic search, clustering, and simil
 </ParamField>
 
 <ParamField body="provider" type="object">
-  Routing constraints for this request.
+  Routing constraints for this request. Embedding requests accept the same `provider` routing block as chat completions, including `zdr`, `aci_verified`, and `aci_session_ids`.
 
-  Set `provider: {"zdr": true}` to route only to serving routes that operate under zero data retention. If no route for the selected embedding model satisfies the constraint, the request fails before input text is sent. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+  Set `provider: {"zdr": true}` to route only to serving routes that operate under zero data retention. If no route for the selected embedding model satisfies the constraint, the request fails before input text is sent. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention) and [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
 </ParamField>
 
 ## Examples

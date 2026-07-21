@@ -781,6 +781,7 @@
                   "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
                   "/phala-cloud/confidential-ai/confidential-model/structured-output",
                   "/phala-cloud/confidential-ai/confidential-model/streaming",
+                  "/phala-cloud/confidential-ai/confidential-model/attested-routing",
                   "/phala-cloud/confidential-ai/confidential-model/zero-data-retention",
                   "/phala-cloud/confidential-ai/confidential-model/error-handling"
                 ]

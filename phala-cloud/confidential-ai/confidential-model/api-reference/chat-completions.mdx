@@ -70,6 +70,22 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
   If no route for the model satisfies the constraint, the request returns `404` and no prompt is sent. The constraint is enforced for the whole request, including failover, so a retry cannot fall back to a route that does not satisfy it.
 
   Find models that can satisfy `zdr` ahead of time with [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters). See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
+  **`aci_verified`** (boolean): set `true` to route only to an upstream the gateway verified inside the TEE before sending the prompt. `false`, or omitting the field, applies no attestation constraint.
+
+  ```json
+  {"provider": {"aci_verified": true}}
+  ```
+
+  If no upstream for the model is both classified as attested and currently verified, the request returns `503` and no prompt is sent. Nothing in the request can relax this constraint once it is set.
+
+  **`aci_session_ids`** (array of strings): restrict the request further to specific attested channels, identified by the session ids from [`GET /v1/aci/sessions`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). Any one of the listed ids may serve the request; if none matches a currently verified channel, the request returns `503`.
+
+  ```json
+  {"provider": {"aci_verified": true, "aci_session_ids": ["as_2a44...6290"]}}
+  ```
+
+  Session ids imply `aci_verified`. Passing them with `"aci_verified": false` returns `400`, as does an empty array or a non-string entry. Both fields are read by the gateway and removed before the request reaches a provider. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
 </ParamField>
 
 ## Examples

@@ -1,0 +1,198 @@
+---
+title: Attested Routing
+description: Restrict a request to an upstream the gateway verified inside the TEE, and pin it to a specific attested channel.
+---
+
+Attested routing restricts a request to an upstream that the gateway verified before sending the prompt. Verification runs inside the TEE, produces an enforceable channel binding, and fails closed: if no eligible upstream verifies, the prompt is never forwarded.
+
+Use it when a prompt must not reach a provider whose execution environment you cannot check. The examples below use a confidential model; see [List the models you can use](#list-the-models-you-can-use) to find one.
+
+Two levels of constraint are available:
+
+| Constraint | What it selects |
+| --- | --- |
+| `provider: {"aci_verified": true}` | Any upstream that is currently verified and channel bound. |
+| `provider: {"aci_session_ids": [...]}` | One specific attested channel, by session id. |
+
+By default a request has no attestation constraint. The gateway still verifies confidential upstreams and still issues receipts, but a request without the constraint can be served by a routed provider whose upstream is not attested. See [Provider Verification](/phala-cloud/confidential-ai/confidential-model/providers).
+
+## Require an attested upstream
+
+Add the `provider` block to the request. Every inference endpoint accepts it: `/v1/chat/completions`, `/v1/messages`, `/v1/responses`, `/v1/embeddings`, and `/v1/completions`.
+
+```bash
+curl https://inference.phala.com/v1/chat/completions \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "phala/qwen3.5-27b",
+    "messages": [{"role": "user", "content": "Summarize this patient note."}],
+    "provider": {"aci_verified": true}
+  }'
+```
+
+If no upstream for the requested model is both classified as attested and currently verified, the request fails before the prompt is sent. A routed model such as `anthropic/claude-sonnet-4.5` always fails this check:
+
+```json
+{
+  "error": {
+    "message": "upstream verification failed: no attested upstream available for model anthropic/claude-sonnet-4.5",
+    "type": "service_unavailable"
+  }
+}
+```
+
+The status is `503`. Failover retries stay inside the attested set, so a plaintext upstream never receives the prompt as a fallback.
+
+Setting `"aci_verified": false`, or omitting the field, applies no attestation constraint.
+
+<Note>
+A request that requires an attested upstream cannot also opt out of the attestation. No request header or option relaxes this constraint once `aci_verified` is set.
+</Note>
+
+## Pin a request to one attested channel
+
+`aci_verified` accepts any upstream that is verified right now. To require one specific attested channel, pass its session id. This is useful when you have already inspected a session's evidence and want subsequent requests to reach that exact channel or fail.
+
+List the sessions that can serve your model. The unfiltered list covers every upstream the gateway has verified, so filter it: a session belonging to another upstream will never match your request.
+
+```bash
+curl -s "https://inference.phala.com/v1/aci/sessions?model=phala/qwen3.5-27b" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq -r '.[] | "\(.session_id)  \(.provider)  \(.endpoint)"'
+```
+
+Each entry carries a `session_id` of the form `as_<64 hex characters>`, the verifier that produced it, its channel binding, and an `expires_at` timestamp. `?provider=` filters the same list by provider. See [Get Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
+
+The most reliable id is the one that already served you. Every response's receipt names the session that served it, so a client can pin follow-up requests to the channel it just used.
+
+Pin a request to one or more of them:
+
+```bash
+curl https://inference.phala.com/v1/chat/completions \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "phala/qwen3.5-27b",
+    "messages": [{"role": "user", "content": "Summarize this patient note."}],
+    "provider": {
+      "aci_verified": true,
+      "aci_session_ids": ["as_2a442c6ba4407b583152949de6331e7a5aa7df7285f7aa9dce810e5e24186290"]
+    }
+  }'
+```
+
+Listing several ids means any one of them may serve the request. If none of them matches a currently verified channel, the request fails with `503` and no prompt is sent:
+
+```json
+{
+  "error": {
+    "message": "upstream verification failed: none of the requested attested sessions is available for model phala/qwen3.5-27b",
+    "type": "service_unavailable"
+  }
+}
+```
+
+A session id is tied to one verified channel, and the gateway re-verifies periodically. When it re-verifies, the evidence changes and the id changes with it. Read a current id shortly before you pin it, and expect a pinned id to stop matching. A pin that stops matching is a failure, never a silent fallback to a different channel.
+
+`aci_session_ids` implies `aci_verified`. Passing session ids together with `"aci_verified": false` is rejected as a contradiction rather than resolved in either direction.
+
+## List the models you can use
+
+```bash
+curl -s "https://inference.phala.com/v1/models?tee=true" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq -r '.data[].id'
+```
+
+Embedding models have their own catalog, which takes the same parameter:
+
+```bash
+curl -s "https://inference.phala.com/v1/embeddings/models?tee=true" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq -r '.data[].id'
+```
+
+`true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter for the full catalog.
+
+<Warning>
+`?tee=true` and `provider: {"aci_verified": true}` read different properties. The catalog filter reports a model's own `is_tee` capability flag. The routing constraint is enforced against the provider actually serving the request.
+
+A model listed under `?tee=true` can still return `503` for an attested request when none of its live deployments is on an attested provider. The catalog tells you which models are offered confidentially. Only the gateway decides what a given request may reach.
+</Warning>
+
+## Request validation
+
+The gateway parses the attestation fields itself and rejects anything it cannot read, rather than treating it as an absent constraint. Every case below returns `400` with type `invalid_request_error` and forwards nothing.
+
+| Request | Result |
+| --- | --- |
+| `"provider": {"aci_verified": true}` | Constraint applied. |
+| `"provider": {"aci_verified": false}` | No constraint. Same as omitting the block. |
+| `"provider": {"aci_verified": "yes"}` | `400`, expected a boolean. |
+| `"provider": {"aci_session_ids": []}` | `400`, must not be empty. |
+| `"provider": {"aci_session_ids": [""]}` | `400`, expected non-empty strings. |
+| `"provider": {"aci_verified": false, "aci_session_ids": ["as_..."]}` | `400`, contradictory. |
+| `"provider": ["aci_verified"]` | `400`, the block must be an object. |
+
+`aci_verified` and `aci_session_ids` are read by the gateway and removed before the request reaches a provider. They compose with the other `provider` fields, such as [`zdr`](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
+## What the constraint guarantees
+
+The check runs before any prompt bytes leave the gateway:
+
+1. The route is classified as an attested provider.
+2. Verification is required for that route and cannot be waived by the request.
+3. Verification returns a verified result and an enforceable channel binding.
+4. The request is forwarded over the bound channel.
+
+Verification evidence is cached for a short interval and refreshed in the background, so a verified result may come from a recent check rather than one performed at that instant. The channel binding is enforced on every connection. If the upstream presents a key or certificate that does not match the binding, the gateway re-verifies and retries, then fails. A request is never served over a channel that does not match the evidence it was verified against.
+
+This constraint applies per request. There is no session to establish and reuse: every request is evaluated on its own, and each failover candidate is evaluated independently.
+
+## Verify that it held
+
+A successful attested request returns `x-receipt-id`. Fetch that receipt and read its `upstream.verified` event:
+
+```bash
+curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer <API_KEY>" \
+  | jq '.event_log[] | select(.type == "upstream.verified")'
+```
+
+```json
+{
+  "seq": 5,
+  "type": "upstream.verified",
+  "provider": "phala",
+  "model_id": "phala/qwen3.5-27b",
+  "result": "verified",
+  "required": true,
+  "session_id": "as_941d3d5f...",
+  "channel_bindings": [{ "type": "tls_spki_sha256", "value": "4088be15..." }],
+  "claims": {
+    "tee_attested": { "status": "Asserted", "source": "HardwareProven" }
+  }
+}
+```
+
+`"result": "verified"` with `"required": true` is the proof that the constraint held. `session_id` names the channel that served the request, and is the id to pin for follow-up requests. The receipt is signed by a key in the attested keyset, so this is evidence rather than a log line. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+
+The request you sent is bound into the same receipt through `request.received.body_hash`, so you can prove which constraint you asked for alongside the result you got.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Receipts and Sessions" icon="link" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions">
+    What a session id identifies and how long it lives.
+  </Card>
+  <Card title="Channel Binding" icon="lock" href="/phala-cloud/confidential-ai/confidential-model/channel-binding">
+    How a verified channel is enforced on the wire.
+  </Card>
+  <Card title="Zero Data Retention" icon="database" href="/phala-cloud/confidential-ai/confidential-model/zero-data-retention">
+    The retention constraint, which composes with this one.
+  </Card>
+  <Card title="Chat Completions" icon="message" href="/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions">
+    The full `provider` routing block.
+  </Card>
+</CardGroup>

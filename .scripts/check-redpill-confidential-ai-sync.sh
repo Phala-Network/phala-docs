@@ -185,6 +185,9 @@ map_target() {
     guides/zero-data-retention.mdx)
       echo "phala-cloud/confidential-ai/confidential-model/zero-data-retention.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/models.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/embeddings.mdx"
       ;;
+    guides/attested-routing.mdx)
+      echo "phala-cloud/confidential-ai/confidential-model/attested-routing.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions.mdx; phala-cloud/confidential-ai/confidential-model/api-reference/models.mdx"
+      ;;
     api-reference/chat-completions.mdx)
       echo "phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions.mdx"
       ;;
@@ -221,6 +224,7 @@ CHANGES="$(git -C "$SOURCE_REPO" diff --name-status "$PINNED..origin/main" -- \
   guides/vision.mdx \
   guides/streaming.mdx \
   guides/zero-data-retention.mdx \
+  guides/attested-routing.mdx \
   guides/migration-from-openai.mdx \
   guides/migration-from-openrouter.mdx \
   guides/integrations \
@@ -269,6 +273,8 @@ CHANGES="$(git -C "$SOURCE_REPO" diff --name-status "$PINNED..origin/main" -- \
     guides/function-calling.mdx \
     guides/vision.mdx \
     guides/streaming.mdx \
+    guides/zero-data-retention.mdx \
+    guides/attested-routing.mdx \
     guides/migration-from-openai.mdx \
     guides/migration-from-openrouter.mdx \
     guides/integrations \
