@@ -25,7 +25,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "phala/qwen3.5-27b",
+    "model": "phala/qwen3.6-35b-a3b-uncensored",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {"aci_verified": true}
   }'
@@ -57,12 +57,12 @@ A request that requires an attested upstream cannot also opt out of the attestat
 List the sessions that can serve your model. The unfiltered list covers every upstream the gateway has verified, so filter it: a session belonging to another upstream will never match your request.
 
 ```bash
-curl -s "https://inference.phala.com/v1/aci/sessions?model=phala/qwen3.5-27b" \
+curl -s "https://inference.phala.com/v1/aci/sessions?model=phala/qwen3.6-35b-a3b-uncensored" \
   -H "Authorization: Bearer <API_KEY>" \
-  | jq -r '.[] | "\(.session_id)  \(.provider)  \(.endpoint)"'
+  | jq -r '.sessions[] | "\(.session_id)  \(.upstream_name)  \(.endpoint)"'
 ```
 
-Each entry carries a `session_id` of the form `as_<64 hex characters>`, the verifier that produced it, its channel binding, and an `expires_at` timestamp. `?provider=` filters the same list by provider. See [Get Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
+Each entry carries a `session_id` of the form `as_<64 hex characters>`, the verifier that produced it, its channel binding, and an `expires_at` timestamp. `?upstream_name=` filters the same list by upstream. See [Get Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
 
 The most reliable id is the one that already served you. Every response's receipt names the session that served it, so a client can pin follow-up requests to the channel it just used.
 
@@ -73,7 +73,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "phala/qwen3.5-27b",
+    "model": "phala/qwen3.6-35b-a3b-uncensored",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {
       "aci_verified": true,
@@ -87,7 +87,7 @@ Listing several ids means any one of them may serve the request. If none of them
 ```json
 {
   "error": {
-    "message": "upstream verification failed: none of the requested attested sessions is available for model phala/qwen3.5-27b",
+    "message": "upstream verification failed: none of the requested attested sessions is available for model phala/qwen3.6-35b-a3b-uncensored",
     "type": "service_unavailable"
   }
 }
@@ -164,15 +164,16 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
 {
   "seq": 5,
   "type": "upstream.verified",
-  "provider": "phala",
-  "model_id": "phala/qwen3.5-27b",
+  "upstream_name": "phala-86",
+  "provider_type": "phala-direct",
+  "model_id": "phala/qwen3.6-35b-a3b-uncensored",
+  "url_origin": "https://qwen3-6-35b-a3b-uncensored.use1.phala.com",
+  "verifier_id": "private-ai-verifier/phala-direct/v1",
   "result": "verified",
   "required": true,
   "session_id": "as_941d3d5f...",
-  "channel_bindings": [{ "type": "tls_spki_sha256", "value": "4088be15..." }],
-  "claims": {
-    "tee_attested": { "status": "Asserted", "source": "HardwareProven" }
-  }
+  "channel_bindings": [{"type": "tls_spki_sha256", "origin": "https://qwen3-6-35b-a3b-uncensored.use1.phala.com", "spki_sha256": "4088be15..."}],
+  "provider_claims": {"trust_boundary": "phala-dstack-cvm", "evidence_scope": "model_instance"}
 }
 ```
 
