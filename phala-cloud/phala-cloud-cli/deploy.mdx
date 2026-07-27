@@ -30,6 +30,8 @@ Deploy new CVM or update existing one
 | `--dev-os, --no-dev-os` | Use dev OS image (requires SSH key) |
 | `--public-logs, --no-public-logs` | Make CVM logs publicly accessible (default: true) |
 | `--public-sysinfo, --no-public-sysinfo` | Make CVM system info publicly accessible (default: true) |
+| `--public-tcbinfo, --no-public-tcbinfo` | Make attestation data publicly accessible (default: true) |
+| `--secure-time, --no-secure-time` | Enable secure time (default: false) |
 | `--listed, --no-listed` | List CVM on the public Trust Center (default: false) |
 
 #### Advanced Options
@@ -41,6 +43,11 @@ Deploy new CVM or update existing one
 | `--fs <value>` | Filesystem type (ext4 or zfs, default: zfs) |
 | `--image <value>` | OS image version (auto-selected if omitted) |
 | `--node-id <value>` | Node ID (auto-selected if omitted) |
+| `--kms-contract <value>` | KMS contract address |
+| `--kms-contract-id <value>` | KMS contract ID |
+| `--key-provider-mode <value>` | Key provider mode: kms or local |
+| `--experimental-key-provider-type <value>` | Set key_provider in compose (kms, local, tpm). Backend resolves key_provider_id for kms; local/tpm require manual key_provider_id. Computes and displays mr_config_id after provision. |
+| `--skip-gateway` | Skip gateway matching |
 | `--custom-app-id <value>` | Custom App ID (requires --nonce for PHALA KMS) |
 | `--nonce <value>` | Nonce for deterministic app_id (requires --custom-app-id, PHALA KMS only) |
 | `--pre-launch-script <value>` | Path to pre-launch script |
@@ -73,7 +80,8 @@ Deploy new CVM or update existing one
 | `-i, --interactive` | Enable interactive mode |
 | `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
-| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+| `--api-version <value>` | API version to use (e.g. 2026-01-21, 2026-05-22, 2026-06-23) |
+| `--timeout SECONDS` | Request timeout in seconds (default 60) |
 
 #### Examples
 

@@ -3,7 +3,7 @@ title: Schema Reference
 description: Zod schema definitions for Phala Cloud API responses — CVM info, user info, and pagination schemas across API versions.
 ---
 
-The `@phala/cloud` SDK uses [Zod](https://zod.dev) schemas for runtime validation of all API responses. Schemas are versioned — each API version has its own set of schemas.
+The `@phala/cloud` SDK uses [Zod](https://zod.dev) schemas for runtime validation of all API responses. API version `2026-06-23` is the default. Its CVM and app endpoints use the `V20260522` schemas, while its KMS endpoints use the contract-centric schemas documented on the [KMS page](/phala-cloud/references/cloud-js-sdk/kms).
 
 ## Schema Validation
 
@@ -23,7 +23,7 @@ const user = await client.getCurrentUser({ schema: MySchema });
 const raw = await client.getCurrentUser({ schema: false });
 ```
 
-## Version `2026-01-21` (Current)
+## Version `2026-01-21`
 
 ### CurrentUserV20260121
 

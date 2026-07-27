@@ -72,7 +72,7 @@ client = create_client()
 client = create_client(
     api_key="phak_your_api_key",
     base_url="https://cloud-api.phala.com/api/v1",
-    version="2026-01-21",
+    version="2026-06-23",
     timeout=30.0,
 )
 ```
@@ -83,7 +83,7 @@ client = create_client(
 |--------|------|---------|-------------|
 | `api_key` | `str` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
 | `base_url` | `str` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
-| `version` | `ApiVersion` | `"2026-01-21"` | API version to use |
+| `version` | `ApiVersion` | `"2026-06-23"` | API version to use |
 | `timeout` | `float` | `30.0` | Request timeout in seconds |
 | `use_cookie_auth` | `bool` | `False` | Use cookie-based auth instead of API key |
 | `headers` | `dict[str, str]` | `None` | Additional request headers |
@@ -91,13 +91,14 @@ client = create_client(
 
 ### API Versions
 
-The SDK supports two API versions. The version affects response shapes for certain endpoints like `get_current_user()` and `get_cvm_list()`.
+The SDK supports four API versions. The version affects response shapes for endpoints such as `get_current_user()` and `get_cvm_list()`.
 
 ```python
 from phala_cloud import SUPPORTED_API_VERSIONS, DEFAULT_API_VERSION
 
-print(SUPPORTED_API_VERSIONS)  # ("2025-10-28", "2026-01-21")
-print(DEFAULT_API_VERSION)     # "2026-01-21"
+print(SUPPORTED_API_VERSIONS)
+# ("2025-10-28", "2026-01-21", "2026-05-22", "2026-06-23")
+print(DEFAULT_API_VERSION)  # "2026-06-23"
 ```
 
 You can switch versions on an existing client without creating a new one from scratch:
@@ -180,6 +181,7 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `get_cvm_attestation(request)` | Get TEE attestation |
 | `get_cvm_pre_launch_script(request)` | Get pre-launch script |
 | `get_cvm_user_config(request)` | Get user config |
+| `get_cvm_status_batch(request)` | Get typed status and resource usage for multiple CVMs |
 
 ### CVM Lifecycle
 
@@ -214,6 +216,7 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `get_app_list(request?)` | List apps |
 | `get_app_info(request)` | Get app details |
 | `get_app_cvms(request)` | List CVMs for an app |
+| `create_app_instance(request)` | Create another instance for an app |
 | `get_app_revisions(request)` | List app revision history |
 | `get_app_revision_detail(request)` | Get revision details |
 | `get_app_filter_options()` | Get available filter options |
@@ -233,9 +236,12 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 
 | Method | Description |
 |--------|-------------|
-| `get_kms_info(request)` | Get KMS info |
-| `get_kms_list(request?)` | List KMS instances |
-| `get_kms_on_chain_detail(request)` | Get on-chain KMS detail |
+| `list_kms_contracts()` | List KMS contracts |
+| `get_kms_contract(slug)` | Get a KMS contract by slug or contract ID |
+| `list_kms_contract_nodes(slug)` | List node replicas under a KMS contract |
+| `get_kms_info(request)` | Get legacy node-centric KMS info (deprecated) |
+| `get_kms_list(request?)` | List legacy node-centric KMS instances (deprecated) |
+| `get_kms_on_chain_detail(request)` | Get on-chain KMS details and verification anchors |
 | `get_app_env_encrypt_pub_key(request)` | Get env encryption public key |
 | `next_app_ids(request?)` | Get next available app IDs |
 
@@ -265,6 +271,7 @@ The SDK also exports standalone utility functions for working with CVM configura
 from phala_cloud import (
     encrypt_env_vars,
     get_compose_hash,
+    get_mr_config_id_hex,
     parse_env,
     parse_env_vars,
     verify_env_encrypt_public_key,
@@ -274,7 +281,11 @@ from phala_cloud import (
 | Function | Description |
 |----------|-------------|
 | `encrypt_env_vars(...)` | Encrypt environment variables for secure deployment |
-| `get_compose_hash(...)` | Compute compose file hash for on-chain verification |
+| `get_compose_hash(...)` | Compute the hash of canonicalized `app-compose.json` |
+| `get_mr_config_id(...)` | Compute V2 `mr_config_id` from byte inputs |
+| `get_mr_config_id_hex(...)` | Compute V2 `mr_config_id` from hex inputs |
+| `get_mr_config_id_v1(...)` | Compute the V1 compose-hash-only format |
+| `verify_mr_config_id(...)` | Verify a V2 `mr_config_id` |
 | `verify_env_encrypt_public_key(...)` | Verify KMS encryption public key |
 | `parse_env(path)` | Parse a `.env` file into key-value pairs |
 | `parse_env_vars(content)` | Parse dotenv content string into key-value pairs |

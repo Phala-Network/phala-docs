@@ -3,6 +3,36 @@ title: Changelog
 description: Release history for the @phala/cloud JavaScript SDK
 ---
 
+## [0.4.0](https://github.com/Phala-Network/phala-cloud/compare/js-v0.3.0...js-v0.4.0) (2026-07-25)
+
+### Breaking changes
+
+- Removed the deprecated `user_id`, `teepod_id`, and `node_id` filters from `getCvmList`. Use `family` and `instance_types` for supported list filtering.
+
+### Features
+
+- Added contract-centric KMS methods: `listKmsContracts`, `getKmsContract`, and `listKmsContractNodes`.
+- Added `getMrConfigId`, `getMrConfigIdV1`, and `verifyMrConfigId` exports.
+- Changed the default API version to `2026-06-23`.
+- Added KMS verification anchors, `mr_config_id` attestation fields, workspace billing status fields, and richer CVM status resource usage.
+- Added `hourly_rate`, `billing_interval`, and `gpu_rental_order` to current CVM schemas.
+
+### Fixes
+
+- Preserved structured API error details, including arrays and objects.
+- Corrected app attestation `chain_id` typing and KMS environment-key verification.
+- Moved resource updates to the unified `PATCH /cvms/{id}` flow.
+
+## [0.3.0](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.10...js-v0.3.0) (2026-06-02)
+
+- Added version-based schema selection for versioned action responses.
+
+## [0.2.10](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.9...js-v0.2.10) (2026-06-02)
+
+- Added hashed CVM ID schemas and a CVM creation resource graph.
+- Added pre-launch script upgrade status and upgrade actions.
+- Added app instance names, TCB identity fields, request IDs on structured errors, and a 60-second default request timeout.
+
 ## [0.2.9](https://github.com/Phala-Network/phala-cloud/compare/js-v0.2.8...js-v0.2.9) (2026-04-17)
 
 ### feat

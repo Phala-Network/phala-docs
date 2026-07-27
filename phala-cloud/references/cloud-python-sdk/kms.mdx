@@ -1,219 +1,250 @@
 ---
 title: KMS
-description: Query Key Management Service info, list KMS instances, get on-chain details, and retrieve encryption public keys.
+description: List KMS contracts, inspect their nodes and verification anchors, and retrieve app encryption keys.
 ---
 
-KMS (Key Management Service) methods let you interact with the Phala Cloud key management infrastructure. You use these to retrieve encryption keys for securing environment variables and to get on-chain KMS details for compose hash verification.
+`phala-cloud` v0.2.0 models KMS resources by contract. A KMS contract groups equivalent KMS node replicas that share one root key.
 
-## get_kms_info
+Every example works with both `PhalaCloud` and `AsyncPhalaCloud`. Add `await` when you use the async client.
 
-`GET /kms/{kmsId}`
-
-Retrieves information about a specific KMS instance.
-
-**Parameters:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `kms_id` | `str` | Yes | KMS identifier (e.g., `"phala"`) |
-
-**Returns:** KMS info object.
-
-**Example:**
-
-<CodeGroup>
-
-```python Sync
-kms = client.get_kms_info({"kms_id": "phala"})
-print(kms.model_dump())
-```
-
-```python Async
-kms = await client.get_kms_info({"kms_id": "phala"})
-print(kms.model_dump())
-```
-
-</CodeGroup>
-
----
-
-## get_kms_list
+## list_kms_contracts
 
 `GET /kms`
 
-Lists all available KMS instances. Supports optional filtering.
+```python
+list_kms_contracts() -> ListKmsContractsResponse
+```
 
-**Parameters:** Optional dictionary of query parameters.
+**Parameters:** None.
 
-**Returns:** `GetKmsListResponse` with a list of KMS instances.
+**Returns:** `ListKmsContractsResponse`, a paginated list of `KmsContract` objects.
 
-**Example:**
+Returns the available KMS contracts. This method always requests API version `2026-06-23`.
 
 <CodeGroup>
 
 ```python Sync
-kms_list = client.get_kms_list()
-for kms in kms_list.items:
-    print(kms.id, kms.name)
+contracts = client.list_kms_contracts()
+for contract in contracts.items:
+    print(contract.slug, contract.chain_id, contract.node_count)
 ```
 
 ```python Async
-kms_list = await client.get_kms_list()
-for kms in kms_list.items:
-    print(kms.id, kms.name)
+contracts = await client.list_kms_contracts()
+for contract in contracts.items:
+    print(contract.slug, contract.chain_id, contract.node_count)
 ```
 
 </CodeGroup>
 
----
+Each `KmsContract` includes the contract `id`, `slug`, `contract_address`, `chain_id`, `node_count`, `k256_pubkey`, and `ca_pubkey`. For the off-chain Phala KMS, `contract_address` is `"phala"` and `chain_id` is `0`.
 
-## get_kms_on_chain_detail
+## get_kms_contract
 
-`GET /kms/on-chain/{chain}`
+`GET /kms/{slug}`
 
-Retrieves the on-chain KMS details for a specific blockchain. This is needed for compose hash verification during CVM provisioning and updates.
+```python
+get_kms_contract(slug: str) -> KmsContract
+```
 
-**Parameters:**
+**Parameters:** `slug` accepts a contract slug or `kc_`-prefixed contract ID.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `chain` | `str` | Yes | Blockchain identifier (e.g., `"phala"`) |
+**Returns:** `KmsContract` for the resolved contract.
 
-**Returns:** On-chain KMS detail response.
-
-**Example:**
+Returns one KMS contract by slug. A `kc_`-prefixed contract ID also resolves.
 
 <CodeGroup>
 
 ```python Sync
-detail = client.get_kms_on_chain_detail({"chain": "phala"})
-print(detail.model_dump())
+contract = client.get_kms_contract("base")
+print(contract.contract_address)
+print(contract.k256_pubkey, contract.ca_pubkey)
 ```
 
 ```python Async
-detail = await client.get_kms_on_chain_detail({"chain": "phala"})
-print(detail.model_dump())
+contract = await client.get_kms_contract("base")
+print(contract.contract_address)
+print(contract.k256_pubkey, contract.ca_pubkey)
 ```
 
 </CodeGroup>
 
----
+## list_kms_contract_nodes
+
+`GET /kms/{slug}/nodes`
+
+```python
+list_kms_contract_nodes(slug: str) -> ListKmsContractNodesResponse
+```
+
+**Parameters:** `slug` accepts a contract slug or `kc_`-prefixed contract ID.
+
+**Returns:** `ListKmsContractNodesResponse` with the contract's node replicas.
+
+Returns the KMS node replicas under a contract, including each node's RPC URL and version.
+
+<CodeGroup>
+
+```python Sync
+nodes = client.list_kms_contract_nodes("base")
+for node in nodes.items:
+    print(node.slug, node.url, node.version)
+```
+
+```python Async
+nodes = await client.list_kms_contract_nodes("base")
+for node in nodes.items:
+    print(node.slug, node.url, node.version)
+```
+
+</CodeGroup>
+
+## Legacy node methods
+
+```python
+get_kms_list(
+    request: GetKmsListRequest | Mapping[str, Any] | None = None,
+) -> GetKmsListResponse
+get_kms_info(request: KmsInfoRequest | Mapping[str, Any]) -> KmsInfo
+```
+
+`get_kms_list()` accepts optional pagination and `is_onchain` filters. `get_kms_info()` requires `kms_id`. They return the earlier node-centric KMS shapes.
+
+Both methods are deprecated and remain pinned to API version `2026-05-22`.
+
+Use `list_kms_contracts()`, `get_kms_contract()`, and `list_kms_contract_nodes()` for new code.
 
 ## get_app_env_encrypt_pub_key
 
 `GET /kms/{kms}/pubkey/{appId}`
 
-Retrieves the public key used to encrypt environment variables for a specific app. You need this key before calling `encrypt_env_vars()`.
+```python
+get_app_env_encrypt_pub_key(
+    request: KmsPubkeyRequest | Mapping[str, Any],
+) -> AppEnvPubkeyResponse
+```
 
-**Parameters:**
+**Parameters:** `kms` is a KMS node ID or slug, and `app_id` is a 20-byte app ID with or without the `0x` prefix.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `kms` | `str` | Yes | KMS identifier (e.g., `"phala"`) |
-| `app_id` | `str` | Yes | App identifier |
+**Returns:** `AppEnvPubkeyResponse` with `public_key` and `signature`.
 
-**Returns:** Response containing the `app_env_encrypt_pubkey` field.
-
-**Example:**
+Returns the public key used to encrypt environment variables for an app.
 
 <CodeGroup>
 
 ```python Sync
-pubkey = client.get_app_env_encrypt_pub_key({
+key = client.get_app_env_encrypt_pub_key({
     "kms": "phala",
-    "app_id": "my-app-id",
+    "app_id": "ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
 })
-print(pubkey.app_env_encrypt_pubkey)
+print(key.public_key, key.signature)
 ```
 
 ```python Async
-pubkey = await client.get_app_env_encrypt_pub_key({
+key = await client.get_app_env_encrypt_pub_key({
     "kms": "phala",
-    "app_id": "my-app-id",
+    "app_id": "ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
 })
-print(pubkey.app_env_encrypt_pubkey)
+print(key.public_key, key.signature)
 ```
 
 </CodeGroup>
-
----
 
 ## next_app_ids
 
 `GET /kms/phala/next_app_id`
 
-Reserves the next available app IDs from the Phala KMS. Useful when you need to know the app ID before provisioning.
-
-**Parameters:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `counts` | `int` | No | Number of IDs to reserve (default: `1`, max: `20`) |
-
-**Returns:** Response with the reserved app IDs.
-
-**Example:**
-
-<CodeGroup>
-
-```python Sync
-ids = client.next_app_ids({"counts": 3})
-print(ids.model_dump())
+```python
+next_app_ids(
+    request: NextAppIdsRequest | Mapping[str, Any] | None = None,
+) -> NextAppIdsResponse
 ```
 
-```python Async
-ids = await client.next_app_ids({"counts": 3})
-print(ids.model_dump())
-```
+**Parameters:** `counts` requests 1 to 20 IDs and defaults to `1`.
 
-</CodeGroup>
+**Returns:** `NextAppIdsResponse` with the reserved `app_id` and `nonce` pairs.
 
----
-
-## Encrypting Environment Variables
-
-The SDK provides utility functions for encrypting environment variables using the KMS public key. Here is the typical workflow:
+Reserves app IDs from the Phala KMS for deterministic provisioning.
 
 ```python
-from phala_cloud import (
-    create_client,
-    encrypt_env_vars,
-    verify_env_encrypt_public_key,
-)
-
-client = create_client()
-
-# 1. Get the encryption public key
-pubkey_resp = client.get_app_env_encrypt_pub_key({
-    "kms": "phala",
-    "app_id": "my-app-id",
-})
-
-# 2. Optionally verify the public key
-verify_env_encrypt_public_key(pubkey_resp.app_env_encrypt_pubkey)
-
-# 3. Encrypt your environment variables
-encrypted = encrypt_env_vars(
-    env_vars=[
-        {"key": "DATABASE_URL", "value": "postgres://..."},
-        {"key": "API_SECRET", "value": "s3cr3t"},
-    ],
-    public_key=pubkey_resp.app_env_encrypt_pubkey,
-)
-
-# 4. Update the CVM with encrypted env vars
-client.update_cvm_envs({
-    "id": "my-app",
-    "encrypted_env": encrypted,
-    "env_keys": ["DATABASE_URL", "API_SECRET"],
-})
+reserved = client.next_app_ids({"counts": 3})
+print(reserved.model_dump())
 ```
 
-<Note>
-The `encrypt_env_vars`, `get_compose_hash`, and `verify_env_encrypt_public_key` functions require the `dstack-sdk` package, which is included as a dependency of `phala-cloud`.
-</Note>
+## get_kms_on_chain_detail
+
+`GET /kms/on-chain/{chain}`
+
+```python
+get_kms_on_chain_detail(
+    request: KmsOnChainDetailRequest | Mapping[str, Any],
+) -> GetKmsOnChainDetailResponse
+```
+
+**Parameters:** `chain` is the chain name, such as `"base"` or `"ethereum"`.
+
+**Returns:** `GetKmsOnChainDetailResponse` with the chain and its KMS contracts.
+
+Returns the contracts, registered devices, OS images, and verification anchors for an on-chain KMS.
+
+```python
+detail = client.get_kms_on_chain_detail({"chain": "base"})
+for contract in detail.contracts:
+    print(contract.contract_address)
+    print(contract.k256_pubkey, contract.ca_pubkey)
+```
+
+## Compute and verify mr_config_id
+
+The SDK exports byte-oriented and hex-oriented helpers:
+
+```python
+get_mr_config_id(
+    compose_hash: bytes,
+    app_id: bytes,
+    key_provider_type: KeyProviderKind,
+    key_provider_id: bytes,
+) -> bytes
+get_mr_config_id_hex(
+    compose_hash_hex: str,
+    app_id_hex: str,
+    key_provider_type: KeyProviderKind,
+    key_provider_id_hex: str = "",
+) -> str
+get_mr_config_id_v1(compose_hash: bytes) -> bytes
+verify_mr_config_id(
+    mr_config_id_hex: str,
+    compose_hash_hex: str,
+    app_id_hex: str,
+    key_provider_type: KeyProviderKind,
+    key_provider_id_hex: str = "",
+) -> bool
+```
+
+For `key_provider_type="kms"`, set `key_provider_id_hex` to the contract's `k256_pubkey`, not its `ca_pubkey`.
+
+```python
+from phala_cloud import get_mr_config_id_hex, verify_mr_config_id
+
+mr_config_id = get_mr_config_id_hex(
+    compose_hash_hex="0x<64-hex-characters>",
+    app_id_hex="0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+    key_provider_type="kms",
+    key_provider_id_hex="0x<kms-key-provider-id>",
+)
+
+matches = verify_mr_config_id(
+    mr_config_id,
+    "0x<64-hex-characters>",
+    "0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+    "kms",
+    "0x<kms-key-provider-id>",
+)
+```
+
+Use `get_mr_config_id()` for byte inputs and `get_mr_config_id_v1()` for the V1 compose-hash-only format.
 
 ## Related
 
-- [CVM Configuration](/phala-cloud/references/cloud-python-sdk/cvm-configuration) — updating CVM settings
-- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling) — handling KMS errors
+- [CVM Configuration](/phala-cloud/references/cloud-python-sdk/cvm-configuration)
+- [Error Handling](/phala-cloud/references/cloud-python-sdk/error-handling)

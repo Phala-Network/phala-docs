@@ -1,133 +1,200 @@
 ---
 title: KMS
-description: Functions for querying Key Management Service instances and reserving app IDs
+description: List KMS contracts, inspect their nodes and verification anchors, and retrieve app encryption keys.
 ---
 
-## getKmsInfo
+`@phala/cloud` v0.4.0 models KMS resources by contract. A KMS contract groups equivalent KMS node replicas that share one root key.
 
-`GET /kms/{kms_id}`
-
-Returns details about a specific KMS instance.
-
-**Parameters:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `kms_id` | `string` | Yes | KMS ID or slug |
-
-**Returns:** `KmsInfo`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | KMS identifier |
-| `slug` | `string` | URL-friendly name |
-| `version` | `string` | KMS version |
-| `url` | `string` | KMS endpoint URL |
-| `chain_id` | `number?` | Blockchain chain ID (on-chain KMS only) |
-| `kms_contract_address` | `string?` | Contract address (on-chain KMS only) |
-| `chain` | `Chain?` | Viem chain configuration (on-chain KMS only) |
-
-**Example:**
-
-```typescript
-const kms = await client.getKmsInfo({ kms_id: "phala" });
-console.log(kms.slug, kms.url);
-```
-
----
-
-## getKmsList
+## listKmsContracts
 
 `GET /kms`
 
-Returns a paginated list of available KMS instances.
-
-**Parameters:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `page` | `number` | No | Page number |
-| `page_size` | `number` | No | Items per page |
-| `is_onchain` | `boolean` | No | Filter for on-chain KMS only |
-
-**Returns:** `GetKmsListResponse` — paginated list of `KmsInfo` objects.
-
-**Example:**
-
 ```typescript
-// List all on-chain KMS instances
-const kmsList = await client.getKmsList({ is_onchain: true });
-kmsList.items.forEach(kms => {
-  console.log(kms.slug, kms.chain_id, kms.kms_contract_address);
-});
+client.listKmsContracts(
+  request?: ListKmsContractsRequest,
+): Promise<ListKmsContractsResponse>
 ```
 
----
+**Parameters:** `page`, `page_size`, and `is_onchain` are optional filters in `request`.
+
+**Returns:** `ListKmsContractsResponse`, a paginated list of `KmsContractInfo` objects.
+
+Returns the available KMS contracts. This method always requests API version `2026-06-23`.
+
+```typescript
+const contracts = await client.listKmsContracts({
+  page: 1,
+  page_size: 20,
+  is_onchain: true,
+});
+
+for (const contract of contracts.items) {
+  console.log(contract.slug, contract.chain_id, contract.node_count);
+}
+```
+
+Each `KmsContractInfo` includes the contract `id`, `slug`, `contract_address`, `chain_id`, `node_count`, `k256_pubkey`, and `ca_pubkey`. For the off-chain Phala KMS, `contract_address` is `"phala"` and `chain_id` is `0`.
+
+## getKmsContract
+
+`GET /kms/{slug}`
+
+```typescript
+client.getKmsContract(
+  request: GetKmsContractRequest,
+): Promise<KmsContractInfo>
+```
+
+**Parameters:** `request.slug` accepts a contract slug or `kc_`-prefixed contract ID.
+
+**Returns:** `KmsContractInfo` for the resolved contract.
+
+Returns one KMS contract by slug. A `kc_`-prefixed contract ID also resolves.
+
+```typescript
+const contract = await client.getKmsContract({ slug: "base" });
+console.log(contract.contract_address);
+console.log(contract.k256_pubkey, contract.ca_pubkey);
+```
+
+Use the public keys as verification anchors when you validate KMS responses.
+
+## listKmsContractNodes
+
+`GET /kms/{slug}/nodes`
+
+```typescript
+client.listKmsContractNodes(
+  request: ListKmsContractNodesRequest,
+): Promise<ListKmsContractNodesResponse>
+```
+
+**Parameters:** `request.slug` accepts a contract slug or `kc_`-prefixed contract ID.
+
+**Returns:** `ListKmsContractNodesResponse` with the contract's node replicas.
+
+Returns the KMS node replicas under a contract, including each node's RPC URL and version.
+
+```typescript
+const nodes = await client.listKmsContractNodes({ slug: "base" });
+
+for (const node of nodes.items) {
+  console.log(node.slug, node.url, node.version);
+}
+```
+
+## Legacy node methods
+
+```typescript
+client.getKmsList(request?: GetKmsListRequest): Promise<GetKmsListResponse>
+client.getKmsInfo(request: GetKmsInfoRequest): Promise<KmsInfo>
+```
+
+`getKmsList()` accepts optional pagination and `is_onchain` filters. `getKmsInfo()` requires `request.kms_id`. They return the earlier node-centric KMS shapes.
+
+Both methods are deprecated and remain pinned to API version `2026-05-22`.
+
+Use `listKmsContracts()`, `getKmsContract()`, and `listKmsContractNodes()` for new code.
+
+## getAppEnvEncryptPubKey
+
+`GET /kms/{kms}/pubkey/{appId}`
+
+```typescript
+client.getAppEnvEncryptPubKey(
+  request: GetAppEnvEncryptPubKeyRequest,
+): Promise<GetAppEnvEncryptPubKey>
+```
+
+**Parameters:** `request.kms` is a KMS node ID or slug, and `request.app_id` is a 20-byte app ID with or without the `0x` prefix.
+
+**Returns:** `GetAppEnvEncryptPubKey` with `public_key` and `signature`.
+
+Returns the public key used to encrypt environment variables for an app. Fetch and verify this key before encrypting secrets.
+
+```typescript
+const key = await client.getAppEnvEncryptPubKey({
+  kms: "phala",
+  app_id: "ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+});
+
+console.log(key.public_key, key.signature);
+```
 
 ## nextAppIds
 
 `GET /kms/phala/next_app_id`
 
-Reserves one or more app IDs from the centralized Phala KMS. Use these with the `nonce` and `app_id` parameters in `provisionCvm` for deterministic app ID assignment.
+```typescript
+client.nextAppIds(request?: NextAppIdsRequest): Promise<NextAppIds>
+```
 
-**Parameters:**
+**Parameters:** `request.counts` requests 1 to 20 IDs and defaults to `1`.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `counts` | `number` | No | Number of IDs to reserve (1-20, default: 1) |
+**Returns:** `NextAppIds` with the reserved `app_id` and `nonce` pairs.
 
-**Returns:** `NextAppIds`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `app_ids` | `array` | Array of `{ app_id, nonce }` pairs |
-
-**Example:**
+Reserves app IDs from the Phala KMS for deterministic provisioning.
 
 ```typescript
 const reserved = await client.nextAppIds({ counts: 3 });
-reserved.app_ids.forEach(({ app_id, nonce }) => {
-  console.log(`Reserved: ${app_id} (nonce: ${nonce})`);
-});
+console.log(reserved.app_ids);
 ```
-
----
 
 ## getKmsOnChainDetail
 
 `GET /kms/on-chain/{chain}`
 
-Returns on-chain KMS details for a specific blockchain, including all registered contracts with their devices and OS images. This is useful for inspecting the on-chain state of KMS infrastructure across a chain.
+```typescript
+client.getKmsOnChainDetail(
+  request: GetKmsOnChainDetailRequest,
+): Promise<GetKmsOnChainDetailResponse>
+```
 
-**Parameters:**
+**Parameters:** `request.chain` is the chain name, such as `"base"` or `"ethereum"`.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `chain` | `string` | Yes | Chain name (e.g., `"base"`, `"ethereum"`) |
+**Returns:** `GetKmsOnChainDetailResponse` with the chain and its KMS contracts.
 
-**Returns:** `GetKmsOnChainDetailResponse`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `chain_name` | `string` | Blockchain name |
-| `chain_id` | `number` | Blockchain chain ID |
-| `contracts` | `array` | KMS contracts with `contract_address`, `chain_id`, `chain_name`, `devices`, `os_images` |
-
-Each contract includes:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `contract_address` | `string` | KMS contract address |
-| `devices` | `array` | Registered devices with `device_id`, `node_name`, `on_chain_allowed` |
-| `os_images` | `array` | OS images with `name`, `version`, `os_image_hash`, `on_chain_allowed` |
-
-**Example:**
+Returns the contracts, registered devices, OS images, and verification anchors for an on-chain KMS.
 
 ```typescript
 const detail = await client.getKmsOnChainDetail({ chain: "base" });
-console.log(`Chain: ${detail.chain_name} (${detail.chain_id})`);
-detail.contracts.forEach(c => {
-  console.log(`Contract: ${c.contract_address}`);
-  c.devices.forEach(d => console.log(`  Device: ${d.device_id} allowed=${d.on_chain_allowed}`));
-});
+
+for (const contract of detail.contracts) {
+  console.log(contract.contract_address);
+  console.log(contract.k256_pubkey, contract.ca_pubkey);
+}
 ```
+
+## Compute and verify mr_config_id
+
+Import the measurement helpers from `@phala/cloud`:
+
+```typescript
+getMrConfigId(input: MrConfigIdInput): Hex
+getMrConfigIdV1(composeHash: Hex): Hex
+verifyMrConfigId(mrConfigId: Hex, input: MrConfigIdInput): boolean
+```
+
+For `key_provider_type: "kms"`, set `key_provider_id` to the contract's `k256_pubkey`, not its `ca_pubkey`.
+
+```typescript
+import { getMrConfigId, verifyMrConfigId } from "@phala/cloud";
+
+const input = {
+  compose_hash: "0x<64-hex-characters>",
+  app_id: "0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+  key_provider_type: "kms" as const,
+  key_provider_id: "0x<kms-key-provider-id>",
+};
+
+const mrConfigId = getMrConfigId(input);
+const matches = verifyMrConfigId(mrConfigId, input);
+```
+
+`getMrConfigIdV1(composeHash)` remains available for the V1 compose-hash-only format.
+
+## Related
+
+- [API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning)
+- [CVM Configuration](/phala-cloud/references/cloud-js-sdk/cvm-configuration)
+- [Error Handling](/phala-cloud/references/cloud-js-sdk/error-handling)

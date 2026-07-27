@@ -19,13 +19,15 @@ Follow the [Deploy Your First CVM](/phala-cloud/phala-cloud-cli/start-from-cloud
 
 ## API Versioning
 
-The CLI communicates with the Phala Cloud API using header-based versioning. The current default API version is `2026-01-21`.
+The CLI communicates with the Phala Cloud API using header-based versioning. The current default API version is `2026-06-23`.
 
 The CLI sends an `X-Phala-Version` header with every request. This determines the response format returned by the server. See the [JS SDK API Versioning](/phala-cloud/references/cloud-js-sdk/api-versioning) page for details on version differences.
 
 | Version | Status |
 |---------|--------|
-| `2026-01-21` | Default (current) |
+| `2026-06-23` | Default |
+| `2026-05-22` | Supported |
+| `2026-01-21` | Supported |
 | `2025-10-28` | Legacy |
 
 You can override the API version with the `--api-version` global flag *(added in v1.1.12)*:
@@ -76,21 +78,22 @@ phala apps --api-version 2025-10-28
 
 | Command | Description |
 |---------|-------------|
+| [`allow-devices`](/phala-cloud/phala-cloud-cli/allow-devices) | Manage an app contract's device allowlist |
 | [`api`](/phala-cloud/phala-cloud-cli/api) | Make authenticated API requests |
+| [`keccak256sum`](/phala-cloud/phala-cloud-cli/keccak256sum) | Compute or verify Keccak-256 checksums |
+| [`kms`](/phala-cloud/phala-cloud-cli/kms) | List KMS contracts and inspect their nodes |
 | [`self`](/phala-cloud/phala-cloud-cli/self) | CLI self-management (update) |
 | [`simulator`](/phala-cloud/phala-cloud-cli/simulator) | Local TEE simulator for development |
 | [`completion`](/phala-cloud/phala-cloud-cli/completion) | Generate shell completion scripts |
 
 ## Deprecated
 
-These commands are deprecated and will be removed in a future release.
+These commands remain available for compatibility but have newer replacements.
 
 | Command | Use instead |
 |---------|-------------|
 | `auth` | [`login`](/phala-cloud/phala-cloud-cli/login), [`logout`](/phala-cloud/phala-cloud-cli/logout), [`status`](/phala-cloud/phala-cloud-cli/status) |
 | [`config`](/phala-cloud/phala-cloud-cli/config) | Profile-based credentials (`~/.phala-cloud/credentials.json`) |
-| [`docker`](/phala-cloud/phala-cloud-cli/docker) | Standard `docker` CLI for build/push |
-| `cvms create` | [`deploy`](/phala-cloud/phala-cloud-cli/deploy) |
 | `cvms upgrade` | [`deploy --cvm-id <id>`](/phala-cloud/phala-cloud-cli/deploy) |
 | `cvms logs` | [`logs`](/phala-cloud/phala-cloud-cli/logs) |
 | `cvms serial-logs` | [`logs --serial`](/phala-cloud/phala-cloud-cli/logs) |
@@ -162,7 +165,8 @@ public_logs = true
 |------|-------------|
 | `--json` | Output in JSON format for programmatic use |
 | `--api-token <token>` | Override the stored API key for this command |
-| `--api-version <version>` | Override the API version (e.g., `2025-10-28`, `2026-01-21`). *Added in v1.1.12* |
+| `--api-version <version>` | Override the API version, including `2026-06-23`, `2026-05-22`, `2026-01-21`, and `2025-10-28` |
+| `--timeout <seconds>` | Set the API request timeout in seconds; the default is 60 |
 
 ## Related
 

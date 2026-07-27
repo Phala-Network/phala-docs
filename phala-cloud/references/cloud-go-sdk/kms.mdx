@@ -1,162 +1,230 @@
 ---
 title: KMS
-description: Query KMS servers, encryption public keys, and on-chain KMS details.
+description: List KMS contracts, inspect their nodes and verification anchors, and retrieve app encryption keys.
 ---
 
-KMS (Key Management Service) methods let you query the key management infrastructure used to encrypt CVM environment variables and manage on-chain app contracts. Most applications use the default `"phala"` KMS type, but the SDK supports querying any available KMS.
+The Go SDK v0.2.0 models KMS resources by contract. A KMS contract groups equivalent KMS node replicas that share one root key.
 
-## GetKMSList
+## ListKMSContracts
 
 `GET /kms`
 
-Returns a paginated list of all available KMS servers.
+```go
+func (c *Client) ListKMSContracts(ctx context.Context) (*ListKMSContractsResponse, error)
+```
+
+**Parameters:** `ctx` controls cancellation and request lifetime.
+
+**Returns:** `*ListKMSContractsResponse`, a paginated list of `KMSContract` values, or an error.
+
+Returns the available KMS contracts. This method always requests API version `2026-06-23`.
+
+```go
+contracts, err := client.ListKMSContracts(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+for _, contract := range contracts.Items {
+	fmt.Println(contract.ID, contract.ContractAddress, contract.NodeCount)
+}
+```
+
+Each `KMSContract` includes the contract ID, slug, contract address, chain ID, node count, `K256Pubkey`, and `CAPubkey`. For the off-chain Phala KMS, the contract address is `"phala"` and the chain ID is `0`.
+
+## GetKMSContract
+
+`GET /kms/{slug}`
+
+```go
+func (c *Client) GetKMSContract(ctx context.Context, slug string) (*KMSContract, error)
+```
+
+**Parameters:** `ctx` controls cancellation; `slug` accepts a contract slug or `kc_`-prefixed contract ID.
+
+**Returns:** `*KMSContract` for the resolved contract, or an error.
+
+Returns one KMS contract by slug. A `kc_`-prefixed contract ID also resolves.
+
+```go
+contract, err := client.GetKMSContract(ctx, "base")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(contract.ContractAddress)
+fmt.Println(contract.K256Pubkey, contract.CAPubkey)
+```
+
+## ListKMSContractNodes
+
+`GET /kms/{slug}/nodes`
+
+```go
+func (c *Client) ListKMSContractNodes(
+	ctx context.Context,
+	slug string,
+) (*ListKMSContractNodesResponse, error)
+```
+
+**Parameters:** `ctx` controls cancellation; `slug` accepts a contract slug or `kc_`-prefixed contract ID.
+
+**Returns:** `*ListKMSContractNodesResponse` with the contract's node replicas, or an error.
+
+Returns the KMS node replicas under a contract, including each node's RPC URL and version.
+
+```go
+nodes, err := client.ListKMSContractNodes(ctx, "base")
+if err != nil {
+	log.Fatal(err)
+}
+for _, node := range nodes.Items {
+	fmt.Println(node.ID, node.URL, node.Version)
+}
+```
+
+## Legacy node methods
 
 ```go
 func (c *Client) GetKMSList(ctx context.Context) (*GetKMSListResponse, error)
-```
-
-**Returns:** `*GetKMSListResponse` — a `Paginated[KMSInfo]` containing:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `Items` | `[]KMSInfo` | List of KMS servers |
-| `Total` | `int` | Total count |
-| `Page` | `int` | Current page |
-| `PageSize` | `int` | Items per page |
-| `Pages` | `int` | Total pages |
-
-Each `KMSInfo` contains:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `ID` | `string` | KMS identifier |
-| `Slug` | `*string` | URL-friendly slug |
-| `URL` | `string` | KMS server URL |
-| `Version` | `string` | KMS version |
-| `ChainID` | `*int` | Blockchain chain ID (for on-chain KMS) |
-| `KMSContractAddress` | `*string` | On-chain KMS contract address |
-
-```go
-kmsList, err := client.GetKMSList(ctx)
-if err != nil {
-	log.Fatal(err)
-}
-for _, kms := range kmsList.Items {
-	fmt.Printf("KMS: %s (version: %s)\n", kms.ID, kms.Version)
-}
-```
-
----
-
-## GetKMSInfo
-
-`GET /kms/{kmsId}`
-
-Returns detailed information about a specific KMS server.
-
-```go
 func (c *Client) GetKMSInfo(ctx context.Context, kmsID string) (*KMSInfo, error)
 ```
 
-**Parameters:**
+`GetKMSList` takes a request context. `GetKMSInfo` also requires a KMS node ID or slug. They return the earlier node-centric KMS shapes or an error.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `kmsID` | `string` | Yes | KMS identifier |
+Both methods are deprecated and remain pinned to API version `2026-05-22`.
 
-**Returns:** `*KMSInfo`
-
-```go
-kms, err := client.GetKMSInfo(ctx, "phala")
-if err != nil {
-	log.Fatal(err)
-}
-fmt.Printf("KMS URL: %s\n", kms.URL)
-```
-
----
+Use `ListKMSContracts`, `GetKMSContract`, and `ListKMSContractNodes` for new code.
 
 ## GetAppEnvEncryptPubKey
 
 `GET /kms/{kmsType}/pubkey/{appId}`
 
-Returns the public key used to encrypt environment variables for a specific app. You need this key to encrypt env vars before passing them to `UpdateCVMEnvs` or `CommitCVMProvision`.
-
 ```go
-func (c *Client) GetAppEnvEncryptPubKey(ctx context.Context, kmsType, appID string) (*AppEnvPubKeyResponse, error)
+func (c *Client) GetAppEnvEncryptPubKey(
+	ctx context.Context,
+	kmsType string,
+	appID string,
+) (*AppEnvPubKeyResponse, error)
 ```
 
-**Parameters:**
+**Parameters:** `ctx` controls cancellation, `kmsType` is a KMS node ID or slug, and `appID` is the app ID.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `kmsType` | `string` | Yes | KMS type (e.g., `"phala"`) |
-| `appID` | `string` | Yes | Application identifier |
+**Returns:** `*AppEnvPubKeyResponse` containing the public key response, or an error.
 
-**Returns:** `*AppEnvPubKeyResponse` (generic map containing the public key)
+Returns the public key used to encrypt environment variables for an app.
 
 ```go
-pubkey, err := client.GetAppEnvEncryptPubKey(ctx, "phala", "app-abc123")
+key, err := client.GetAppEnvEncryptPubKey(
+	ctx,
+	"phala",
+	"ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+)
 if err != nil {
 	log.Fatal(err)
 }
+fmt.Println(key)
 ```
 
-<Note>
-The encryption public key is specific to each app and KMS combination. Always fetch a fresh key before encrypting environment variables.
-</Note>
+## NextAppIDs
 
----
+`GET /kms/phala/next_app_id`
+
+```go
+func (c *Client) NextAppIDs(ctx context.Context) (*NextAppIDsResponse, error)
+```
+
+**Parameters:** `ctx` controls cancellation and request lifetime.
+
+**Returns:** `*NextAppIDsResponse` with the reserved app IDs, or an error.
+
+Reserves app IDs from the Phala KMS for deterministic provisioning.
+
+```go
+reserved, err := client.NextAppIDs(ctx)
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(reserved)
+```
 
 ## GetKMSOnChainDetail
 
 `GET /kms/on-chain/{chain}`
 
-Returns on-chain details for a KMS on a specific blockchain, including contract addresses, registered devices, and OS images.
-
 ```go
-func (c *Client) GetKMSOnChainDetail(ctx context.Context, chain string) (*KMSOnChainDetail, error)
+func (c *Client) GetKMSOnChainDetail(
+	ctx context.Context,
+	chain string,
+) (*KMSOnChainDetail, error)
 ```
 
-**Parameters:**
+**Parameters:** `ctx` controls cancellation; `chain` is the chain name, such as `"base"` or `"ethereum"`.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `chain` | `string` | Yes | Chain name (e.g., `"base"`) |
+**Returns:** `*KMSOnChainDetail` with the chain and its KMS contracts, or an error.
 
-**Returns:** `*KMSOnChainDetail` containing:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `ChainName` | `string` | Blockchain name |
-| `ChainID` | `int` | Blockchain chain ID |
-| `Contracts` | `[]OnChainKMSContract` | List of KMS contracts with devices and OS images |
+Returns the contracts, registered devices, OS images, and verification anchors for an on-chain KMS.
 
 ```go
 detail, err := client.GetKMSOnChainDetail(ctx, "base")
 if err != nil {
 	log.Fatal(err)
 }
-fmt.Printf("Chain: %s (ID: %d), Contracts: %d\n", detail.ChainName, detail.ChainID, len(detail.Contracts))
+for _, contract := range detail.Contracts {
+	fmt.Println(contract.ContractAddress)
+	fmt.Println(contract.K256Pubkey, contract.CAPubkey)
+}
 ```
 
----
+## Compute and verify mr_config_id
 
-## NextAppIDs
-
-`GET /kms/phala/next_app_id`
-
-Returns the next available app IDs for provisioning. Useful when you need to reserve an app ID before deployment.
+Use `GetMrConfigIdHex` when your inputs are hex strings:
 
 ```go
-func (c *Client) NextAppIDs(ctx context.Context) (*NextAppIDsResponse, error)
+func GetMrConfigId(input MrConfigIdInput) ([48]byte, error)
+func GetMrConfigIdHex(
+	composeHashHex string,
+	appIDHex string,
+	kp KeyProviderKind,
+	kpIDHex string,
+) (string, error)
+func GetMrConfigIdV1(composeHash [32]byte) [48]byte
+func VerifyMrConfigId(
+	mrConfigIDHex string,
+	composeHashHex string,
+	appIDHex string,
+	kp KeyProviderKind,
+	kpIDHex string,
+) (bool, error)
 ```
 
-**Returns:** `*NextAppIDsResponse` (generic map)
+For `KeyProviderKMS`, set `kpIDHex` to the contract's `K256Pubkey`, not its `CAPubkey`.
 
 ```go
-nextIDs, err := client.NextAppIDs(ctx)
+mrConfigID, err := phala.GetMrConfigIdHex(
+	"0x<64-hex-characters>",
+	"0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+	phala.KeyProviderKMS,
+	"0x<kms-key-provider-id>",
+)
 if err != nil {
 	log.Fatal(err)
 }
+
+matches, err := phala.VerifyMrConfigId(
+	mrConfigID,
+	"0x<64-hex-characters>",
+	"0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+	phala.KeyProviderKMS,
+	"0x<kms-key-provider-id>",
+)
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(matches)
 ```
+
+Use `GetMrConfigId` for fixed-size byte inputs and `GetMrConfigIdV1` for the V1 compose-hash-only format.
+
+## Related
+
+- [CVM Configuration](/phala-cloud/references/cloud-go-sdk/cvm-configuration)
+- [Error Handling](/phala-cloud/references/cloud-go-sdk/error-handling)

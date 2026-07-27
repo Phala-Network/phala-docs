@@ -1,31 +1,29 @@
 ---
-title: "docker build"
-description: "Build a Docker image"
+title: "kms nodes"
+description: "List the KMS nodes (with RPC url) under a contract"
 ---
 
 <Note>
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala docker build`
+## Command: `phala kms nodes`
 
 ### Syntax
 
 ```
-phala docker build [options]
+phala kms nodes [options] <slug>
 ```
 
 ### Description
 
-Build a Docker image
+List the KMS nodes (with RPC url) under a contract
 
-### Options
+### Arguments
 
-| Option | Description |
-| ------ | ----------- |
-| `-i, --image <value>` | Image name |
-| `-t, --tag <value>` | Image tag |
-| `-f, --file <value>` | Path to Dockerfile |
+| Argument | Description |
+| -------- | ----------- |
+| `<slug>` | KMS contract slug (e.g. phala, base, ethereum) |
 
 ### Global Options
 
@@ -38,19 +36,20 @@ Build a Docker image
 | `--interactive` | Enable interactive mode for commands that support it |
 | `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
-| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+| `--api-version <value>` | API version to use (e.g. 2026-01-21, 2026-05-22, 2026-06-23) |
+| `--timeout SECONDS` | Request timeout in seconds (default 60) |
 
 ### Examples
 
-* Build docker image with prompts
+* List nodes of the phala KMS contract
 
 ```bash
-phala docker build
+phala kms nodes phala
 ```
 
-* Build docker image with options
+* Output as JSON
 
 ```bash
-phala docker build --image myapp --tag latest
+phala kms nodes phala --json
 ```
 

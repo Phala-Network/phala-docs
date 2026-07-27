@@ -47,15 +47,19 @@ Returns a paginated list of CVMs.
 |-------|------|----------|-------------|
 | `page` | `number` | No | Page number |
 | `page_size` | `number` | No | Items per page |
-| `node_id` | `number` | No | Filter by node |
-| `user_id` | `string` | No | Filter by user |
+| `family` | `"all" \| "cpu" \| "gpu"` | No | Filter by instance family |
+| `instance_types` | `string[]` | No | Filter by instance type IDs |
 
 **Returns:** Paginated list of CVM objects.
 
 **Example:**
 
 ```typescript
-const list = await client.getCvmList({ page: 1, page_size: 10 });
+const list = await client.getCvmList({
+  page: 1,
+  page_size: 10,
+  family: "gpu",
+});
 ```
 
 ---
