@@ -1,29 +1,23 @@
 ---
-title: "docker push"
-description: "Push a Docker image to Docker Hub"
+title: "kms phala"
+description: "Show the off-chain Phala KMS root keys"
 ---
 
 <Note>
 This command is marked as unstable and may change in future releases.
 </Note>
 
-## Command: `phala docker push`
+## Command: `phala kms phala`
 
 ### Syntax
 
 ```
-phala docker push [options]
+phala kms phala [options]
 ```
 
 ### Description
 
-Push a Docker image to Docker Hub
-
-### Options
-
-| Option | Description |
-| ------ | ----------- |
-| `-i, --image <value>` | Full image name (e.g. username/image:tag) |
+Show the off-chain Phala KMS root keys
 
 ### Global Options
 
@@ -36,12 +30,20 @@ Push a Docker image to Docker Hub
 | `--interactive` | Enable interactive mode for commands that support it |
 | `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
-| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+| `--api-version <value>` | API version to use (e.g. 2026-01-21, 2026-05-22, 2026-06-23) |
+| `--timeout SECONDS` | Request timeout in seconds (default 60) |
 
 ### Examples
 
-* Display help:
+* Show Phala KMS keys
 
 ```bash
-phala docker push --help
+phala kms phala
 ```
+
+* Output as JSON
+
+```bash
+phala kms phala --json
+```
+

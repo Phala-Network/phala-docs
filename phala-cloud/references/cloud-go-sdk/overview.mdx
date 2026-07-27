@@ -75,11 +75,11 @@ Every option is a function passed to `NewClient`. They follow Go's functional op
 |--------|---------|-------------|
 | `WithAPIKey(key)` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
 | `WithBaseURL(url)` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
-| `WithAPIVersion(v)` | `"2026-01-21"` | API version header value |
+| `WithAPIVersion(v)` | `"2026-06-23"` | API version header value |
 | `WithTimeout(d)` | no timeout | HTTP client timeout as `time.Duration` |
 | `WithMaxRetries(n)` | `30` | Maximum retries for retryable errors (409/429/503) |
 | `WithHTTPClient(hc)` | `&http.Client{}` | Custom `*http.Client` for full control |
-| `WithUserAgent(ua)` | `phala-cloud-sdk-go/0.1.0` | Custom User-Agent header |
+| `WithUserAgent(ua)` | `phala-cloud-sdk-go/0.2.0` | Custom User-Agent header |
 | `WithHeader(key, val)` | — | Add a custom header to all requests |
 
 ## Environment Variables
@@ -156,6 +156,7 @@ This means you never need to worry about converting between ID formats yourself.
 | `UpdateOSImage(ctx, id, req)` | Update OS image |
 | `PatchCVM(ctx, id, req)` | Multi-field update |
 | `ConfirmCVMPatch(ctx, id, req)` | Confirm patch with on-chain hash |
+| `UpdateCVMListed(ctx, id, listed)` | Update marketplace visibility in place |
 
 ### CVM Query
 
@@ -170,6 +171,7 @@ This means you never need to worry about converting between ID formats yourself.
 | `GetCVMAttestation(ctx, id)` | Get TEE attestation |
 | `GetCVMUserConfig(ctx, id)` | Get user configuration |
 | `WatchCVMState(ctx, id, opts)` | Watch state changes via SSE |
+| `GetCVMStatusBatch(ctx, ids)` | Get typed status and resource usage for multiple CVMs |
 
 ### Apps
 
@@ -178,7 +180,9 @@ This means you never need to worry about converting between ID formats yourself.
 | `GetAppList(ctx)` | List applications |
 | `GetAppInfo(ctx, appID)` | Get app details |
 | `GetAppCVMs(ctx, appID)` | List CVMs for an app |
+| `CreateAppInstance(ctx, appID, req)` | Create another instance for an app |
 | `GetAppRevisions(ctx, appID, opts)` | List revision history |
+| `RedeployAppRevision(ctx, appID, revisionID, req)` | Redeploy an app revision |
 | `GetAppAttestation(ctx, appID)` | Get app attestation |
 | `GetAppDeviceAllowlist(ctx, appID)` | Get device allowlist |
 
@@ -191,12 +195,25 @@ This means you never need to worry about converting between ID formats yourself.
 | `GetWorkspaceNodes(ctx, slug, opts)` | List workspace nodes |
 | `GetWorkspaceQuotas(ctx, slug)` | Get workspace quotas |
 
+### Nodes, Instance Types, and OS Images
+
+| Method | Description |
+|--------|-------------|
+| `GetAvailableNodes(ctx)` | List available TEE nodes |
+| `GetCVMCreateResources(ctx)` | Get the CVM creation resource graph |
+| `ListAllInstanceTypeFamilies(ctx)` | List all instance type families |
+| `ListFamilyInstanceTypes(ctx, family)` | List instance types in a family |
+| `GetOSImages(ctx)` | List public OS images |
+
 ### KMS
 
 | Method | Description |
 |--------|-------------|
-| `GetKMSList(ctx)` | List KMS servers |
-| `GetKMSInfo(ctx, kmsID)` | Get KMS details |
+| `ListKMSContracts(ctx)` | List KMS contracts |
+| `GetKMSContract(ctx, slug)` | Get a KMS contract by slug or contract ID |
+| `ListKMSContractNodes(ctx, slug)` | List node replicas under a KMS contract |
+| `GetKMSList(ctx)` | List legacy node-centric KMS servers (deprecated) |
+| `GetKMSInfo(ctx, kmsID)` | Get legacy node-centric KMS details |
 | `GetAppEnvEncryptPubKey(ctx, kmsType, appID)` | Get env encryption public key |
 | `GetKMSOnChainDetail(ctx, chain)` | Get KMS on-chain detail |
 
@@ -209,6 +226,17 @@ This means you never need to worry about converting between ID formats yourself.
 | `DeleteSSHKey(ctx, keyID)` | Delete an SSH key |
 | `ImportGithubProfileSSHKeys(ctx, username)` | Import keys from GitHub profile |
 | `SyncGithubSSHKeys(ctx)` | Sync keys from GitHub |
+
+### Measurement Utilities
+
+| Function | Description |
+|----------|-------------|
+| `GetMrConfigId(input)` | Compute V2 `mr_config_id` from fixed-size byte inputs |
+| `GetMrConfigIdHex(...)` | Compute V2 `mr_config_id` from hex inputs |
+| `GetMrConfigIdV1(composeHash)` | Compute the V1 compose-hash-only format |
+| `VerifyMrConfigId(...)` | Verify a V2 `mr_config_id` |
+
+See [KMS](/phala-cloud/references/cloud-go-sdk/kms) for examples.
 
 ### Webhook Verification
 

@@ -3,6 +3,29 @@ title: Changelog
 description: Release history for the Phala Cloud CLI
 ---
 
+## [1.1.20](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.19...cli-v1.1.20) (2026-07-26)
+
+### Features
+
+- Added `phala kms list`, `phala kms nodes`, and `phala kms phala` for contract-centric KMS discovery.
+- Added `phala keccak256sum` with stdin, check, quiet, and status modes.
+- Added `--force-stop` to `phala deploy` for updates that must bypass graceful shutdown.
+- Added `--timeout` and `--api-version 2026-06-23` as global options.
+- Added compose types and `mr_config_id` computation to the deployment flow.
+- Added KMS contract verification anchors to on-chain detail output.
+
+### Changes and fixes
+
+- Removed the legacy `phala docker` command group and `phala cvms create`. Use `phala deploy` to create CVMs.
+- Added `0x` prefixes to hex output and clearer KMS allowlist labels.
+- Improved API and provisioning errors with request details and structured error codes.
+- Verified KMS environment encryption public keys before use.
+
+## [1.1.19](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.18...cli-v1.1.19) (2026-05-19)
+
+- Added app instance names.
+- Added the CVM creation resource graph.
+
 ## [1.1.18](https://github.com/Phala-Network/phala-cloud/compare/cli-v1.1.17...cli-v1.1.18) (2026-04-17)
 
 ### feat

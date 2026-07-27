@@ -3,6 +3,25 @@ title: Changelog
 description: Version history for the Phala Cloud Python SDK.
 ---
 
+## [0.2.0](https://github.com/Phala-Network/phala-cloud/compare/python-v0.1.3...python-v0.2.0) (2026-07-26)
+
+### Breaking changes
+
+- Removed the deprecated `user_id`, `teepod_id`, and `node_id` filters from CVM list requests.
+
+### Features
+
+- Added contract-centric KMS methods for listing contracts, retrieving one contract, and listing its node replicas.
+- Added `get_mr_config_id`, `get_mr_config_id_hex`, `get_mr_config_id_v1`, and `verify_mr_config_id`.
+- Changed the default API version to `2026-06-23`.
+- Added typed app attestation and batch CVM status responses.
+- Added KMS verification anchors, node device ID history, and GPU rental billing fields to response models.
+
+### Fixes
+
+- Added the KMS `k256_pubkey` field and locked the `pysha3` dependency used for measurement computation.
+- Moved resource updates to the unified `PATCH /cvms/{id}` flow.
+
 ## [0.1.2](https://github.com/Phala-Network/phala-cloud/compare/python-v0.1.1...python-v0.1.2) (2026-03-27)
 
 ### Features

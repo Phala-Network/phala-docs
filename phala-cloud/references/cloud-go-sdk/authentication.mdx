@@ -67,12 +67,12 @@ Each call to `WithHeader` adds one header. You can call it multiple times to set
 
 ## API Versioning
 
-The SDK sends an API version header with every request. The default is `"2026-01-21"`. Override it if you need to target a different version.
+The SDK sends an API version header with every request. The default is `"2026-06-23"`. Override it if you need an older response shape.
 
 ```go
 client, err := phala.NewClient(
 	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithAPIVersion("2026-01-21"),
+	phala.WithAPIVersion("2026-05-22"),
 )
 ```
 
@@ -98,7 +98,7 @@ When using `WithHTTPClient`, the `WithTimeout` option modifies the timeout on yo
 
 ## User Agent
 
-The SDK sends a `User-Agent` header like `phala-cloud-sdk-go/0.1.0` by default. Override it to identify your application in server logs.
+The SDK sends a `User-Agent` header like `phala-cloud-sdk-go/0.2.0` by default. Override it to identify your application in server logs.
 
 ```go
 client, err := phala.NewClient(

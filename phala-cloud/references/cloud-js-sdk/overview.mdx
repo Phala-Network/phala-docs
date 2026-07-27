@@ -53,8 +53,8 @@ const client = createClient();
 const client = createClient({
   apiKey: "phak_your_api_key",
   baseURL: "https://cloud-api.phala.com/api/v1",
-  version: "2026-01-21",
-  timeout: 30000,
+  version: "2026-06-23",
+  timeout: 60000,
 });
 ```
 
@@ -64,8 +64,8 @@ const client = createClient({
 |--------|------|---------|-------------|
 | `apiKey` | `string` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
 | `baseURL` | `string` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
-| `version` | `ApiVersion` | `"2026-01-21"` | [API version](/phala-cloud/references/cloud-js-sdk/api-versioning) to use |
-| `timeout` | `number` | `30000` | Request timeout in milliseconds |
+| `version` | `ApiVersion` | `"2026-06-23"` | [API version](/phala-cloud/references/cloud-js-sdk/api-versioning) to use |
+| `timeout` | `number` | `60000` | Request timeout in milliseconds |
 | `useCookieAuth` | `boolean` | `false` | Use cookie-based auth instead of API key |
 | `headers` | `Record<string, string>` | — | Additional request headers |
 | `onResponseError` | `function` | — | Custom response error handler |
@@ -168,6 +168,7 @@ Actions marked with **V** return different response types depending on the clien
 | `getAppList(request?)` **V** | List apps |
 | `getAppInfo(request)` **V** | Get app details |
 | `getAppCvms(request)` **V** | List CVMs for an app |
+| `createAppInstance(request)` **V** | Create another instance for an app |
 | `getAppRevisions(request)` | List app revision history |
 | `getAppRevisionDetail(request)` | Get app revision details |
 | `getAppFilterOptions()` | Get available filter options for app list |
@@ -190,6 +191,7 @@ Actions marked with **V** return different response types depending on the clien
 | Method | Description |
 |--------|-------------|
 | `getAvailableNodes()` | List available TEE nodes |
+| `getCvmCreateResources()` | Get the CVM creation resource graph |
 | `listAllInstanceTypeFamilies()` | List all instance type families |
 | `listFamilyInstanceTypes(request)` | List instance types in a family |
 | `getOsImages(request?)` | List public OS images (paginated) |
@@ -198,9 +200,12 @@ Actions marked with **V** return different response types depending on the clien
 
 | Method | Description |
 |--------|-------------|
-| `getKmsInfo(request)` | Get KMS info |
-| `getKmsList(request?)` | List KMS instances |
-| `getKmsOnChainDetail(request)` | Get on-chain KMS details |
+| `listKmsContracts(request?)` | List KMS contracts |
+| `getKmsContract(request)` | Get a KMS contract by slug or contract ID |
+| `listKmsContractNodes(request)` | List node replicas under a KMS contract |
+| `getKmsInfo(request)` | Get legacy node-centric KMS info (deprecated) |
+| `getKmsList(request?)` | List legacy node-centric KMS instances (deprecated) |
+| `getKmsOnChainDetail(request)` | Get on-chain KMS details and verification anchors |
 | `getAppEnvEncryptPubKey(request)` | Get env encryption public key |
 | `nextAppIds(request?)` | Get next available app IDs |
 
@@ -229,6 +234,18 @@ These functions interact directly with the blockchain, not the Phala Cloud API. 
 | `checkDeviceAllowed(request)` | Check if a device is allowed on-chain |
 | `checkComposeHashAllowed(request)` | Check if a compose hash is allowed on-chain |
 | `checkOnChainPrerequisites(request)` | Batch check all on-chain prerequisites |
+
+## Measurement Utilities
+
+Import measurement helpers from `@phala/cloud`:
+
+| Function | Description |
+|----------|-------------|
+| `getMrConfigId(input)` | Compute a V2 `mr_config_id` from the compose hash, app ID, and key provider |
+| `getMrConfigIdV1(composeHash)` | Compute the V1 compose-hash-only format |
+| `verifyMrConfigId(mrConfigId, input)` | Verify a V2 `mr_config_id` |
+
+See [KMS](/phala-cloud/references/cloud-js-sdk/kms) for examples.
 
 ## Safe Methods
 

@@ -3,6 +3,23 @@ title: Changelog
 description: Version history and release notes for the Phala Cloud Go SDK.
 ---
 
+## [v0.2.0](https://github.com/Phala-Network/phala-cloud/compare/sdks/go/v0.1.1...sdks/go/v0.2.0) (2026-07-26)
+
+### Features
+
+- Added contract-centric KMS methods: `ListKMSContracts`, `GetKMSContract`, and `ListKMSContractNodes`.
+- Added `GetMrConfigId`, `GetMrConfigIdHex`, `GetMrConfigIdV1`, and `VerifyMrConfigId`.
+- Changed the default API version to `2026-06-23`.
+- Added versioned CVM response helpers and typed batch CVM status results.
+- Added `CreateAppInstance`, `RedeployAppRevision`, `UpdateCVMListed`, and the CVM creation resource graph.
+- Added KMS verification anchors, node device ID history, app attestation types, and GPU rental billing fields.
+
+### Fixes
+
+- Aligned CVM schemas with hashed IDs and exposed request IDs on structured errors.
+- Added `APIError.ComposePrecondition` and `CvmKmsInfo.ChainName` helpers.
+- Moved resource updates to the unified `PATCH /cvms/{id}` flow.
+
 ## [v0.1.1](https://github.com/Phala-Network/phala-cloud/compare/go-v0.1.0...go-v0.1.1) (2026-03-27)
 
 ### Features

@@ -1,25 +1,33 @@
 ---
-title: "status"
-description: "Check authentication status"
+title: "keccak256sum"
+description: "Compute or verify keccak256 checksums of hex inputs"
 ---
 
-### Command: `phala status`
+### Command: `phala keccak256sum`
 
 #### Syntax
 
 ```
-phala status [options]
+phala keccak256sum [options] <hex-values>...
 ```
 
 #### Description
 
-Check authentication status
+Compute or verify keccak256 checksums of hex inputs
+
+#### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<hex-values...>` | Hex strings to hash, or checksum file path when using -c |
 
 #### Options
 
 | Option | Description |
 | ------ | ----------- |
-| `-d, --debug` | Enable debug output |
+| `-c, --check` | Read checksums from file and verify them |
+| `--quiet` | In check mode, suppress OK messages |
+| `--status` | In check mode, suppress all output; exit code indicates result |
 
 #### Global Options
 
@@ -37,15 +45,21 @@ Check authentication status
 
 #### Examples
 
-* Show login status
+* Hash concatenated hex values
 
 ```bash
-phala status
+phala keccak256sum deadbeef 0123456789abcdef 0x02 cafe
 ```
 
-* Get status as JSON
+* Hash hex from stdin
 
 ```bash
-phala status --json
+echo 'deadbeef' | phala keccak256sum
+```
+
+* Verify checksums from file
+
+```bash
+phala keccak256sum -c checksums.txt
 ```
 

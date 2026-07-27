@@ -5,6 +5,26 @@ rss: true
 noindex: true
 ---
 
+<Update label="July 25-26, 2026" tags={["SDK", "CLI", "KMS"]} rss={{ title: "New SDK and CLI Releases", description: "Contract-centric KMS APIs, measurement helpers, and updated CLI command references" }}>
+
+  ## SDK Releases
+
+  - **JavaScript v0.4.0**: Added contract-centric KMS methods, `mr_config_id` helpers, richer CVM status models, and API version `2026-06-23` as the default.
+  - **Python v0.2.0**: Added sync and async KMS contract methods, measurement helpers, typed attestations, and typed batch CVM status responses.
+  - **Go v0.2.0**: Added KMS contract methods, measurement helpers, app instance creation, revision redeployment, and versioned CVM response support.
+  - **CVM List Filters**: JavaScript and Python now reject the removed `user_id`, `teepod_id`, and `node_id` list filters.
+
+  ## CLI v1.1.20
+
+  - **KMS Discovery**: Added commands to list KMS contracts, inspect contract nodes, and show the Phala KMS.
+  - **Deployment Controls**: Added forced-stop updates, KMS verification anchors, and `mr_config_id` output.
+  - **Hash Utility**: Added `phala keccak256sum` with stdin and checksum verification modes.
+  - **Removed Commands**: Removed `phala docker` and `phala cvms create`. Use `phala deploy` to create CVMs.
+
+  See the [CLI changelog](/phala-cloud/phala-cloud-cli/changelog) and the [JavaScript](/phala-cloud/references/cloud-js-sdk/changelog), [Python](/phala-cloud/references/cloud-python-sdk/changelog), and [Go](/phala-cloud/references/cloud-go-sdk/changelog) SDK changelogs for details.
+
+</Update>
+
 <Update label="April 27 - May 1, 2026" tags={["Workspace", "Billing", "KMS", "Admin", "Gateways"]} rss={{ title: "Workspace Abandonment & On-Chain KMS Clusters", description: "Abandoned workspace lockdown, on-chain KMS cluster relations, admin gateway surface, and global ApiErrorDialog" }}>
 
   ## Workspace Suspension & Abandonment

@@ -24,6 +24,7 @@ Create a new instance under an existing app
 | Option | Description |
 | ------ | ----------- |
 | `--app-id <value>` | App ID (hex identifier). Defaults to app_id in phala.toml. |
+| `--name <value>` | Custom CVM name for the new instance. |
 | `--node-id <value>, --teepod-id <value>` | Target node ID for the new instance. |
 | `-c, --compose-file <value>` | Path to Docker Compose file. |
 | `--pre-launch-script <value>` | Path to pre-launch script file. |
@@ -52,7 +53,8 @@ Create a new instance under an existing app
 | `-i, --interactive` | Enable interactive mode |
 | `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
 | `--profile PROFILE` | Temporarily use a different auth profile for this command |
-| `--api-version <value>` | API version to use (e.g. 2025-10-28, 2026-01-21) |
+| `--api-version <value>` | API version to use (e.g. 2026-01-21, 2026-05-22, 2026-06-23) |
+| `--timeout SECONDS` | Request timeout in seconds (default 60) |
 
 ### Examples
 
@@ -60,6 +62,12 @@ Create a new instance under an existing app
 
 ```bash
 phala instances add --app-id <app-id> --node-id 5
+```
+
+* Add instance with custom name
+
+```bash
+phala instances add --app-id <app-id> --name redis-0 --node-id 5
 ```
 
 * Add instance with new Docker Compose
