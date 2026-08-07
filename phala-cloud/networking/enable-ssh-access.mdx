@@ -4,7 +4,7 @@ description: Connect to your CVM via SSH for debugging and management
 ---
 
 <Warning>
-SSH access is only available with **dev** OS images. Select "dstack-dev" when creating your CVM. Production images have SSH disabled for security.
+SSH access is only available with dev OS images. Select "dstack-dev" when creating your CVM. Production images have SSH disabled for security. Since dstack 0.5.6, only public key login works — password login is disabled.
 </Warning>
 
 The easiest way to SSH into your CVM is with the Phala CLI. One command connects you through the secure gateway tunnel.
