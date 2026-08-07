@@ -229,11 +229,12 @@ include it in your Docker image.
 
 | Variable | Required | Description |
 | --- | --- | --- |
+| `DSTACK_ROOT_PASSWORD` | No | Linux root password for dstack OS. If not set, a random 32-character password is generated. Starting with dstack 0.5.6, SSH password login is disabled, so this password no longer lets you SSH in. |
 | `DSTACK_ROOT_PUBLIC_KEY` | No | SSH public key added to `/home/root/.ssh/authorized_keys` |
 | `DSTACK_AUTHORIZED_KEYS` | No | SSH authorized keys for `/home/root/.ssh/authorized_keys`. Overwrites `DSTACK_ROOT_PUBLIC_KEY` if both are set. |
 
 <Warning>
-For security, `DSTACK_ROOT_PUBLIC_KEY` and `DSTACK_AUTHORIZED_KEYS` are
+For security, `DSTACK_ROOT_PASSWORD`, `DSTACK_ROOT_PUBLIC_KEY`, and `DSTACK_AUTHORIZED_KEYS` are
 **unset** from the environment immediately after they are applied. They will **not** be visible to
 your Docker Compose services.
 </Warning>

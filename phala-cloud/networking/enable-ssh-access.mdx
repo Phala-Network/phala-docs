@@ -20,6 +20,10 @@ Start by adding your SSH keys in **Account Settings > SSH Keys** on the [Phala C
 
 When creating a CVM, the SSH Authorization section lets you add an additional public key specific to that instance. It is added alongside your account keys.
 
+<Warning>
+Starting with dstack 0.5.6, SSH password login is disabled. `DSTACK_ROOT_PASSWORD` still sets the Linux root password for console use, but you cannot SSH in with it. Use a public key instead.
+</Warning>
+
 <Note>
 SSH keys are injected **only at CVM creation time**. Updating your account keys won't affect already-deployed CVMs. To modify credentials on existing CVMs, use **Code Update** to set the `DSTACK_ROOT_PUBLIC_KEY` environment variable.
 </Note>
