@@ -18,10 +18,10 @@ The easiest way to SSH into your CVM is with the Phala CLI. One command connects
 
 Start by adding your SSH keys in **Account Settings > SSH Keys** on the [Phala Cloud dashboard](https://cloud.phala.com/account/settings). You can add keys manually or sync them from GitHub. All saved keys are automatically added to every new CVM you deploy.
 
-When creating a CVM, the SSH Authorization section lets you add an additional root password or public key specific to that instance. These are added alongside your account keys.
+When creating a CVM, the SSH Authorization section lets you add an additional public key specific to that instance. It is added alongside your account keys.
 
 <Note>
-SSH keys are injected **only at CVM creation time**. Updating your account keys won't affect already-deployed CVMs. To modify credentials on existing CVMs, use **Code Update** to set the `DSTACK_ROOT_PASSWORD` or `DSTACK_ROOT_PUBLIC_KEY` environment variables.
+SSH keys are injected **only at CVM creation time**. Updating your account keys won't affect already-deployed CVMs. To modify credentials on existing CVMs, use **Code Update** to set the `DSTACK_ROOT_PUBLIC_KEY` environment variable.
 </Note>
 
 ## Step 2: Connect
