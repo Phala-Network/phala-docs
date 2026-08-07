@@ -4,10 +4,10 @@ description: Connect to your CVM via SSH for debugging and management
 ---
 
 <Warning>
-SSH access is only available with dev OS images. Select "dstack-dev" when creating your CVM. Production images have SSH disabled for security. Since dstack 0.5.6, only public key login works — password login is disabled.
+SSH works only on dev OS images. Select "dstack-dev" when you create your CVM. Production images have SSH turned off for security. You sign in with an SSH key. Passwords do not work.
 </Warning>
 
-The easiest way to SSH into your CVM is with the Phala CLI. One command connects you through the secure gateway tunnel.
+The Phala CLI connects you through the secure gateway tunnel in one command.
 
 ## Prerequisites
 
@@ -18,15 +18,13 @@ The easiest way to SSH into your CVM is with the Phala CLI. One command connects
 
 Start by adding your SSH keys in **Account Settings > SSH Keys** on the [Phala Cloud dashboard](https://cloud.phala.com/account/settings). You can add keys manually or sync them from GitHub. All saved keys are automatically added to every new CVM you deploy.
 
-When creating a CVM, the SSH Authorization section lets you add an additional public key specific to that instance. It is added alongside your account keys.
+When creating a CVM, the SSH Authorization section lets you add one more public key just for that CVM. It is added alongside your account keys.
 
-<Warning>
-Starting with dstack 0.5.6, SSH password login is disabled. `DSTACK_ROOT_PASSWORD` still sets the Linux root password for console use, but you cannot SSH in with it. Use a public key instead.
-</Warning>
+Your keys are copied into the CVM when it starts for the first time. Adding a key to your account later does not reach a CVM that is already running. To add a key to a running CVM, use **Code Update** and set the `DSTACK_ROOT_PUBLIC_KEY` environment variable.
 
-<Note>
-SSH keys are injected **only at CVM creation time**. Updating your account keys won't affect already-deployed CVMs. To modify credentials on existing CVMs, use **Code Update** to set the `DSTACK_ROOT_PUBLIC_KEY` environment variable.
-</Note>
+### Why can't I sign in with a password?
+
+Since dstack 0.5.6, the SSH server rejects password logins. Only keys work. `DSTACK_ROOT_PASSWORD` still sets the Linux root password inside the CVM, but SSH will turn it down no matter what you set it to. Add a public key instead.
 
 ## Step 2: Connect
 
@@ -109,7 +107,7 @@ Remember to switch to a Production OS image when you're done debugging.
 
 | Issue | Solution |
 |-------|----------|
-| Permission denied | Check Account Settings for saved keys. For existing CVMs, use Code Update to set credentials. |
+| Permission denied | Check that Account Settings has the key you are using. Passwords are rejected. For a running CVM, use Code Update to add a key. |
 | Connection refused | Confirm you deployed with Development OS, not Production |
 | Connection timeout | Run `phala ssh -v` to see detailed connection info |
 

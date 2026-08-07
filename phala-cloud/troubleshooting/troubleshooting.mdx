@@ -135,7 +135,7 @@ See the [SSH access guide](/phala-cloud/networking/enable-ssh-access) for detail
 **Common issues:**
 - Not using Development OS image (SSH is disabled on Production OS)
 - Missing `DSTACK_ROOT_PUBLIC_KEY` environment variable
-- Trying to log in with a root password: dstack 0.5.6 and later disable SSH password login, so only public keys work
+- Signing in with a root password. Since dstack 0.5.6, SSH rejects passwords. Use a public key.
 - Using LibreSSL instead of OpenSSL on macOS
 
 ## GPU TEE Issues
