@@ -66,12 +66,20 @@ GPU TEE instances provide confidential AI computing with hardware-level isolatio
 
 ### GPU TEE Pricing
 
-| GPU Model | Commitment | Price | Notes |
-|-----------|------------|-------|-------|
-| **NVIDIA H200** | On-Demand | $3.50/hour | 24-hour minimum |
-| **NVIDIA H200** | 1-Month | $2.56/hour | Monthly commitment |
-| **NVIDIA H200** | 6-Month | $2.30/hour | Best value |
-| **NVIDIA B200** | On-Demand | $3.80/hour | 24-hour minimum |
+| GPU Model | GPUs per Instance | Plan | Price per Hour |
+|-----------|-------------------|------|----------------|
+| **NVIDIA H200** | 1 | On-Demand | $4.80 |
+| **NVIDIA H200** | 1 | 1-Month Commitment | $4.30 |
+| **NVIDIA H200** | 1 | 6-Month Commitment | $3.80 |
+| **NVIDIA H200** | 8 | 1-Month Commitment | $32.00 |
+| **NVIDIA H200** | 8 | 6-Month Commitment | $28.00 |
+| **NVIDIA B300** | 1 | On-Demand | $9.00 |
+| **NVIDIA B300** | 1 | 1-Month Commitment | $8.50 |
+| **NVIDIA B300** | 1 | 6-Month Commitment | $7.80 |
+| **NVIDIA B300** | 8 | 1-Month Commitment | $62.40 |
+| **NVIDIA B300** | 8 | 6-Month Commitment | $56.00 |
+
+Prices are for the US region. Check the [GPU TEE dashboard](https://cloud.phala.com) for current rates and availability.
 
 ### GPU TEE Billing Rules
 
@@ -80,20 +88,21 @@ GPU TEE instances provide confidential AI computing with hardware-level isolatio
 </Warning>
 
 **On-Demand GPU TEE:**
-- **Minimum charge**: When you start an instance, you are charged **$84 upfront for the first 24 hours** (H200)
+- **Minimum charge**: Each instance has a minimum rental period, charged upfront when you order. For a single H200 at $4.80 per hour with a 24-hour minimum, you pay $115.20 upfront. A B300 has a 30-day (720-hour) minimum, so a single B300 at $9.00 per hour costs $6,480 upfront.
 - **When billing starts**: No charges until the instance is actually launched
 - Configuring Docker settings or topping up your account does NOT incur compute costs
-- Usage beyond 24 hours is billed hourly (pay-as-you-go)
-- If you stop and restart later, the 24-hour minimum applies again
+- Usage beyond the minimum period is billed hourly (pay-as-you-go)
+- If you stop and restart later, the minimum charge applies again
+- **Provisioning lead time**: up to 24 hours for a single H200, 72 hours for 8x H200, and 7 days for B300
 
 **Commitment Plans:**
-- Lower hourly rates with monthly or 6-month commitments
+- Lower hourly rates with 1-month or 6-month commitments
 - Contact cloud@phala.network for commitment pricing
 
 ### GPU Configuration
 
-- Available GPUs per instance: 1, 2, 4, or 8 GPUs
-- Multi-GPU pricing scales linearly (e.g., 2x H200 = 2x hourly rate)
+- Available GPUs per instance: 1 or 8 GPUs
+- An 8-GPU instance has its own hourly rates, listed in the pricing table above
 
 ### Refunds
 

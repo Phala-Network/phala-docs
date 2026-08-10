@@ -37,22 +37,21 @@ Available options include:
 
 | GPU type | Region | vCPU cores | VRAM | RAM | Storage | Price* |
 |----------|--------|-----------|------|-----|---------|--------|
-| H200 | US | 24 | 141 GB | 256 GB | 200 GB | $2.56/GPU/hour |
-| H200 | India | 15 | 141 GB | 384 GB | 200 GB | $2.30/GPU/hour |
-| B200 | US | 12 | 180 GB | 192 GB | 200 GB | $3.80/GPU/hour |
+| H200 (1 GPU) | US | 24 | 141 GB | 192 GB | 1 TB | $4.80/hour |
+| H200 (8 GPUs) | US | 192 | 1128 GB | 1536 GB | 1 TB | from $28.00/hour |
 
-\*Pricing may vary. Check the dashboard for current rates.
+\*On-demand rate for the 1-GPU option; the 8-GPU option starts at the 6-month commitment rate. Check the dashboard for current rates and commitment pricing.
 
 Click your preferred GPU card to highlight it in green.
 
 ### Configure GPU count
 
-Choose the number of GPUs for your instance. You can scale from **1 to 8 GPUs** per instance. The UI updates resource totals dynamically:
+Choose the number of GPUs for your instance: **1 or 8 GPUs** per instance. The UI updates resource totals dynamically:
 
-| GPU count | Example: B200 | Total vCPU | Total VRAM | Total RAM | Total storage |
+| GPU count | Example: H200 | Total vCPU | Total VRAM | Total RAM | Total storage |
 |-----------|---------------|-----------|-----------|-----------|---------------|
-| 1 GPU | Single | 12 cores | 180 GB | 192 GB | 200 GB |
-| 8 GPUs | Multi | 96 cores | 1 TB | 1 TB | 1 TB |
+| 1 GPU | Single | 24 cores | 141 GB | 192 GB | 1 TB |
+| 8 GPUs | Multi | 192 cores | 1128 GB | 1536 GB | 1 TB |
 
 ### Configure deployment
 
