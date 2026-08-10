@@ -155,6 +155,10 @@ def validate_redirects(docs_config: Dict[str, Any], available_paths: Set[str]) -
         source = redirect.get("source", "")
         destination = redirect.get("destination", "")
 
+        # External URL destinations are allowed and skip path validation
+        if destination.startswith("http://") or destination.startswith("https://"):
+            continue
+
         # Check if destination matches any available path (exact or pattern)
         if not path_matches_any_available(destination, available_paths):
             invalid_redirects.append({

@@ -1767,7 +1767,11 @@
       "source": "/phala-cloud/be-production-ready"
     },
     {
-      "destination": "/phala-cloud/what-is/what-is-phala-cloud",
+      "destination": "https://cloud.phala.com/about/pricing",
+      "source": "/phala-cloud/pricing"
+    },
+    {
+      "destination": "https://cloud.phala.com/about/pricing",
       "source": "/phala-cloud/references/phala-cloud-pricing"
     },
     {
