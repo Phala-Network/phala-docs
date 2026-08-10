@@ -104,7 +104,7 @@ def with_retry(call, max_retries=3):
     Some models support `max_tokens`; others require `max_completion_tokens`. Check `supported_parameters` in `/v1/models`.
   </Accordion>
   <Accordion title="Rate limited">
-    Back off and retry. For sustained high volume, use dedicated models or dedicated GPU TEE capacity.
+    Back off and retry. For sustained high volume, use dedicated GPU TEE capacity.
   </Accordion>
   <Accordion title="Upstream unavailable">
     Retry after backoff or choose another model. For sensitive prompts, confirm the replacement model returns `upstream.verified.result = verified`.

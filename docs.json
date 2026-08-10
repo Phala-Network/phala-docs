@@ -224,7 +224,6 @@
                 "group": "GPU CVM",
                 "pages": [
                   "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
-                  "/phala-cloud/confidential-ai/confidential-gpu/model-template",
                   "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
                   "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting",
                   "/phala-cloud/confidential-ai/benchmark"
@@ -1768,7 +1767,11 @@
       "source": "/phala-cloud/be-production-ready"
     },
     {
-      "destination": "/phala-cloud/what-is/what-is-phala-cloud",
+      "destination": "https://cloud.phala.com/about/pricing",
+      "source": "/phala-cloud/pricing"
+    },
+    {
+      "destination": "https://cloud.phala.com/about/pricing",
       "source": "/phala-cloud/references/phala-cloud-pricing"
     },
     {
@@ -1816,7 +1819,11 @@
       "source": "/phala-cloud/gpu/confidential-ai/gpu-tee/inference-api"
     },
     {
-      "destination": "/phala-cloud/confidential-ai/confidential-gpu/model-template",
+      "destination": "/phala-cloud/confidential-ai/overview",
+      "source": "/phala-cloud/confidential-ai/confidential-gpu/model-template"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/overview",
       "source": "/phala-cloud/confidential-ai/confidential-gpu/confidential-ai-models"
     },
     {

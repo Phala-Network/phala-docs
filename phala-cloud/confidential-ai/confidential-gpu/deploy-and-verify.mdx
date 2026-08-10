@@ -3,11 +3,11 @@ title: Deploy and Verify GPU TEE
 description: Deploy or fine-tune AI models with hardware-level security using TEE-protected GPUs and verify they run in genuine TEE hardware
 ---
 
-GPU TEE gives you dedicated H100, H200, or B200 GPUs running inside trusted execution environments for custom AI workloads. You get full control over your environment with Docker container support, and you can verify hardware authenticity using NVIDIA's local verification tools.
+GPU TEE gives you dedicated H200 or B300 GPUs running inside trusted execution environments for custom AI workloads. You get full control over your environment with Docker container support, and you can verify hardware authenticity using NVIDIA's local verification tools.
 
-This option works when you need to train, fine-tune, or run inference on proprietary datasets with custom code. For standard LLM inference, the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) or [Model Template](/phala-cloud/confidential-ai/confidential-gpu/model-template) are simpler alternatives.
+This option works when you need to train, fine-tune, or run inference on proprietary datasets with custom code. For standard LLM inference, the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) is a simpler alternative.
 
-Each instance includes NVIDIA Driver `570.133.20` and CUDA `12.8`. You can scale from 1 to 8 GPUs per instance.
+Each instance comes with the NVIDIA driver and CUDA toolkit pre-installed, with 1 or 8 GPUs.
 
 ## Prerequisites
 
@@ -30,29 +30,28 @@ Check your credit balance in the upper right corner. GPU instances incur hourly 
 Select your GPU type based on your compute needs.
 
 <Frame caption="GPU Device Selection">
-  <img src="/images/confidential-ai/confidential-gpu/gpu-tee-01.png" alt="GPU TEE hardware selection interface showing H100, H200, and B200 GPU options with specifications" />
+  <img src="/images/confidential-ai/confidential-gpu/gpu-tee-01.png" alt="GPU TEE hardware selection interface showing H200 and B300 GPU options with specifications" />
 </Frame>
 
 Available options include:
 
-| GPU type | Region | vCPU cores | VRAM | RAM | Storage | Price* |
-|----------|--------|-----------|------|-----|---------|--------|
-| H200 | US | 24 | 141 GB | 256 GB | 200 GB | $2.56/GPU/hour |
-| H200 | India | 15 | 141 GB | 384 GB | 200 GB | $2.30/GPU/hour |
-| B200 | US | 12 | 180 GB | 192 GB | 200 GB | $3.80/GPU/hour |
+| GPU type | Region | vCPU cores | VRAM | RAM | Storage |
+|----------|--------|-----------|------|-----|---------|
+| H200 (1 GPU) | US | 24 | 141 GB | 192 GB | 1 TB |
+| H200 (8 GPUs) | US | 192 | 1128 GB | 1536 GB | 1 TB |
 
-\*Pricing may vary. Check the dashboard for current rates.
+Check the [pricing page](https://cloud.phala.com/about/pricing) for current rates.
 
 Click your preferred GPU card to highlight it in green.
 
 ### Configure GPU count
 
-Choose the number of GPUs for your instance. You can scale from **1 to 8 GPUs** per instance. The UI updates resource totals dynamically:
+Choose the number of GPUs for your instance: **1 or 8 GPUs** per instance. The UI updates resource totals dynamically:
 
-| GPU count | Example: B200 | Total vCPU | Total VRAM | Total RAM | Total storage |
+| GPU count | Example: H200 | Total vCPU | Total VRAM | Total RAM | Total storage |
 |-----------|---------------|-----------|-----------|-----------|---------------|
-| 1 GPU | Single | 12 cores | 180 GB | 192 GB | 200 GB |
-| 8 GPUs | Multi | 96 cores | 1 TB | 1 TB | 1 TB |
+| 1 GPU | Single | 24 cores | 141 GB | 192 GB | 1 TB |
+| 8 GPUs | Multi | 192 cores | 1128 GB | 1536 GB | 1 TB |
 
 ### Configure deployment
 
@@ -68,13 +67,13 @@ You can always deploy different containers later. Your initial template choice i
 
 Choose a commitment period:
 
-| Plan | Rate | Notes |
-|------|------|-------|
-| 6-month commitment | ~$2.88/GPU/hour | Includes storage, saves ~18% vs on-demand |
-| 1-month commitment | ~$3.20/GPU/hour | Includes storage, short-term commitment |
-| On-Demand | ~$3.50/GPU/hour + storage | Pay-as-you-go, no commitment |
+| Plan | Notes |
+|------|-------|
+| 6-month commitment | Lowest rate, long-term commitment |
+| 1-month commitment | Short-term commitment |
+| On-Demand | Pay-as-you-go, no commitment |
 
-Review the **Pricing Summary** showing estimated costs per hour, day, and month.
+Check the [pricing page](https://cloud.phala.com/about/pricing) for current rates. Review the **Pricing Summary** showing estimated costs per hour, day, and month.
 
 ### Launch instance
 
@@ -112,7 +111,7 @@ First, confirm your GPU is detected and confidential compute mode is active. Run
 nvidia-smi
 ```
 
-Look for your GPU model (H100/H200/B200), driver version 570.133.20, and CUDA version 12.8. Then check confidential compute status:
+Look for your GPU model (H200/B300) and confirm the driver and CUDA versions are loaded. Then check confidential compute status:
 
 ```bash
 nvidia-smi conf-compute -q

@@ -141,14 +141,14 @@ To verify the report, user can get the report hex data from Phala Cloud dashboar
 
 ## Pricing and Resources
 
+Rates and billing rules change over time. The dashboard pages always show the current values:
+
+- [Pricing](https://cloud.phala.com/about/pricing) - current instance, storage, and GPU rates
+- [Billing](https://cloud.phala.com/about/billing) - how billing works
+
 ### What is the current pricing structure for Phala Cloud?
 
-Check the [pricing page](/phala-cloud/pricing) for more details.
-
-**Quick summary:**
-- **Compute**: Billed per-minute based on instance type (only while running)
-- **Storage**: $0.000139/GB/hour (~$0.10/GB/month) - charged even when stopped
-- **GPU TEE**: Billed hourly with 24-hour minimum for on-demand
+See the [pricing page](https://cloud.phala.com/about/pricing) for current rates and the [billing page](https://cloud.phala.com/about/billing) for billing rules.
 
 ### What kind of user levels do we have on Phala Cloud?
 
@@ -178,16 +178,16 @@ Users under **Free** tier can only create one single CVM. Verify your account an
 
 **Regular CVMs:** Billed by seconds. The pricing page displays hourly rates for ease of understanding, but actual billing is based on precise second-level usage.
 
-**GPU TEE:** Billed by hours with a 24-hour minimum. See [GPU TEE Billing](/phala-cloud/pricing#gpu-tee-billing-rules) for details.
+**GPU TEE:** Billed by hours with a minimum rental period. See [GPU TEE Billing](#how-does-gpu-tee-billing-work) for details.
 
 ### How does GPU TEE billing work?
 
 For On-Demand GPU TEE (e.g., H200):
-- **Minimum charge**: $84 upfront for the first 24 hours
+- **Minimum charge**: Each instance has a minimum rental period, charged upfront when you order. For example, a single H200 has a 24-hour minimum and a B300 has a 30-day (720-hour) minimum. Check the [pricing page](https://cloud.phala.com/about/pricing) for current hourly rates.
 - **When billing starts**: Only when the instance is actually launched
 - Topping up your account or configuring Docker settings does NOT incur charges
-- Usage beyond 24 hours is billed hourly
-- If you stop and restart later, the 24-hour minimum applies again
+- Usage beyond the minimum period is billed hourly
+- If you stop and restart later, the minimum charge applies again
 
 For commitment plans (1-month or 6-month), you get lower hourly rates.
 
