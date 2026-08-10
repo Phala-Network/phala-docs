@@ -7,7 +7,7 @@ GPU TEE gives you dedicated H200 or B300 GPUs running inside trusted execution e
 
 This option works when you need to train, fine-tune, or run inference on proprietary datasets with custom code. For standard LLM inference, the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) is a simpler alternative.
 
-Each instance includes NVIDIA Driver `570.133.20` and CUDA `12.8`. Each instance comes with 1 or 8 GPUs.
+Each instance comes with the NVIDIA driver and CUDA toolkit pre-installed, with 1 or 8 GPUs.
 
 ## Prerequisites
 
@@ -111,7 +111,7 @@ First, confirm your GPU is detected and confidential compute mode is active. Run
 nvidia-smi
 ```
 
-Look for your GPU model (H200/B300), driver version 570.133.20, and CUDA version 12.8. Then check confidential compute status:
+Look for your GPU model (H200/B300) and confirm the driver and CUDA versions are loaded. Then check confidential compute status:
 
 ```bash
 nvidia-smi conf-compute -q
