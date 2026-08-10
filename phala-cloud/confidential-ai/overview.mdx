@@ -1,5 +1,5 @@
 ---
-description: Use Confidential AI through an OpenAI-compatible API, dedicated model deployments, or custom GPU TEE infrastructure, with attestation reports and signed receipts you can verify.
+description: Use Confidential AI through an OpenAI-compatible API or custom GPU TEE infrastructure, with attestation reports and signed receipts you can verify.
 title: Overview
 ---
 
@@ -14,7 +14,7 @@ Traditional cloud AI deployments ask you to trust the platform operator and the 
 
 The on-demand API is OpenAI-compatible and served through an Attested Confidential Inference (ACI) gateway. Every response includes a signed receipt, and the gateway publishes an attestation report that proves which TEE workload served the request. Confidential model responses additionally show, in the receipt, that the upstream provider was verified and channel-bound before your prompt was forwarded.
 
-Phala Cloud offers pre-deployed **Models** (API or Dedicated) for quick integration, and **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
+Phala Cloud offers pre-deployed **Models** through an API for quick integration, and **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
 
 <Columns cols={2}>
   <Card
@@ -26,17 +26,6 @@ Phala Cloud offers pre-deployed **Models** (API or Dedicated) for quick integrat
     **Pre-deployed models, pay per request**
 
     Best for quick integration. 5 minute setup with OpenAI-compatible API and no infrastructure management.
-  </Card>
-
-  <Card
-    icon="workflow"
-    href="/phala-cloud/confidential-ai/confidential-gpu/model-template"
-    title="Dedicated Models"
-    arrow="true"
-  >
-    **Same models, dedicated performance**
-
-    Best for high-volume workloads. Same API as API Access, but with hourly billing and dedicated GPU resources.
   </Card>
 
   <Card
@@ -53,13 +42,11 @@ Phala Cloud offers pre-deployed **Models** (API or Dedicated) for quick integrat
 
 ## Quick Tour of Confidential AI
 
-### Models: API and Dedicated
+### Models: API Access
 
 **API Access** provides pre-deployed models through an OpenAI-compatible API at `https://inference.phala.com/v1`. Pay per request with no infrastructure to manage. Start with [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
 
 For advanced API features, explore [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) to enable LLMs to interact with external tools and APIs securely within TEE.
-
-**Dedicated Models** give you the same pre-deployed models but with dedicated GPU resources and hourly pricing. Choose this for predictable performance or high-volume workloads. See [Dedicated Models](/phala-cloud/confidential-ai/confidential-gpu/model-template).
 
 ### GPU TEE: Custom Infrastructure
 
@@ -84,7 +71,7 @@ Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions a
 
 - **Drop-in compatibility**: OpenAI-compatible API with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
 - **Verifiable security**: Gateway attestation, signed per-response receipts, and upstream verification events you can check yourself
-- **Flexible deployment**: Choose from API access (pay per request), dedicated models (hourly dedicated GPU), or GPU TEE (full infrastructure control)
+- **Flexible deployment**: Choose from API access (pay per request) or GPU TEE (full infrastructure control)
 
 ## Open Source Foundation
 
