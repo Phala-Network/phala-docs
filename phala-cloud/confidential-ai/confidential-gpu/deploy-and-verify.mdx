@@ -3,11 +3,11 @@ title: Deploy and Verify GPU TEE
 description: Deploy or fine-tune AI models with hardware-level security using TEE-protected GPUs and verify they run in genuine TEE hardware
 ---
 
-GPU TEE gives you dedicated H100, H200, or B200 GPUs running inside trusted execution environments for custom AI workloads. You get full control over your environment with Docker container support, and you can verify hardware authenticity using NVIDIA's local verification tools.
+GPU TEE gives you dedicated H200 or B300 GPUs running inside trusted execution environments for custom AI workloads. You get full control over your environment with Docker container support, and you can verify hardware authenticity using NVIDIA's local verification tools.
 
 This option works when you need to train, fine-tune, or run inference on proprietary datasets with custom code. For standard LLM inference, the [Confidential AI API](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api) is a simpler alternative.
 
-Each instance includes NVIDIA Driver `570.133.20` and CUDA `12.8`. You can scale from 1 to 8 GPUs per instance.
+Each instance includes NVIDIA Driver `570.133.20` and CUDA `12.8`. Each instance comes with 1 or 8 GPUs.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Check your credit balance in the upper right corner. GPU instances incur hourly 
 Select your GPU type based on your compute needs.
 
 <Frame caption="GPU Device Selection">
-  <img src="/images/confidential-ai/confidential-gpu/gpu-tee-01.png" alt="GPU TEE hardware selection interface showing H100, H200, and B200 GPU options with specifications" />
+  <img src="/images/confidential-ai/confidential-gpu/gpu-tee-01.png" alt="GPU TEE hardware selection interface showing H200 and B300 GPU options with specifications" />
 </Frame>
 
 Available options include:
@@ -111,7 +111,7 @@ First, confirm your GPU is detected and confidential compute mode is active. Run
 nvidia-smi
 ```
 
-Look for your GPU model (H100/H200/B200), driver version 570.133.20, and CUDA version 12.8. Then check confidential compute status:
+Look for your GPU model (H200/B300), driver version 570.133.20, and CUDA version 12.8. Then check confidential compute status:
 
 ```bash
 nvidia-smi conf-compute -q
