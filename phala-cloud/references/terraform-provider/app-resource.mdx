@@ -66,7 +66,7 @@ resource "phala_app" "web" {
 |-----------|------|-------------|
 | `disk_size` | Number | Disk size in GB. Can only grow — shrink attempts are rejected by the provider. |
 | `replicas` | Number | Desired replica count. All replicas share the same compose, env, and settings. |
-| `storage_fs` | String | Storage filesystem: `zfs` or `ext4`. **Immutable after create** — changing forces replacement. |
+| `storage_fs` | String | Filesystem for the data disk: `zfs` (default) or `ext4`. `ext4` has lower I/O overhead; only `zfs` detects a modified block on the encrypted disk. **Immutable after create** — changing forces replacement. |
 | `ssh_authorized_keys` | List of String | SSH public keys injected at launch. **Force-new** — runtime mutation is not supported. |
 | `pre_launch_script` | String | Optional script content run before the CVM starts. |
 
