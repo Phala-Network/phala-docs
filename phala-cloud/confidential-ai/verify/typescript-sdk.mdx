@@ -1,0 +1,117 @@
+---
+title: TypeScript ACI Verifier
+description: Use the official TypeScript SDK to verify Phala Confidential AI attestation, pin the TLS channel, and audit signed response receipts.
+---
+
+`@phala/aci-verifier` is the official TypeScript implementation of the ACI
+client checks. Node.js and Bun applications can use it to establish an
+instance-scoped, SPKI-pinned connection before sending model traffic. The
+package is ESM-only and supports Node.js 20.18.1 or newer and Bun 1.4.0 or
+newer.
+
+## Install
+
+```bash
+npm install @phala/aci-verifier openai
+```
+
+## Create a verified connection
+
+```typescript
+import OpenAI from "openai";
+import { connectAci } from "@phala/aci-verifier/runtime";
+
+const apiKey = process.env.PHALA_AI_API_KEY;
+if (!apiKey) throw new Error("PHALA_AI_API_KEY is required");
+
+const aci = await connectAci({
+  baseURL: "https://inference.phala.com/v1",
+  serving: {
+    requireVerified: true,
+    requireReceipt: true,
+  },
+});
+
+try {
+  if (!aci.identity.transcript.verdict.verified) {
+    throw new Error(aci.identity.transcript.verdict.line);
+  }
+
+  const client = new OpenAI({
+    baseURL: aci.baseURL,
+    apiKey,
+    fetch: aci.fetch,
+  });
+
+  const response = await client.chat.completions.create({
+    model: "phala/qwen3.5-27b",
+    messages: [{ role: "user", content: "Explain attestation." }],
+  });
+
+  const audit = await aci.verifyReceipt();
+  if (!audit.transcript.verdict.verified) {
+    throw new Error(audit.transcript.verdict.line);
+  }
+
+  console.log(response.choices[0].message.content);
+} finally {
+  await aci.close();
+}
+```
+
+`connectAci()` verifies a fresh nonce-bound workload report and creates a
+hostname-validated TLS transport pinned to the attested SPKI. Its scoped
+`fetch` rejects non-HTTPS and cross-origin requests, expired workload
+identities, TLS key mismatches, and missing receipt ids, and requires verified
+serving in JSON inference requests.
+
+## Receipt auditing
+
+The runtime records the exact request and response wire digests while the body
+is consumed. Call `verifyReceipt()` after the response finishes to fetch and
+verify the latest signed receipt, including its signature, wire hashes,
+verified upstream status, and cited session. Pass a receipt id returned by
+`aci.receipts()` to audit another retained exchange.
+
+The default local history is the latest 32 receipt-bearing requests and exists
+only for the current process. Gateway receipts and sessions follow the
+deployment's server-side retention policy.
+
+<Warning>
+The low-level SDK does not automatically call `verifyReceipt()` for every
+response. Applications must make that call before accepting a result. The
+native Pi and OpenCode providers perform this audit automatically before the
+agent finishes each turn.
+</Warning>
+
+## Browser use
+
+The browser export can verify attestation and receipt documents, but browser
+JavaScript cannot observe the server certificate SPKI. It therefore cannot
+enforce the same pinned transport by itself. Use the Node.js or Bun runtime
+export when the application must bind model traffic to the attested TLS key.
+
+## Release policy
+
+Attestation proves which compose hash was measured; it does not prove that your
+organization reviewed that release. When you have an authenticated allowlist,
+pass its hashes as `policy.acceptedComposeHashes`. Never copy a hash from the
+endpoint and trust it on first use.
+
+For the complete API and security limits, see the
+[`@phala/aci-verifier` package documentation](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/clients/verifier-ts).
+
+<CardGroup cols={2}>
+  <Card
+    icon="shield-check"
+    href="/phala-cloud/confidential-ai/verify/verify-attestation"
+    title="Verify Attestation"
+    arrow="true"
+  />
+  <Card
+    icon="receipt"
+    href="/phala-cloud/confidential-ai/verify/verify-signature"
+    title="Verify a Response"
+    arrow="true"
+  />
+</CardGroup>
