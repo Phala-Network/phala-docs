@@ -127,6 +127,8 @@ client = OpenAI(
 Observability tools may store prompts, responses, metadata, or traces. For sensitive data, configure redaction or self-hosting before sending production traffic.
 </Warning>
 
+For custom Node.js or Bun applications, use the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) to inject a pinned `fetch` and audit signed receipts in code.
+
 ## Verified Coding Agents
 
 Pi and OpenCode can use native Phala Cloud providers that verify the ACI
