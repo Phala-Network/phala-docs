@@ -785,6 +785,7 @@
                 "group": "Verification",
                 "pages": [
                   "/phala-cloud/confidential-ai/verify/overview",
+                  "/phala-cloud/confidential-ai/verify/typescript-sdk",
                   "/phala-cloud/confidential-ai/verify/verify-attestation",
                   "/phala-cloud/confidential-ai/verify/verify-signature",
                   "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
