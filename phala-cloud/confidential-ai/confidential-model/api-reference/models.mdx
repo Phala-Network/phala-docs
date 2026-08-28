@@ -10,6 +10,7 @@ GET https://inference.phala.com/v1/models
 ```
 
 Use the live model catalog before hardcoding model IDs. The catalog returns model IDs, context windows, pricing, serving metadata, modalities, supported parameters, and whether a model can be served confidentially.
+No API key is required.
 
 ## Query Parameters
 
@@ -22,8 +23,7 @@ Use the live model catalog before hardcoding model IDs. The catalog returns mode
 </ParamField>
 
 ```bash
-curl "https://inference.phala.com/v1/models?zdr=true" \
-  -H "Authorization: Bearer <API_KEY>"
+curl "https://inference.phala.com/v1/models?zdr=true"
 ```
 
 <ParamField query="tee" type="string">
@@ -35,8 +35,7 @@ curl "https://inference.phala.com/v1/models?zdr=true" \
 </ParamField>
 
 ```bash
-curl "https://inference.phala.com/v1/models?tee=true" \
-  -H "Authorization: Bearer <API_KEY>"
+curl "https://inference.phala.com/v1/models?tee=true"
 ```
 
 Both filters compose. Combining them returns models that satisfy each constraint.
@@ -56,51 +55,8 @@ An invalid value returns `400`:
 
 ## Examples
 
-<CodeGroup>
-```bash All Models
-curl https://inference.phala.com/v1/models \
-  -H "Authorization: Bearer <API_KEY>"
-```
-
-```python Python
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="<API_KEY>",
-    base_url="https://inference.phala.com/v1",
-)
-
-models = client.models.list()
-for model in models.data:
-    print(model.id)
-```
-</CodeGroup>
-
-## Response
-
-```json
-{
-  "data": [
-    {
-      "id": "phala/qwen3.5-27b",
-      "name": "Qwen3.5 27B",
-      "created": 1677652288,
-      "is_tee": true,
-      "description": "Qwen model running through Phala GPU TEE infrastructure",
-      "context_length": 262144,
-      "max_output_length": 262144,
-      "pricing": {
-        "prompt": "0.00000030",
-        "completion": "0.00000240"
-      },
-      "providers": ["phala"],
-      "input_modalities": ["text"],
-      "output_modalities": ["text"],
-      "supported_parameters": ["max_tokens", "temperature", "tools", "tool_choice", "response_format"],
-      "metadata": {}
-    }
-  ]
-}
+```bash
+curl https://inference.phala.com/v1/models
 ```
 
 ## Model Object Fields
@@ -110,23 +66,25 @@ for model in models.data:
 | `id` | Model identifier for API calls |
 | `name` | Human-readable model name |
 | `is_tee` | `true` if the model can be served confidentially by a verified TEE provider |
+| `created` | Unix timestamp when the model was added |
 | `description` | Model or provider description |
 | `context_length` | Maximum context window |
 | `max_output_length` | Maximum output length |
 | `pricing.prompt` | Input token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.completion` | Output token price per token; multiply by 1,000,000 for per-million-token pricing |
+| `pricing.input_cache_read` | Cached input price per token when the model exposes cache pricing |
 | `providers` | Serving routes available for the model. |
 | `input_modalities` | Supported input types, such as `text` or `image` |
 | `output_modalities` | Supported output types, such as `text` or `embeddings` |
 | `supported_parameters` | Request parameters accepted by the model |
+| `supported_features` | Higher-level capabilities declared by the model, such as `tools`, `reasoning`, or `structured_outputs` |
 
 ## Find Verifiable TEE Models
 
 Filter for models that can be served confidentially:
 
 ```bash
-curl "https://inference.phala.com/v1/models?tee=true" \
-  -H "Authorization: Bearer <API_KEY>" | \
+curl "https://inference.phala.com/v1/models?tee=true" | \
   jq -r '.data[].id'
 ```
 
@@ -137,8 +95,7 @@ curl "https://inference.phala.com/v1/models?tee=true" \
 `is_tee` and `zdr` describe different properties. `is_tee` says a model can run inside a verified TEE, which constrains who can read memory during execution. Zero data retention says the upstream serving route does not keep prompt or completion content after serving the request. Filter for it with the query parameter rather than inferring it from `is_tee`:
 
 ```bash
-curl -s "https://inference.phala.com/v1/models?zdr=true" \
-  -H "Authorization: Bearer <API_KEY>" | \
+curl -s "https://inference.phala.com/v1/models?zdr=true" | \
   jq -r '.data[].id'
 ```
 

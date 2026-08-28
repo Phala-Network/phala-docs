@@ -53,7 +53,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="phala/qwen3.5-27b",
+    model="z-ai/glm-5.2",
     messages=[{"role": "user", "content": "Explain TEE privacy."}],
 )
 
@@ -64,12 +64,12 @@ print(response.choices[0].message.content)
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: process.env.API_KEY,
+  apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
 const response = await client.chat.completions.create({
-  model: "phala/qwen3.5-27b",
+  model: "z-ai/glm-5.2",
   messages: [{ role: "user", content: "Explain TEE privacy." }],
 });
 ```
@@ -81,7 +81,7 @@ const response = await client.chat.completions.create({
 from langchain_openai import ChatOpenAI
 
 chat = ChatOpenAI(
-    model="phala/qwen3.5-27b",
+    model="z-ai/glm-5.2",
     api_key="YOUR_PHALA_API_KEY",
     base_url="https://inference.phala.com/v1",
 )
@@ -97,12 +97,12 @@ import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 
 const phala = createOpenAI({
-  apiKey: process.env.API_KEY,
+  apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
 const { text } = await generateText({
-  model: phala("phala/qwen3.5-27b"),
+  model: phala("z-ai/glm-5.2"),
   prompt: "Explain attestation.",
 });
 ```

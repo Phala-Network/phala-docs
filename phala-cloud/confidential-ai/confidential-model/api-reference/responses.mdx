@@ -15,7 +15,7 @@ POST https://inference.phala.com/v1/responses
 ## Request Body
 
 <ParamField body="model" type="string" required>
-  Model id, for example `phala/qwen3.5-27b` or another id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+  Model id, for example `z-ai/glm-5.2` or another id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
 </ParamField>
 
 <ParamField body="input" type="string | array" required>
@@ -48,10 +48,10 @@ POST https://inference.phala.com/v1/responses
 
 ```bash
 curl https://inference.phala.com/v1/responses \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "phala/qwen3.5-27b",
+    "model": "z-ai/glm-5.2",
     "input": "Explain attestation in one sentence."
   }'
 ```
@@ -63,7 +63,7 @@ curl https://inference.phala.com/v1/responses \
   "id": "resp_023cda4f5e268c44006a30f3e0b6f4819b87536574ae6ecd14",
   "object": "response",
   "status": "completed",
-  "model": "phala/qwen3.5-27b",
+  "model": "z-ai/glm-5.2",
   "output": [
     {
       "type": "message",

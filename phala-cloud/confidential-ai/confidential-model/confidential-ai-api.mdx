@@ -22,7 +22,7 @@ Once you get the API Key, you can start making requests to the Confidential AI A
 
 ## Make Your First Request
 
-Replace `<API_KEY>` with your actual API key. The examples below use `phala/qwen3.5-27b`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
+Replace `<API_KEY>` with your actual API key. The examples below use `z-ai/glm-5.2`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
 
 <CodeGroup>
 ```python Python
@@ -36,7 +36,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="phala/qwen3.5-27b",
+    model="z-ai/glm-5.2",
     messages=[
         {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": "What is your model name?"},
@@ -56,7 +56,7 @@ const client = new OpenAI({
 
 async function main() {
   const completion = await client.chat.completions.create({
-    model: 'phala/qwen3.5-27b',
+    model: 'z-ai/glm-5.2',
     messages: [
       {
         role: 'user',
@@ -87,7 +87,7 @@ curl -X 'POST' \
       "role": "user"
     }
   ],
-  "model": "phala/qwen3.5-27b"
+  "model": "z-ai/glm-5.2"
 }'
 ```
 </CodeGroup>
@@ -112,35 +112,16 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
 
 For a confidential response, `result` is `verified` and `required` is `true`. To verify the gateway identity and receipt signature end to end, follow [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
 
-## Available Models
+## Choose a Model
 
 The live catalog is authoritative; query it before hardcoding model IDs:
 
 ```bash
-curl https://inference.phala.com/v1/models \
-  -H "Authorization: Bearer <API_KEY>"
+curl https://inference.phala.com/v1/models
 ```
 
-Pricing and availability can change; use the API response for production routing.
-
-### Phala Models
-
-| Model ID | Context | Modality | Pricing (input/output per 1M tokens) |
-|----------|---------|----------|--------------------------------------|
-| `phala/qwen3.5-27b` | 262K | Text | $0.30 / $2.40 |
-| `phala/qwen3-vl-30b-a3b-instruct` | 128K | Vision + Text | $0.20 / $0.70 |
-| `qwen/qwen3-embedding-8b` | 32K | Embeddings | $0.01 / $0 |
-| `phala/gemma-3-27b-it` | 53K | Vision + Text | $0.11 / $0.40 |
-| `phala/glm-4.7-flash` | 202K | Text | $0.10 / $0.43 |
-| `phala/gpt-oss-20b` | 131K | Text | $0.04 / $0.15 |
-| `phala/qwen-2.5-7b-instruct` | 32K | Text | $0.04 / $0.10 |
-| `phala/qwen2.5-vl-72b-instruct` | 128K | Vision + Text | $0.40 / $1.20 |
-| `phala/uncensored-24b` | 32K | Text | $0.20 / $0.90 |
-| `sentence-transformers/all-minilm-l6-v2` | 512 | Embeddings | $0.005 / $0 |
-
-<Note>
-`phala/qwen2.5-vl-72b-instruct` is a legacy alias that may route to `phala/qwen3-vl-30b-a3b-instruct`. Prefer the canonical ID returned by `/v1/models`.
-</Note>
+The catalog is public and authoritative for availability, pricing, context limits, modalities, and
+capabilities. Embedding models are listed separately at `GET /v1/embeddings/models`.
 
 <Note>
 TEE provider presence and confidential serving are not identical for every provider and model. Use `is_tee` from `/v1/models` to find models that can be served confidentially, then verify the actual response with its `x-receipt-id`.

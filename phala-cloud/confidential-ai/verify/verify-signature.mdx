@@ -12,7 +12,7 @@ For a confidential response, the receipt's `upstream.verified` event shows `resu
 ## Prerequisites
 
 ```bash
-export API_KEY="<API_KEY>"
+export PHALA_AI_API_KEY="<API_KEY>"
 export BASE="https://inference.phala.com"
 ```
 
@@ -24,7 +24,7 @@ You need `curl`, `jq`, and a SHA-256 tool. On Linux use `sha256sum`; on macOS us
 export NONCE="$(openssl rand -hex 16)"
 
 curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -o report.json
 ```
 
@@ -34,9 +34,9 @@ Verify the report as described in [Verify Attestation](/phala-cloud/confidential
 
 ```bash
 curl -s -D headers.txt "$BASE/v1/chat/completions" \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"phala/qwen3.5-27b",
+  -d '{"model":"z-ai/glm-5.2",
        "messages":[{"role":"user","content":"Explain attestation in one sentence."}]}' \
   -o response.json
 
@@ -50,7 +50,7 @@ Keep `response.json`; the receipt commits to the exact response bytes.
 
 ```bash
 curl -s "$BASE/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -o receipt.json
 
 jq '{receipt_id, workload_id, workload_keyset_digest, endpoint}' receipt.json
@@ -115,7 +115,7 @@ To inspect the immutable upstream security context:
 SESSION_ID="$(jq -r '.event_log[] | select(.type=="upstream.verified") | .session_id' receipt.json)"
 
 curl -s "$BASE/v1/aci/sessions/$SESSION_ID" \
-  -H "Authorization: Bearer $API_KEY" | \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" | \
   jq '{session_id, provider, endpoint, channel_binding, claims}'
 ```
 
@@ -125,7 +125,7 @@ Older clients may call `GET /v1/signature/{id}`. It returns the same receipt ins
 
 ```bash
 curl -s "$BASE/v1/signature/$RECEIPT_ID" \
-  -H "Authorization: Bearer $API_KEY"
+  -H "Authorization: Bearer $PHALA_AI_API_KEY"
 ```
 
 New clients should use `GET /v1/aci/receipts/{id}` directly.

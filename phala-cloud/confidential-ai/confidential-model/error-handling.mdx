@@ -49,12 +49,12 @@ from openai import OpenAI, AuthenticationError, RateLimitError, APIError
 
 client = OpenAI(
     base_url="https://inference.phala.com/v1",
-    api_key=os.environ["API_KEY"],
+    api_key=os.environ["PHALA_AI_API_KEY"],
 )
 
 try:
     response = client.chat.completions.create(
-        model="phala/qwen3.5-27b",
+        model="z-ai/glm-5.2",
         messages=[{"role": "user", "content": "Hello"}],
     )
 except AuthenticationError:

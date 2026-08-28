@@ -14,7 +14,7 @@ Every inference response includes `x-receipt-id`. Fetch it with [Get Receipt](/p
 
 ```bash
 curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer $API_KEY"
+  -H "Authorization: Bearer $PHALA_AI_API_KEY"
 ```
 
 The receipt records ordered events with hashes and facts, not prompt text.

@@ -21,7 +21,7 @@ client = OpenAI(
 )
 
 stream = client.chat.completions.create(
-    model="phala/qwen3.5-27b",
+    model="z-ai/glm-5.2",
     messages=[
         {
             "role": "user",
@@ -45,7 +45,7 @@ const client = new OpenAI({
 });
 
 const stream = await client.chat.completions.create({
-  model: "phala/qwen3.5-27b",
+  model: "z-ai/glm-5.2",
   messages: [
     { role: "user", content: "say `Hello` 2 times fast, no other output" },
   ],

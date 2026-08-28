@@ -101,7 +101,6 @@ A session id is tied to one verified channel, and the gateway re-verifies period
 
 ```bash
 curl -s "https://inference.phala.com/v1/models?tee=true" \
-  -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.data[].id'
 ```
 
@@ -109,7 +108,6 @@ Embedding models have their own catalog, which takes the same parameter:
 
 ```bash
 curl -s "https://inference.phala.com/v1/embeddings/models?tee=true" \
-  -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.data[].id'
 ```
 
