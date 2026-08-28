@@ -21,7 +21,7 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "model": "phala/gpt-oss-20b",
+        "model": "z-ai/glm-5.2",
         "messages": [
             {"role": "user", "content": "What is the weather like in Los Angeles?"},
         ],
@@ -71,12 +71,9 @@ print(info)
 </Accordion>
 
 
-### Supported Models for Structured Output
+### Find Compatible Models
 
-Confidential AI supports structured output for the following models:
-
-- `phala/gemma-3-27b-it`
-- `phala/gpt-oss-20b`
-- `phala/gpt-oss-120b`
-- `phala/qwen3.5-27b`
-- `phala/qwen3-vl-30b-a3b-instruct`
+```bash
+curl -s https://inference.phala.com/v1/models \
+  | jq -r '.data[] | select((.supported_features // []) | index("structured_outputs")) | .id'
+```

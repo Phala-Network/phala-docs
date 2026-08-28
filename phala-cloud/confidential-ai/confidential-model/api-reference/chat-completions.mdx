@@ -16,7 +16,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 <ParamField body="model" type="string" required>
   Model ID to use for completion.
 
-  Examples: `phala/qwen3.5-27b`, `phala/gemma-3-27b-it`, `z-ai/glm-5`, `openai/gpt-oss-120b`.
+  Example: `z-ai/glm-5.2`. Use an id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
 </ParamField>
 
 <ParamField body="messages" type="array" required>
@@ -96,7 +96,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <API_KEY>" \
   -d '{
-    "model": "phala/qwen3.5-27b",
+    "model": "z-ai/glm-5.2",
     "messages": [
       {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
     ]
@@ -112,7 +112,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="phala/qwen3.5-27b",
+    model="z-ai/glm-5.2",
     messages=[
         {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
     ],
@@ -130,7 +130,7 @@ const client = new OpenAI({
 });
 
 const response = await client.chat.completions.create({
-  model: "phala/qwen3.5-27b",
+  model: "z-ai/glm-5.2",
   messages: [
     { role: "user", content: "What privacy guarantees does GPU TEE provide?" },
   ],
@@ -147,7 +147,7 @@ console.log(response.choices[0].message.content);
   "id": "chatcmpl-123",
   "object": "chat.completion",
   "created": 1677652288,
-  "model": "phala/qwen3.5-27b",
+  "model": "z-ai/glm-5.2",
   "choices": [
     {
       "index": 0,

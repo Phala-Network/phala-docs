@@ -17,7 +17,7 @@ Fetch and verify the gateway attestation report, then read the E2EE key from the
 
 ```bash
 curl -s "https://inference.phala.com/v1/aci/attestation?nonce=$(openssl rand -hex 16)" \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   | jq -r '.attestation.workload_keyset.e2ee_public_keys[] | select(.key_id=="dstack-kms-e2ee-v1") | .public_key'
 ```
 

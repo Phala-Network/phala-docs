@@ -26,6 +26,7 @@ if (!apiKey) throw new Error("PHALA_AI_API_KEY is required");
 
 const aci = await connectAci({
   baseURL: "https://inference.phala.com/v1",
+  policy: { requireProductionOs: true },
   serving: {
     requireVerified: true,
     requireReceipt: true,
@@ -33,10 +34,6 @@ const aci = await connectAci({
 });
 
 try {
-  if (!aci.identity.transcript.verdict.verified) {
-    throw new Error(aci.identity.transcript.verdict.line);
-  }
-
   const client = new OpenAI({
     baseURL: aci.baseURL,
     apiKey,
@@ -44,7 +41,7 @@ try {
   });
 
   const response = await client.chat.completions.create({
-    model: "phala/qwen3.5-27b",
+    model: "z-ai/glm-5.2",
     messages: [{ role: "user", content: "Explain attestation." }],
   });
 
@@ -93,10 +90,16 @@ export when the application must bind model traffic to the attested TLS key.
 
 ## Release policy
 
-Attestation proves which compose hash was measured; it does not prove that your
+`requireProductionOs` rejects development and unknown OS measurements.
+Attestation also proves which compose hash was measured, but not that your
 organization reviewed that release. When you have an authenticated allowlist,
 pass its hashes as `policy.acceptedComposeHashes`. Never copy a hash from the
 endpoint and trust it on first use.
+
+Without a compose allowlist, the client verifies that the measured compose ran
+in a genuine TDX workload. It does not claim that Phala reviewed that release.
+For a production security decision, pair compose appraisal with a dstack
+verifier result for the same quote and require `is_valid: true`.
 
 For the complete API and security limits, see the
 [`@phala/aci-verifier` package documentation](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/clients/verifier-ts).

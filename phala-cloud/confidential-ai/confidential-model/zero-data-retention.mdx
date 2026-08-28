@@ -46,7 +46,6 @@ Setting `"zdr": false`, or omitting the field, applies no retention constraint a
 
 ```bash
 curl -s "https://inference.phala.com/v1/models?zdr=true" \
-  -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.data[].id'
 ```
 
@@ -54,7 +53,6 @@ Embedding models have their own catalog, which takes the same parameter:
 
 ```bash
 curl -s "https://inference.phala.com/v1/embeddings/models?zdr=true" \
-  -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.data[].id'
 ```
 
