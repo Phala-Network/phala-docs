@@ -16,7 +16,7 @@ Make sure your application can handle being stopped and started at any time. Avo
 
 ### 1.2. Persist data on volumes
 
-Use [Docker volumes](https://docs.docker.com/reference/compose-file/services/#volumes) for any data that needs to persist across restarts or upgrades. Write files (databases, user uploads, etc.) to a mounted volume rather than the container’s ephemeral filesystem. Phala Cloud preserves these volumes and encrypts the data at rest, so restarting or upgrading your CVM will not lose your stored data.
+Use [Docker volumes](https://docs.docker.com/reference/compose-file/services/#volumes) for any data that needs to persist across restarts or upgrades. Write files (databases, user uploads, etc.) to a mounted volume rather than the container’s ephemeral filesystem. Phala Cloud preserves these volumes and encrypts the data at rest, so restarting or upgrading your CVM will not lose your stored data. Keep the default `zfs` storage filesystem, which also detects a modified block on the disk.
 
 Be sure to configure the volume in your docker-compose.yml to capture the right directories.
 </Step>

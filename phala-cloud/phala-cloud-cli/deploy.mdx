@@ -40,7 +40,7 @@ Deploy new CVM or update existing one
 | ------ | ----------- |
 | `--debug` | Enable debug logging |
 | `--disk-size <value>` | Disk size with unit (e.g., 50G, default: 40GB) |
-| `--fs <value>` | Filesystem type (ext4 or zfs, default: zfs) |
+| `--fs <value>` | Filesystem for the data disk: zfs (default) or ext4. ext4 has lower I/O overhead; only zfs detects a modified block on the encrypted disk. |
 | `--image <value>` | OS image version (auto-selected if omitted) |
 | `--node-id <value>` | Node ID (auto-selected if omitted) |
 | `--kms-contract <value>` | KMS contract address |

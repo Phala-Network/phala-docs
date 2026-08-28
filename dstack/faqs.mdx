@@ -30,8 +30,13 @@ Reference: https://github.com/Dstack-TEE/dstack/blob/master/docs/deployment.md
 
 ## How does the current data encryption system work?
 
-The system uses Linux's built-in LUKS (Linux Unified Key Setup) for disk encryption:\
-Reference: https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/fde\_setup.rs#L437-L442
+The CVM data disk is a LUKS2 volume encrypted with `aes-xts-plain64`. The guest creates it on first boot and unlocks it on every boot after that.
+
+The key comes from KMS, which releases it only after the CVM's attestation passes the app's on-chain authorization. KMS derives it from its root key over the app ID and instance ID, so each instance gets a distinct key that exists only inside the CVM. The host holds ciphertext and never sees the key.
+
+LUKS encrypts the disk but does not authenticate it, so detecting a modified block is the filesystem's job. The default `zfs` checksums every block and fails the read. `ext4` checksums metadata but not file data.
+
+Reference: [`dstack-util/src/system_setup.rs`](https://github.com/Dstack-TEE/dstack/blob/next/dstack/dstack-util/src/system_setup.rs)
 
 ## Where is the deployment function located in the Dstack-TEE codebase, and can it be integrated with custom tools?
 
