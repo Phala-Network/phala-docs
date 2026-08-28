@@ -127,6 +127,66 @@ client = OpenAI(
 Observability tools may store prompts, responses, metadata, or traces. For sensitive data, configure redaction or self-hosting before sending production traffic.
 </Warning>
 
+## Verified Coding Agents
+
+Pi and OpenCode can use native Phala Cloud providers that verify the ACI
+workload and TLS channel before model traffic is sent, then verify each signed
+response receipt before the agent finishes the turn.
+
+### Pi
+
+Install the provider through Pi's package manager:
+
+```bash
+pi install npm:pi-provider-phala-cloud
+```
+
+Start Pi and use its native login and model picker:
+
+```text
+/login phala
+# choose Phala Cloud account or Phala Cloud API key
+# wait for the footer to show aci-verified
+/model
+# search for phala/, select a model, and press Ctrl+S to save it as the default
+```
+
+Pi stores the credential, model catalog, and saved default through its native
+persistence. `PHALA_AI_API_KEY` is also supported for the current process.
+
+### OpenCode
+
+Install the provider through OpenCode's plugin command:
+
+```bash
+opencode plugin opencode-provider-phala-cloud --global
+```
+
+Restart OpenCode, then use its native provider and model pickers:
+
+```text
+/connect
+# select Phala Cloud and choose the account flow or API-key method
+/models
+# search for phala/ and select a model
+```
+
+OpenCode stores the plugin configuration and credential in its native stores.
+Do not add a separate `provider.phala` block. `PHALA_AI_API_KEY` is also
+supported for the current process.
+
+Both providers expose `/phala-attestation`, `/phala-receipts`,
+`/phala-receipt`, and `/phala-session` for inspecting verified evidence. These
+commands are optional: connection and response verification already fail
+closed automatically.
+
+<Note>
+Changing only an OpenAI-compatible base URL does not inject ACI's attested TLS
+transport. Base-URL clients can call the API and verify receipts separately;
+use the native Pi or OpenCode provider when verification must be enforced inside
+the agent.
+</Note>
+
 ## Coding Assistants and Desktop Clients
 
 For tools that support an OpenAI-compatible provider, use:
