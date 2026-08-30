@@ -1,41 +1,26 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
-title: Serials Logs
+description: View CVM boot and QEMU logs from the Phala Cloud dashboard.
+title: Serial Logs
 ---
 
+VM logs show the CVM boot process and host-side QEMU output. Use them to diagnose startup failures, image download problems, and system initialization errors.
 
-## Log Types in Phala Cloud
+## View VM logs
 
-Phala Cloud provides two distinct types of logs to help you monitor and troubleshoot your applications:
+1. Open your app in the [Phala Cloud dashboard](https://cloud.phala.com), then open the CVM instance.
+2. Click **Logs** on the CVM detail page.
+3. Under **VM Logs**, select a log source:
 
-### CVM Logs
+   - **Kernel serial output** shows the CVM boot and system console output.
+   - **qemu output** shows standard output from the QEMU process.
+   - **qemu stderr** shows errors written by the QEMU process.
 
-CVM logs show the bootstrapping process of your application, including:
+The log drawer switches to the selected source. Use **Auto-scroll** to follow new output or open the toolbar menu and click **Retry Connection** if the stream disconnects.
 
-* Default RA report generation
-* Docker image downloads
-* System initialization events
-
-**How to access:** Click the **Serial Logs** button in the CVM card.
-
-<Frame caption="CVM logs showing system initialization details">
-    <img src="/images/cloud-cvm-log.png" alt="CVM logs interface" />
-
+<Frame caption="Kernel serial output in the CVM log drawer">
+  <img src="/images/cloud-cvm-log.png" alt="CVM log drawer with VM Logs expanded, Kernel serial selected, and boot output streaming" />
 </Frame>
 
-### Docker Logs, e.g. your application's output log
+## View application logs
 
-Docker logs contain your application's runtime output, providing insights into its behavior and any issues that may arise during execution.
-
-**Visibility settings:** During deployment, you can choose to make these logs public in the **Advanced Features** section. When public, anyone with the log URL can view them.
-
-**How to access:** Navigate to the detailed page and locate the **Containers** section.
-
-<Frame caption="Container logs showing application output">
-    <img src="/images/cloud-container-log.png" alt="Docker container logs" />
-
-</Frame>
-
-## Set Private with Log Viewer
-
-Head to the [Private Log Viewer](/phala-cloud/monitoring/private-log-viewer) section if you want to set your logs as private.
+VM logs describe the CVM and its boot process. To inspect output written by your application, select a container under **Docker Containers** instead. See [View and share Docker container logs](/phala-cloud/monitoring/public-logs) for the complete procedure and visibility controls.

@@ -1,41 +1,56 @@
 ---
-description: Create and manage Confidential Virtual Machines (CVMs) on Phala Cloud.
+description: View Docker container logs and control access to their public URLs.
 title: Public Logs
 ---
 
+Use the CVM log drawer to inspect a container's runtime output. When **Public Logs** is enabled, you can also open the selected container's log stream in a separate browser tab and share its URL.
 
-## Log Types in Phala Cloud
+<Warning>
+Docker logs can contain application data, request details, or secrets written by your application. Only enable **Public Logs** when the output is safe to share with anyone who has the URL.
+</Warning>
 
-Phala Cloud provides two distinct types of logs to help you monitor and troubleshoot your applications:
+## View Docker container logs
 
-### CVM Logs
+1. Open your app in the [Phala Cloud dashboard](https://cloud.phala.com), then open the CVM instance.
+2. Click **Logs** on the CVM detail page.
+3. Under **Docker Containers**, select the container whose logs you want to view.
 
-CVM logs show the bootstrapping process of your application, including:
+The log drawer switches to the selected container's output. If a container does not have an available log endpoint, the container is disabled in the list.
 
-* Default RA report generation
-* Docker image downloads
-* System initialization events
-
-**How to access:** Click the **Serial Logs** button in the CVM card.
-
-<Frame caption="CVM logs showing system initialization details">
-    <img src="/images/cloud-cvm-log.png" alt="CVM logs interface" />
-
+<Frame caption="Docker Containers in the CVM log drawer">
+  <img src="/images/cloud-container-log.png" alt="CVM log drawer with demo-api selected under Docker Containers and its application output streaming" />
 </Frame>
 
-### Docker Logs, e.g. your application's output log
+## Open and copy a public log URL
 
-Docker logs contain your application's runtime output, providing insights into its behavior and any issues that may arise during execution.
+1. Select a container under **Docker Containers**.
+2. Open the log toolbar menu, then click **Open in New Window**.
+3. Copy the URL from the new window's browser address bar.
 
-**Visibility settings:** During deployment, you can choose to make these logs public in the **Advanced Features** section. When public, anyone with the log URL can view them.
+**Open in New Window** is available only when the selected container has a public log endpoint. Anyone with the copied URL can open it without signing in to Phala Cloud.
 
-**How to access:** Navigate to the detailed page and locate the **Containers** section.
+## Control public access
 
-<Frame caption="Container logs showing application output">
-    <img src="/images/cloud-container-log.png" alt="Docker container logs" />
+The **Public Logs** setting controls Phala Cloud's managed Docker log endpoints.
 
+| Setting | Behavior |
+| --- | --- |
+| Enabled | The dashboard provides a log URL for each available container. Anyone with a URL can view that container's logs without a Phala Cloud session. |
+| Disabled | The dashboard does not provide Docker log URLs. Use an in-CVM log viewer or forward logs to a private external service instead. |
+
+To change the setting for an existing CVM:
+
+1. Open the CVM detail page and click **Settings**.
+2. Find **Worker Attestation Visibility Settings**.
+3. Enable or disable **Public Logs**.
+4. Click **Save Changes**, then confirm the change.
+
+<Frame caption="Public Logs under Worker Attestation Visibility Settings">
+  <img src="/images/cloud-public-log-setting.png" alt="Worker Attestation Visibility Settings with the Public Logs switch enabled" />
 </Frame>
 
-## Set Private with Log Viewer
+<Warning>
+Changing a visibility setting restarts the CVM. Its applications are temporarily unavailable during the restart.
+</Warning>
 
-Head to the [Private Log Viewer](/phala-cloud/monitoring/private-log-viewer) section if you want to set your logs as private.
+For authenticated access to private Docker logs, follow [Set up a private log viewer](/phala-cloud/monitoring/private-log-viewer).
