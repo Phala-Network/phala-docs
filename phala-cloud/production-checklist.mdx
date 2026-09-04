@@ -92,6 +92,6 @@ You may also want to set up HTTP basic auth to limit the read access to yourself
 
 ### 4.2. Plan for log access
 
-Decide how you will handle application logs in production. By default, Phala Cloud treats logs as public. You have the option to disable Public Logs in the Advanced settings. If you keep logs private, set up a secure log viewer like [Dozzle](https://dozzle.dev/) or [Grafana Loki](https://grafana.com/oss/loki/) to forward logs to an external logging service so you can still debug issues.
+Decide how you will handle application logs in production. When **Public Logs** is enabled, anyone with a container's log URL can read its output without a Phala Cloud session. Manage the setting under **Settings → Worker Attestation Visibility Settings → Public Logs**. If you keep logs private, set up a secure log viewer like [Dozzle](https://dozzle.dev/) or [Grafana Loki](https://grafana.com/oss/loki/) to forward logs to an external logging service so you can still debug issues.
 </Step>
 </Steps>
