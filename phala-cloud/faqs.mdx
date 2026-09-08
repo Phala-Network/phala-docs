@@ -34,7 +34,9 @@ No, it's encrypted on the client side and sent to the CVM using X25519 encryptio
 
 ### Can Docker logs be accessed by any other part, including the host OS?
 
-Currently, the logs are not end-to-end encrypted. However, you can decide whether to make them public under **Advanced Features → Public Logs** during deployment. If you choose public, anyone with the log URL can view them, and the Log URL can be inferred from your instance ID in the public endpoints. If you choose private, no one can access the logs, and you'll need to configure a log viewer to view them elsewhere.
+Docker logs are not end-to-end encrypted. When **Public Logs** is enabled, anyone with a container's log URL can view its output without signing in to Phala Cloud. To get the URL, open the CVM detail page, click **Logs**, select the container under **Docker Containers**, then choose **Open in New Window** and copy the URL from the browser address bar.
+
+For an existing CVM, manage this setting under **Settings → Worker Attestation Visibility Settings → Public Logs**. When **Public Logs** is disabled, Phala Cloud does not provide Docker log URLs. Use a [private log viewer](/phala-cloud/monitoring/private-log-viewer) or forward logs to a private external service instead. Changing the setting restarts the CVM.
 
 ### Is application data persistent on the disk?
 
