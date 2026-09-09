@@ -26,7 +26,7 @@ Always pass a fresh random `nonce` when verifying an attestation report. The gat
 
 <CodeGroup>
 ```bash cURL
-NONCE=$(openssl rand -hex 16)
+NONCE=$(openssl rand -hex 32)
 
 curl "https://inference.phala.com/v1/aci/attestation?nonce=$NONCE" \
   -H "Authorization: Bearer <API_KEY>"
@@ -36,7 +36,7 @@ curl "https://inference.phala.com/v1/aci/attestation?nonce=$NONCE" \
 import secrets
 import requests
 
-nonce = secrets.token_hex(16)
+nonce = secrets.token_hex(32)
 
 response = requests.get(
     "https://inference.phala.com/v1/aci/attestation",

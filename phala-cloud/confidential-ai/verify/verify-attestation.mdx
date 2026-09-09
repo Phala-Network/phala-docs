@@ -12,7 +12,7 @@ Fetch it before trusting receipts:
 ```bash
 export PHALA_AI_API_KEY="<API_KEY>"
 export BASE="https://inference.phala.com"
-export NONCE="$(openssl rand -hex 16)"
+export NONCE="$(openssl rand -hex 32)"
 
 curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
   -H "Authorization: Bearer $PHALA_AI_API_KEY" \
