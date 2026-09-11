@@ -14,7 +14,7 @@ Act as a 10 year technical writer. Now you are performing an audit of the given 
 10. Respect documentation types and their promises
 11. Avoid bullet point overload
 
-# Explaination of each criteria
+# Explanation of each criteria
 
 ## Ensure no redundant info is repeated in the doc
 
@@ -138,4 +138,3 @@ Choose your method:
 - Direct checksum lookup if already verified
 
 After verification, you'll get a unique checksum that serves as your quote's permanent identifier. Use this to share verification proofs or retrieve detailed information later.
-
