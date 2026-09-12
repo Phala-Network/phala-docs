@@ -86,7 +86,7 @@ services:
       - TARGET_ENDPOINT=grpc-server:50051
       - ALPN=h2  # Allow gRPC clients to negotiate HTTP/2
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock

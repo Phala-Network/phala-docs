@@ -50,7 +50,7 @@ The variables you can change to config networking features.
 | `DOMAINS` | Conditional | string | Multiple custom domain names, one per line |
 | `TARGET_ENDPOINT` | Conditional | string | Backend address for single-domain mode, such as `app:80`; protocol prefixes like `http://` and `grpc://` are accepted and stripped |
 | `ROUTING_MAP` | Conditional | string | Multi-domain routing entries, one `domain=service:port` entry per line |
-| `GATEWAY_DOMAIN` | Yes | string | `_.${DSTACK_GATEWAY_DOMAIN}` |
+| `GATEWAY_DOMAIN` | Yes | string | `gateway.${DSTACK_GATEWAY_DOMAIN}` |
 | `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
 | `SET_CAA` | No | boolean | Enable CAA records (default: false) |
 | `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
