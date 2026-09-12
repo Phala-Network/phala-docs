@@ -220,7 +220,7 @@ services:
       - DOMAIN=ai.mycompany.com
       - TARGET_ENDPOINT=vllm:8000
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:

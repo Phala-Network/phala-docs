@@ -53,7 +53,7 @@ services:
       - DOMAIN=api.mycompany.com  # Your custom domain
       - TARGET_ENDPOINT=app:80  # Your app's internal endpoint
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - GATEWAY_DOMAIN=_.${DSTACK_GATEWAY_DOMAIN}
+      - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
@@ -84,6 +84,13 @@ Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal 
 <Note>
 `dstack-ingress` is a HAProxy-based L4/TCP proxy. It terminates TLS and forwards the TCP stream to `TARGET_ENDPOINT`; it does not apply Nginx-style HTTP redirects, header rules, body limits, or buffering settings. Put HTTP-specific behavior in your application or in a separate HTTP proxy behind `TARGET_ENDPOINT` if needed.
 </Note>
+
+<Warning>
+  `GATEWAY_DOMAIN` becomes your domain's CNAME target, and its first label must
+  start with a letter or digit. Android rejects a leading underscore, so the
+  older `_.${DSTACK_GATEWAY_DOMAIN}` form resolves everywhere except Android —
+  change it to `gateway.${DSTACK_GATEWAY_DOMAIN}` if your deployment still has it.
+</Warning>
 
 ## Step 3: Configure Environment Variables
 
@@ -138,7 +145,7 @@ services:
       DNS_PROVIDER: cloudflare
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      GATEWAY_DOMAIN: _.${DSTACK_GATEWAY_DOMAIN}
+      GATEWAY_DOMAIN: gateway.${DSTACK_GATEWAY_DOMAIN}
       SET_CAA: true
       DOMAINS: |
         app.mycompany.com

@@ -141,6 +141,17 @@ dig TXT your-domain.com
 docker logs <dstack-ingress-container>
 ```
 
+### Resolves Everywhere Except Android
+
+```bash
+# Check the CNAME target
+dig CNAME your-domain.com +short
+```
+
+Android rejects a target whose first label starts with an underscore — the old
+`_.<gateway-domain>` form. Set `GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}`
+and redeploy.
+
 ### Certificate Not Issued
 
 For custom domains using dstack-ingress:
