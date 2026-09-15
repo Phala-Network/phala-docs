@@ -70,7 +70,7 @@ Host my-cvm
     HostName <app-id>-22.<cluster>.phala.network
     User root
     Port 443
-    ProxyCommand openssl s_client -quiet -connect %h:%p
+    ProxyCommand openssl s_client -quiet -connect %h:%p -servername %h -verify_hostname %h -verify_return_error
 ```
 
 Replace `<app-id>` with your application ID and `<cluster>` with your cluster (e.g., `dstack-pha-prod7`).

@@ -245,7 +245,7 @@ If using manual SSH configuration, macOS LibreSSL may cause timeouts:
 brew install openssl
 
 # Use full path in ProxyCommand
-/opt/homebrew/bin/openssl s_client -quiet -connect %h:%p
+/opt/homebrew/bin/openssl s_client -quiet -connect %h:%p -servername %h -verify_hostname %h -verify_return_error
 ```
 
 For detailed SSH setup, see [Enable SSH Access](/phala-cloud/networking/enable-ssh-access).
