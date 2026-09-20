@@ -46,7 +46,7 @@ Update your `docker-compose.yml` to include the dstack-ingress container:
 ```yaml
 services:
   dstack-ingress:
-    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
+    image: ghcr.io/dstack-tee/dstack-ingress:2.6@sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0
     ports:
       - "443:443"
     environment:
@@ -138,7 +138,7 @@ You can route multiple custom domains from one ingress container by using `DOMAI
 ```yaml
 services:
   ingress:
-    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
+    image: ghcr.io/dstack-tee/dstack-ingress:2.6@sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0
     ports:
       - "443:443"
     environment:
