@@ -418,6 +418,7 @@
                   "/phala-cloud/networking/quickstart",
                   "/phala-cloud/networking/expose-http-service",
                   "/phala-cloud/networking/setup-custom-domain",
+                  "/phala-cloud/networking/custom-domain-faq",
                   "/phala-cloud/networking/expose-tcp-service",
                   "/phala-cloud/networking/enable-ssh-access",
                   "/phala-cloud/networking/tls-passthrough",
