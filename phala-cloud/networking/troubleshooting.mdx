@@ -104,27 +104,19 @@ curl https://localhost:8080
 
 ### Certificate Hostname Mismatch
 
-In passthrough mode, you have two options:
+With dstack-ingress, connect through the configured custom domain and verify the
+certificate SAN matches it:
 
-**Option 1: Use a custom domain with dstack-ingress**
 ```bash
-# Your certificate CN should match your custom domain
-openssl x509 -in server.crt -text -noout | grep CN
-# Should show: CN=your-domain.com
+openssl s_client -connect your-domain.com:443 \
+  -servername your-domain.com </dev/null 2>/dev/null | \
+  openssl x509 -noout -ext subjectAltName
 ```
 
-**Option 2: Configure your service to ignore hostname validation**
-```javascript
-// For development only - accepts any certificate
-const server = https.createServer({
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt'),
-  // Don't verify hostname
-  requestCert: false
-});
-```
-
-Note: You cannot get a valid certificate for `*.phala.network` domains. Use passthrough mode primarily with custom domains or for protocols that handle certificates differently (like some databases).
+With application-managed passthrough, the service owns TLS and must present a
+certificate matching the hostname used by the client. Follow the
+[tcp-port-forwarding example](https://github.com/Dstack-TEE/dstack-examples/tree/main/tcp-port-forwarding)
+for domain registration and certificate provisioning.
 
 ## Custom Domain Issues
 
@@ -135,7 +127,10 @@ Note: You cannot get a valid certificate for `*.phala.network` domains. Use pass
 dig CNAME your-domain.com
 
 # Check TXT record for app identification
-dig TXT your-domain.com
+dig TXT _dstack-app-address.your-domain.com
+
+# Wildcard certificates use this label at the base domain
+dig TXT _dstack-app-address-wildcard.example.com
 
 # View ingress container logs
 docker logs <dstack-ingress-container>
@@ -157,11 +152,11 @@ and redeploy.
 For custom domains using dstack-ingress:
 ```bash
 # Check certificate evidence
-curl https://your-domain.com/evidences/
+curl --http1.1 https://your-domain.com/evidences/
 
 # Files available:
 # - acme-account.json
-# - cert.pem
+# - cert-your-domain.com.pem
 # - sha256sum.txt
 # - quote.json
 ```
@@ -190,9 +185,12 @@ dig CAA your-domain.com
 
 2. **Manually remove old CAA records**: Use your DNS provider's control panel to delete CAA records before redeploying.
 
-3. **Disable CAA temporarily**: Set `SET_CAA=false` to avoid CAA checks during certificate issuance.
+3. **Restore the original ACME state**: Reattach the persisted
+   `/etc/letsencrypt` volume when it contains the account named in CAA.
 
-Note: Namecheap doesn't support CAA records via API, so this issue won't occur with Namecheap as DNS provider.
+`SET_CAA=false` only skips future CAA writes. Existing DNS CAA records continue
+to govern certificate issuance. Namecheap users should also inspect manually
+created CAA records because the ingress integration cannot update them.
 
 ## gRPC Connection Failed
 

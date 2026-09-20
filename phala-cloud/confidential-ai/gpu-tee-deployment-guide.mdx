@@ -219,9 +219,9 @@ services:
     environment:
       - DOMAIN=ai.mycompany.com
       - TARGET_ENDPOINT=vllm:8000
+      - DNS_PROVIDER=cloudflare
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock

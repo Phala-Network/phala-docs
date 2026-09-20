@@ -85,9 +85,9 @@ services:
       - DOMAIN=api.mycompany.com
       - TARGET_ENDPOINT=grpc-server:50051
       - ALPN=h2  # Allow gRPC clients to negotiate HTTP/2
+      - DNS_PROVIDER=cloudflare
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
       - /var/run/tappd.sock:/var/run/tappd.sock
@@ -105,6 +105,10 @@ volumes:
 Then connect to: `api.mycompany.com`. Learn more details at [Set up custom domains](/phala-cloud/networking/setup-custom-domain).
 
 `dstack-ingress` terminates TLS and forwards raw TCP to the backend. For gRPC custom domains, set `ALPN=h2` so clients can negotiate HTTP/2 over TLS; your backend should accept cleartext HTTP/2 on `TARGET_ENDPOINT`.
+
+The built-in `/evidences/` handler recognizes HTTP/1.1 request bytes. Use
+`curl --http1.1 https://api.mycompany.com/evidences/` when checking evidence on
+an ingress configured with `ALPN=h2`.
 
 ## Testing with grpcurl
 
