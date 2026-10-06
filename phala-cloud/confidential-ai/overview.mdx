@@ -1,16 +1,16 @@
 ---
-description: Use Confidential AI through an OpenAI-compatible API or custom GPU TEE infrastructure, with attestation reports and signed receipts you can verify.
+description: Use Private AI through an OpenAI-compatible API, or rent GPU TEE servers for your own confidential AI, with attestation reports and signed receipts you can verify.
 title: Overview
 ---
 
 <img
   src="/images/confidential-ai/confidential-ai-overview.jpeg"
-  alt="Confidential AI overview - run AI models with hardware-level privacy in GPU TEEs"
+  alt="Private AI overview - run AI models with hardware-level privacy in GPU TEEs"
 />
 
-## Why Confidential AI?
+## Why Private AI?
 
-Traditional cloud AI deployments ask you to trust the platform operator and the upstream model provider. Phala Confidential AI runs inference through an attested gateway and verified TEE providers, then gives you cryptographic evidence for each response.
+Traditional cloud AI deployments ask you to trust the platform operator and the upstream model provider. Phala Private AI runs inference through an attested gateway and verified TEE providers, then gives you cryptographic evidence for each response.
 
 The on-demand API is OpenAI-compatible and served through an Attested Confidential Inference (ACI) gateway. Every response includes a signed receipt, and the gateway publishes an attestation report that proves which TEE workload served the request. Confidential model responses additionally show, in the receipt, that the upstream provider was verified and channel-bound before your prompt was forwarded.
 
@@ -40,7 +40,7 @@ Phala Cloud offers pre-deployed **Models** through an API for quick integration,
   </Card>
 </Columns>
 
-## Quick Tour of Confidential AI
+## Quick Tour of Private AI
 
 ### Models: API Access
 
@@ -65,9 +65,9 @@ Our [benchmark](/phala-cloud/confidential-ai/benchmark) shows GPU TEE mode achie
 
 ### FAQs
 
-Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions about Confidential AI.
+Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions about Private AI.
 
-## What makes Phala Cloud Confidential AI Different?
+## What makes Phala Cloud Private AI Different?
 
 - **Drop-in compatibility**: OpenAI-compatible API with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
 - **Verifiable security**: Gateway attestation, signed per-response receipts, and upstream verification events you can check yourself

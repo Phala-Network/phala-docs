@@ -44,7 +44,7 @@ Before replicating:
 
 - The **source CVM** exists in your current workspace. It can be running or stopped.
 - The **target node** (if you pin one) is deployable for your workspace, has the required OS image, and has enough vCPU, memory, and disk.
-- Your **workspace has enough credit** to cover the new instance. Replicas are billed like any other CVM.
+- Your **workspace has enough Balance** to cover the new instance. Replicas are billed like any other CVM.
 
 For Onchain KMS workflows only:
 
@@ -282,7 +282,7 @@ Replicate calls share the same structured error envelope as the rest of the Phal
 | `ERR-03-006` | The source CVM's OS image is not available on the target node. |
 | `ERR-03-008` | The source instance is not visible in the current workspace. |
 | `ERR-03-009` | The source app has multiple live instances; pass `--compose-hash` or use a specific source UUID. |
-| `ERR-04-001` | Workspace credit balance is too low. |
+| `ERR-04-001` | Workspace Balance is too low. |
 
 See [Error Codes](/phala-cloud/references/error-codes) for the full catalog, HTTP status mappings, and the exception class behind each code.
 

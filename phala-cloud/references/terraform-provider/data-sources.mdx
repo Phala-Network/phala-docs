@@ -7,7 +7,7 @@ The Phala Cloud provider includes seven read-only data sources. Use them to disc
 
 ## phala_account
 
-Returns current account info including user profile, credits, and active workspace linkage.
+Returns current account info including user profile, Balance, and active workspace linkage.
 
 ```hcl
 data "phala_account" "current" {}
@@ -34,9 +34,9 @@ output "credit_balance" {
 | `has_password` | Boolean | Whether a password is set. |
 | `totp_enabled` | Boolean | Whether TOTP 2FA is enabled. |
 | `has_backup_codes` | Boolean | Whether backup codes exist. |
-| `credit_balance` | String | Current credit balance. |
-| `credit_granted_balance` | String | Granted credit balance. |
-| `credit_outstanding_amount` | String | Outstanding credit amount. |
+| `credit_balance` | String | Current Balance. |
+| `credit_granted_balance` | String | Gifted credits balance. |
+| `credit_outstanding_amount` | String | Amount the workspace owes. |
 | `credit_is_post_paid` | Boolean | Whether the account is post-paid. |
 | `workspace_id` | String | Active workspace ID. |
 | `workspace_name` | String | Active workspace name. |

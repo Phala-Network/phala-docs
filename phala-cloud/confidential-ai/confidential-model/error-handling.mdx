@@ -1,6 +1,6 @@
 ---
 title: Error Handling
-description: Handle Confidential AI API errors, retries, unsupported parameters, and upstream failures.
+description: Handle Private AI API errors, retries, unsupported parameters, and upstream failures.
 ---
 
 ## Error Response Format
@@ -34,7 +34,7 @@ The `type` field is the machine-readable discriminator.
 | --- | --- |
 | `400` | Bad request, unknown model, or invalid parameter. |
 | `401` | Missing or invalid API key. |
-| `403` | Forbidden, for example insufficient credits. |
+| `403` | Forbidden, for example your Balance is too low to fund Private AI. Top up, and calls work again within about 5 minutes. |
 | `429` | Rate limited. |
 | `500` | Gateway server error. |
 | `502` | Upstream provider unavailable. |

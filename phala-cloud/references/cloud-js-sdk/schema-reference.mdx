@@ -50,10 +50,10 @@ Three-layer user response with separate user, workspace, and credits objects.
     avatar?: string | null;
   };
   credits: {
-    balance: string | number;
-    granted_balance: string | number;
-    is_post_paid: boolean;
-    outstanding_amount: string | number | null;
+    balance: string | number;            // Balance: pays for CVMs, GPU instances, and Private AI
+    granted_balance: string | number;    // Gifted credits: CVMs and GPU instances only, used first
+    is_post_paid: boolean;               // CVM usage beyond Balance is charged to the card
+    outstanding_amount: string | number | null; // what the workspace owes
   };
 }
 ```
