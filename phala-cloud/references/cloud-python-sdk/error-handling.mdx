@@ -177,7 +177,7 @@ except ResourceError as e:
     if e.error_code == CVM_APP_ID_CONFLICT:
         print("App ID already in use with a different compose hash")
     elif e.error_code == INSUFFICIENT_BALANCE:
-        print("Add credits to your workspace")
+        print("Top up your Balance")
     elif e.error_code == QUOTA_EXCEEDED:
         print("Workspace quota exceeded")
     elif e.error_code == NODE_NOT_FOUND:
