@@ -17,7 +17,7 @@ Phala Cloud is a next-generation cloud solution built on **Dstack** that provide
 - **Verifiable Results**: Cryptographic proof that your AI computations are genuine and unmodified  
 - **Privacy Protection**: Complete confidentiality for your models, data, and algorithms
 - **Easy Deployment**: Deploy existing Docker applications with zero code changes
-- **Cost Effective**: Web2 pricing model with transparent, second-level billing
+- **Cost Effective**: Web2 pricing model, billed by the minute
 
 ## Getting Started
 
