@@ -178,6 +178,14 @@ Even in auto-encryption mode, plaintext values are stored in your Terraform stat
 
 **Keep secret names consistent.** Use the same key names in your compose file and encrypted secrets to avoid confusion. While Phala Cloud allows different names, matching them makes your configuration easier to audit.
 
+## What happens to secrets when I roll back?
+
+Nothing changes. A rollback restores the Docker Compose file from the earlier revision, but your CVM keeps the encrypted secrets it has now. We do this so a rollback never brings back an old secret you already rotated.
+
+This matters after a failed update. If the update changed your secrets, the rollback keeps those new values. If the bad secrets caused the failure, fix them in the same step.
+
+Rolling back can also fail to start if the earlier compose file needs a variable your current secrets do not have. In that case, send a full set of secrets along with the rollback, encrypted the same way as at deploy time. With the API or SDKs, pass the encrypted blob as `encrypted_env`. If you roll back several CVMs of one app at once, they all get the same blob.
+
 ## Built-in Environment Variables
 
 Phala Cloud attaches a [default pre-launch script](https://github.com/Dstack-TEE/dstack-examples/tree/main/phala-cloud-prelaunch-script)
