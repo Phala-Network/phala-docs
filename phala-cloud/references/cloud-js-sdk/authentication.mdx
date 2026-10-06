@@ -7,7 +7,7 @@ description: User authentication functions in the Cloud JS SDK
 
 `GET /auth/me`
 
-Returns the authenticated user's profile, workspace, and credit balance.
+Returns the authenticated user's profile, workspace, and the workspace's Balance.
 
 **Parameters:** None
 
@@ -17,7 +17,7 @@ Returns the authenticated user's profile, workspace, and credit balance.
 |-------|------|-------------|
 | `user` | `object` | User info (username, email, avatar) |
 | `workspace` | `object` | Active workspace (name, slug, tier) |
-| `credits` | `object` | Credit balance (remaining, total, used) |
+| `credits` | `object` | Money in the workspace: `balance` (Balance; pays for CVMs, GPU instances, and Private AI), `granted_balance` (Gifted credits; CVMs and GPU instances only, used first), `is_post_paid` (CVM usage beyond Balance is charged to the card), `outstanding_amount` (what the workspace owes) |
 
 **Example:**
 
