@@ -72,7 +72,7 @@ CVMs support both HTTP-over-TLS (Zero Trust HTTPS) and TCP-over-TLS. See the [TC
 
 Under the hood, the TEE wraps the tcp ports you have exposed in docker with TLS. The gateway then routes the TLS traffic based on SNI, the domain name attached to every TLS connection. TLS is needed because it's the only way to multiplex the tcp traffic. When using the tcp-port-forwarding example, it automatically helps you set up the domain and TLS certificate securely in TEE (thus “Zero Trust”), and reverse-proxy the incoming traffic to your tcp port. You can also manually accept TLS traffic in your CVM and handle the certificate on the application level.
 
-### Is there a simulator or free tier available for testing?
+### Is there a simulator available for testing?
 
 Yes. The Phala Cloud CLI includes a [simulator](/phala-cloud/phala-cloud-cli/simulator) for local testing. Some new workspaces are also offered a welcome credit when they add a card, while the offer lasts. The dashboard shows the amount before you claim it.
 
@@ -156,7 +156,7 @@ See the [pricing page](https://cloud.phala.com/about/pricing) for current rates 
 
 Your workspace has one Balance. It pays for CVMs, GPU instances, and Private AI. You top it up in the dashboard, or turn on auto-topup to charge your card when Balance drops below an amount you choose. Auto-topup checks every hour.
 
-- **Gifted credits** (for example a welcome credit or a promotion code) pay for CVMs and GPU instances first, then your Balance pays. Gifted credits never pay for Private AI.
+- **Gifted credits** (for example from a promotion code) pay for CVMs and GPU instances first, then your Balance pays. Gifted credits never pay for Private AI. A welcome credit goes into your Balance.
 - **Private AI** only uses Balance. We move money from your Balance to Private AI every 5 minutes as you use it. There is no separate Private AI top-up and no minimum.
 - **With a card** (post-paid, the default when you add one), your CVMs keep running when Balance runs out. We charge your card for the rest.
 - **Without a card**, top up first. Your CVMs stop when Balance reaches $0.
@@ -169,7 +169,6 @@ You can get a refund for a top-up within 24 hours of paying it, for the part you
 
 ### What kind of user levels do we have on Phala Cloud?
 
-* **Free**: User who registered on Phala Cloud, with limited resources
 * **Pro**: Paid users with self-service capabilities
 * **Enterprise**: Customized pricing, available through Business Development only
 
@@ -184,16 +183,12 @@ You can get a refund for a top-up within 24 hours of paying it, for the part you
 New accounts start at Tier 1. Contact cloud@phala.network to upgrade.
 
 <Note>
-**Important:** Check your tier limits BEFORE deploying multiple CVMs. You'll receive a "No available nodes found" error if you exceed your limits.
+Check your tier limits before you deploy several CVMs. If you go over your limits, you get a "No available nodes found" error.
 </Note>
-
-#### What are the resource limits for the Free tier users?
-
-Users under **Free** tier can only create one single CVM. Add a card to access Tier 1 limits.
 
 ### What is the billing granularity for Phala Cloud? Is it by hour or minute?
 
-**Regular CVMs:** Billed by seconds. The pricing page displays hourly rates for ease of understanding, but actual billing is based on precise second-level usage.
+**Regular CVMs:** Billed by the minute. The pricing page shows hourly rates, but we charge by the minute.
 
 **GPU TEE:** Billed by hours with a minimum rental period. See [GPU TEE Billing](#how-does-gpu-tee-billing-work) for details.
 
@@ -202,12 +197,12 @@ Users under **Free** tier can only create one single CVM. Add a card to access T
 For On-Demand GPU TEE (e.g., H200):
 - **Minimum charge**: Each instance has a minimum rental period, charged upfront when you order. For example, a single H200 has a 24-hour minimum and a B300 has a 30-day (720-hour) minimum. Check the [pricing page](https://cloud.phala.com/about/pricing) for current hourly rates.
 - **When billing starts**: Only when the instance is actually launched
-- Topping up your Balance or configuring Docker settings does NOT incur charges
+- Topping up your Balance or configuring Docker settings does not incur charges
 - GPU instances use Gifted credits first, then your Balance
 - Usage beyond the minimum period is billed hourly
 - If you stop and restart later, the minimum charge applies again
 
-For commitment plans (1-month or 6-month), you get lower hourly rates.
+For commitment plans (30, 180, or 365 days), you get lower hourly rates.
 
 ### What happens if my Balance reaches zero?
 
