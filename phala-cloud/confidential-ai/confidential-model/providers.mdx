@@ -1,6 +1,6 @@
 ---
 title: Provider Verification
-description: Understand how Confidential AI verifies upstream serving environments without relying on a static provider list.
+description: Understand how Private AI verifies upstream serving environments without relying on a static provider list.
 ---
 
 A confidential response is served by an upstream provider whose enclave the gateway verifies before forwarding your prompt. The receipt is the authoritative record for a specific response: read `upstream.verified.provider`, `result`, `required`, `session_id`, `channel_bindings`, and `claims`.
@@ -11,7 +11,7 @@ Zero data retention is a separate property from provider verification. It means 
 
 ## Binding Methods
 
-Confidential AI can bind a verified upstream session in more than one way:
+Private AI can bind a verified upstream session in more than one way:
 
 | Binding | Meaning |
 | --- | --- |

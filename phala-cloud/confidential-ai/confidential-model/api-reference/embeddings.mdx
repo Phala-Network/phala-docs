@@ -46,7 +46,7 @@ curl https://inference.phala.com/v1/embeddings \
   -H "Content-Type: application/json" \
   -d '{
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Confidential AI keeps inference data private."
+    "input": "Private AI keeps inference data private."
   }'
 ```
 
@@ -60,7 +60,7 @@ client = OpenAI(
 
 response = client.embeddings.create(
     model="qwen/qwen3-embedding-8b",
-    input="Confidential AI keeps inference data private.",
+    input="Private AI keeps inference data private.",
 )
 
 vector = response.data[0].embedding
@@ -77,7 +77,7 @@ const client = new OpenAI({
 
 const response = await client.embeddings.create({
   model: "qwen/qwen3-embedding-8b",
-  input: "Confidential AI keeps inference data private.",
+  input: "Private AI keeps inference data private.",
 });
 
 console.log(response.data[0].embedding.length);

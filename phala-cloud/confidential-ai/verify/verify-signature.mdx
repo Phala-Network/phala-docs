@@ -1,11 +1,11 @@
 ---
-description: Learn how to verify a Confidential AI response with the gateway attestation report and signed receipt.
+description: Learn how to verify a Private AI response with the gateway attestation report and signed receipt.
 title: Verify a Response
 ---
 
 ## What the receipt proves
 
-Every Confidential AI response includes a signed receipt id in the `x-receipt-id` header. The receipt is an ordered transparency event log. It records request and response hashes, the selected route, upstream verification status, and the signature that binds the record to the attested gateway keyset.
+Every Private AI response includes a signed receipt id in the `x-receipt-id` header. The receipt is an ordered transparency event log. It records request and response hashes, the selected route, upstream verification status, and the signature that binds the record to the attested gateway keyset.
 
 For a confidential response, the receipt's `upstream.verified` event shows `result: verified`, `required: true`, and a `session_id`. That session records the verified upstream security context and channel binding.
 
