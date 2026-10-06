@@ -13,7 +13,7 @@ Phala Cloud is a next-generation cloud solution built on **Dstack** that provide
 
 ### Key Features for AI Developers
 
-- **Confidential AI Computing**: Run LLMs and AI models in GPU TEE with hardware-level security
+- **Confidential AI computing**: Run LLMs and AI models in GPU TEE with hardware-level security
 - **Verifiable Results**: Cryptographic proof that your AI computations are genuine and unmodified  
 - **Privacy Protection**: Complete confidentiality for your models, data, and algorithms
 - **Easy Deployment**: Deploy existing Docker applications with zero code changes
