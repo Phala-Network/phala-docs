@@ -51,7 +51,7 @@
           },
           {
             "href": "https://docs.phala.network/phala-cloud/gpu-tee/llm-in-tee",
-            "label": "Confidential AI"
+            "label": "Private AI"
           },
           {
             "href": "https://docs.phala.network/phala-cloud/faqs",
@@ -101,7 +101,7 @@
         ]
       },
       {
-        "header": "Confidential AI",
+        "header": "Private AI",
         "items": [
           {
             "href": "https://docs.phala.network/phala-cloud/confidential-ai/overview",
@@ -742,7 +742,7 @@
         "icon": "shield-check",
         "pages": [
           {
-            "group": "Confidential AI",
+            "group": "Private AI",
             "pages": [
               "/phala-cloud/confidential-ai/overview",
               {
@@ -806,7 +806,7 @@
             ]
           }
         ],
-        "tab": "Confidential AI"
+        "tab": "Private AI"
       },
       {
         "icon": "terminal",
