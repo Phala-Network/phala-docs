@@ -5,14 +5,14 @@ title: On-demand API
 
 ## Overview
 
-On-demand Confidential AI API provides an OpenAI-compatible interface for confidential inference. Requests go through Phala's ACI gateway at `https://inference.phala.com/v1`. The gateway runs in a TEE, publishes an attestation report, and signs a per-response receipt that you can verify.
+The on-demand Private AI API provides an OpenAI-compatible interface for confidential inference. Requests go through Phala's ACI gateway at `https://inference.phala.com/v1`. The gateway runs in a TEE, publishes an attestation report, and signs a per-response receipt that you can verify.
 
 
 ## Prerequisites
 
-Before you begin, ensure you have enough funds to get the API key. You need at least $5 in your account. Go to **Dashboard** and click **Deposit** to add funds.
+Private AI is paid from your workspace Balance, the same Balance that pays for CVMs and GPU instances. There is no separate top-up and no minimum: if your Balance has money, the API works. Gifted credits do not pay for Private AI.
 
-Navigate to **Dashboard** → **Confidential AI API** and click **Enable**. Then create your first API key and click the key to copy.
+In the dashboard, go to **Private AI** → **API Keys** and create your first API key. Click the key to copy it.
 
 <Frame>
     <img src="/images/confidential-ai/confidential-model/api-keys.png" alt="GPU TEE API Generate Key" />
