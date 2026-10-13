@@ -36,34 +36,53 @@ Phala Cloud networking infra always ensure end-to-end encryption. You can still 
 
 The `s` suffix immediately after the port number tells the gateway to use passthrough mode instead of TLS termination.
 
-## When TLS Passthrough is Actually Useful
+## Choose the TLS Termination Point
 
-TLS passthrough is practical for services that need to handle TLS themselves, typically when using custom domains with dstack-ingress or for specific protocols that require end-to-end TLS control.
+The `s` suffix controls the Phala gateway. It forwards the encrypted TLS stream
+to the selected CVM port.
 
-### Custom Domain with Self-Managed TLS
+For a dstack-ingress custom domain, the same gateway passthrough path carries the
+encrypted stream into the CVM, where dstack-ingress terminates TLS and forwards
+decrypted TCP to `TARGET_ENDPOINT`. The backend application therefore serves
+cleartext HTTP, h2c, or another plaintext TCP protocol on its internal port.
 
-When using your own domain with dstack-ingress, you might want to handle TLS directly:
+For application-managed TLS, the application itself terminates the stream and
+must provision a certificate matching the client hostname. Use the
+[tcp-port-forwarding example](https://github.com/Dstack-TEE/dstack-examples/tree/main/tcp-port-forwarding)
+for the required domain registration, certificate lifecycle, and forwarding
+setup.
+
+### dstack-ingress custom domain
 
 ```yaml
 services:
+  ingress:
+    image: ghcr.io/dstack-tee/dstack-ingress:2.6@sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0
+    ports:
+      - "443:443"
+    environment:
+      DOMAIN: api.example.com
+      TARGET_ENDPOINT: api:8080
+      GATEWAY_DOMAIN: gateway.${DSTACK_GATEWAY_DOMAIN}
+      DNS_PROVIDER: cloudflare
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      - letsencrypt:/etc/letsencrypt
+      - evidences:/evidences
+
   api:
     image: your-api:latest
-    ports:
-      - "8443:8443"  # Custom HTTPS port
-    environment:
-      # TLS cert data from environment variables (encrypted deployment)
-      TLS_CERT_PEM: ${TLS_CERT_PEM}
-      TLS_KEY_PEM: ${TLS_KEY_PEM}
-      PORT: 8443
-      TLS_ENABLED: "true"
+    expose:
+      - "8080"
+
+volumes:
+  letsencrypt:
+  evidences:
 ```
 
-Then clients connect via TLS passthrough:
-```bash
-curl https://deadbeef111111111111111111111111-8443s.dstack-prod5.phala.network/api/status
-```
-
-Your application handles the TLS termination and can implement custom certificate validation, cipher selection, or client certificate requirements.
+Clients establish TLS with dstack-ingress. The `api` service receives the
+decrypted stream on port 8080.
 
 ### Proxying External TLS Services
 
@@ -97,7 +116,7 @@ services:
       # Custom cipher suites, client cert requirements, etc.
 ```
 
-**Practical note**: TLS passthrough is most useful when you have custom domains (via dstack-ingress) or need to implement specific TLS behaviors that the gateway's automatic TLS termination doesn't support.
+**Practical note**: Use dstack-ingress when it should own the custom-domain certificate and terminate TLS inside the CVM. Use application-managed passthrough when your service owns the certificate and TLS policy.
 
 ## Security Considerations
 

@@ -36,7 +36,7 @@ Deploy it and you're done. No reverse proxy setup needed. No certificate managem
 
 ## Use Your Own Domain
 
-Want `api.mycompany.com` instead of the default URL? Add the dstack-ingress container to your deployment. It handles DNS setup and SSL certificates automatically through your DNS provider (Cloudflare, Linode, or Namecheap).
+Want `api.mycompany.com` instead of the default URL? Add the dstack-ingress container to your deployment. DNS-01 automation supports Cloudflare, Linode, Namecheap, and Route53. TLS-ALPN-01 supports operator-managed DNS without provider credentials.
 
 ## Beyond HTTP
 

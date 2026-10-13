@@ -177,9 +177,9 @@ Without verification, users can't tell the legitimate TEE-controlled certificate
 
 Your TLS certificates are generated and controlled entirely within the TEE. For custom domains, the TEE creates its own ACME account and TLS private keys inside encrypted memory. The private keys never leave the TEE.
 
-Evidence files published at `/evidences/` prove the TEE controls the certificate through cryptographic binding. The TEE puts a hash of the certificate evidence into the TDX quote's `report_data` field. This proves the TEE created both the quote and the certificate evidence at the same time.
+Evidence files published at `/evidences/` bind the certificate manifest to a TDX quote. dstack-ingress places `sha256(sha256sum.txt)` in the first 32 bytes of the quote's `report_data` field and fills the remaining 32 bytes with zeros.
 
-CAA (Certification Authority Authorization) DNS records add another layer of protection. They restrict which Certificate Authorities can issue certificates for your domain, preventing unauthorized issuance even if DNS is compromised.
+CAA (Certification Authority Authorization) DNS records add an issuance policy layer. Their protection depends on the effective provider-specific record remaining in DNS. Certificate Transparency monitoring covers issued certificates.
 
 ### How to Verify
 
@@ -189,10 +189,11 @@ The verification process differs based on your domain type.
 
 Verify the evidence files:
 
-1. Download evidence files from `https://your-domain.com/evidences/`
-2. Verify the certificate fingerprint matches what's being served
-3. Check that the TDX quote contains the hash of the evidence files
-4. Confirm CAA records restrict certificate issuance to the TEE's ACME account
+1. Download `quote.json`, `sha256sum.txt`, `acme-account.json`, and `cert-<domain>.pem` from `https://your-domain.com/evidences/` over HTTP/1.1
+2. Cryptographically validate the quote signature, Intel collateral, TCB status, and debug policy
+3. Compare the authenticated `report_data` with `sha256(sha256sum.txt)` followed by 32 zero bytes
+4. Run `sha256sum -c sha256sum.txt` and match `cert-<domain>.pem` to the served certificate
+5. Review the effective CAA response and Certificate Transparency history
 
 See **[Domain Attestation](/phala-cloud/networking/domain-attestation)** for complete step-by-step verification.
 
@@ -267,7 +268,7 @@ Verify the full platform integrity by checking each component:
 **Network Security:**
 - [ ] TLS certificate fingerprint matches served certificate
 - [ ] Evidence files at `/evidences/` are cryptographically bound to quote
-- [ ] CAA DNS records restrict certificate issuance
+- [ ] Effective CAA policy matches the selected DNS provider and intended issuance policy
 
 **Governance:**
 - [ ] Smart contract addresses are verified
@@ -280,7 +281,7 @@ Verify the full platform integrity by checking each component:
 
 **Malicious KMS:** KMS binding in RTMR3 and on-chain governance prevent unauthorized KMS instances from providing keys.
 
-**Certificate impersonation:** Evidence files and CAA records prevent unauthorized TLS certificates from being issued.
+**Certificate impersonation:** Verified evidence binds the served certificate to a TDX quote. CAA constrains future issuance under the active DNS policy, and Certificate Transparency exposes issued certificates for monitoring.
 
 **Supply chain attacks:** Reproducible OS builds and governance contracts prevent compromised build infrastructure from injecting malicious code.
 

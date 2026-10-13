@@ -44,17 +44,39 @@ The variables you can change to config networking features.
 
 ### Custom Domains
 
-| Variable | Required | Type | Purpose |
-|----------|----------|------|---------|
-| `DOMAIN` | Conditional | string | Single custom domain name; use `DOMAINS` for multi-domain mode |
-| `DOMAINS` | Conditional | string | Multiple custom domain names, one per line |
-| `TARGET_ENDPOINT` | Conditional | string | Backend address for single-domain mode, such as `app:80`; protocol prefixes like `http://` and `grpc://` are accepted and stripped |
-| `ROUTING_MAP` | Conditional | string | Multi-domain routing entries, one `domain=service:port` entry per line |
-| `GATEWAY_DOMAIN` | Yes | string | `gateway.${DSTACK_GATEWAY_DOMAIN}` |
-| `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
-| `SET_CAA` | No | boolean | Enable CAA records (default: false) |
-| `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
-| `ALPN` | No | string | TLS ALPN protocols, such as `h2` for gRPC custom domains |
+A deployment uses either `DOMAIN` with `TARGET_ENDPOINT`, or `DOMAINS` with
+`ROUTING_MAP`.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `DOMAIN` | Empty | Single certificate name; one leading `*.` is supported with DNS-01 |
+| `TARGET_ENDPOINT` | Empty | Single backend as `host`, `host:port`, or an accepted URL form |
+| `DOMAINS` | Empty | Comma- or newline-separated certificate names |
+| `ROUTING_MAP` | Empty | Comma- or newline-separated `domain=backend:port` SNI routes |
+| `GATEWAY_DOMAIN` | Empty | DNS alias target, for example `gateway.dstack-prod5.phala.network` |
+| `APP_ID` | Guest agent app ID | Optional DNS-01 routing identity override |
+| `PORT` | `443` | Public HAProxy and gateway routing port |
+| `ALPN` | Empty | Comma-separated TLS protocols, such as `h2,http/1.1` |
+| `CHALLENGE_TYPE` | `dns-01` | ACME mode: `dns-01` or `tls-alpn-01` |
+| `ACME_EMAIL` | Empty | Optional public ACME contact; `CERTBOT_EMAIL` is a historical alias |
+| `ACME_STAGING` | `false` | Use Let's Encrypt staging; `CERTBOT_STAGING` is an alias |
+| `ACME_DIRECTORY_URL` | Let's Encrypt production | Custom directory for direct DNS-01 issuance |
+| `RENEW_INTERVAL` | `43200` | Seconds between certificate checks |
+| `EVIDENCE_SERVER` | `true` | Serve evidence through the HTTP/1.1 `/evidences/` handler |
+| `EVIDENCE_PORT` | `80` | Internal evidence HTTP server port |
+| `EVIDENCE_DIR` | `/evidences` | Evidence output directory |
+| `SET_CAA` | `false` | Request CAA creation in direct DNS-01 mode |
+| `TXT_PREFIX` | `_dstack-app-address` | Gateway routing TXT label prefix |
+| `DELEGATION_ZONE` | Empty | Enable full DNS delegation for DNS-01 |
+| `DETERMINISTIC_TLS_KEY` | `false` | Derive the direct DNS-01 TLS key through the current dstack socket |
+| `MAXCONN` | `4096` | HAProxy connection limit |
+| `TIMEOUT_CONNECT` | `10s` | Backend connection timeout |
+| `TIMEOUT_CLIENT` | `86400s` | Client timeout |
+| `TIMEOUT_SERVER` | `86400s` | Backend timeout |
+
+URL schemes in `TARGET_ENDPOINT` and `ROUTING_MAP` are removed after parsing.
+HAProxy forwards a decrypted raw TCP stream, so `https://` does not enable
+backend TLS and URL paths are discarded.
 
 ### DNS Provider Credentials
 
@@ -63,6 +85,30 @@ The variables you can change to config networking features.
 | Cloudflare | `CLOUDFLARE_API_TOKEN` | Zone:Read, DNS:Edit |
 | Linode | `LINODE_API_TOKEN` | Domains:Read/Write |
 | Namecheap | `NAMECHEAP_USERNAME`, `NAMECHEAP_API_KEY`, `NAMECHEAP_CLIENT_IP` | API enabled |
+| Route53 | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ROLE_ARN`, `AWS_REGION` | AssumeRole plus hosted-zone read/write |
+
+Set `DNS_PROVIDER` to `cloudflare`, `linode`, `namecheap`, or `route53`.
+Credential-based detection follows that order when the variable is omitted.
+
+### TLS-ALPN-01 DNS Setup
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `DNS_SETUP_MODE` | `wait` | `wait`, `print`, or `webhook` operator workflow |
+| `DNS_WEBHOOK_URL` | Empty | Notification endpoint for webhook mode |
+| `DNS_WEBHOOK_TOKEN` | Empty | Shared secret used to HMAC-sign webhook payloads |
+| `DNS_SETUP_TIMEOUT` | `1800` | Seconds to wait for DNS setup |
+| `DNS_SETUP_INTERVAL` | `15` | Seconds between DNS checks |
+| `DOH_RESOLVERS` | Google + Cloudflare | Comma-separated DoH resolvers used for record verification |
+| `TLSALPN_PORT` | `9443` | Loopback port for the lego ACME responder |
+| `TLS_TERMINATE_PORT` | `9444` | Loopback port for the TLS frontend in TLS-ALPN-01 mode |
+| `DNS_SETTLE_SECONDS` | `30` | Cache-settle delay before first issuance |
+| `RENEW_DAYS_BEFORE` | Client default | Remaining certificate lifetime that triggers renewal |
+| `DELEGATION_PROPAGATION_SECONDS` | `120` | Wait after writing delegated challenge TXT records |
+| `CERTBOT_TIMEOUT` | Provider-derived | Maximum duration for one Certbot run |
+
+`tls-alpn-01` requires operator-managed DNS and direct CA access to port 443.
+It routes to one CVM instance. Wildcard certificates use DNS-01.
 
 ## Protocol Support
 
@@ -78,7 +124,7 @@ The variables you can change to config networking features.
 
 | Component | Image | Hash |
 |-----------|-------|------|
-| Custom domains | `dstacktee/dstack-ingress:2.2` | `sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0` |
+| Custom domains | `ghcr.io/dstack-tee/dstack-ingress:2.6` | `sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0` |
 
 ## Rate Limits
 
