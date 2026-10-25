@@ -13929,7 +13929,7 @@
           "name"
         ],
         "title": "ComposeManifest",
-        "description": "@see https://github.com/Dstack-TEE/dstack/blob/master/tdxctl/src/utils.rs#L77\n@see https://github.com/Dstack-TEE/dstack/blob/master/basefiles/app-compose.sh"
+        "description": "@see https://github.com/Dstack-TEE/dstack/blob/next/dstack/dstack-types/src/lib.rs#L203\n@see https://github.com/Dstack-TEE/dstack/blob/next/os/common/rootfs/app-compose.sh"
       },
       "ComposeManifestPatchRequest": {
         "properties": {

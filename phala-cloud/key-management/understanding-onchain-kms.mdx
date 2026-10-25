@@ -53,7 +53,7 @@ The `compose_hash` is the SHA-256 of a canonicalized JSON document called **`app
 - `public_logs`, `public_sysinfo`, `public_tcbinfo`
 - `no_instance_id`, `secure_time`, `storage_fs`, `swap_size`
 
-See the [`AppCompose` definition in dstack-types](https://github.com/Dstack-TEE/dstack/blob/master/dstack-types/src/lib.rs) for the authoritative list of fields.
+See the [`AppCompose` definition in dstack-types](https://github.com/Dstack-TEE/dstack/blob/next/dstack/dstack-types/src/lib.rs) for the authoritative list of fields.
 
 Canonicalization sorts the object keys alphabetically and serializes with a specific JSON variant so that the hash is deterministic regardless of which tool produced it. The CLI exports [`getComposeHash()`](https://github.com/Phala-Network/phala-cloud/blob/main/js/src/utils/get_compose_hash.ts) from `@phala/cloud` if you want to compute the hash in your own code and compare it against what the backend or the contract reports.
 
