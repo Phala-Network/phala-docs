@@ -49,7 +49,7 @@ Tools with an OpenAI-compatible provider setting, such as [Cline](/phala-cloud/c
 | --- | --- |
 | Base URL | `http://127.0.0.1:4180/v1` |
 | API Key | The client key from the app's Overview screen |
-| Model | `z-ai/glm-5.2`, or another chat model from the app's verified catalog |
+| Model | `z-ai/glm-5.3`, or another chat model from the app's verified catalog |
 
 See [Other Tools](/phala-cloud/confidential-ai/agents/other-tools) for Continue, Zed, Copilot, Aider, Goose, and chat apps.
 
@@ -71,4 +71,4 @@ curl -s https://inference.phala.com/v1/models \
   | jq -r '.data[] | select((.supported_features // []) | index("tools")) | .id'
 ```
 
-Use an exact chat-model ID such as `z-ai/glm-5.2` from [`/v1/models`](https://inference.phala.com/v1/models). For SDKs, observability tools, and gateways, see [Migration and Integrations](/phala-cloud/confidential-ai/confidential-model/migration-and-integrations).
+Use an exact chat-model ID such as `z-ai/glm-5.3` from [`/v1/models`](https://inference.phala.com/v1/models). For SDKs, observability tools, and gateways, see [Migration and Integrations](/phala-cloud/confidential-ai/confidential-model/migration-and-integrations).

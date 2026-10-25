@@ -33,7 +33,7 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
 
 ```json5 ~/.openclaw/openclaw.json
 {
-  agents: { defaults: { model: { primary: "phala/z-ai/glm-5.2" } } },
+  agents: { defaults: { model: { primary: "phala/z-ai/glm-5.3" } } },
   models: {
     mode: "merge",
     providers: {
@@ -42,8 +42,8 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
         apiKey: "${PHALA_AI_API_KEY}",
         api: "openai-completions",
         models: [
-          { id: "z-ai/glm-5.2", name: "GLM 5.2", reasoning: true, input: ["text"],
-            contextWindow: 1048576, maxTokens: 131072 },
+          { id: "z-ai/glm-5.3", name: "GLM 5.3", reasoning: true, input: ["text"],
+            contextWindow: 1048576, maxTokens: 1048576 },
         ],
       },
     },

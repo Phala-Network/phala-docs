@@ -36,7 +36,7 @@ Verify the report as described in [Verify Attestation](/phala-cloud/confidential
 curl -s -D headers.txt "$BASE/v1/chat/completions" \
   -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"z-ai/glm-5.2",
+  -d '{"model":"z-ai/glm-5.3",
        "messages":[{"role":"user","content":"Explain attestation in one sentence."}]}' \
   -o response.json
 

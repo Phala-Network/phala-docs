@@ -22,7 +22,7 @@ Once you get the API Key, you can start making requests to the Private AI API.
 
 ## Make Your First Request
 
-Replace `<API_KEY>` with your actual API key. The examples below use `z-ai/glm-5.2`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
+Replace `<API_KEY>` with your actual API key. The examples below use `z-ai/glm-5.3`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
 
 <CodeGroup>
 ```python Python
@@ -36,7 +36,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="z-ai/glm-5.2",
+    model="z-ai/glm-5.3",
     messages=[
         {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": "What is your model name?"},
@@ -56,7 +56,7 @@ const client = new OpenAI({
 
 async function main() {
   const completion = await client.chat.completions.create({
-    model: 'z-ai/glm-5.2',
+    model: 'z-ai/glm-5.3',
     messages: [
       {
         role: 'user',
@@ -87,7 +87,7 @@ curl -X 'POST' \
       "role": "user"
     }
   ],
-  "model": "z-ai/glm-5.2"
+  "model": "z-ai/glm-5.3"
 }'
 ```
 </CodeGroup>

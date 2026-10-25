@@ -31,10 +31,10 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
 export ANTHROPIC_BASE_URL="https://inference.phala.com"
 export ANTHROPIC_AUTH_TOKEN="$PHALA_AI_API_KEY"
 export ANTHROPIC_API_KEY=""
-export ANTHROPIC_MODEL="z-ai/glm-5.2"
-export ANTHROPIC_DEFAULT_OPUS_MODEL="z-ai/glm-5.2"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="z-ai/glm-5.2"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="z-ai/glm-5.2"
+export ANTHROPIC_MODEL="z-ai/glm-5.3"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="z-ai/glm-5.3"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="z-ai/glm-5.3"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="z-ai/glm-5.3"
 
 claude
 ```
@@ -43,7 +43,7 @@ claude
 existing Anthropic key from adding a conflicting `x-api-key` header.
 
 Phala model IDs do not appear in the `/model` picker; set the model with `ANTHROPIC_MODEL` or
-`/model z-ai/glm-5.2`. The alias variables send plan mode and background work to a Phala model.
+`/model z-ai/glm-5.3`. The alias variables send plan mode and background work to a Phala model.
 
 This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
 
