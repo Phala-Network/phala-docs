@@ -25,7 +25,7 @@ name: Phala
 version: 0.0.1
 schema: v1
 models:
-  - name: Phala GLM 5.2
+  - name: Phala GLM 5.3
     provider: openai
     model: z-ai/glm-5.3
     apiBase: https://inference.phala.com/v1
@@ -56,7 +56,7 @@ Add this provider under `language_models` in your settings file using Zed's [Ope
 
 ## GitHub Copilot (VS Code BYOK)
 
-Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example reserves 65,536 tokens for output:
+Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example uses the model's context window from the catalog and reserves 65,536 tokens for output, within the model's 1,048,576-token output maximum:
 
 ```json
 [
@@ -67,7 +67,7 @@ Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**,
     "models": [
       {
         "id": "z-ai/glm-5.3",
-        "name": "Phala GLM 5.2",
+        "name": "Phala GLM 5.3",
         "url": "https://inference.phala.com/v1/chat/completions",
         "toolCalling": true,
         "contextWindow": 1048576,
