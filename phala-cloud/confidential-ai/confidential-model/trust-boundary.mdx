@@ -1,40 +1,38 @@
 ---
 title: Trust Boundary
-description: Understand what the attested gateway protects, what routed models expose, and where plaintext is visible.
+description: Understand Phala's attested gateway, provider evidence coverage, and where plaintext exists.
 ---
 
-Confidential computing is precise: it proves specific facts, not a generic promise that everything is private. Use this page to decide what data belongs on a confidential model, a routed model, or a custom GPU TEE deployment.
+Every model on `https://inference.phala.com/v1` uses the TEE-only serving policy. The Phala gateway requires upstream verification and channel binding before forwarding; if that fails, it refuses the request. The evidence covers different boundaries for different [providers](/phala-cloud/confidential-ai/confidential-model/providers).
 
-## What the Gateway Protects
+## What the gateway protects
 
-- **Gateway identity**: Verify the gateway is a specific workload running in a genuine TEE with [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
-- **Per-response integrity**: Verify a signed [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) that binds request and response hashes to the attested gateway.
-- **No body retention in receipts**: Receipts store hashes and verification facts, not prompt or response bodies.
-- **Confidential upstreams**: For confidential responses, the gateway verifies the upstream provider and enforces channel binding before forwarding.
-- **Upstream retention, on request**: The gateway's own no-retention property says nothing about the provider it forwards to. Send `provider: {"zdr": true}` to restrict routing to providers that do not retain prompt or completion content. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+- **Gateway identity**: A fresh [attestation report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) binds the gateway keyset to hardware evidence.
+- **Per-response integrity**: A signed [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) binds request and response hashes to that keyset.
+- **No body retention in receipts**: Receipts contain hashes and verification facts rather than prompt or response bodies.
+- **Required upstream verification**: The gateway verifies the provider boundary and enforces channel binding before forwarding.
+- **Optional retention constraint**: `provider: {"zdr": true}` restricts routing to serving routes that do not retain prompt or completion content. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
 
-## What It Does Not Protect
+## Limits
 
-- **Plain TLS is visible inside the attested gateway**: TLS terminates inside the TEE. E2EE (end-to-end encryption) adds field-level encryption to a gateway key, but it still decrypts inside that verified gateway.
-- **Routed models expose prompts to third parties**: For routed models, the gateway forwards to an un-attested provider. The receipt records that the upstream was not verified. Requesting [zero data retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention) constrains whether such a provider stores your prompt, not whether it sees it.
-- **The gateway cannot make arbitrary upstreams confidential**: A provider is confidential only when the gateway has a provider-specific verifier and an enforceable binding.
-- **Receipts are not a permanent public log**: Treat receipt availability as operational retention, not immutable public storage.
+- **Plaintext is processed in the gateway TEE**: TLS terminates there. Field-level [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption) encrypts to an attested gateway key and decrypts inside that gateway.
+- **Upstream coverage varies**: Some verifiers cover a model CVM, others a router or broker. Read the cited session's claims; gateway attestation does not independently attest every upstream model worker, GPU link, or model weight.
+- **Client verification is explicit**: Ordinary clients do not verify the quote, pin TLS to the attested key, or audit receipts. Use the [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
+- **Receipts are not a permanent public log**: Fetch them promptly and archive them if durable evidence is required.
+- **Local tools remain separate**: Agent tools, MCP servers, browser automation, and telemetry can expose data outside the inference boundary.
 
-## Where Plaintext Exists
+## Where plaintext exists
 
-| Stage | Who can see plaintext |
+| Stage | Plaintext boundary |
 | --- | --- |
-| Client to gateway | TLS protects the connection. With E2EE, selected fields are encrypted to the gateway's attested key. |
-| Inside gateway TEE | The attested gateway, after TLS termination or E2EE decryption. |
-| Gateway to confidential upstream | The verified, channel-bound upstream enclave. |
-| Gateway to routed upstream | The third-party provider over ordinary TLS. |
+| Client to gateway | TLS protects transit; optional E2EE protects selected fields to the gateway's attested key. |
+| Inside gateway TEE | The attested workload processes the request after TLS termination or E2EE decryption. |
+| Gateway to provider | TLS pinned to a verified key or provider-specific E2EE binds the outgoing channel. |
+| Inside provider | Depends on the verified model-instance, router, or broker boundary and the session's evidence. |
 
-## Choosing a Model
+## Apply a policy
 
-- Use a confidential response when the upstream model provider must be attested. Confirm it from the receipt: `upstream.verified.result` is `verified` and `required` is `true`.
-- Add [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption) when you want field-level encryption to a key from the attested gateway keyset.
-- Use a routed model only when you accept that the upstream provider sees the prompt.
-- Add [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention) when the upstream provider must not retain prompt or completion content after serving.
+Verify the receipt and its session, then require the claims your workload needs. Add a compose allowlist from authenticated release metadata when you need reviewed gateway releases. Add zero data retention when post-request storage matters. Use a custom GPU TEE deployment when you need control over the complete serving workload.
 
 ## Related
 

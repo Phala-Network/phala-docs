@@ -1,103 +1,60 @@
 ---
 title: Attestation
-description: Learn how to verify the ACI gateway attestation report for Private AI.
+description: Verify the Phala gateway's TDX evidence, nonce-bound keyset, expiry, and measured compose.
 ---
 
-## What the attestation report proves
+The attestation report describes the **Phala gateway**, rather than every upstream model's execution environment. It publishes the gateway's receipt-signing, TLS, and E2EE keys. Upstream evidence is in the [attested session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions) cited by a response receipt, and its coverage varies by provider.
 
-The attestation report is the gateway's proof of identity. It proves the API is served by a specific workload running inside a genuine TEE and publishes the public keys used to sign receipts and support end-to-end encryption.
+## Inspect the report
 
-Fetch it before trusting receipts:
+The endpoint is public. Generate a fresh 32-byte nonce, encoded as exactly 64 lowercase hex characters:
 
 ```bash
-export PHALA_AI_API_KEY="<API_KEY>"
-export BASE="https://inference.phala.com"
-export NONCE="$(openssl rand -hex 32)"
-
-curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+NONCE=$(openssl rand -hex 32)
+curl --fail-with-body -sS "https://inference.phala.com/v1/aci/attestation?nonce=$NONCE" \
   -o report.json
-```
 
-## What to inspect first
-
-```bash
-jq '{api_version, workload_id, workload_keyset_digest,
+jq '{api_version, workload_keyset_digest,
      report_data: .attestation.report_data,
-     stale_after: .attestation.freshness.stale_after,
+     not_after: .attestation.workload_keyset.not_after,
      provenance: .attestation.source_provenance}' report.json
 ```
 
-Check that:
+These commands inspect the document. They do not verify a hardware quote, the nonce binding, or a receipt signature. Applications should use [`connectAci()`](/phala-cloud/confidential-ai/verify/typescript-sdk); agent tools can use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
 
-- `api_version` is `aci/1`.
-- `attestation.freshness.stale_after` is in the future.
-- `workload_id` and `workload_keyset_digest` are present; receipts must cite the same values.
-- `attestation.source_provenance` matches the gateway release you trust.
-- `attestation.report_data` is bound to your nonce and the published keyset.
+## Report fields
 
-## What the report contains
-
-| Field | What it proves |
+| Field | Meaning |
 | --- | --- |
-| `workload_id` | Stable identity of the gateway workload. |
-| `workload_keyset_digest` | Digest over the published keyset. Receipts cite this value. |
-| `attestation.tee_type` | TEE technology, for example `tdx`. |
-| `attestation.evidence.quote` | Hardware-signed TDX quote. This is the root of trust. |
-| `attestation.report_data` | Value bound into the quote, committing to the nonce and keyset. |
-| `attestation.workload_keyset` | Workload identity, receipt signing keys, E2EE (end-to-end encryption) public keys, TLS keys, and keyset epoch. |
-| `attestation.keyset_endorsement` | Signature over the keyset under the workload identity key. |
-| `attestation.source_provenance` | Source repo, commit, image digest, and image provenance when available. |
-| `attestation.freshness` | Fetch and expiry timestamps. |
-| `service_capabilities` | Runtime capabilities such as supported E2EE versions. |
+| `api_version` | `aci/1`. |
+| `workload_keyset_digest` | `sha256:` digest of the RFC 8785 JCS form of the complete published keyset. |
+| `attestation.tee_type` | TEE technology, currently `tdx` for this gateway. |
+| `attestation.workload_keyset` | `subject`, `not_after`, `receipt_signing_keys`, `e2ee_public_keys`, and `tls_public_keys`. |
+| `attestation.report_data` | Digest of the nonce/keyset statement bound into the quote. |
+| `attestation.evidence` | Quote, report data, boot event log, VM configuration, `app_compose`, key custody, and downstream TLS binding. |
+| `attestation.source_provenance` | Workload-declared source/build labels; these are not a trust root. |
+| `service_capabilities` | Supported E2EE extension versions and `serving: "aggregator"`. |
 
-## Verification steps
+The published receipt key uses `algo: "ed25519"` and `key_id: "dstack-kms-receipt-ed25519-v1"`. Select the key from the verified report rather than hardcoding its public key.
 
-### 1. Verify the TEE quote
+## Verification procedure
 
-Verify `attestation.evidence.quote` against Intel DCAP collateral and confirm the quote's report data matches `attestation.report_data`.
+1. **Verify the TDX quote.** Verify `attestation.evidence.quote` against Intel DCAP collateral, inspect TCB status, and apply your OS and key-custody policy. A local verifier such as [dcap-qvl](https://github.com/Phala-Network/dcap-qvl) can verify Intel evidence; the [ACI SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) also applies the dstack policy.
+2. **Recompute the keyset digest.** Canonicalize the complete `attestation.workload_keyset` with JCS (RFC 8785), hash those bytes with SHA-256, prefix the lowercase hex digest with `sha256:`, and require equality with `workload_keyset_digest`. Sorting keys with `jq` is not a general JCS implementation.
+3. **Check nonce binding.** Build this exact statement with the recomputed digest and your nonce, without whitespace and in this field order:
 
-You can use Phala's public verification service for TDX quote decoding:
+   ```text
+   {"keyset_digest":"sha256:<hex>","nonce":"<64 lowercase hex>","purpose":"aci.report_data.v1"}
+   ```
 
-```bash
-jq -r '.attestation.evidence.quote' report.json > quote.txt
+   Require its SHA-256 digest to equal `attestation.report_data` and the quote's first 32 report-data bytes, with the remaining 32 bytes zero. A report fetched without a nonce does not establish freshness.
+4. **Check expiry.** Require `attestation.workload_keyset.not_after` to be a future Unix timestamp under your policy. Reject implausibly distant expiry. Receipts must cite this verified `workload_keyset_digest` and a receipt key in this keyset.
+5. **Replay measured evidence.** Replay the boot event log to the quote's RTMR3. Confirm the measured `compose-hash` equals `sha256(app_compose)`. Inspect the measured launcher/configuration path that selects the gateway release.
+6. **Apply release policy.** For reviewed-release enforcement, compare the measured compose hash against an independently obtained, authenticated allowlist. `source_provenance.repo_url` and `repo_commit` are inspection labels; trusting them without measured corroboration does not establish a reviewed release. Pair compose appraisal with a dstack verifier result for the same quote and require `is_valid: true`.
+7. **Bind the client channel before sending traffic.** Pin hostname-validated TLS to the SPKI listed for `inference.phala.com` in the attested keyset. The TypeScript SDK and Private AI Proxy implement this step.
 
-curl -s https://cloud-api.phala.com/api/v1/attestations/verify \
-  -H "Content-Type: application/json" \
-  -d "{\"hex\":\"$(cat quote.txt)\"}"
-```
-
-For local verification, use an Intel DCAP verifier such as [dcap-qvl](https://github.com/Phala-Network/dcap-qvl). For manual inspection, paste the quote into the [TEE Attestation Explorer](https://proof.t16z.com/).
-
-### 2. Verify nonce and keyset binding
-
-The quote's report data must commit to the nonce you generated and to the gateway keyset. This prevents replay and proves the receipt-signing keys belong to the attested workload.
-
-At a high level, your verifier should:
-
-1. Canonicalize the `workload_keyset`.
-2. Recompute the expected keyset digest.
-3. Confirm the quote report data binds that digest and your `NONCE`.
-4. Confirm `workload_keyset_digest` matches the recomputed digest.
-
-### 3. Verify the keyset endorsement
-
-Verify `attestation.keyset_endorsement` under `attestation.workload_keyset.workload_identity`. This ties the receipt signing keys and E2EE keys to the attested workload identity.
-
-Receipts are only valid when their signatures verify under a key from `attestation.workload_keyset.receipt_signing_keys`.
-
-### 4. Check freshness and provenance
-
-`attestation.freshness.stale_after` must be in the future when you verify. In production, compare `attestation.source_provenance.repo_url`, `repo_commit`, and image provenance against the release or source code you are willing to trust.
-
-### 5. Handle multi-instance deployments
-
-The top-level `attestation` is the instance that answered your request. `all_attestations` lists other instances behind the same service. When verifying a receipt, match the receipt's `workload_id` and `workload_keyset_digest` against the attestation for the instance that signed it.
+A valid hardware quote alone does not verify a particular response. Continue with [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
 
 ## Legacy compatibility
 
-`GET /v1/attestation/report` remains available for older clients. It returns the gateway attestation in a compatibility response shape and may include top-level signer fields such as `signing_address`. New integrations should use `GET /v1/aci/attestation`.
-
-## Next step
-
-After you verify the gateway report, [verify a response](/phala-cloud/confidential-ai/verify/verify-signature) by checking a signed receipt.
+`GET /v1/attestation/report?nonce=…` returns the gateway report with compatibility signer fields. `signing_algo=ecdsa` (default) or `ed25519` selects the legacy signer. New integrations should use `/v1/aci/attestation` and the keyset directly.

@@ -1,52 +1,36 @@
 ---
 title: Overview
-description: Learn how to verify Private AI gateway attestation, signed receipts, and upstream provider verification.
+description: Verify Phala gateway attestation, pinned TLS, signed receipts, and upstream evidence.
 ---
 
-## Why verification matters
+Private AI verification connects the gateway's hardware evidence to the exact request and response bytes. The attestation report identifies the **Phala gateway**. The response receipt cites a verified upstream session, whose evidence coverage varies by provider.
 
-Private AI verification answers two questions:
+Every model on `https://inference.phala.com/v1` uses the TEE-only serving policy: upstream verification and channel binding are required before forwarding. A failed check refuses the request. Ordinary clients still need a verification client to check this from their own machine.
 
-- **Who served my request?** The gateway attestation report proves the API was served by a specific workload running in a genuine TEE.
-- **What happened to my request?** The signed receipt binds your request and response hashes to that attested workload and records whether the upstream model provider was verified.
+## Start with a verification client
 
-For confidential responses, the receipt also shows that the upstream provider was verified and channel-bound before your prompt was forwarded. For routed responses, the gateway is still attested, but the upstream provider is not.
+- For Node.js or Bun, use the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk): `connectAci()`, the scoped `aci.fetch`, and `verifyReceipt()` after each response.
+- For coding agents, use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy): attestation and pinned TLS before traffic, receipt audits after delivery.
+- Use [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature) to understand the checks and inspect existing artifacts. cURL and `jq` inspection alone does not verify them.
 
 ## Verification workflow
 
 <Steps>
-  <Step title="Fetch gateway attestation">
-    Generate a fresh nonce and call `GET /v1/aci/attestation`. Verify the TEE quote, keyset endorsement, freshness, and source provenance.
+  <Step title="Verify the gateway before traffic">
+    Generate a fresh nonce, verify the TDX quote and JCS keyset digest, check `not_after`, replay RTMR3 and the measured compose hash, and apply your release policy. Source labels alone are not a trust root.
   </Step>
-  <Step title="Make an inference request">
-    Call an OpenAI-compatible endpoint such as `POST /v1/chat/completions` and capture the `x-receipt-id` header.
+  <Step title="Pin the request channel">
+    Use hostname-validated TLS pinned to the SPKI listed for `inference.phala.com` in the verified keyset.
   </Step>
-  <Step title="Fetch the signed receipt">
-    Call `GET /v1/aci/receipts/{id}`. Confirm the receipt's `workload_id` and `workload_keyset_digest` match the attestation report.
+  <Step title="Verify the receipt">
+    Match `workload_keyset_digest`, verify the receipt signature under its `key_id`, and compare `request.received.body_hash` and `response.returned.body_hash` with the exact bytes exchanged.
   </Step>
-  <Step title="Verify hashes and upstream status">
-    Check request and response hashes, verify the receipt signature against the attested keyset, and read `upstream.verified`.
+  <Step title="Audit the cited upstream session">
+    Require `upstream.verified.result: verified` and `required: true`. Recompute the full session's content address and verify its evidence, channel binding, and claims under your policy.
   </Step>
 </Steps>
 
-```mermaid
-flowchart TD
-  A[Generate nonce] --> B[GET /v1/aci/attestation]
-  B --> C[Verify TEE quote and keyset]
-  C --> D[POST /v1/chat/completions]
-  D --> E[Read x-receipt-id]
-  E --> F[GET /v1/aci/receipts/id]
-  F --> G[Match workload id and keyset digest]
-  G --> H[Verify receipt signature and hashes]
-  H --> I[Read upstream.verified]
-```
-
-## What a passing verification proves
-
-- The gateway is a genuine TEE workload with a known identity.
-- The receipt was signed by a key published in the attested gateway keyset.
-- The response bytes you received match the response hash in the receipt.
-- For a confidential response, the upstream provider was verified and the request channel was bound before forwarding.
+A passing audit proves the exchange used the attested gateway and cited upstream channel. It proves a reviewed release only with an independently obtained compose allowlist. It does not imply that every provider proves GPU binding, model-weight provenance, or the same software measurements.
 
 ## Canonical and legacy endpoints
 
@@ -59,30 +43,8 @@ flowchart TD
 Use the canonical `/v1/aci/*` endpoints for new integrations.
 
 <CardGroup cols={2}>
-  <Card
-    icon="shield-check"
-    href="/phala-cloud/confidential-ai/verify/verify-attestation"
-    title="Verify Attestation"
-    arrow="true"
-  >
-    Understand the attestation report, nonce binding, gateway keyset, and source provenance.
-  </Card>
-
-  <Card
-    icon="receipt"
-    href="/phala-cloud/confidential-ai/verify/verify-signature"
-    title="Verify a Response"
-    arrow="true"
-  >
-    Verify a signed receipt, response hashes, and confidential upstream status.
-  </Card>
-
-  <Card
-    icon="code"
-    href="/phala-cloud/confidential-ai/verify/typescript-sdk"
-    title="TypeScript ACI Verifier"
-    arrow="true"
-  >
-    Use a verified Node.js or Bun transport and audit signed receipts in code.
-  </Card>
+  <Card title="Attestation" icon="shield-check" href="/phala-cloud/confidential-ai/verify/verify-attestation" />
+  <Card title="Verify a Response" icon="receipt" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+  <Card title="TypeScript ACI Verifier" icon="code" href="/phala-cloud/confidential-ai/verify/typescript-sdk" />
+  <Card title="Private AI Proxy" icon="lock" href="/phala-cloud/confidential-ai/agents/private-ai-proxy" />
 </CardGroup>

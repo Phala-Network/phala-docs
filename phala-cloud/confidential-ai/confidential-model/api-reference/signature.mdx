@@ -11,13 +11,17 @@ New integrations should use `GET /v1/aci/receipts/{id}`.
 ## Endpoint
 
 ```bash
-GET https://inference.phala.com/v1/signature/{id}
+GET https://inference.phala.com/v1/signature/{id}?signing_algo=ecdsa
 ```
 
 ## Parameters
 
 <ParamField path="id" type="string" required>
   Receipt id (`rcpt-...`) or response id from `POST /v1/chat/completions`.
+</ParamField>
+
+<ParamField query="signing_algo" type="string" default="ecdsa">
+  Legacy wrapper signature algorithm: `ecdsa` (default) or `ed25519`. This selects the wrapper signer; the canonical receipt retains its own `key_id` and Ed25519 signature.
 </ParamField>
 
 ## Example
@@ -58,9 +62,9 @@ curl "https://inference.phala.com/v1/signature/$RECEIPT_OR_RESPONSE_ID" \
 For new clients, verify the `receipt` object directly:
 
 1. Fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
-2. Confirm `receipt.workload_id` and `receipt.workload_keyset_digest` match the report.
-3. Verify `receipt.signature` under a `receipt_signing_keys` entry from the attested keyset.
-4. Confirm the request and response hashes in `receipt.event_log` match the bytes you sent and received.
+2. Confirm `receipt.workload_keyset_digest` matches the report.
+3. Resolve `receipt.key_id` in the attested `receipt_signing_keys` and verify `receipt.signature` over the JCS receipt with `signature` removed. The canonical receipt uses `ed25519` (`dstack-kms-receipt-ed25519-v1`), independently of the wrapper's `signing_algo`.
+4. Confirm `request.received.body_hash` and `response.returned.body_hash` match the exact bytes you sent and received. On this TEE-only endpoint, require `upstream.verified.result: verified`, `required: true`, and a verified cited session.
 
 For legacy clients that verify the wrapper, also verify `signature` over `text`, then bind `signing_address` back to a fresh attestation report.
 

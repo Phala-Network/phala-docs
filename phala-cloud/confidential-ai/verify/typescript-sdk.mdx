@@ -41,7 +41,7 @@ try {
   });
 
   const response = await client.chat.completions.create({
-    model: "z-ai/glm-5.2",
+    model: "z-ai/glm-5.3",
     messages: [{ role: "user", content: "Explain attestation." }],
   });
 
@@ -66,7 +66,7 @@ serving in JSON inference requests.
 
 The runtime records the exact request and response wire digests while the body
 is consumed. Call `verifyReceipt()` after the response finishes to fetch and
-verify the latest signed receipt, including its signature, wire hashes,
+verify the latest signed receipt, including its signature, request and response `body_hash` values,
 verified upstream status, and cited session. Pass a receipt id returned by
 `aci.receipts()` to audit another retained exchange.
 

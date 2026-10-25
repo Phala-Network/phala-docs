@@ -10,7 +10,7 @@ Receipts and sessions are the two response-level artifacts you use after verifyi
 
 ## Receipt Lifecycle
 
-Every inference response includes `x-receipt-id`. Fetch it with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts):
+A completed inference response identifies its receipt with `x-receipt-id`. A stream whose headers were committed before the id was allocated may instead require lookup by response id after completion. Fetch it with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts):
 
 ```bash
 curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
@@ -24,7 +24,7 @@ The receipt records ordered events with hashes and facts, not prompt text.
 | `request.received` | Hash of the request body observed by the gateway. |
 | `route.selected` | Selected backend route. |
 | `request.forwarded` | Hash of the provider-facing request. |
-| `upstream.verified` | Provider verification result, channel binding, claims, and `session_id`. |
+| `upstream.verified` | `model_id`, `result`, `required`, and the `session_id` for verification details. |
 | `response.received` | Hash of the provider response before post-processing. |
 | `response.returned` | Hash of the final wire response. |
 
@@ -33,13 +33,15 @@ The receipt records ordered events with hashes and facts, not prompt text.
 A verified receipt proves:
 
 1. The receipt was signed by a key in the attested gateway keyset.
-2. `workload_id` and `workload_keyset_digest` match the attestation report.
-3. The returned response bytes match `response.returned.wire_hash`.
-4. The upstream verification result for that response is recorded.
+2. `workload_keyset_digest` matches the verified attestation report.
+3. The exact request bytes match `request.received.body_hash`, and the returned response bytes match `response.returned.body_hash`.
+4. The required upstream verification result is recorded. On this TEE-only endpoint `required` is `true`; a failed check refuses forwarding.
+
+Receipt signatures cover the JCS form of the full receipt with `signature` removed. Resolve `key_id` in the verified keyset's `receipt_signing_keys`; the Phala key is `dstack-kms-receipt-ed25519-v1` (`ed25519`). Hash comparisons alone do not verify the signature or attestation. Use the [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
 
 ## Streaming Responses
 
-For streaming, `x-receipt-id` can arrive before the stream ends. Fetch the receipt after the stream completes because `response.returned.wire_hash` covers the full response body.
+For streaming, `x-receipt-id` can arrive before the stream ends. Fetch the receipt after the stream completes because `response.returned.body_hash` covers the full response body.
 
 ## Attested Sessions
 
@@ -52,7 +54,7 @@ A session captures:
 - Typed claims and reasons.
 - Evidence digest and evidence payload.
 
-The `session_id` is content-addressed. If the verified material changes, the session id changes.
+The `session_id` is the bare 64-character lowercase SHA-256 digest of the complete session document in JCS form, with no prefix. It is not a field in the full document. If the material changes, the id changes. The list endpoint returns `{ "api_version": "aci/1", "sessions": [...] }`; entries include `session_id` but omit `evidence.data`. Fetch the full record before checking the content address. Filter the list with `?upstream_name=chutes` or `?model=z-ai/glm-5.3`.
 
 ## Trace a Response
 
@@ -62,7 +64,7 @@ receipt  -> upstream.verified.session_id
 session  -> provider identity, binding, claims, evidence
 ```
 
-For most applications, the receipt has enough data to decide whether a response was confidential. Fetch the session when you need deeper audit evidence.
+The receipt records the attested gateway's assertion about the upstream. Independent upstream auditing also verifies the cited session's evidence and binding. Coverage varies by provider; apply the claims your policy requires.
 
 ## Related
 

@@ -7,7 +7,7 @@ OpenClaw speaks Chat Completions. Private AI Proxy configures it automatically.
 
 ## With Private AI Proxy
 
-1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile, sign in, and turn on **Protected**.
 2. On the **Agents** screen, connect **OpenClaw**.
 3. Restart OpenClaw; it reads the native-host provider and local token on start.
 
@@ -33,7 +33,7 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
 
 ```json5 ~/.openclaw/openclaw.json
 {
-  agents: { defaults: { model: { primary: "phala/z-ai/glm-5.2" } } },
+  agents: { defaults: { model: { primary: "phala/z-ai/glm-5.3" } } },
   models: {
     mode: "merge",
     providers: {
@@ -42,7 +42,7 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
         apiKey: "${PHALA_AI_API_KEY}",
         api: "openai-completions",
         models: [
-          { id: "z-ai/glm-5.2", name: "GLM 5.2", reasoning: true, input: ["text"],
+          { id: "z-ai/glm-5.3", name: "GLM 5.2", reasoning: true, input: ["text"],
             contextWindow: 1048576, maxTokens: 131072 },
         ],
       },

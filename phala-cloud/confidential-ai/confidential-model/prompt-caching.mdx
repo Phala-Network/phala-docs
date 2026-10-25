@@ -1,0 +1,29 @@
+---
+title: "Prompt caching"
+description: "Providers that cache a repeated prompt prefix report cached tokens in usage, and Phala bills them at the model's cache rate."
+---
+
+Prompt caching happens at the provider and needs nothing in the request. When a provider serves
+part of a prompt from its cache, the response reports it in `usage`, and the cached tokens are billed
+at `pricing.input_cache_read` when the model lists one, otherwise at the normal prompt rate.
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 1905,
+    "prompt_tokens_details": {"cached_tokens": 1792},
+    "completion_tokens": 64
+  }
+}
+```
+
+To benefit, keep the stable part of a prompt, such as the system message and reference material,
+at the start, and vary only the end. Cache eligibility and prefix thresholds depend on the provider. Which models expose a cache rate is visible in the catalog: look for
+`input_cache_read` in `pricing`.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Billing" icon="credit-card" href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api#billing" />
+  <Card title="Models" icon="layer-group" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models" />
+</CardGroup>

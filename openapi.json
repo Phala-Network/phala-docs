@@ -32665,12 +32665,12 @@
             ],
             "title": "Name",
             "description": "Display name for the API key",
-            "default": "Redpill API Key"
+            "default": "Private AI API Key"
           }
         },
         "type": "object",
         "title": "RedpillApiKeyCreate",
-        "description": "Request body for creating a Redpill API key."
+        "description": "Request body for creating a Private AI API key."
       },
       "RedpillConnectionStatus": {
         "properties": {
@@ -34420,7 +34420,7 @@
                 "type": "null"
               }
             ],
-            "title": "Redpill Credits"
+            "title": "Private AI Credits"
           },
           "credits_line": {
             "type": "number",
@@ -35796,7 +35796,7 @@
           },
           "has_redpill": {
             "type": "boolean",
-            "title": "Has Redpill",
+            "title": "Has Private AI",
             "default": false
           },
           "redpill_post_paid": {
@@ -35808,7 +35808,7 @@
                 "type": "null"
               }
             ],
-            "title": "Redpill Post Paid"
+            "title": "Private AI Post Paid"
           },
           "redpill_connection_id": {
             "anyOf": [
@@ -35819,7 +35819,7 @@
                 "type": "null"
               }
             ],
-            "title": "Redpill Connection Id"
+            "title": "Private AI Connection Id"
           },
           "flag_network_config_enabled": {
             "type": "boolean",
@@ -36143,7 +36143,7 @@
           },
           "has_redpill": {
             "type": "boolean",
-            "title": "Has Redpill",
+            "title": "Has Private AI",
             "default": false
           },
           "redpill_post_paid": {
@@ -36155,7 +36155,7 @@
                 "type": "null"
               }
             ],
-            "title": "Redpill Post Paid"
+            "title": "Private AI Post Paid"
           },
           "redpill_connection_id": {
             "anyOf": [
@@ -36166,7 +36166,7 @@
                 "type": "null"
               }
             ],
-            "title": "Redpill Connection Id"
+            "title": "Private AI Connection Id"
           },
           "flag_network_config_enabled": {
             "type": "boolean",
@@ -41448,7 +41448,7 @@
           "confidential_models_enabled": {
             "type": "boolean",
             "title": "Confidential Models Enabled",
-            "description": "Whether Confidential Models (Redpill) is enabled",
+            "description": "Whether Private AI is enabled",
             "default": false
           }
         },

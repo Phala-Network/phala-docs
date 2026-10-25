@@ -27,7 +27,7 @@ flowchart TD
   B -->|No| D[Reject before forwarding]
 ```
 
-For a routed model, `required` is `false`. The gateway can forward over ordinary TLS, and the receipt records `upstream.verified.result = failed`.
+On the Phala TEE-only endpoint, `required` is `true` for every routed request. A failed verification refuses forwarding; it does not fall back to an unverified provider.
 
 ## How to Confirm Binding
 
@@ -35,8 +35,10 @@ You do not enforce the provider binding from your client. You verify that the ga
 
 1. Verify the [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
 2. Fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts).
-3. Read `upstream.verified.channel_bindings` and confirm `result: verified`, `required: true`, and a `session_id`.
-4. Fetch the [Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions) for deeper evidence when needed.
+3. Verify the receipt signature and exact request/response `body_hash` values; require `upstream.verified.result: verified`, `required: true`, and a `session_id`.
+4. Fetch the full [Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions), verify its content address and evidence, and inspect `channel_binding` under your policy.
+
+The [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) and [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) implement client-side checks. cURL inspection alone does not establish channel binding.
 
 ## Related
 

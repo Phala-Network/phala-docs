@@ -16,7 +16,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 <ParamField body="model" type="string" required>
   Model ID to use for completion.
 
-  Example: `z-ai/glm-5.2`. Use an id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+  Example: `z-ai/glm-5.3`. Use an id returned by [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
 </ParamField>
 
 <ParamField body="messages" type="array" required>
@@ -71,7 +71,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 
   Find models that can satisfy `zdr` ahead of time with [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters). See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
 
-  **`aci_verified`** (boolean): set `true` to route only to an upstream the gateway verified inside the TEE before sending the prompt. `false`, or omitting the field, applies no attestation constraint.
+  **`aci_verified`** (boolean): set `true` to route only to an upstream the gateway verified inside the TEE before sending the prompt. `false`, or omitting the field, adds no request-level constraint; the Phala TEE-only endpoint still requires verified serving.
 
   ```json
   {"provider": {"aci_verified": true}}
@@ -82,7 +82,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
   **`aci_session_ids`** (array of strings): restrict the request further to specific attested channels, identified by the session ids from [`GET /v1/aci/sessions`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). Any one of the listed ids may serve the request; if none matches a currently verified channel, the request returns `503`.
 
   ```json
-  {"provider": {"aci_verified": true, "aci_session_ids": ["as_2a44...6290"]}}
+  {"provider": {"aci_verified": true, "aci_session_ids": ["2a442c6ba4407b583152949de6331e7a5aa7df7285f7aa9dce810e5e241862902a44"]}}
   ```
 
   Session ids imply `aci_verified`. Passing them with `"aci_verified": false` returns `400`, as does an empty array or a non-string entry. Both fields are read by the gateway and removed before the request reaches a provider. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
@@ -96,7 +96,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <API_KEY>" \
   -d '{
-    "model": "z-ai/glm-5.2",
+    "model": "z-ai/glm-5.3",
     "messages": [
       {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
     ]
@@ -112,7 +112,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="z-ai/glm-5.2",
+    model="z-ai/glm-5.3",
     messages=[
         {"role": "user", "content": "What privacy guarantees does GPU TEE provide?"}
     ],
@@ -130,7 +130,7 @@ const client = new OpenAI({
 });
 
 const response = await client.chat.completions.create({
-  model: "z-ai/glm-5.2",
+  model: "z-ai/glm-5.3",
   messages: [
     { role: "user", content: "What privacy guarantees does GPU TEE provide?" },
   ],
@@ -147,7 +147,7 @@ console.log(response.choices[0].message.content);
   "id": "chatcmpl-123",
   "object": "chat.completion",
   "created": 1677652288,
-  "model": "z-ai/glm-5.2",
+  "model": "z-ai/glm-5.3",
   "choices": [
     {
       "index": 0,

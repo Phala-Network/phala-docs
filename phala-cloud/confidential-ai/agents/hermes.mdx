@@ -7,7 +7,7 @@ Hermes speaks Chat Completions. Private AI Proxy configures it automatically.
 
 ## With Private AI Proxy
 
-1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile, sign in, and turn on **Protected**.
 2. On the **Agents** screen, connect **Hermes**.
 3. Start a new Hermes session; existing sessions stay on their original provider.
 
@@ -37,12 +37,12 @@ providers:
     api: https://inference.phala.com/v1
     key_env: PHALA_AI_API_KEY
     transport: chat_completions
-    default_model: z-ai/glm-5.2
+    default_model: z-ai/glm-5.3
     discover_models: true
 
 model:
   provider: custom:phala
-  default: z-ai/glm-5.2
+  default: z-ai/glm-5.3
 ```
 
 This changes the main text and tool-calling loop only; image, speech, embedding, search, and browser

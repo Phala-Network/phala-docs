@@ -1,0 +1,41 @@
+---
+title: "Reasoning"
+description: "Control how much a model thinks before it answers, and whether the reasoning text is returned."
+---
+
+Reasoning models think before they answer. Ask for more or less of it with the `reasoning` object,
+and choose whether the reasoning text comes back. A model supports it when its
+`supported_features` in [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models) include `reasoning`. Supported effort levels and token budgets depend on the selected model and serving route.
+
+## Set the effort
+
+```json
+{
+  "model": "z-ai/glm-5.3",
+  "messages": [{"role": "user", "content": "What is 17 * 23?"}],
+  "reasoning": {"effort": "low"}
+}
+```
+
+`effort` is one of `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. The OpenAI-style
+`reasoning_effort` field is accepted as an alias; if both are sent they must match.
+
+Instead of an effort, `reasoning.max_tokens` sets a token budget for thinking. The two are
+mutually exclusive, and a model that cannot express a budget returns `400`.
+
+## Read or hide the reasoning
+
+Models that return their reasoning put it in `message.reasoning_content`, or
+`delta.reasoning_content` while streaming. Reasoning text availability depends on the model and provider. When reported,
+`usage.completion_tokens_details.reasoning_tokens` counts the thinking, and it is billed as
+completion tokens.
+
+To keep the reasoning out of the response, send `"reasoning": {"exclude": true}` or
+`"include_reasoning": false`. The tokens are still generated and billed.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Chat completions" icon="code" href="/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions" />
+  <Card title="Billing" icon="credit-card" href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api#billing" />
+</CardGroup>

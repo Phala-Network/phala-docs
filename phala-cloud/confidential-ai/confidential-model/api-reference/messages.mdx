@@ -55,7 +55,7 @@ curl https://inference.phala.com/v1/messages \
   -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "anthropic/claude-sonnet-4.5",
+    "model": "z-ai/glm-5.3",
     "max_tokens": 100,
     "messages": [
       {"role": "user", "content": "Say hello in three words."}
@@ -70,7 +70,7 @@ curl https://inference.phala.com/v1/messages \
   "id": "msg_01ABC...",
   "type": "message",
   "role": "assistant",
-  "model": "anthropic/claude-sonnet-4.5",
+  "model": "z-ai/glm-5.3",
   "content": [
     { "type": "text", "text": "Hello, howdy, hi!" }
   ],

@@ -1,0 +1,188 @@
+---
+title: System One
+description: "Ask a model typed questions about a state and get structured decisions."
+api: "POST /systemone"
+---
+
+System One models answer typed questions about a piece of content instead of generating text. Each
+answer is a calibrated probability, a choice among options, or a level on a scale, so software can
+act on it directly. The endpoint follows the TypeSafe System One protocol, so the official TypeSafe
+SDKs work with Phala by changing the base URL.
+
+System One models list `decisions` in `output_modalities` in [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+They do not serve chat: a chat completion request to one returns `404 model_not_found`. Responses are
+never streamed.
+
+```bash
+POST https://inference.phala.com/v1/systemone
+```
+
+## Request body
+
+<ParamField body="model" type="string" required>
+  Id of a model whose `output_modalities` include `decisions`, for example `jaredpalmer/kev-4b`.
+</ParamField>
+
+<ParamField body="state" type="string | object | array" required>
+  The content the questions are about: a message, a document, or any JSON value.
+</ParamField>
+
+<ParamField body="questions" type="object" required>
+  Questions keyed by an id you choose. Each answer is returned under the same id. Every question
+  has a `type` and usually `instructions` that state the question.
+
+  <Expandable title="question types">
+    <ResponseField name="noul" type="object">
+      A yes/no question. `criteria` optionally describes what `true` and `false` mean.
+
+      ```json
+      { "type": "noul", "instructions": "Is this about billing?" }
+      ```
+    </ResponseField>
+    <ResponseField name="choice" type="object">
+      Pick one option. `criteria` maps each option to a description, or to `null`.
+
+      ```json
+      {
+        "type": "choice",
+        "instructions": "What is the tone?",
+        "criteria": { "calm": null, "upset": null }
+      }
+      ```
+    </ResponseField>
+    <ResponseField name="score" type="object">
+      Rate on an ordered scale. `criteria` lists the levels from lowest to highest.
+
+      ```json
+      {
+        "type": "score",
+        "instructions": "How urgent is it?",
+        "criteria": ["low", "medium", "high"]
+      }
+      ```
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="provider" type="object">
+  The same `provider` routing block as chat completions. It is used for routing and is not sent to
+  the upstream.
+</ParamField>
+
+Other fields are not forwarded.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl https://inference.phala.com/v1/systemone \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "jaredpalmer/kev-4b",
+    "state": "I was charged twice this month. Please fix it today.",
+    "questions": {
+      "billing": { "type": "noul", "instructions": "Is this about billing?" },
+      "tone": {
+        "type": "choice",
+        "instructions": "What is the tone?",
+        "criteria": { "calm": null, "upset": null }
+      },
+      "urgency": {
+        "type": "score",
+        "instructions": "How urgent is it?",
+        "criteria": ["low", "medium", "high"]
+      }
+    }
+  }'
+```
+
+```python Python
+import os
+from typesafe_sdk import Choice, Noul, Score, TypeSafeClient
+
+client = TypeSafeClient(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com",
+    model="jaredpalmer/kev-4b",
+)
+
+result = client.system_one(
+    state="I was charged twice this month. Please fix it today.",
+    questions={
+        "billing": Noul(instructions="Is this about billing?"),
+        "tone": Choice(instructions="What is the tone?", criteria={"calm": None, "upset": None}),
+        "urgency": Score(instructions="How urgent is it?", criteria=["low", "medium", "high"]),
+    },
+)
+print(result.nouls["billing"].noul, result.choices["tone"].choice, result.scores["urgency"].score)
+```
+
+```javascript JavaScript
+import { TypeSafeClient, choice, noul, score } from "@typesafe-ai/sdk";
+
+const client = new TypeSafeClient({
+  baseURL: "https://inference.phala.com",
+  apiKey: process.env.PHALA_AI_API_KEY,
+});
+
+const result = await client.systemOne({
+  model: "jaredpalmer/kev-4b",
+  state: "I was charged twice this month. Please fix it today.",
+  questions: {
+    billing: noul("Is this about billing?"),
+    tone: choice("What is the tone?", { calm: null, upset: null }),
+    urgency: score("How urgent is it?", ["low", "medium", "high"]),
+  },
+});
+console.log(result.answers.billing.noul, result.answers.tone.choice, result.answers.urgency.score);
+```
+
+</CodeGroup>
+
+The SDKs append `/v1/systemone` themselves, so set their base URL to `https://inference.phala.com`
+without `/v1`. Install them with `pip install typesafe-sdk` or `npm install @typesafe-ai/sdk`.
+
+## Response
+
+```json
+{
+  "model": "jaredpalmer/kev-4b",
+  "answers": {
+    "billing": { "type": "noul", "noul": 0.8828 },
+    "tone": {
+      "type": "choice",
+      "choice": "upset",
+      "confidence": 0.4882,
+      "probabilities": { "calm": 0.2559, "upset": 0.7441 }
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.4055,
+      "legend": { "0": "low", "1": "medium", "2": "high" },
+      "probabilities": { "0": 0.1268, "1": 0.3408, "2": 0.5323 },
+      "confidence": 0.1083
+    }
+  },
+  "usage": { "input_tokens": 57, "output_tokens": 167, "cost": 0.000002394 }
+}
+```
+
+<ResponseField name="answers" type="object">
+  One answer per question id, in the same type as the question:
+
+- `noul`: `noul` is the probability that the answer is `true`.
+- `choice`: `choice` is the most likely option, with `probabilities` per option and a 0 to 1
+    `confidence`.
+- `score`: `score` is the probability-weighted level index, with `probabilities` per level,
+    `legend` mapping each index to its level, and a 0 to 1 `confidence`.
+</ResponseField>
+
+<ResponseField name="usage" type="object">
+  `input_tokens`, `output_tokens`, and `cost`, the charge for this request in USD.
+</ResponseField>
+
+The response carries `x-typesafe-request-id`, which the SDKs read, and the gateway's `x-receipt-id`
+for [receipt verification](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). Errors use the same error format as the other
+endpoints.

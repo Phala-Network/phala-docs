@@ -29,7 +29,7 @@ Read [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boun
 | Storage limitation | Zero-data-retention providers do not keep prompt or completion content after serving a request. |
 | Confidential processing | TEE isolation and attestation provide verifiable runtime identity. |
 | Audit evidence | Attestation reports, receipts, sessions, and source provenance can be retained by the customer. |
-| Provider separation | Receipts distinguish confidential upstreams from routed third-party providers. |
+| Provider separation | Receipts cite the verified upstream session; its claims describe provider-specific evidence coverage. |
 
 For regulated data, use confidential responses and verify `upstream.verified.result = verified`, `required = true`, and the provider claims your policy requires.
 
@@ -46,7 +46,7 @@ Every gateway attestation report includes `attestation.source_provenance`:
 }
 ```
 
-Use these fields to compare the running workload against the source release you are willing to trust.
+These are workload-declared inspection labels, not a trust root. Replay the measured event log to RTMR3, match `sha256(app_compose)` to the measured compose hash, and require an independently obtained compose allowlist for reviewed-release enforcement. See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
 
 ## Relevant Repositories
 
@@ -62,7 +62,7 @@ Use these fields to compare the running workload against the source release you 
 ## What to Audit
 
 - Attestation report generation and nonce binding.
-- Keyset endorsement and receipt signing keys.
+- JCS keyset digest, expiry, key custody, and receipt signing keys.
 - Provider verification and channel binding.
 - Receipt event log construction.
 - Fail-closed behavior when confidential upstream verification is required.
