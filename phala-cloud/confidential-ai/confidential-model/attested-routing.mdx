@@ -25,7 +25,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "z-ai/glm-5.2",
+    "model": "z-ai/glm-5.3",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {"aci_verified": true}
   }'
@@ -57,7 +57,7 @@ A request that requires an attested upstream cannot also opt out of the attestat
 List the sessions that can serve your model. The unfiltered list covers every upstream the gateway has verified, so filter it: a session belonging to another upstream will never match your request.
 
 ```bash
-curl -s "https://inference.phala.com/v1/aci/sessions?model=z-ai/glm-5.2" \
+curl -s "https://inference.phala.com/v1/aci/sessions?model=z-ai/glm-5.3" \
   -H "Authorization: Bearer <API_KEY>" \
   | jq -r '.sessions[] | "\(.session_id)  \(.upstream_name)  \(.endpoint)"'
 ```
@@ -73,7 +73,7 @@ curl https://inference.phala.com/v1/chat/completions \
   -H "Authorization: Bearer <API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "z-ai/glm-5.2",
+    "model": "z-ai/glm-5.3",
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {
       "aci_verified": true,
@@ -87,7 +87,7 @@ Listing several ids means any one of them may serve the request. If none of them
 ```json
 {
   "error": {
-    "message": "upstream verification failed: none of the requested attested sessions is available for model z-ai/glm-5.2",
+    "message": "upstream verification failed: none of the requested attested sessions is available for model z-ai/glm-5.3",
     "type": "service_unavailable"
   }
 }

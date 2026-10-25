@@ -37,7 +37,11 @@ export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
       "baseUrl": "https://inference.phala.com/v1",
       "api": "openai-completions",
       "apiKey": "$PHALA_AI_API_KEY",
-      "models": [{ "id": "z-ai/glm-5.2" }]
+      "models": [{
+        "id": "z-ai/glm-5.3",
+        "contextWindow": 1048576,
+        "maxTokens": 1048576
+      }]
     }
   }
 }

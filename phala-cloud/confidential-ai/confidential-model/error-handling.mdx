@@ -54,7 +54,7 @@ client = OpenAI(
 
 try:
     response = client.chat.completions.create(
-        model="z-ai/glm-5.2",
+        model="z-ai/glm-5.3",
         messages=[{"role": "user", "content": "Hello"}],
     )
 except AuthenticationError:

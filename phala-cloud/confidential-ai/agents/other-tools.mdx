@@ -10,7 +10,7 @@ For tools that support an OpenAI-compatible provider, use:
 | Provider type | OpenAI compatible |
 | Base URL | `https://inference.phala.com/v1` |
 | API key | Your Phala API key |
-| Model | `z-ai/glm-5.2`, or another chat model from [`/v1/models`](https://inference.phala.com/v1/models) |
+| Model | `z-ai/glm-5.3`, or another chat model from [`/v1/models`](https://inference.phala.com/v1/models) |
 
 Create a key under **Private AI → API Keys** in the Phala dashboard. For the shell examples below, set `PHALA_AI_API_KEY` in your local environment.
 
@@ -25,9 +25,9 @@ name: Phala
 version: 0.0.1
 schema: v1
 models:
-  - name: Phala GLM 5.2
+  - name: Phala GLM 5.3
     provider: openai
-    model: z-ai/glm-5.2
+    model: z-ai/glm-5.3
     apiBase: https://inference.phala.com/v1
     apiKey: YOUR_PHALA_API_KEY
 ```
@@ -44,7 +44,7 @@ Add this provider under `language_models` in your settings file using Zed's [Ope
         "api_url": "https://inference.phala.com/v1",
         "available_models": [
           {
-            "name": "z-ai/glm-5.2",
+            "name": "z-ai/glm-5.3",
             "max_tokens": 1048576
           }
         ]
@@ -56,7 +56,7 @@ Add this provider under `language_models` in your settings file using Zed's [Ope
 
 ## GitHub Copilot (VS Code BYOK)
 
-Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example reserves 65,536 tokens for output:
+Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example uses the model's context window from the catalog and reserves 65,536 tokens for output, within the model's 1,048,576-token output maximum:
 
 ```json
 [
@@ -66,8 +66,8 @@ Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**,
     "apiKey": "${input:phalaApiKey}",
     "models": [
       {
-        "id": "z-ai/glm-5.2",
-        "name": "Phala GLM 5.2",
+        "id": "z-ai/glm-5.3",
+        "name": "Phala GLM 5.3",
         "url": "https://inference.phala.com/v1/chat/completions",
         "toolCalling": true,
         "contextWindow": 1048576,
@@ -87,7 +87,7 @@ Use Aider's [OpenAI-compatible endpoint](https://aider.chat/docs/llms/openai-com
 ```bash
 export OPENAI_API_BASE="https://inference.phala.com/v1"
 export OPENAI_API_KEY="$PHALA_AI_API_KEY"
-aider --model openai/z-ai/glm-5.2
+aider --model openai/z-ai/glm-5.3
 ```
 
 ## Goose
@@ -114,7 +114,7 @@ Save the following as `phala.json` in Goose's [`custom_providers` directory](htt
 }
 ```
 
-With `PHALA_AI_API_KEY` set, run `goose configure`, choose **Configure Providers → Phala**, and select `z-ai/glm-5.2`. Dynamic discovery also lists the non-chat `jaredpalmer/kev-4b` decision model; choose a chat model.
+With `PHALA_AI_API_KEY` set, run `goose configure`, choose **Configure Providers → Phala**, and select `z-ai/glm-5.3`. Dynamic discovery also lists the non-chat `jaredpalmer/kev-4b` decision model; choose a chat model.
 
 ## AnythingLLM
 
@@ -123,13 +123,13 @@ In **Settings → AI Providers → LLM**, select **Generic OpenAI** and enter th
 ```text
 Base URL: https://inference.phala.com/v1
 API Key: Your Phala API key
-Selected Model: z-ai/glm-5.2
+Selected Model: z-ai/glm-5.3
 Model context window: 1048576
 ```
 
 ## Cherry Studio
 
-Open **Settings → Model Services → + Add Provider** and add a [custom provider](https://docs.cherryai.com.cn/docs/en-us/pre-basic/providers/zi-ding-yi-fu-wu-shang) with the values below. Enter the base URL in the OpenAI-compatible endpoint/API address row. Select **Add**, then **Get model list** and add `z-ai/glm-5.2`:
+Open **Settings → Model Services → + Add Provider** and add a [custom provider](https://docs.cherryai.com.cn/docs/en-us/pre-basic/providers/zi-ding-yi-fu-wu-shang) with the values below. Enter the base URL in the OpenAI-compatible endpoint/API address row. Select **Add**, then **Get model list** and add `z-ai/glm-5.3`:
 
 ```text
 Provider Name: Phala
@@ -139,7 +139,7 @@ Base URL: https://inference.phala.com/v1
 
 ## LobeHub
 
-Open **App Settings → AI Providers** and create a [custom AI provider](https://lobehub.com/changelog/2025-01-22-new-ai-provider) with the values below. Enable the provider and fetch or add `z-ai/glm-5.2` in its model list, then select it in your Agent settings:
+Open **App Settings → AI Providers** and create a [custom AI provider](https://lobehub.com/changelog/2025-01-22-new-ai-provider) with the values below. Enable the provider and fetch or add `z-ai/glm-5.3` in its model list, then select it in your Agent settings:
 
 ```text
 Provider ID: phala
@@ -151,7 +151,7 @@ API Key: Your Phala API key
 
 ## Jan
 
-In [Jan Desktop](https://docs.jan.ai/desktop/remote-models/custom-endpoint), open **Settings → Model Providers → Add Provider**, choose **OpenAI-compatible**, and set **Provider name** to `Phala`, **Base URL** to `https://inference.phala.com/v1`, and **API key** to your Phala key. Select **Create**, then select `z-ai/glm-5.2` from the model list. For tool use, edit the model and enable **Tools** under **Capabilities**.
+In [Jan Desktop](https://docs.jan.ai/desktop/remote-models/custom-endpoint), open **Settings → Model Providers → Add Provider**, choose **OpenAI-compatible**, and set **Provider name** to `Phala`, **Base URL** to `https://inference.phala.com/v1`, and **API key** to your Phala key. Select **Create**, then select `z-ai/glm-5.3` from the model list. For tool use, edit the model and enable **Tools** under **Capabilities**.
 
 For [Jan Agent CLI](https://docs.jan.ai/agent/providers), save a provider and start Jan with it:
 
@@ -159,6 +159,6 @@ For [Jan Agent CLI](https://docs.jan.ai/agent/providers), save a provider and st
 jan config set --provider phala \
   --api-key "$PHALA_AI_API_KEY" \
   --base-url https://inference.phala.com/v1 \
-  --model z-ai/glm-5.2
-jan --provider phala --model z-ai/glm-5.2
+  --model z-ai/glm-5.3
+jan --provider phala --model z-ai/glm-5.3
 ```
