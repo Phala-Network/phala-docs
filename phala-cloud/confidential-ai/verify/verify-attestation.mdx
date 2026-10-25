@@ -39,7 +39,7 @@ The published receipt key uses `algo: "ed25519"` and `key_id: "dstack-kms-receip
 
 ## Verification procedure
 
-1. **Verify the TDX quote.** Verify `attestation.evidence.quote` against Intel DCAP collateral, inspect TCB status, and apply your OS and key-custody policy. A local verifier such as [dcap-qvl](https://github.com/Phala-Network/dcap-qvl) can verify Intel evidence; the [ACI SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) also applies the dstack policy.
+1. **Verify the TDX quote.** Verify `attestation.evidence.quote` against Intel DCAP collateral, inspect TCB status, and apply your OS and key-custody policy. A local verifier such as [dcap-qvl](https://github.com/Phala-Network/dcap-qvl) can verify Intel evidence. The [ACI SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) verifies the quote but does not check whether the dstack OS image is production or development. For OS-image assurance, verify the same quote, event log, and VM configuration with an independent [dstack verifier](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier) and require `is_valid: true`.
 2. **Recompute the keyset digest.** Canonicalize the complete `attestation.workload_keyset` with JCS (RFC 8785), hash those bytes with SHA-256, prefix the lowercase hex digest with `sha256:`, and require equality with `workload_keyset_digest`. Sorting keys with `jq` is not a general JCS implementation.
 3. **Check nonce binding.** Build this exact statement with the recomputed digest and your nonce, without whitespace and in this field order:
 
@@ -50,7 +50,7 @@ The published receipt key uses `algo: "ed25519"` and `key_id: "dstack-kms-receip
    Require its SHA-256 digest to equal `attestation.report_data` and the quote's first 32 report-data bytes, with the remaining 32 bytes zero. A report fetched without a nonce does not establish freshness.
 4. **Check expiry.** Require `attestation.workload_keyset.not_after` to be a future Unix timestamp under your policy. Reject implausibly distant expiry. Receipts must cite this verified `workload_keyset_digest` and a receipt key in this keyset.
 5. **Replay measured evidence.** Replay the boot event log to the quote's RTMR3. Confirm the measured `compose-hash` equals `sha256(app_compose)`. Inspect the measured launcher/configuration path that selects the gateway release.
-6. **Apply release policy.** For reviewed-release enforcement, compare the measured compose hash against an independently obtained, authenticated allowlist. `source_provenance.repo_url` and `repo_commit` are inspection labels; trusting them without measured corroboration does not establish a reviewed release. Pair compose appraisal with a dstack verifier result for the same quote and require `is_valid: true`.
+6. **Apply release policy.** For reviewed-release enforcement, compare the measured compose hash against an independently obtained, authenticated allowlist. `source_provenance.repo_url` and `repo_commit` are inspection labels; trusting them without measured corroboration does not establish a reviewed release. Pair compose appraisal with the independent OS verification in step 1.
 7. **Bind the client channel before sending traffic.** Pin hostname-validated TLS to the SPKI listed for `inference.phala.com` in the attested keyset. The TypeScript SDK and Private AI Proxy implement this step.
 
 A valid hardware quote alone does not verify a particular response. Continue with [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
