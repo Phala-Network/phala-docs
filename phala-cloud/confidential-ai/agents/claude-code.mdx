@@ -1,0 +1,69 @@
+---
+title: Claude Code
+description: "Run Claude Code on Phala through Private AI Proxy, or configure it by hand."
+---
+
+Claude Code speaks the Anthropic Messages protocol. Private AI Proxy configures it automatically.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+2. On the **Agents** screen, connect **Claude Code**.
+3. Start `claude`.
+
+The app writes the Messages provider into Claude Code's settings with an agent-scoped token for its
+local API, and restores the previous settings when you disconnect or stop Protected.
+
+From the CLI, the same connection is:
+
+```bash
+pap agents connect claude-code
+```
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Set the base URL to the host without `/v1`; Claude Code appends `/v1/messages` itself.
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+export ANTHROPIC_BASE_URL="https://inference.phala.com"
+export ANTHROPIC_AUTH_TOKEN="$PHALA_AI_API_KEY"
+export ANTHROPIC_API_KEY=""
+export ANTHROPIC_MODEL="z-ai/glm-5.2"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="z-ai/glm-5.2"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="z-ai/glm-5.2"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="z-ai/glm-5.2"
+
+claude
+```
+
+`ANTHROPIC_AUTH_TOKEN` sends the key as a bearer token; clearing `ANTHROPIC_API_KEY` stops an
+existing Anthropic key from adding a conflicting `x-api-key` header.
+
+Phala model IDs do not appear in the `/model` picker; set the model with `ANTHROPIC_MODEL` or
+`/model z-ai/glm-5.2`. The alias variables send plan mode and background work to a Phala model.
+
+This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Run `/status` in Claude Code. With the Proxy, the base URL is `http://127.0.0.1:4180`; without it,
+`https://inference.phala.com`. Confirm the bearer credential source and the selected model.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Claude Code ignores the Proxy | Confirm **Connected** in the app and that Protected is on, then restart `claude`. |
+| Request path contains `/v1/v1/messages` | Remove `/v1` from `ANTHROPIC_BASE_URL`. |
+| Authentication fails | Use `ANTHROPIC_AUTH_TOKEN` and clear `ANTHROPIC_API_KEY`. |
+
+## Related
+
+- [Claude Code gateway configuration](https://code.claude.com/docs/en/llm-gateway-connect)
+- [Claude Code gateway model discovery](https://code.claude.com/docs/en/llm-gateway-protocol#model-discovery)
+- [Claude Code model configuration](https://code.claude.com/docs/en/model-config)
+- [Phala Messages API](/phala-cloud/confidential-ai/confidential-model/api-reference/messages)
+- [Phala model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

@@ -1,0 +1,66 @@
+---
+title: Hermes
+description: "Run Hermes Agent on Phala through Private AI Proxy, or configure it by hand."
+---
+
+Hermes speaks Chat Completions. Private AI Proxy configures it automatically.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+2. On the **Agents** screen, connect **Hermes**.
+3. Start a new Hermes session; existing sessions stay on their original provider.
+
+The app writes the provider into `~/.hermes/config.yaml` with an agent-scoped token for its local
+API, and restores the file when you disconnect or stop Protected.
+
+From the CLI, the same connection is:
+
+```bash
+pap agents connect hermes
+```
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Define and select a named provider. Hermes reads the key from its process environment or
+`~/.hermes/.env`; do not put it in `config.yaml`.
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+```
+
+```yaml ~/.hermes/config.yaml
+providers:
+  phala:
+    api: https://inference.phala.com/v1
+    key_env: PHALA_AI_API_KEY
+    transport: chat_completions
+    default_model: z-ai/glm-5.2
+    discover_models: true
+
+model:
+  provider: custom:phala
+  default: z-ai/glm-5.2
+```
+
+This changes the main text and tool-calling loop only; image, speech, embedding, search, and browser
+providers stay separate. This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Start `hermes`, run `/model`, and confirm the active provider, then run one harmless tool task.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Hermes ignores the Proxy | Confirm **Connected** in the app and that Protected is on, then start a new session. |
+| Provider is not selected | Start a new session and choose `custom:phala` with `/model`. |
+| Authentication fails | Export `PHALA_AI_API_KEY` in the Hermes process environment. |
+
+## Related
+
+- [Hermes model providers](https://hermes-agent.nousresearch.com/docs/integrations/providers)
+- [Phala model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

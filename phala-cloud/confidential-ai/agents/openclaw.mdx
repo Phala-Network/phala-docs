@@ -1,0 +1,74 @@
+---
+title: OpenClaw
+description: "Run OpenClaw on Phala through Private AI Proxy, or configure it by hand."
+---
+
+OpenClaw speaks Chat Completions. Private AI Proxy configures it automatically.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+2. On the **Agents** screen, connect **OpenClaw**.
+3. Restart OpenClaw; it reads the native-host provider and local token on start.
+
+The app writes a native-host provider into OpenClaw's gateway configuration with an agent-scoped
+token for its local API, and restores the file when you disconnect or stop Protected.
+
+From the CLI, the same connection is:
+
+```bash
+pap agents connect openclaw
+```
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Merge a named provider into the gateway configuration and keep your existing agent, channel, tool,
+and provider settings. Export the key where the OpenClaw gateway process can read it.
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+```
+
+```json5 ~/.openclaw/openclaw.json
+{
+  agents: { defaults: { model: { primary: "phala/z-ai/glm-5.2" } } },
+  models: {
+    mode: "merge",
+    providers: {
+      phala: {
+        baseUrl: "https://inference.phala.com/v1",
+        apiKey: "${PHALA_AI_API_KEY}",
+        api: "openai-completions",
+        models: [
+          { id: "z-ai/glm-5.2", name: "GLM 5.2", reasoning: true, input: ["text"],
+            contextWindow: 1048576, maxTokens: 131072 },
+        ],
+      },
+    },
+  },
+}
+```
+
+This changes the main model loop only; image, speech, embedding, search, and browser providers stay
+separate. This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Run `openclaw config validate` and `openclaw models list`, confirm the Phala model is listed, then
+run one harmless tool task.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| OpenClaw ignores the Proxy | Confirm **Connected** in the app and that Protected is on, then restart OpenClaw. |
+| Configuration is rejected | Run `openclaw config validate` and preserve JSON5 syntax. |
+| Key is unavailable | Export `PHALA_AI_API_KEY` for the gateway process, not only an interactive shell. |
+
+## Related
+
+- [OpenClaw model providers](https://docs.openclaw.ai/concepts/model-providers/custom-providers)
+- [OpenClaw configuration](https://docs.openclaw.ai/gateway/configuration)
+- [Phala model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

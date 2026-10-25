@@ -1,0 +1,67 @@
+---
+title: Pi
+description: "Run Pi on Phala through Private AI Proxy, or configure it by hand."
+---
+
+Pi speaks Chat Completions. Private AI Proxy configures it automatically.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+2. On the **Agents** screen, connect **Pi**.
+3. Start `pi`.
+
+The app writes the provider into Pi's settings with an agent-scoped token for its local API, and
+restores the previous settings when you disconnect or stop Protected.
+
+From the CLI, the same connection is:
+
+```bash
+pap agents connect pi
+```
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Export your Phala API key, then add a custom provider to `~/.pi/agent/models.json`:
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+```
+
+```json ~/.pi/agent/models.json
+{
+  "providers": {
+    "phala": {
+      "baseUrl": "https://inference.phala.com/v1",
+      "api": "openai-completions",
+      "apiKey": "$PHALA_AI_API_KEY",
+      "models": [{ "id": "z-ai/glm-5.2" }]
+    }
+  }
+}
+```
+
+Start `pi`, run `/model`, and select the model under `phala`. Opening `/model` reloads the file;
+press Ctrl+S on the model to save it as the default. The key is read from the process environment.
+
+This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Run `/model` in Pi, confirm the provider and model, then send a short prompt. With the Proxy, the
+provider points at `http://127.0.0.1:4180/v1`; without it, at `https://inference.phala.com/v1`.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Pi ignores the Proxy | Confirm **Connected** in the app and that Protected is on, then restart `pi`. |
+| The custom model is absent from `/model` | Check `providers.phala` in `~/.pi/agent/models.json` and export `PHALA_AI_API_KEY` in Pi's shell. |
+| Authentication fails | Check for a stale `phala` credential in `auth.json`; stored credentials take precedence over `models.json`. |
+
+## Related
+
+- [Pi model configuration](https://pi.dev/docs/latest/models)
+- [Phala model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

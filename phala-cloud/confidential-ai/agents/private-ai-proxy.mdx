@@ -1,0 +1,197 @@
+---
+title: "Private AI Proxy"
+description: "The desktop app and CLI that verifies the Phala gateway on your machine and connects your agents to a verified local API."
+---
+
+Private AI Proxy runs on your computer. It signs in to your Phala account, verifies the gateway's
+attestation before any prompt leaves your machine, and gives your agents a local API so they never
+hold your Phala credential. It is open source in
+[Dstack-TEE/private-ai-gateway](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/apps/desktop)
+and published by dstack TEE.
+
+```text
+your agent  →  Local API on 127.0.0.1:4180 (agent-scoped token)
+            →  Private AI Proxy, verified and pinned channel
+            →  Phala gateway (attested), signed receipt per response
+```
+
+The sections below follow the app's screens: Profiles, Privacy, Agents, Local API, Usage, and
+Settings, then the CLI.
+
+## Install
+
+### Desktop App
+
+Download an installer for macOS, Windows, or Linux from [GitHub Releases](https://github.com/Dstack-TEE/private-ai-gateway/releases). On macOS, you can also use Homebrew:
+
+```bash
+brew install --cask dstack-tee/private-ai/private-ai-proxy
+```
+
+Linux requires glibc 2.35 or newer. Windows Desktop is currently Preview.
+
+### Command-Line Tool
+
+Install the CLI with Homebrew or npm:
+
+<CodeGroup>
+
+```bash Homebrew
+brew install dstack-tee/private-ai/private-ai-proxy
+```
+
+```bash npm
+npm install --global private-ai-proxy
+```
+
+</CodeGroup>
+
+Do not use `--omit=optional` with npm; it selects the native package through an optional dependency. Standalone packages, release signatures, and checksums are also available from [GitHub Releases](https://github.com/Dstack-TEE/private-ai-gateway/releases).
+
+On Homebrew 6+, the fully qualified commands above automatically tap the repository and trust the item being installed. Homebrew and npm manage their own upgrades and removal.
+
+Verify the installation:
+
+```bash
+pap --version
+pap doctor
+```
+
+## Profiles and Sign-In
+
+Add a profile and choose **Phala**; new profiles default to **RedPill**. A Phala profile holds one account's inference credential. Choose either:
+
+- **Account login**: sign in with a Phala account. The app shows a device code and opens your browser to approve it. This uses device authorization (RFC 8628), with no workspace picker or local callback. The sign-in token stays in memory; if saving fails, **Retry** reuses the approval.
+- **API key**: **Get API key** opens the [Phala dashboard](https://cloud.phala.com/dashboard). Create a key under **Private AI → API Keys** and paste it into the **Phala API key** field.
+
+Credentials live in an owner-only, plaintext `credentials.toml` file in the app's settings directory. The operating system's credential store is used only to migrate old installations; profile exports never contain credentials. Sign in again or paste a new key to replace one, and revoke old keys in the dashboard.
+
+## Privacy: What Protected Does
+
+Switching on **Protected** runs the ACI relying-party checks against the gateway with a fresh nonce:
+
+1. the hardware quote verifies to the TEE vendor root and binds the report data;
+2. the attested keyset digest matches the statement for that nonce;
+3. the keyset has not expired;
+4. source provenance is present and the app compose matches its measured hash; and
+5. the TLS key actually used for the connection is in the attested keyset.
+
+On success the app pins the channel to that keyset for the session and enables inference through
+the Local API. A verification failure or network loss keeps connected agents pointed at the Local
+API, which refuses requests until protection is verified again.
+
+Stopping Protected, choosing
+**Stop All and Quit**, stopping the service, or disconnecting an agent restores its previous
+configuration. Quitting only the desktop app leaves the backend running. Verification is never
+restored from disk after a restart; it is redone.
+
+## Agents
+
+The **Agents** screen lists the agents the app can configure. **Connect** writes Phala into the
+agent's own provider settings, in the protocol the agent speaks, with an agent-scoped token for the
+Local API. **Disconnect** restores the file you had before; edits you made in the meantime are
+preserved, and an incomplete restore stays retryable.
+
+| Agent | Protocol | Where the app writes | After connecting |
+| --- | --- | --- | --- |
+| Claude Code | Messages | `~/.claude/settings.json` | Restart `claude` |
+| Codex | Responses | Custom model provider in `~/.codex/config.toml` | Restart `codex` |
+| DeepSeek Harness | Chat Completions | `~/.dsh/cordis.patch.yml` and `.credentials.yaml` | New session; restart headless/ACP processes |
+| OpenCode | Chat Completions | `~/.config/opencode/opencode.json` | Restart OpenCode |
+| Pi | Chat Completions | `~/.pi/agent/models.json` | Restart Pi |
+| Hermes | Chat Completions | `~/.hermes/config.yaml` | Restart Hermes |
+| OpenClaw | Chat Completions | Native-host provider with a local token reference | Restart OpenClaw |
+| Oh My Pi | Chat Completions | Local token and models file | Restart `omp` |
+
+Only agents that are both connected and currently protected are authorized on the Local API.
+Connecting from the CLI previews the change first and applies it with a revision, so a file that
+changed in between is rejected rather than overwritten.
+
+## Local API
+
+While Protected is on, the app serves an OpenAI-compatible API on your machine:
+
+| Field | Value |
+| --- | --- |
+| Base URL | `http://127.0.0.1:4180/v1` |
+| API key | The client key shown on the Overview and Local API screens (`sk-pap-…`) |
+| Models | The verified catalog for the active profile |
+
+Any tool that accepts an OpenAI-compatible endpoint can use it, for example
+[Cline](/phala-cloud/confidential-ai/agents/cline). The Local API is plain HTTP on loopback by default; send
+ordinary request bodies. It rejects end-to-end encryption headers because the app already owns the
+verified channel. Its listener runs with the backend, but inference is refused without verified
+protection. Rotate the client key from Local API settings or `token rotate`.
+
+## Usage
+
+Responses stream to the agent immediately. The app fetches the signed receipt for each response
+afterwards and audits it against the attestation. **Usage** records every request with the agent,
+model, tokens, estimated cost, and the audit result; an audit failure is recorded but cannot recall
+bytes the agent already received.
+
+The Overview screen shows the current session's totals. Usage can
+be filtered, exported to CSV, and cleared.
+
+## Settings
+
+- **Protect on launch** starts protection when the background service starts.
+- **Open at Login** is an operating system preference set from the desktop app.
+- **Advanced > Reset settings** stops protection, disconnects agents, restores defaults, generates
+  a new web UI password, and disables Open at Login. Profiles, API keys, the local client key, and
+  usage history are kept.
+- Closing the window or choosing **Quit** from the tray or menu leaves the backend running.
+  **Stop All and Quit** stops protection, restores agent configuration, and stops the backend.
+
+## CLI
+
+`pap` drives the same background service without a window. It comes with the desktop app or
+[on its own](#command-line-tool). The macOS app registers it automatically; add `~/.local/bin` to your terminal's
+PATH if needed.
+
+The Windows installer registers it on the user PATH, and Linux packages install
+it system-wide. Settings > Advanced > **pap command** manages registration in the desktop app.
+`private-ai-proxy` and `aci` are the same executable.
+
+```bash
+pap doctor                  # local installation, settings, and backend diagnostics
+pap profiles login work --provider phala
+pap start --profile work    # verify the gateway and turn on Protected
+pap agents connect codex    # add --model MODEL to pick a model yourself
+pap status --json
+pap stop                    # stop Protected and restore agent configuration
+```
+
+For an API-key profile instead of account sign-in, run this command and paste the key at its hidden prompt:
+
+```bash
+pap profiles add --id work --name Phala \
+  --url https://inference.phala.com --provider phala
+pap start --profile work
+```
+
+| Task | Command |
+| --- | --- |
+| Service and protection | `service start`, `start`, `stop`, `status --watch` |
+| Profiles and credentials | `profiles login/list/show/add/edit/verify/use/remove`, `token clear-credential` |
+| Agents | `agents list/connect/disconnect/disconnect-all` |
+| Catalog and usage | `models list --refresh`, `usage list/show/export/clear` |
+| Local API settings and token | `settings show/set`, `token show/rotate` |
+| Verify any ACI service | `verify <url>`, `sessions <url>`, `serve <url>` |
+
+Credentials are entered through a hidden prompt or `--key-stdin`, never as an argument. For
+scripts, `--json --non-interactive` returns data and `--yes` approves a change; agent changes are
+previewed with `--dry-run` and applied with the returned `--revision`. Exit status is `0` on
+success, `2` for invalid arguments, `1` for operation failures.
+
+`verify`, `sessions`, and `serve`
+work against any ACI service without a profile; `serve` refuses to start unless verification passes.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Protected will not turn on | Run `pap doctor`; it reports local installation, settings, and backend checks separately, with warnings for credentials other users can read or profiles without a saved key. |
+| An agent still uses its old provider | Confirm it shows **Connected**, that Protected is on, and restart the agent. |
+| A tool cannot reach `127.0.0.1:4180` | Confirm the backend is running and check Settings > Local API; inference requires verified protection. |
+| Settings look wrong after an update | Settings > Advanced > Reset settings. |

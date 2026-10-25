@@ -76,9 +76,8 @@ deployment's server-side retention policy.
 
 <Warning>
 The low-level SDK does not automatically call `verifyReceipt()` for every
-response. Applications must make that call before accepting a result. The
-native Pi and OpenCode providers perform this audit automatically before the
-agent finishes each turn.
+response. Applications must make that call before accepting a result.
+Private AI Proxy audits every receipt automatically after delivery.
 </Warning>
 
 ## Browser use

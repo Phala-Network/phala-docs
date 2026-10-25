@@ -1,0 +1,74 @@
+---
+title: Use in Agents
+sidebarTitle: Overview
+description: Connect coding agents to Private AI through Private AI Proxy, or configure an OpenAI-compatible endpoint directly.
+---
+
+[Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) verifies the Phala gateway on your machine and connects your agents to a local API. Agents receive a local token instead of your Phala credential. Tools can also connect to Phala directly.
+
+## Connect an Agent
+
+<Steps>
+  <Step title="Install Private AI Proxy and Sign In">
+    [Install the desktop app or CLI](/phala-cloud/confidential-ai/agents/private-ai-proxy#install). Add a profile and choose **Phala**; new profiles default to RedPill. Sign in with a Phala account or paste a key from **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+  </Step>
+  <Step title="Turn On Protected">
+    The app verifies the gateway's attestation and pins the channel before sending model traffic. Signed response receipts are audited after delivery.
+  </Step>
+  <Step title="Connect the Agent">
+    On the **Agents** screen, connect the agent and restart it. The app writes its Local API into the agent's provider settings; disconnecting restores the previous settings.
+  </Step>
+</Steps>
+
+| Agent | What Changes | Guide |
+| --- | --- | --- |
+| Claude Code | Messages provider in `~/.claude/settings.json` | [Claude Code](/phala-cloud/confidential-ai/agents/claude-code) |
+| Codex | Custom Responses provider in `~/.codex/config.toml` | [Codex CLI](/phala-cloud/confidential-ai/agents/codex) |
+| DeepSeek Harness | `~/.dsh/cordis.patch.yml` and `.credentials.yaml` | |
+| OpenCode | Provider in `~/.config/opencode/opencode.json` | [OpenCode](/phala-cloud/confidential-ai/agents/opencode) |
+| Pi | Provider in `~/.pi/agent/models.json` | [Pi](/phala-cloud/confidential-ai/agents/pi) |
+| Hermes | Provider in `~/.hermes/config.yaml` | [Hermes](/phala-cloud/confidential-ai/agents/hermes) |
+| OpenClaw | Native-host provider; restart required | [OpenClaw](/phala-cloud/confidential-ai/agents/openclaw) |
+| Oh My Pi | Local token and models file; restart `omp` | |
+
+From the CLI, sign in and start protection before connecting an agent:
+
+```bash
+pap profiles login work --provider phala
+pap start --profile work
+pap agents connect codex
+```
+
+See [Private AI Proxy CLI](/phala-cloud/confidential-ai/agents/private-ai-proxy#cli) for API-key profiles and other commands.
+
+## Other Tools
+
+Tools with an OpenAI-compatible provider setting, such as [Cline](/phala-cloud/confidential-ai/agents/cline), can use the Proxy's Local API while Protected is on:
+
+| Field | Value |
+| --- | --- |
+| Base URL | `http://127.0.0.1:4180/v1` |
+| API Key | The client key from the app's Overview screen |
+| Model | `z-ai/glm-5.2`, or another chat model from the app's verified catalog |
+
+See [Other Tools](/phala-cloud/confidential-ai/agents/other-tools) for Continue, Zed, Copilot, Aider, Goose, and chat apps.
+
+## Without the Proxy
+
+On servers, in CI, or in frameworks, point the client at Phala directly. Every model on this endpoint runs in a TEE, but a base-URL configuration does not verify attestation locally. Use the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) to enforce a verified channel in Node.js or Bun applications.
+
+| Client | Protocol | Base URL |
+| --- | --- | --- |
+| OpenAI clients and agent frameworks | Chat Completions | `https://inference.phala.com/v1` |
+| Codex CLI and other Responses clients | Responses | `https://inference.phala.com/v1` |
+| Claude Code and Anthropic clients | Messages | `https://inference.phala.com` (the client appends `/v1/messages`) |
+
+For direct connections, create a key under **Private AI → API Keys** and export it in the client's shell:
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+curl -s https://inference.phala.com/v1/models \
+  | jq -r '.data[] | select((.supported_features // []) | index("tools")) | .id'
+```
+
+Use an exact chat-model ID such as `z-ai/glm-5.2` from [`/v1/models`](https://inference.phala.com/v1/models). For SDKs, observability tools, and gateways, see [Migration and Integrations](/phala-cloud/confidential-ai/confidential-model/migration-and-integrations).
