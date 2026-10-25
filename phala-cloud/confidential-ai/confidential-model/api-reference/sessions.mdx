@@ -1,91 +1,98 @@
 ---
-title: Get Session
-description: Fetch the immutable attested-session record behind a confidential response.
+title: "Session"
+description: "The immutable attested-session record behind a confidential response."
 api: "GET /aci/sessions/{session_id}"
 ---
 
-## Endpoints
+Returns an [attested session](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions#attested-sessions): the immutable, content-addressed
+record of the verified TEE channel a confidential request was bound to. A receipt's
+`upstream.verified.session_id` references it, so you can trace any confidential response back to the
+exact verified security context, with its typed claims and channel binding.
 
-```bash
-GET https://inference.phala.com/v1/aci/sessions/{session_id}
-GET https://inference.phala.com/v1/aci/sessions?provider={provider}&model={model}
+```http
+GET /v1/aci/sessions/{session_id}
+GET /v1/aci/sessions?upstream_name={upstream_name}&model={model}
 ```
 
-An attested session is the verified security context behind a confidential response. A receipt's `upstream.verified.session_id` references the session used for that response.
-
-## Get One Session
+## Get one session
 
 <ParamField path="session_id" type="string" required>
-  The `as_...` id from a receipt's `upstream.verified.session_id`.
+  The bare 64-character lowercase hex id (no prefix) from a receipt's `upstream.verified.session_id`.
 </ParamField>
-
-```bash
-curl "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
-  -H "Authorization: Bearer <API_KEY>"
-```
 
 ### Response
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `api_version` | string | ACI version token. |
-| `session_id` | string | `as_<sha256>` content hash of the verified material. |
-| `provider` | string | Upstream provider or route name. |
-| `endpoint` | string | Verified upstream origin. |
-| `verifier_id` | string | Verifier that produced the result. |
-| `established_at` | number | Verification time as Unix seconds. |
-| `expires_at` | number | Retention deadline as Unix seconds. |
-| `identity` | object | Verified upstream identity keys when available. |
-| `channel_binding` | array | Enforced binding, such as a TLS SPKI digest or E2EE (end-to-end encryption) public key. |
-| `claims` | object | Typed claims about the upstream TEE. |
-| `evidence` | object | Byte-preserving evidence checked by the verifier. |
+| `upstream_name` | string | The service-chosen upstream label for this channel. |
+| `endpoint` | string | The verified upstream origin. |
+| `verifier_id` | string | The verifier that produced this result. |
+| `established_at` | number | When the material was verified (Unix seconds). |
+| `expires_at` | number | Retention deadline (Unix seconds). |
+| `identity` | object | Verified upstream identity keys (for example a signing address). |
+| `channel_binding` | array | The enforceable binding(s): TLS SPKI, E2EE public key, or measured co-deployed proxy image/credential. |
+| `claims` | object | Typed claims (below). |
+| `evidence` | object | Byte-preserving evidence the verifier checked (`digest` + data URI). |
+
+### Binding types
+
+| Type | Meaning |
+| --- | --- |
+| `tls_spki_sha256` | Pins the upstream TLS public key. |
+| `e2ee_public_key_sha256` | Binds provider-facing encryption to a verified key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
+
+### Typed claims
+
+Each claim carries a `status` (`asserted` / `refuted` / `unknown`), a `source`
+(`hardware_proven` / `verifier_derived` / `provider_asserted` / `operator_asserted`), and a `reason`. The
+claim set: `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_known_good`,
+`gpu_attested`, `model_weights_provenance`, plus provider-specific entries in `extra`. See
+[Claims](/phala-cloud/confidential-ai/confidential-model/tcb-and-claims).
 
 ```json
 {
   "api_version": "aci/1",
-  "session_id": "as_3681736b33b9b8191216968e37e350bfa1e4fd8d5d192bbebf4c17c0d4edf344",
-  "provider": "phala",
-  "endpoint": "https://inference.phala.com",
-  "verifier_id": "private-ai-verifier/phala-gateway/v1",
+  "upstream_name": "near-ai",
+  "endpoint": "https://cloud-api.near.ai",
+  "verifier_id": "private-ai-verifier/near-ai-gateway/v1",
   "established_at": 1781588840,
   "expires_at": 1781589140,
-  "channel_binding": [{ "type": "tls_spki_sha256", "value": "..." }],
+  "channel_binding": [
+    { "type": "tls_spki_sha256", "origin": "https://cloud-api.near.ai", "spki_sha256": "…" }
+  ],
   "claims": {
-    "tee_attested": { "status": "Asserted", "source": "HardwareProven", "reason": "verified TDX quote" },
-    "tcb_up_to_date": { "status": "Asserted", "source": "HardwareProven" },
-    "gpu_attested": { "status": "Unknown" }
+    "tee_attested": { "status": "asserted", "source": "hardware_proven", "reason": "verified TDX quote" },
+    "tcb_up_to_date": { "status": "asserted", "source": "hardware_proven" },
+    "gpu_attested": { "status": "unknown" }
   },
-  "evidence": { "digest": "sha256:...", "data": "data:application/json;base64,..." }
+  "evidence": { "digest": "sha256:…", "data": "data:application/json;base64,…" }
 }
 ```
 
-## List Sessions
+## List current sessions
 
-Use the query form to inspect current sessions for a provider or model before sending prompts:
+`GET /v1/aci/sessions?upstream_name={upstream_name}&model={model}` returns current attested sessions.
+The endpoint is public. `upstream_name` is a service-chosen route label such as `chutes` or `phala-267`, rather than a catalog provider id. Use it as a preflight survey: inspect the verified identity, channel binding, and claims for a model
+before sending a prompt.
 
 ```bash
-curl "https://inference.phala.com/v1/aci/sessions?provider=phala" \
-  -H "Authorization: Bearer <API_KEY>"
+curl "https://inference.phala.com/v1/aci/sessions?upstream_name=chutes"
 ```
 
-The response is a JSON array of session records.
+Returns `{ "api_version": "aci/1", "sessions": [...] }`. Each list entry includes its `session_id`
+but omits the bulky `evidence.data`; fetch the full record before verifying its content hash.
 
-## Typed Claims
+## Why content-addressed
 
-Each claim carries a `status`, a `source`, and a reason when available.
-
-| Source | Meaning |
-| --- | --- |
-| `HardwareProven` | Comes from the verified TEE quote or collateral. |
-| `VerifierDerived` | Computed by the verifier from verified evidence. |
-| `ProviderAsserted` | Published by the provider, not independently proven. |
-| `OperatorAsserted` | Declared by the gateway operator. |
-
-The common claim set includes `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_known_good`, `gpu_attested`, and `model_weights_provenance`. A claim that is not established is `Unknown`, not a silent pass.
+The full session document does not contain its own id. `session_id` is the bare SHA-256 of the full session document in canonical JCS form. Any change
+produces a new id, and sessions are never updated in place. Recompute the id after fetching the full
+record to confirm it is exactly the document cited by the receipt.
 
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
-  <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
+  <Card title="Verified upstreams" icon="link" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions#attested-sessions" />
+  <Card title="Get receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
 </CardGroup>

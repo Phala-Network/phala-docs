@@ -97,20 +97,19 @@ The response is a standard OpenAI chat completion. In raw HTTP responses, Phala 
 | Header | Meaning |
 | --- | --- |
 | `x-receipt-id` | Receipt id for this response. Use it with `GET /v1/aci/receipts/{id}`. |
-| `x-aci-identity` | Attested gateway workload identity. |
 | `x-aci-keyset-digest` | Digest of the gateway keyset used for receipt verification. |
 
-## Confirm the Response Was Attested
+## Inspect the Response Receipt
 
 Fetch the receipt with the `x-receipt-id` header:
 
 ```bash
 curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
   -H "Authorization: Bearer <API_KEY>" | \
-  jq '.event_log[] | select(.type=="upstream.verified") | {provider, result, required, session_id}'
+  jq '.event_log[] | select(.type=="upstream.verified") | {model_id, result, required, session_id}'
 ```
 
-For a confidential response, `result` is `verified` and `required` is `true`. To verify the gateway identity and receipt signature end to end, follow [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+On this TEE-only endpoint, successful upstream verification records `result: verified` and `required: true`; a failed required check refuses forwarding. This command only inspects the receipt. Ordinary SDK clients and cURL do not verify the gateway or each response. For client-side verification, use the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
 
 ## Choose a Model
 
@@ -124,7 +123,7 @@ The catalog is public and authoritative for availability, pricing, context limit
 capabilities. Embedding models are listed separately at `GET /v1/embeddings/models`.
 
 <Note>
-TEE provider presence and confidential serving are not identical for every provider and model. Use `is_tee` from `/v1/models` to find models that can be served confidentially, then verify the actual response with its `x-receipt-id`.
+Every model served at this Phala endpoint uses the TEE-only policy. Provider evidence covers different boundaries; inspect the cited session and apply the claims your policy requires. The catalog describes capabilities, while a verified receipt and session bind a specific exchange.
 </Note>
 
 <Note>
@@ -133,9 +132,13 @@ Confidential inference and zero data retention are separate properties. `is_tee`
 
 ## Verify Your AI is Running Securely
 
-Before trusting receipts, fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation). Then fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) for a response and verify that its `workload_id` and `workload_keyset_digest` match the report.
+The verification client checks a fresh [attestation report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation), recomputes the JCS keyset digest, checks its expiry and measured compose, and pins TLS before traffic. After the response it checks the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) signature, `workload_keyset_digest`, exact request/response `body_hash` values, and cited upstream session. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
 
 The legacy [Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) endpoint remains available for older clients, but new integrations should use `GET /v1/aci/receipts/{id}`.
+
+## Billing
+
+Private AI usage is charged to your workspace Balance. The response's `usage.cost` reports the request charge in USD when present. Token prices are published in the live catalog. Cached input tokens are charged at `pricing.input_cache_read` when a model exposes that rate, otherwise at its normal prompt rate; see [Prompt Caching](/phala-cloud/confidential-ai/confidential-model/prompt-caching).
 
 ## Next Steps
 

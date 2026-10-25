@@ -1,0 +1,106 @@
+---
+title: Anthropic SDK
+description: "Use the official Anthropic Python or TypeScript SDK with Phala's Messages API."
+---
+
+The Anthropic SDK can call Phala's compatible [`/v1/messages`](/phala-cloud/confidential-ai/confidential-model/api-reference/messages) endpoint
+directly. Set the Phala host without `/v1` because the SDK appends `/v1/messages`.
+
+<Warning>
+  Use `auth_token` in Python or `authToken` in TypeScript. The `api_key` option sends `x-api-key`,
+  while Phala expects `Authorization: Bearer`.
+</Warning>
+
+## Install
+
+<CodeGroup>
+
+```bash Python
+pip install anthropic
+```
+
+```bash TypeScript
+npm install @anthropic-ai/sdk
+```
+
+</CodeGroup>
+
+## Send a message
+
+<CodeGroup>
+
+```python Python
+import os
+
+from anthropic import Anthropic
+
+client = Anthropic(
+    auth_token=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com",
+)
+
+message = client.messages.create(
+    model="z-ai/glm-5.3",
+    max_tokens=128,
+    messages=[{"role": "user", "content": "Explain attestation in one sentence."}],
+)
+
+for block in message.content:
+    if block.type == "text":
+        print(block.text)
+```
+
+```typescript TypeScript
+import Anthropic from '@anthropic-ai/sdk';
+
+const authToken = process.env.PHALA_AI_API_KEY;
+if (!authToken) throw new Error('PHALA_AI_API_KEY is required');
+
+const client = new Anthropic({
+  authToken,
+  baseURL: 'https://inference.phala.com',
+});
+
+const message = await client.messages.create({
+  model: 'z-ai/glm-5.3',
+  max_tokens: 128,
+  messages: [{ role: 'user', content: 'Explain attestation in one sentence.' }],
+});
+
+for (const block of message.content) {
+  if (block.type === 'text') console.log(block.text);
+}
+```
+
+</CodeGroup>
+
+## Choose a model
+
+Use a model ID from the live Phala catalog; the Messages format also works with supported non-Anthropic models:
+
+```bash
+curl -s https://inference.phala.com/v1/models \
+  | jq -r '.data[] | .id'
+```
+
+Model availability and supported fields change. Test streaming or tool use with the selected model
+before depending on it in production.
+
+## Privacy boundary
+
+Every request enters through Phala's attested gateway. This TEE-only endpoint requires a verified upstream; evidence coverage varies by provider. Ordinary Anthropic SDK clients do not verify the gateway, pin its TLS key, or audit response receipts. Use the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) for client-side verification.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| `401` authentication error | Pass the Phala key as `auth_token` or `authToken`, not `api_key` or `apiKey`. |
+| Request path contains `/v1/v1/messages` | Set the base URL to `https://inference.phala.com`, without `/v1`. |
+| Model not found | Refresh `GET /v1/models` and use the exact model ID. |
+| Unsupported field returns `400` | Update the SDK, then remove beta-only fields not accepted by the selected model. |
+
+## Related
+
+- [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python)
+- [Anthropic TypeScript SDK](https://github.com/anthropics/anthropic-sdk-typescript)
+- [Phala Messages API](/phala-cloud/confidential-ai/confidential-model/api-reference/messages)

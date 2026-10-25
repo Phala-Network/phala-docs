@@ -23,7 +23,7 @@ Every Intel TDX host exposes a **Platform Provisioning ID** (PPID) — a hardwar
 
 Phala Cloud surfaces each node's PPID to the workspaces that are allowed to deploy to it. PPID is not a global public directory — you can see the PPID and `device_id` of the nodes listed in your own workspace's deployable node list (for example, in the node picker inside the create-CVM wizard). Nodes you cannot deploy to are not exposed.
 
-Phala Cloud and the `DstackApp` contract never store the raw PPID on-chain. Instead they store the SHA-256 hash of the PPID bytes — `device_id = sha256(ppid)`. This derivation is implemented in dstack's attestation library ([`dstack-attest/src/attestation.rs`](https://github.com/Dstack-TEE/dstack/blob/master/dstack-attest/src/attestation.rs)) and is the same value that Phala Cloud surfaces in the node list, writes to the `DstackApp.allowedDeviceIds` mapping, and checks at boot time.
+Phala Cloud and the `DstackApp` contract never store the raw PPID on-chain. Instead they store the SHA-256 hash of the PPID bytes — `device_id = sha256(ppid)`. This derivation is implemented in dstack's attestation library ([`dstack-attest/src/attestation.rs`](https://github.com/Dstack-TEE/dstack/blob/next/dstack/dstack-attest/src/attestation.rs)) and is the same value that Phala Cloud surfaces in the node list, writes to the `DstackApp.allowedDeviceIds` mapping, and checks at boot time.
 
 This derivation gives you:
 

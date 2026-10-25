@@ -1,138 +1,54 @@
 ---
-description: Learn how to verify a Private AI response with the gateway attestation report and signed receipt.
+description: Verify a Phala response with a pinned client transport, signed receipt, and cited upstream session.
 title: Verify a Response
 ---
 
-## What the receipt proves
+`https://inference.phala.com/v1` requires confidential routing through Phala's attested gateway. Ordinary HTTP clients do not verify its attestation, pin its TLS key, or verify each response receipt. `curl` and `jq` can inspect the artifacts; client-side verification requires the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
 
-Every Private AI response includes a signed receipt id in the `x-receipt-id` header. The receipt is an ordered transparency event log. It records request and response hashes, the selected route, upstream verification status, and the signature that binds the record to the attested gateway keyset.
+## Choose a verification client
 
-For a confidential response, the receipt's `upstream.verified` event shows `result: verified`, `required: true`, and a `session_id`. That session records the verified upstream security context and channel binding.
+| Client | Verification |
+| --- | --- |
+| Node.js or Bun application | Call `connectAci()` before traffic, use `aci.fetch`, and call `verifyReceipt()` after consuming the response. See the [TypeScript example](/phala-cloud/confidential-ai/verify/typescript-sdk). |
+| Coding agent through Private AI Proxy | The proxy verifies attestation and pins the channel before traffic, then audits receipts after delivery. See [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy). |
+| Ordinary OpenAI/Anthropic SDK or cURL | Base-URL configuration alone does not perform client-side verification. |
 
-## Prerequisites
+Agent tools, MCP servers, browser automation, and telemetry remain separate trust boundaries.
 
-```bash
-export PHALA_AI_API_KEY="<API_KEY>"
-export BASE="https://inference.phala.com"
-```
+## What the verifier checks
 
-You need `curl`, `jq`, and a SHA-256 tool. On Linux use `sha256sum`; on macOS use `shasum -a 256`.
+1. Verify a fresh nonce-bound gateway quote, recompute the JCS keyset digest, check `not_after`, and replay the measured compose evidence. See [Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
+2. Before sending model traffic, use hostname-validated TLS pinned to a key in the attested keyset.
+3. Fetch the receipt named by `x-receipt-id` using the same credential that made the request. Require `workload_keyset_digest` to match the verified keyset. Resolve `key_id` in `receipt_signing_keys` and verify the Ed25519 signature over the JCS receipt with `signature` removed.
+4. Match `request.received.body_hash` and `response.returned.body_hash` to the exact request and response bytes. For SSE, the response hash includes the complete in-order stream framing. E2EE request hashes follow the transport extension's restored-plaintext rules.
+5. Require a successful `upstream.verified` event with `result: "verified"`, `required: true`, and a `session_id`. Fetch the full session, recompute its bare SHA-256 JCS content address, verify its evidence and binding, and apply your claim policy. The receipt's serving time must fall within that session's validity interval.
 
-## 1. Fetch a fresh gateway attestation
+A receipt event by itself is an assertion by the attested gateway. Verifying the cited session's evidence provides the independent upstream audit; coverage varies by provider.
 
-```bash
-export NONCE="$(openssl rand -hex 32)"
+## Inspect existing artifacts
 
-curl -s "$BASE/v1/aci/attestation?nonce=$NONCE" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
-  -o report.json
-```
-
-Verify the report as described in [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation). The receipt checks below assume you trust the attested keyset from this report.
-
-## 2. Make a request and capture the receipt id
+The following commands only display documents for a request you already made. They do not produce a verification verdict.
 
 ```bash
-curl -s -D headers.txt "$BASE/v1/chat/completions" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"z-ai/glm-5.3",
-       "messages":[{"role":"user","content":"Explain attestation in one sentence."}]}' \
-  -o response.json
+# Set RECEIPT_ID to the x-receipt-id header from your inference response.
+curl --fail-with-body -sS "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" -o receipt.json
 
-export RECEIPT_ID="$(grep -i '^x-receipt-id' headers.txt | tr -d '\r' | awk '{print $2}')"
-echo "receipt: $RECEIPT_ID"
+jq '{receipt_id, workload_keyset_digest, key_id, endpoint,
+     upstream: [.event_log[] | select(.type == "upstream.verified")]}' receipt.json
+
+# Stop if the receipt does not cite a successful upstream session.
+SESSION_ID=$(jq -er '.event_log[] | select(.type == "upstream.verified" and .result == "verified") | .session_id | select(type == "string" and test("^[0-9a-f]{64}$"))' receipt.json) && \
+  curl --fail-with-body -sS "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
+    | jq '{upstream_name, endpoint, channel_binding, claims}'
 ```
 
-Keep `response.json`; the receipt commits to the exact response bytes.
+The session uses `upstream_name` (for example `chutes` or `phala-267`). The list endpoint accepts `?upstream_name=` and `?model=`; it omits `evidence.data`, so fetch the full record for a content-address check.
 
-## 3. Fetch the signed receipt
+## Release policy and limits
 
-```bash
-curl -s "$BASE/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
-  -o receipt.json
-
-jq '{receipt_id, workload_id, workload_keyset_digest, endpoint}' receipt.json
-```
-
-## 4. Match the receipt to the attested gateway
-
-```bash
-test "$(jq -r .workload_id report.json)" = "$(jq -r .workload_id receipt.json)" \
-  && test "$(jq -r .workload_keyset_digest report.json)" = "$(jq -r .workload_keyset_digest receipt.json)" \
-  && echo "workload matches" || echo "MISMATCH"
-```
-
-If these values do not match, the receipt is not bound to the attestation report you verified.
-
-## 5. Check the response hash
-
-The `response.returned.wire_hash` event must match the bytes you received.
-
-```bash
-# Linux:
-RESP_HASH="sha256:$(sha256sum response.json | awk '{print $1}')"
-
-# macOS alternative:
-# RESP_HASH="sha256:$(shasum -a 256 response.json | awk '{print $1}')"
-
-RECEIPT_RESP_HASH="$(jq -r '.event_log[] | select(.type=="response.returned") | .wire_hash' receipt.json)"
-
-echo "received: $RESP_HASH"
-echo "receipt:  $RECEIPT_RESP_HASH"
-test "$RESP_HASH" = "$RECEIPT_RESP_HASH" && echo "response hash matches"
-```
-
-The receipt also contains `request.received.body_hash`. In production, hash the exact request body bytes you sent and compare them to that event.
-
-## 6. Verify the receipt signature
-
-The receipt signature covers the canonical receipt bytes. Verify it under one of the `receipt_signing_keys` entries from `attestation.workload_keyset`.
-
-```bash
-# Conceptual:
-# verifier check-receipt --attestation report.json --receipt receipt.json
-```
-
-A receipt signed by a key outside the attested keyset is not bound to the verified gateway and must fail verification.
-
-## 7. Confirm the upstream was confidential
-
-```bash
-jq '.event_log[] | select(.type=="upstream.verified")
-    | {provider, model_id, result, required, session_id}' receipt.json
-```
-
-Interpretation:
-
-- Confidential response: `result` is `verified`, `required` is `true`, and `session_id` is present.
-- Routed response: `result` is `failed`, `required` is `false`, and no `session_id` is present. The gateway was attested, but the upstream provider was not.
-
-To inspect the immutable upstream security context:
-
-```bash
-SESSION_ID="$(jq -r '.event_log[] | select(.type=="upstream.verified") | .session_id' receipt.json)"
-
-curl -s "$BASE/v1/aci/sessions/$SESSION_ID" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" | \
-  jq '{session_id, provider, endpoint, channel_binding, claims}'
-```
+A passing audit binds the exact exchange to a genuine attested gateway, pinned TLS channel, signed receipt, and verified upstream session. It establishes a reviewed release only when you enforce an independently obtained compose allowlist. Workload-declared `source_provenance` is not a trust root. See the [SDK release policy](/phala-cloud/confidential-ai/verify/typescript-sdk#release-policy).
 
 ## Legacy signature endpoint
 
-Older clients may call `GET /v1/signature/{id}`. It returns the same receipt inside a compatibility envelope:
-
-```bash
-curl -s "$BASE/v1/signature/$RECEIPT_ID" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY"
-```
-
-New clients should use `GET /v1/aci/receipts/{id}` directly.
-
-## What a passing verification proves
-
-- The gateway is a specific reviewed workload in a genuine TEE.
-- The receipt is signed by a key in the attested gateway keyset.
-- The response you received is exactly the response the gateway signed.
-- For a confidential model response, the upstream provider was verified and channel-bound before forwarding.
+`GET /v1/signature/{id}` wraps the same canonical receipt for older clients. New integrations should verify `/v1/aci/receipts/{id}` directly.

@@ -750,7 +750,8 @@
                 "pages": [
                   "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
                   "/phala-cloud/confidential-ai/confidential-model/playground",
-                  "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations"
+                  "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations",
+                  "/phala-cloud/confidential-ai/confidential-model/anthropic-sdk"
                 ]
               },
               {
@@ -775,6 +776,7 @@
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/responses",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/messages",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/completions",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/systemone",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
@@ -790,6 +792,8 @@
                   "/phala-cloud/confidential-ai/confidential-model/tool-calling",
                   "/phala-cloud/confidential-ai/confidential-model/images-and-vision",
                   "/phala-cloud/confidential-ai/confidential-model/structured-output",
+                  "/phala-cloud/confidential-ai/confidential-model/reasoning",
+                  "/phala-cloud/confidential-ai/confidential-model/prompt-caching",
                   "/phala-cloud/confidential-ai/confidential-model/streaming",
                   "/phala-cloud/confidential-ai/confidential-model/attested-routing",
                   "/phala-cloud/confidential-ai/confidential-model/zero-data-retention",

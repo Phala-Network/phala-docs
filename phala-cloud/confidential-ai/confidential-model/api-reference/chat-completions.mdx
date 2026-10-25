@@ -71,18 +71,18 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 
   Find models that can satisfy `zdr` ahead of time with [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters). See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
 
-  **`aci_verified`** (boolean): set `true` to route only to an upstream the gateway verified inside the TEE before sending the prompt. `false`, or omitting the field, applies no attestation constraint.
+  **`aci_verified`** (boolean): set `true` to route only to an upstream the gateway verified inside the TEE before sending the prompt. `false`, or omitting the field, adds no request-level constraint; the Phala TEE-only endpoint still requires verified serving.
 
   ```json
   {"provider": {"aci_verified": true}}
   ```
 
-  If no upstream for the model is both classified as attested and currently verified, the request returns `503` and no prompt is sent. Nothing in the request can relax this constraint once it is set.
+  If no upstream for the model is both classified as attested and currently verified, the request returns `503` (`upstream_verification_failed`) and no prompt is sent. Nothing in the request can relax this constraint once it is set.
 
-  **`aci_session_ids`** (array of strings): restrict the request further to specific attested channels, identified by the session ids from [`GET /v1/aci/sessions`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). Any one of the listed ids may serve the request; if none matches a currently verified channel, the request returns `503`.
+  **`aci_session_ids`** (array of strings): restrict the request further to specific attested channels, identified by the session ids from [`GET /v1/aci/sessions`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). Any one of the listed ids may serve the request; if none matches a currently verified channel, the request returns `412` (`session_not_accepted`). Refresh the session list before pinning; example ids are snapshots, not permanent accepted channels.
 
   ```json
-  {"provider": {"aci_verified": true, "aci_session_ids": ["as_2a44...6290"]}}
+  {"provider": {"aci_verified": true, "aci_session_ids": ["50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"]}}
   ```
 
   Session ids imply `aci_verified`. Passing them with `"aci_verified": false` returns `400`, as does an empty array or a non-string entry. Both fields are read by the gateway and removed before the request reaches a provider. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).

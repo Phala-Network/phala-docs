@@ -67,7 +67,7 @@ The verifier checks:
 - **Key management**: KeyProviderInfo extracted from RTMR3 events
 - **Event log integrity**: Replays events to verify RTMR values match quote
 
-Response shows `is_valid: true` when all checks pass. See [dstack-verifier README](https://github.com/Dstack-TEE/dstack/tree/master/verifier) for API details and configuration.
+Response shows `is_valid: true` when all checks pass. See [dstack-verifier README](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier) for API details and configuration.
 
 ### What the Verifier Checks Automatically
 
@@ -114,7 +114,7 @@ Intel signs the quote containing these measurements with their hardware root of 
 
 Use dstack-verifier to verify hardware and firmware automatically. It validates the quote signature, checks TCB status, and ensures debug mode is disabled.
 
-**Implementation details**: See [`verify_quote` function](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for the complete TCB validation logic.
+**Implementation details**: See [`verify_quote` function](https://github.com/Dstack-TEE/dstack/blob/next/dstack/verifier/src/verification.rs) in verifier/src/verification.rs for the complete TCB validation logic.
 
 ## 2. Operating System Verification
 
@@ -134,7 +134,7 @@ Use dstack-verifier to verify OS integrity automatically. It downloads the OS im
 
 For reproducible builds, you can independently build the OS from [meta-dstack](https://github.com/Dstack-TEE/meta-dstack) source and verify it produces identical measurements.
 
-**Implementation details**: See [`verify_os_image_hash` function](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for the OS verification logic.
+**Implementation details**: See [`verify_os_image_hash` function](https://github.com/Dstack-TEE/dstack/blob/next/dstack/verifier/src/verification.rs) in verifier/src/verification.rs for the OS verification logic.
 
 ## 3. Key Management Verification
 
@@ -163,7 +163,7 @@ Use dstack-verifier to extract the key provider information from RTMR3 events au
 
 For production deployments, use [trust-center](https://github.com/Phala-Network/trust-center) which automates complete KMS verification including all reference value comparisons.
 
-**Implementation details**: See [`decode_app_info` method](https://github.com/Dstack-TEE/dstack/blob/master/verifier/src/verification.rs) in verifier/src/verification.rs for key provider extraction logic.
+**Implementation details**: See [`decode_app_info` method](https://github.com/Dstack-TEE/dstack/blob/next/dstack/verifier/src/verification.rs) in verifier/src/verification.rs for key provider extraction logic.
 
 ## 4. Network Security Verification
 
@@ -288,10 +288,10 @@ Verify the full platform integrity by checking each component:
 
 ## Tools and Resources
 
-- **[dstack-verifier](https://github.com/Dstack-TEE/dstack/tree/main/verifier)** - Automated platform verification tool
+- **[dstack-verifier](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier)** - Automated platform verification tool
 - **[meta-dstack](https://github.com/Dstack-TEE/meta-dstack)** - Reproducible OS builds
 - **[dstack SDK](https://www.npmjs.com/package/@phala/dstack-sdk)** - Application info and quote retrieval
-- **[Smart Contracts](https://github.com/Dstack-TEE/dstack/tree/master/kms/auth-eth/contracts)** - DstackKms and DstackApp source
+- **[Smart Contracts](https://github.com/Dstack-TEE/dstack/tree/next/dstack/kms/auth-eth/contracts)** - DstackKms and DstackApp source
 - **[trust-center](https://github.com/Phala-Network/trust-center)** - Complete reference implementation
 
 ## Real-World Example: Private AI

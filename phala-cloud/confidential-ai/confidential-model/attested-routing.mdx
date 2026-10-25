@@ -14,7 +14,7 @@ Two levels of constraint are available:
 | `provider: {"aci_verified": true}` | Any upstream that is currently verified and channel bound. |
 | `provider: {"aci_session_ids": [...]}` | One specific attested channel, by session id. |
 
-By default a request has no attestation constraint. The gateway still verifies confidential upstreams and still issues receipts, but a request without the constraint can be served by a routed provider whose upstream is not attested. See [Provider Verification](/phala-cloud/confidential-ai/confidential-model/providers).
+The Phala endpoint is TEE-only: upstream verification is required even when this block is omitted. `aci_verified` can express that requirement explicitly, and `aci_session_ids` narrows it to specified verified channels. No request option disables the endpoint policy. See [Provider Verification](/phala-cloud/confidential-ai/confidential-model/providers).
 
 ## Require an attested upstream
 
@@ -31,20 +31,20 @@ curl https://inference.phala.com/v1/chat/completions \
   }'
 ```
 
-If no upstream for the requested model is both classified as attested and currently verified, the request fails before the prompt is sent. A routed model such as `anthropic/claude-sonnet-4.5` always fails this check:
+If no upstream for the requested model is both classified as attested and currently verified, the request fails before the prompt is sent. For example, an unavailable verified route can return:
 
 ```json
 {
   "error": {
-    "message": "upstream verification failed: no attested upstream available for model anthropic/claude-sonnet-4.5",
-    "type": "service_unavailable"
+    "message": "upstream verification failed: no attested upstream available for model z-ai/glm-5.3",
+    "type": "upstream_verification_failed"
   }
 }
 ```
 
-The status is `503`. Failover retries stay inside the attested set, so a plaintext upstream never receives the prompt as a fallback.
+The status is `503` (`upstream_verification_failed`). Failover retries stay inside the attested set, so a plaintext upstream never receives the prompt as a fallback.
 
-Setting `"aci_verified": false`, or omitting the field, applies no attestation constraint.
+Setting `"aci_verified": false`, or omitting the field, adds no request-level constraint. The endpoint still requires verified serving.
 
 <Note>
 A request that requires an attested upstream cannot also opt out of the attestation. No request header or option relaxes this constraint once `aci_verified` is set.
@@ -62,11 +62,11 @@ curl -s "https://inference.phala.com/v1/aci/sessions?model=z-ai/glm-5.3" \
   | jq -r '.sessions[] | "\(.session_id)  \(.upstream_name)  \(.endpoint)"'
 ```
 
-Each entry carries a `session_id` of the form `as_<64 hex characters>`, the verifier that produced it, its channel binding, and an `expires_at` timestamp. `?upstream_name=` filters the same list by upstream. See [Get Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
+Each entry carries a `session_id` as a bare 64-character lowercase hex digest with no prefix, the verifier that produced it, its channel binding, and an `expires_at` timestamp. `?upstream_name=` filters the same list by upstream. See [Get Session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
 
 The most reliable id is the one that already served you. Every response's receipt names the session that served it, so a client can pin follow-up requests to the channel it just used.
 
-Pin a request to one or more of them:
+Pin a request to one or more of them. The example id below was obtained from the live sessions endpoint; replace it with a currently accepted id before sending:
 
 ```bash
 curl https://inference.phala.com/v1/chat/completions \
@@ -77,18 +77,18 @@ curl https://inference.phala.com/v1/chat/completions \
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {
       "aci_verified": true,
-      "aci_session_ids": ["as_2a442c6ba4407b583152949de6331e7a5aa7df7285f7aa9dce810e5e24186290"]
+      "aci_session_ids": ["50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"]
     }
   }'
 ```
 
-Listing several ids means any one of them may serve the request. If none of them matches a currently verified channel, the request fails with `503` and no prompt is sent:
+Listing several ids means any one of them may serve the request. If none of them matches a currently verified channel, the request fails with `412` (`session_not_accepted`) and no prompt is sent:
 
 ```json
 {
   "error": {
     "message": "upstream verification failed: none of the requested attested sessions is available for model z-ai/glm-5.3",
-    "type": "service_unavailable"
+    "type": "session_not_accepted"
   }
 }
 ```
@@ -126,11 +126,11 @@ The gateway parses the attestation fields itself and rejects anything it cannot 
 | Request | Result |
 | --- | --- |
 | `"provider": {"aci_verified": true}` | Constraint applied. |
-| `"provider": {"aci_verified": false}` | No constraint. Same as omitting the block. |
+| `"provider": {"aci_verified": false}` | No extra request constraint; endpoint policy still applies. |
 | `"provider": {"aci_verified": "yes"}` | `400`, expected a boolean. |
 | `"provider": {"aci_session_ids": []}` | `400`, must not be empty. |
 | `"provider": {"aci_session_ids": [""]}` | `400`, expected non-empty strings. |
-| `"provider": {"aci_verified": false, "aci_session_ids": ["as_..."]}` | `400`, contradictory. |
+| `"provider": {"aci_verified": false, "aci_session_ids": ["<64 lowercase hex>"]}` | `400`, contradictory. |
 | `"provider": ["aci_verified"]` | `400`, the block must be an object. |
 
 `aci_verified` and `aci_session_ids` are read by the gateway and removed before the request reaches a provider. They compose with the other `provider` fields, such as [`zdr`](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
@@ -160,22 +160,15 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
 
 ```json
 {
-  "seq": 5,
   "type": "upstream.verified",
-  "upstream_name": "phala-120",
-  "provider_type": "phala-direct",
-  "model_id": "z-ai/glm-5.2",
-  "url_origin": "https://glm-5-2.usc1.phala.com",
-  "verifier_id": "private-ai-verifier/phala-direct/v1",
+  "model_id": "z-ai/glm-5.3",
   "result": "verified",
   "required": true,
-  "session_id": "as_8317766f...",
-  "channel_bindings": [{"type": "tls_spki_sha256", "origin": "https://glm-5-2.usc1.phala.com", "spki_sha256": "f55e21b2..."}],
-  "provider_claims": {"trust_boundary": "phala-dstack-cvm", "evidence_scope": "model_instance"}
+  "session_id": "50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"
 }
 ```
 
-`"result": "verified"` with `"required": true` is the proof that the constraint held. `session_id` names the channel that served the request, and is the id to pin for follow-up requests. The receipt is signed by a key in the attested keyset, so this is evidence rather than a log line. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+These fields record the gateway's assertion that the constraint held. Inspection alone does not verify it; verify the receipt signature, hashes, and cited session with the [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy). `session_id` names the channel that served the request, and is the id to pin for follow-up requests. The cited session holds `channel_binding`, typed claims, and evidence; inspect its `upstream_name` rather than assuming a catalog provider name. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
 
 The request you sent is bound into the same receipt through `request.received.body_hash`, so you can prove which constraint you asked for alongside the result you got.
 

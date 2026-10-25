@@ -75,9 +75,13 @@ curl https://inference.phala.com/v1/models
 | `pricing.input_cache_read` | Cached input price per token when the model exposes cache pricing |
 | `providers` | Serving routes available for the model. |
 | `input_modalities` | Supported input types, such as `text` or `image` |
-| `output_modalities` | Supported output types, such as `text` or `embeddings` |
+| `output_modalities` | Supported output types, such as `text`, `embeddings`, or `decisions` |
 | `supported_parameters` | Request parameters accepted by the model |
 | `supported_features` | Higher-level capabilities declared by the model, such as `tools`, `reasoning`, or `structured_outputs` |
+
+## Decision models
+
+Models with `"decisions"` in `output_modalities`, such as `jaredpalmer/kev-4b`, answer typed questions through [`POST /v1/systemone`](/phala-cloud/confidential-ai/confidential-model/api-reference/systemone). They do not serve chat completions and do not stream.
 
 ## Find Verifiable TEE Models
 

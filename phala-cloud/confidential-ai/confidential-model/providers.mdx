@@ -1,42 +1,51 @@
 ---
 title: Provider Verification
-description: Understand how Private AI verifies upstream serving environments without relying on a static provider list.
+description: Understand the evidence and channel bindings for each provider in Phala's live catalog.
 ---
 
-A confidential response is served by an upstream provider whose enclave the gateway verifies before forwarding your prompt. The receipt is the authoritative record for a specific response: read `upstream.verified.provider`, `result`, `required`, `session_id`, `channel_bindings`, and `claims`.
+Every model served at `https://inference.phala.com/v1` uses the TEE-only policy. The Phala gateway requires upstream verification and an enforceable channel binding before forwarding your prompt. Evidence coverage varies by provider: a verified router, a model instance, and a provider broker prove different boundaries.
 
-Provider and model coverage changes over time. Do not treat documentation as a provider allowlist. Use the live model catalog to discover available models, and use receipts for per-response truth.
+The public [model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) lists serving providers in `providers`. The receipt identifies the session that actually served a response; inspect that session's `upstream_name`, `verifier_id`, `channel_binding`, `claims`, and `evidence`. A route label such as `phala-267` is distinct from the catalog provider `phala`.
 
-Zero data retention is a separate property from provider verification. It means the provider does not keep prompt or completion content after serving a request. To request that property for a specific request, send `provider: {"zdr": true}`. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+## Provider evidence
 
-## Binding Methods
+These are the providers in the live catalog. Availability changes; the catalog and each response's verified session remain authoritative.
 
-Private AI can bind a verified upstream session in more than one way:
+| Catalog provider | What the gateway verifier checks and binds | Evidence boundary |
+| --- | --- | --- |
+| `phala` | dstack TDX quote, nonce and signing-address/TLS-SPKI report-data binding, measured compose, and available GPU evidence; pins upstream TLS. | A Phala dstack model CVM. GPU claims depend on verified, nonce-bound evidence. |
+| `chutes` | Instance TDX evidence and verified instance encryption keys; binds forwarding to a verified ML-KEM E2EE key. | Model instance. Inspect the session for GPU evidence and claim status rather than assuming a CPU-to-GPU binding. |
+| `tinfoil` | The official verifier checks enclave evidence, release/code measurements, and router TLS SPKI. | The confidential model router. The gateway does not independently attest each model worker through this verifier. |
+| `near-ai` | Nonce-bound gateway TDX evidence and TLS SPKI; pins the verified gateway channel. | The NEAR AI gateway. Per-model backend verification is delegated to that gateway. |
+| `privatemode` | The official proxy is co-deployed in the gateway's measured compose. Its readiness follows initial Contrast verification and secret exchange; requests and successful responses use Privatemode OAE protection. | The measured proxy and its Contrast-attested secret path. The observed dynamic manifest is not bound to the active inference secret and is not proof of a particular serving manifest. |
+| `fortanix` | The `armet-ai` verifier checks nonce-bound TDX evidence, TLS SPKI, model-id/GPU-evidence report-data commitments, NRAS GPU verification, and an operator-pinned TD measurement profile. | The per-model Armet AI TD. Matching a configured measurement pin does not independently establish model-weight provenance. |
+| `0g-private-computer` | Native verifier checks provider-broker TDX evidence, a pinned boot chain, and report-data-bound encryption/signing keys; forwarding uses the verified E2EE key. | The provider broker TEE. `plaintext_destination_verified: false` means the evidence does not independently establish the plaintext inference destination. |
+
+The implementation is public in the [gateway provider verifiers](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/src/aci/verifier) and [provider evidence bridges](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/scripts/provider_verifier).
+
+## Binding methods
 
 | Binding | Meaning |
 | --- | --- |
 | `tls_spki_sha256` | Pins the provider-facing HTTPS connection to a verified TLS key. |
-| `e2ee_public_key_sha256` | Encrypts the provider-facing request to a verified enclave key. |
+| `e2ee_public_key_sha256` | Encrypts the provider-facing request to a verified key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
 
-The enforced binding appears on the response receipt and on the attested session referenced by that receipt.
+Bindings and typed claims are in the **session**, referenced by the receipt's `upstream.verified.session_id`. The receipt event records `model_id`, `result`, `required`, and `session_id`; do not assume it embeds all verification details.
 
-## Claim Coverage
+## Claim coverage
 
-Each verified session carries typed claims. Coverage depends on the serving environment and verifier, so clients should evaluate the claims required by their own policy instead of assuming every model has the same evidence.
+Claims have lowercase statuses `asserted`, `refuted`, or `unknown`, and a source that distinguishes hardware proof, verifier derivation, and provider/operator assertions.
 
-- `tee_attested` is the baseline hardware claim. A confidential response should assert it with hardware-backed evidence.
-- `tcb_up_to_date` is tri-state. A stale TCB (Trusted Computing Base) is recorded as refuted, not hidden.
-- `serving_software_known_good` means the verifier can connect software measurements to known source or build provenance.
-- `gpu_attested` proves GPU attestation evidence was verified and nonce-bound. It is supplemental; the session gate is still the verified and bound upstream channel.
-- `model_weights_provenance` is not generally proven today. Treat `Unknown` as not proven.
+- `tee_attested` describes the verified TEE boundary above.
+- `tcb_up_to_date` can be `refuted` for a stale TCB; successful verification does not silently turn it into an up-to-date claim.
+- `serving_software_known_good` depends on the verifier's measurement/provenance policy.
+- `gpu_attested` depends on provider evidence. A genuine GPU attestation alone does not establish its binding to the serving CPU TEE.
+- `model_weights_provenance` is not generally proven. Treat `unknown` as unproven.
 
-## Router-Backed Serving
+Zero data retention is a separate property. Send `provider: {"zdr": true}` when the provider must not keep prompt or completion content after serving. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
 
-Some serving environments front many models behind one verified gateway. In that case, the attested session belongs to the verified provider channel, and the served model is recorded on the receipt. Do not infer provider security from the model id alone.
-
-## Routed Responses
-
-Routed responses still pass through the attested Phala gateway, but the upstream serving environment is not attested. The receipt records `result: failed` and `required: false` for `upstream.verified`.
+Ordinary clients do not verify each response. Use the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) for client-side verification.
 
 ## Related
 
