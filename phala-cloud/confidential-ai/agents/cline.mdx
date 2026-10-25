@@ -1,0 +1,54 @@
+---
+title: Cline
+description: Run Cline on Private AI through Private AI Proxy, or configure it by hand.
+---
+
+Cline uses Chat Completions through its **OpenAI Compatible** provider. Private AI Proxy does not configure it automatically; enter the app's Local API values by hand.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a Phala profile, sign in, and turn on **Protected**.
+2. Open Cline's settings (gear icon), select **OpenAI Compatible** under **API Provider**, and enter the Local API values:
+
+   | Field | Value |
+   | --- | --- |
+   | Base URL | `http://127.0.0.1:4180/v1` |
+   | API Key | The client key from the app's Overview screen |
+   | Model ID | `z-ai/glm-5.2`, or another chat model from the app's verified catalog |
+
+3. Start a task.
+
+Requests succeed only while Protected is on. From the CLI, `pap token show` prints the client key and `pap models list` lists the catalog. Keep the client key private.
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Open Cline's settings (gear icon) and select **OpenAI Compatible** under **API Provider**, then enter the following [provider settings](https://docs.cline.bot/provider-config/openai-compatible):
+
+```text
+Base URL: https://inference.phala.com/v1
+API Key: Your Phala API key
+Model ID: z-ai/glm-5.2
+```
+
+Choose another chat model from [`/v1/models`](https://inference.phala.com/v1/models) and copy its context and output limits when entering a model by hand.
+
+This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Use Cline's **Verify** action, then run a read-only request in a disposable repository and confirm the selected provider and model.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Verify fails with the Proxy | Protected must be on; copy the client key again. |
+| Verify fails without the Proxy | Keep `/v1` in the base URL and check the API key. |
+| Tool calls fail | Choose a model that declares `tools` in the live catalog and repeat Verify. |
+
+## Related
+
+- [Cline OpenAI-Compatible Providers](https://docs.cline.bot/provider-config/openai-compatible)
+- [Phala Model Catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

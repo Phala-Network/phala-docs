@@ -75,3 +75,13 @@ phala-cloud/networking/protect-cvm-endpoint
 phala-cloud/networking/setting-up-custom-domain
 phala-cloud/attestation/trust-center-verification
 dstack/trust-center-technical
+phala-cloud/confidential-ai/agents/overview
+phala-cloud/confidential-ai/agents/private-ai-proxy
+phala-cloud/confidential-ai/agents/claude-code
+phala-cloud/confidential-ai/agents/codex
+phala-cloud/confidential-ai/agents/opencode
+phala-cloud/confidential-ai/agents/pi
+phala-cloud/confidential-ai/agents/hermes
+phala-cloud/confidential-ai/agents/openclaw
+phala-cloud/confidential-ai/agents/cline
+phala-cloud/confidential-ai/agents/other-tools

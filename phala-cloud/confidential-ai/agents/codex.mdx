@@ -1,0 +1,66 @@
+---
+title: Codex CLI
+description: "Run Codex CLI on Phala through Private AI Proxy, or configure it by hand."
+---
+
+Codex speaks the Responses protocol. Private AI Proxy configures it automatically.
+
+## With Private AI Proxy
+
+1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile (the default is RedPill), sign in, and turn on **Protected**.
+2. On the **Agents** screen, connect **Codex** and pick a model from the verified catalog.
+3. Start `codex`.
+
+The app adds a custom model provider to `~/.codex/config.toml` that points at its local API with an
+agent-scoped token, and restores the file when you disconnect or stop Protected.
+
+From the CLI, the same connection is:
+
+```bash
+pap agents connect codex
+```
+
+## Without the Proxy
+
+Create a key under **Private AI → API Keys** in the [Phala dashboard](https://cloud.phala.com/dashboard).
+
+Add Phala as a custom provider in the user-level configuration; Codex ignores `model_provider`
+and `model_providers` in a project-local `.codex/config.toml`.
+
+```bash
+export PHALA_AI_API_KEY="YOUR_PHALA_API_KEY"
+```
+
+```toml ~/.codex/config.toml
+model = "z-ai/glm-5.2"
+model_provider = "phala"
+
+[model_providers.phala]
+name = "Phala"
+base_url = "https://inference.phala.com/v1"
+env_key = "PHALA_AI_API_KEY"
+wire_api = "responses"
+```
+
+Pick the model from [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models); choose one that declares `tools`.
+
+This path does not verify attestation locally; use [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) or the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk). Every model on this endpoint runs in a TEE.
+
+## Check the Connection
+
+Start `codex` and run one bounded tool task. With the Proxy, the provider in `config.toml` points
+at `http://127.0.0.1:4180/v1`; without it, at `https://inference.phala.com/v1`.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Codex ignores the Proxy | Confirm **Connected** in the app and that Protected is on, then restart `codex`. |
+| Codex still uses the default provider | Confirm `model_provider = "phala"` is at the top level of the user-level file. |
+| Chat works but tools fail | Choose a model that declares `tools` in the live catalog. |
+
+## Related
+
+- [Codex custom model providers](https://learn.chatgpt.com/docs/config-file/config-advanced#custom-model-providers)
+- [Phala Responses API](/phala-cloud/confidential-ai/confidential-model/api-reference/responses)
+- [Phala model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models)

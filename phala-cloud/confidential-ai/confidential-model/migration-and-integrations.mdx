@@ -1,6 +1,6 @@
 ---
 title: Migration and Integrations
-description: Connect OpenAI-compatible clients, Pi, OpenCode, LangChain, Vercel AI SDK, observability tools, and desktop clients to Private AI.
+description: Migrate from OpenAI or OpenRouter and connect SDKs, observability tools, and gateways.
 ---
 
 Phala Private AI is OpenAI-compatible. Most integrations require changing only the base URL and API key:
@@ -39,11 +39,12 @@ client = OpenAI(
 )
 ```
 
-Model ids use the provider/model format returned by `/v1/models`. Use `is_tee: true` to find models that can be served confidentially, then verify the actual response receipt.
+Model ids use the provider/model format returned by `/v1/models`. Verify the actual response receipt when you need evidence for an exchange.
 
 ## OpenAI SDK
 
 <CodeGroup>
+
 ```python Python
 from openai import OpenAI
 
@@ -73,6 +74,7 @@ const response = await client.chat.completions.create({
   messages: [{ role: "user", content: "Explain TEE privacy." }],
 });
 ```
+
 </CodeGroup>
 
 ## LangChain
@@ -129,91 +131,51 @@ Observability tools may store prompts, responses, metadata, or traces. For sensi
 
 For custom Node.js or Bun applications, use the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) to inject a pinned `fetch` and audit signed receipts in code.
 
-## Verified Coding Agents
+## Gateways
 
-Pi and OpenCode can use native Phala Cloud providers that verify the ACI
-workload and TLS channel before model traffic is sent, then verify each signed
-response receipt before the agent finishes the turn.
+### Cloudflare AI Gateway
 
-### Pi
-
-Install the provider through Pi's package manager:
+In **Compute & AI → AI Gateway → Custom Providers → Add Custom Provider**, set **Provider Name** to `Phala`, **Provider Slug** to `phala`, and **Base URL** to `https://inference.phala.com`, then save and enable the provider. Cloudflare's [custom-provider routing](https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/) appends the path after `custom-phala/`, so the request includes `/v1/chat/completions`. For authenticated gateways, also send `cf-aig-authorization`:
 
 ```bash
-pi install npm:pi-provider-phala-cloud
+curl "https://gateway.ai.cloudflare.com/v1/$CLOUDFLARE_ACCOUNT_ID/$CLOUDFLARE_GATEWAY_ID/custom-phala/v1/chat/completions" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -H "cf-aig-authorization: Bearer $CF_AIG_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "z-ai/glm-5.2",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
 ```
 
-Start Pi and use its native login and model picker:
+### LiteLLM
 
-```text
-/login phala
-# choose Phala Cloud account or Phala Cloud API key
-# wait for the footer to show aci-verified
-/model
-# search for phala/, select a model, and press Ctrl+S to save it as the default
+Add this model to your LiteLLM proxy `config.yaml` using its [generic OpenAI-compatible route](https://docs.litellm.ai/docs/providers/openai_compatible). Set `PHALA_AI_API_KEY` in the proxy's environment and start it with `litellm --config config.yaml`:
+
+```yaml
+model_list:
+  - model_name: phala-glm
+    litellm_params:
+      model: openai/z-ai/glm-5.2
+      api_base: https://inference.phala.com/v1
+      api_key: os.environ/PHALA_AI_API_KEY
 ```
 
-Pi stores the credential, model catalog, and saved default through its native
-persistence. `PHALA_AI_API_KEY` is also supported for the current process.
-
-### OpenCode
-
-Install the provider through OpenCode's plugin command:
-
-```bash
-opencode plugin opencode-provider-phala-cloud --global
-```
-
-Restart OpenCode, then use its native provider and model pickers:
-
-```text
-/connect
-# select Phala Cloud and choose the account flow or API-key method
-/models
-# search for phala/ and select a model
-```
-
-OpenCode stores the plugin configuration and credential in its native stores.
-Do not add a separate `provider.phala` block. `PHALA_AI_API_KEY` is also
-supported for the current process.
-
-Both providers expose `/phala-attestation`, `/phala-receipts`,
-`/phala-receipt`, and `/phala-session` for inspecting verified evidence. These
-commands are optional: connection and response verification already fail
-closed automatically.
-
-<Note>
-Changing only an OpenAI-compatible base URL does not inject ACI's attested TLS
-transport. Base-URL clients can call the API and verify receipts separately;
-use the native Pi or OpenCode provider when verification must be enforced inside
-the agent.
-</Note>
-
-## Coding Assistants and Desktop Clients
-
-For tools that support an OpenAI-compatible provider, use:
-
-| Setting | Value |
-| --- | --- |
-| Provider type | OpenAI compatible |
-| Base URL | `https://inference.phala.com/v1` |
-| API key | Your Phala API key |
-| Model | Any id from `/v1/models` |
-
-This works for tools such as Continue, Cline-compatible assistants, Cherry Studio, and other clients that let you set an OpenAI-compatible base URL.
+Clients of the proxy use `phala-glm` as their model name; LiteLLM sends `z-ai/glm-5.2` to Phala.
 
 ## Migration Checklist
 
 - [ ] Create a Phala API key.
 - [ ] Change the base URL to `https://inference.phala.com/v1`.
 - [ ] List models with `GET /v1/models`.
-- [ ] Use `is_tee: true` for confidential-capable models.
+- [ ] Use a catalog model; every model on this endpoint runs in a TEE.
 - [ ] Capture `x-receipt-id` in raw HTTP responses when you need verification.
 - [ ] Verify one representative response before production rollout.
 
 ## Related
 
 <CardGroup cols={2}>
+  <Card title="Use in Agents" icon="terminal" href="/phala-cloud/confidential-ai/agents/overview" />
   <Card title="On-demand API" icon="bolt" href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api" />
   <Card title="Error Handling" icon="triangle-alert" href="/phala-cloud/confidential-ai/confidential-model/error-handling" />
 </CardGroup>
