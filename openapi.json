@@ -32665,7 +32665,7 @@
             ],
             "title": "Name",
             "description": "Display name for the API key",
-            "default": "Private AI API Key"
+            "default": "Private AI API key"
           }
         },
         "type": "object",

@@ -13,6 +13,7 @@ For a confidential response, gateway verification and binding are one fact: if t
 | --- | --- | --- |
 | `tls_spki_sha256` | SHA-256 digest of the upstream TLS public key (SPKI). | The gateway pins the HTTPS connection to that key before forwarding. |
 | `e2ee_public_key_sha256` | SHA-256 digest of the upstream E2EE public key. | The gateway encrypts the provider-facing request to the verified enclave key. |
+| `proxy_image_sha256` | Privatemode proxy image digest and startup-checked shared credential digest. | The gateway requires the binding to match the measured co-deployed proxy and sends plaintext only to its configured internal origin; the proxy handles provider-facing encryption. |
 
 The binding type depends on the provider. See [Providers](/phala-cloud/confidential-ai/confidential-model/providers).
 

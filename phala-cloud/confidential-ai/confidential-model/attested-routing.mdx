@@ -37,12 +37,12 @@ If no upstream for the requested model is both classified as attested and curren
 {
   "error": {
     "message": "upstream verification failed: no attested upstream available for model z-ai/glm-5.3",
-    "type": "service_unavailable"
+    "type": "upstream_verification_failed"
   }
 }
 ```
 
-The status is `503`. Failover retries stay inside the attested set, so a plaintext upstream never receives the prompt as a fallback.
+The status is `503` (`upstream_verification_failed`). Failover retries stay inside the attested set, so a plaintext upstream never receives the prompt as a fallback.
 
 Setting `"aci_verified": false`, or omitting the field, adds no request-level constraint. The endpoint still requires verified serving.
 
@@ -66,7 +66,7 @@ Each entry carries a `session_id` as a bare 64-character lowercase hex digest wi
 
 The most reliable id is the one that already served you. Every response's receipt names the session that served it, so a client can pin follow-up requests to the channel it just used.
 
-Pin a request to one or more of them:
+Pin a request to one or more of them. The example id below was obtained from the live sessions endpoint; replace it with a currently accepted id before sending:
 
 ```bash
 curl https://inference.phala.com/v1/chat/completions \
@@ -77,18 +77,18 @@ curl https://inference.phala.com/v1/chat/completions \
     "messages": [{"role": "user", "content": "Summarize this patient note."}],
     "provider": {
       "aci_verified": true,
-      "aci_session_ids": ["2a442c6ba4407b583152949de6331e7a5aa7df7285f7aa9dce810e5e241862902a44"]
+      "aci_session_ids": ["50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"]
     }
   }'
 ```
 
-Listing several ids means any one of them may serve the request. If none of them matches a currently verified channel, the request fails with `503` and no prompt is sent:
+Listing several ids means any one of them may serve the request. If none of them matches a currently verified channel, the request fails with `412` (`session_not_accepted`) and no prompt is sent:
 
 ```json
 {
   "error": {
     "message": "upstream verification failed: none of the requested attested sessions is available for model z-ai/glm-5.3",
-    "type": "service_unavailable"
+    "type": "session_not_accepted"
   }
 }
 ```
@@ -164,7 +164,7 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
   "model_id": "z-ai/glm-5.3",
   "result": "verified",
   "required": true,
-  "session_id": "2a442c6ba4407b583152949de6331e7a5aa7df7285f7aa9dce810e5e241862902a44"
+  "session_id": "50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"
 }
 ```
 

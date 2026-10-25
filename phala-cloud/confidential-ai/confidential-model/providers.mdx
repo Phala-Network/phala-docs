@@ -29,6 +29,7 @@ The implementation is public in the [gateway provider verifiers](https://github.
 | --- | --- |
 | `tls_spki_sha256` | Pins the provider-facing HTTPS connection to a verified TLS key. |
 | `e2ee_public_key_sha256` | Encrypts the provider-facing request to a verified key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
 
 Bindings and typed claims are in the **session**, referenced by the receipt's `upstream.verified.session_id`. The receipt event records `model_id`, `result`, `required`, and `session_id`; do not assume it embeds all verification details.
 

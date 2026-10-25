@@ -27,8 +27,18 @@ Every model on `https://inference.phala.com/v1` uses the TEE-only serving policy
 | --- | --- |
 | Client to gateway | TLS protects transit; optional E2EE protects selected fields to the gateway's attested key. |
 | Inside gateway TEE | The attested workload processes the request after TLS termination or E2EE decryption. |
-| Gateway to provider | TLS pinned to a verified key or provider-specific E2EE binds the outgoing channel. |
+| Gateway to provider | Pinned TLS, provider-specific E2EE, or a measured co-deployed proxy binding enforces the provider path. |
 | Inside provider | Depends on the verified model-instance, router, or broker boundary and the session's evidence. |
+
+## Upstream binding boundaries
+
+| Binding | Boundary |
+| --- | --- |
+| `tls_spki_sha256` | The verified upstream TLS key. |
+| `e2ee_public_key_sha256` | The verified provider encryption key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
+
+The Privatemode proxy owns Contrast verification, secret exchange, and body encryption after that internal hop. Its dynamic manifest observation is not bound to the active inference secret.
 
 ## Apply a policy
 

@@ -26,6 +26,8 @@ The `type` field is the machine-readable discriminator.
 | `invalid_request_error` | Malformed request body or unsupported parameter. |
 | `model_not_found` | The requested model id is unavailable. |
 | `not_found_error` | The model exists but no serving route can satisfy the request constraints, for example `provider: {"zdr": true}`. |
+| `session_not_accepted` | None of the requested attested session ids is currently accepted (`412`); refresh and verify the session before retrying. |
+| `upstream_verification_failed` | Required upstream verification failed or no eligible attested upstream is available (`503`); no prompt is forwarded. |
 | `upstream_error` | The upstream provider failed or timed out. |
 
 ## Status Codes
@@ -36,10 +38,11 @@ The `type` field is the machine-readable discriminator.
 | `401` | Missing or invalid API key. |
 | `403` | Forbidden, for example your Balance is too low to fund Private AI. Top up, and calls work again within about 5 minutes. |
 | `404` | No eligible route under the request constraints, or an unknown/expired receipt or session. |
+| `412` | No requested attested session is currently accepted (`session_not_accepted`). |
 | `429` | Rate limited. |
 | `500` | Gateway server error. |
 | `502` | Upstream provider unavailable. |
-| `503` | Service temporarily unavailable. |
+| `503` | Service temporarily unavailable, including required upstream verification failure (`upstream_verification_failed`). |
 
 ## SDK Handling
 
@@ -72,6 +75,7 @@ Retry only transient errors:
 
 - Retry `429`, `500`, `502`, and `503` with exponential backoff.
 - Do not retry `400` or `401` until you fix the request or key.
+- For `412 session_not_accepted`, refresh and verify an accepted session before retrying; do not retry the same stale pin.
 - If a confidential upstream verification fails, treat it as a failed security condition, not a normal retry loop, unless the API response documents it as transient.
 
 ```python

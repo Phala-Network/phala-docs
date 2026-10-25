@@ -31,9 +31,17 @@ GET /v1/aci/sessions?upstream_name={upstream_name}&model={model}
 | `established_at` | number | When the material was verified (Unix seconds). |
 | `expires_at` | number | Retention deadline (Unix seconds). |
 | `identity` | object | Verified upstream identity keys (for example a signing address). |
-| `channel_binding` | array | The enforceable binding(s): a TLS SPKI digest or an E2EE public key. |
+| `channel_binding` | array | The enforceable binding(s): TLS SPKI, E2EE public key, or measured co-deployed proxy image/credential. |
 | `claims` | object | Typed claims (below). |
 | `evidence` | object | Byte-preserving evidence the verifier checked (`digest` + data URI). |
+
+### Binding types
+
+| Type | Meaning |
+| --- | --- |
+| `tls_spki_sha256` | Pins the upstream TLS public key. |
+| `e2ee_public_key_sha256` | Binds provider-facing encryption to a verified key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
 
 ### Typed claims
 
