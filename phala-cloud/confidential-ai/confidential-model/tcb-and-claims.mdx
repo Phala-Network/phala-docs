@@ -38,12 +38,17 @@ A claim is not just a boolean. It has a status, a source, and often a reason.
 
 | Claim | Meaning |
 | --- | --- |
-| `tee_attested` | A genuine CPU TEE was verified and bound to the channel. |
+| `tee_attested` | An attested TEE identity is bound to the channel, directly or through the measured proxy; inspect `source`. |
 | `tcb_up_to_date` | The platform Trusted Computing Base is current. |
 | `os_known_good` | The OS or platform image maps to reviewed source or known measurements. |
 | `serving_software_known_good` | Serving software maps to reviewed source or build provenance. |
 | `gpu_attested` | NVIDIA confidential-computing GPU evidence was verified and nonce-bound. |
 | `model_weights_provenance` | Model weights and quantization match a reviewed provenance chain. |
+
+Privatemode reports `tee_attested: asserted` with `source: verifier_derived` under verifier
+`privatemode-proxy/co-deployed-contrast/v1`. It relies on the measured co-deployed proxy and its
+Contrast-attested secret path, rather than a provider quote verified directly by the gateway.
+Its other common claims are `unknown`.
 
 ## TCB Freshness
 
@@ -61,7 +66,7 @@ Your verifier policy decides whether a refuted TCB is acceptable. The receipt's 
 
 ## Suggested Policy
 
-1. Require `tee_attested: asserted` from `hardware_proven`.
+1. For direct hardware proof, require `tee_attested: asserted` from `hardware_proven`. This policy excludes Privatemode's `verifier_derived` sessions.
 2. Require `upstream.verified.result = verified` and `required = true` for sensitive prompts.
 3. Treat `unknown` as not proven.
 4. Decide whether to reject `tcb_up_to_date: refuted`.
