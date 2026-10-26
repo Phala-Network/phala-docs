@@ -37,7 +37,7 @@ Bindings and typed claims are in the **session**, referenced by the receipt's `u
 
 Claims have lowercase statuses `asserted`, `refuted`, or `unknown`, and a source that distinguishes hardware proof, verifier derivation, and provider/operator assertions.
 
-- `tee_attested` describes the verified TEE boundary above.
+- `tee_attested` describes the verified TEE boundary above. Check its `source` as well as its `status`: Privatemode reports `verifier_derived`, based on the measured proxy and its Contrast-attested secret path, rather than `hardware_proven`.
 - `tcb_up_to_date` can be `refuted` for a stale TCB; successful verification does not silently turn it into an up-to-date claim.
 - `serving_software_known_good` depends on the verifier's measurement/provenance policy.
 - `gpu_attested` depends on provider evidence. A genuine GPU attestation alone does not establish its binding to the serving CPU TEE.

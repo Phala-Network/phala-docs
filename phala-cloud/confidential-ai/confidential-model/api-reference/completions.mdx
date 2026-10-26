@@ -18,14 +18,14 @@ POST https://inference.phala.com/v1/completions
 
 ```json
 {
-  "model": "gpt-3.5-turbo-instruct",
+  "model": "z-ai/glm-5.3",
   "prompt": "Say this is a test",
   "max_tokens": 7,
   "temperature": 0
 }
 ```
 
-This endpoint accepts the same `provider` routing block as chat completions, including `zdr`, `aci_verified`, and `aci_session_ids`. See [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions#body-provider).
+This endpoint accepts the same `provider` routing block as chat completions, including `zdr`, `aci_verified`, and `aci_session_ids`. See [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions#param-provider).
 
 ## Response
 
@@ -34,7 +34,7 @@ This endpoint accepts the same `provider` routing block as chat completions, inc
   "id": "cmpl-123",
   "object": "text_completion",
   "created": 1677652288,
-  "model": "gpt-3.5-turbo-instruct",
+  "model": "z-ai/glm-5.3",
   "choices": [
     {
       "text": "\n\nThis is a test.",
