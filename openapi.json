@@ -8242,18 +8242,6 @@
             "title": "Compose Hash",
             "description": "Compose hash to check (hex)"
           },
-          "node_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node Id",
-            "description": "Node ID (resolves device_id from DB)"
-          },
           "device_id": {
             "anyOf": [
               {
@@ -8277,6 +8265,19 @@
             ],
             "title": "Chain Id",
             "description": "Chain ID for RPC URL resolution. If omitted, resolved from DB via CVM/KMS records."
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
@@ -14360,30 +14361,6 @@
       },
       "CreateAppInstanceRequest": {
         "properties": {
-          "teepod_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Teepod Id",
-            "description": "Target node ID (deprecated, use node_id)"
-          },
-          "node_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node Id",
-            "description": "Target node ID for the replica"
-          },
           "encrypted_env": {
             "anyOf": [
               {
@@ -14455,11 +14432,24 @@
             ],
             "title": "Transaction Hash",
             "description": "On-chain transaction hash proving compose-hash registration. Use 'already-registered' (or omit) when the hash was registered earlier."
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
         "title": "CreateAppInstanceRequest",
-        "description": "Request model for creating a new instance under an existing app.\n\nInherits node_id, encrypted_env, compose_hash and their validators from ReplicateRequest."
+        "description": "Request model for creating a new instance under an existing app.\n\nInherits node, encrypted_env, compose_hash and their validators from ReplicateRequest."
       },
       "CreateConnectionRequest": {
         "properties": {
@@ -23849,18 +23839,6 @@
             "title": "Compose Hash",
             "description": "Override compose hash to check"
           },
-          "node_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node Id",
-            "description": "Override node (resolves device_id)"
-          },
           "device_id": {
             "anyOf": [
               {
@@ -23872,6 +23850,19 @@
             ],
             "title": "Device Id",
             "description": "Override device_id directly"
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
@@ -26965,6 +26956,18 @@
             ],
             "title": "Version",
             "description": "Teepod version"
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
@@ -30235,7 +30238,7 @@
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/NodeRef"
+              "$ref": "#/components/schemas/WorkspaceNodeRef"
             },
             "type": "array",
             "title": "Items"
@@ -31527,17 +31530,6 @@
             "title": "Prefer Dev",
             "description": "Prefer dev OS image (True) or non-dev OS image (False). When None, auto-selects based on image name or defaults to dev."
           },
-          "teepod_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Teepod Id"
-          },
           "region": {
             "anyOf": [
               {
@@ -31687,6 +31679,19 @@
               }
             ],
             "title": "Experimental Vpc Server App Id"
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
@@ -32998,30 +33003,6 @@
       },
       "ReplicateRequest": {
         "properties": {
-          "teepod_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Teepod Id",
-            "description": "Target node ID (deprecated, use node_id)"
-          },
-          "node_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node Id",
-            "description": "Target node ID for the replica"
-          },
           "encrypted_env": {
             "anyOf": [
               {
@@ -33045,6 +33026,19 @@
             ],
             "title": "Compose Hash",
             "description": "Explicit compose hash to replicate. Required when the source app has multiple live instances."
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node",
+            "description": "Physical node name"
           }
         },
         "type": "object",
@@ -43912,11 +43906,16 @@
             "type": "array",
             "title": "Kms List",
             "default": []
+          },
+          "node": {
+            "type": "string",
+            "title": "Node"
           }
         },
         "type": "object",
         "required": [
           "teepod_id",
+          "node",
           "name",
           "listed",
           "resource_score",
@@ -44640,6 +44639,155 @@
           "balance"
         ],
         "title": "Credit"
+      },
+      "WorkspaceNodeRef": {
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "const": "node",
+            "title": "Object Type",
+            "description": "Fixed value 'node'",
+            "default": "node"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "Teepod numeric ID"
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node Id",
+            "description": "Physical node numeric ID"
+          },
+          "node": {
+            "type": "string",
+            "title": "Node"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Node display name"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "Region identifier"
+          },
+          "device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Id",
+            "description": "Resolved single device ID (deprecated)"
+          },
+          "device_ids": {
+            "items": {
+              "$ref": "#/components/schemas/NodeDeviceIdOut"
+            },
+            "type": "array",
+            "title": "Device Ids",
+            "description": "All device_ids configured for this node"
+          },
+          "ppid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ppid",
+            "description": "PPID"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeepodStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Node status"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "description": "Teepod version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "node"
+        ],
+        "title": "WorkspaceNodeRef"
+      },
+      "NodeDeviceIdOut": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id",
+            "description": "Device identifier"
+          },
+          "algorithm_version": {
+            "type": "string",
+            "title": "Algorithm Version",
+            "description": "Semver of the derivation algorithm that produced this device_id"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Whether this device_id is active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id",
+          "algorithm_version",
+          "enabled"
+        ],
+        "title": "NodeDeviceIdOut"
       }
     },
     "securitySchemes": {
