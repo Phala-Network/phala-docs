@@ -54,7 +54,7 @@ resource "phala_app" "web" {
 |-----------|------|-------------|
 | `region` | String | Preferred region slug (e.g. `US-WEST-1`). **Force-new.** Discover values with `data.phala_regions`. |
 | `image` | String | OS image slug. Updatable in-place. Use exact slugs from `data.phala_images`. |
-| `node_id` | Number | Pin placement to a specific worker node. **Force-new.** Discover nodes with `data.phala_nodes`. |
+| `node` | String | Pin placement to a nonempty physical node name. **Force-new.** Discover names with `data.phala_nodes`. |
 | `kms` | String | KMS type for provisioning: `phala` (default), `ethereum`, or `base`. **Force-new.** |
 | `custom_app_id` | String | Custom app ID for deterministic identity flow (PHALA KMS). **Force-new.** |
 | `nonce` | Number | Nonce paired with `custom_app_id` for deterministic identity. **Force-new.** |
@@ -164,7 +164,7 @@ Changing any of these attributes destroys the existing resource and creates a ne
 - `kms`
 - `custom_app_id`
 - `nonce`
-- `node_id`
+- `node`
 
 ### In-Place Updates
 

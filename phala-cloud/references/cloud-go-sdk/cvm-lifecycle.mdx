@@ -25,7 +25,7 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | `VCPU` | `*int` | No | Number of vCPUs |
 | `Memory` | `*int` | No | Memory in MB |
 | `DiskSize` | `*int` | No | Disk size in GB |
-| `TeepodID` | `*int` | No | Target teepod ID |
+| `Node` | `*string` | No | Nonempty physical node name, such as `usw5` |
 | `Image` | `*string` | No | OS image name |
 | `Region` | `*string` | No | Target region |
 | `KMSType` | `*string` | No | KMS type (e.g., `"phala"`) |
@@ -258,11 +258,11 @@ func (c *Client) ReplicateCVM(ctx context.Context, cvmID string, opts *Replicate
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `NodeID` | `*int` | Target node ID for the replica |
+| `Node` | `*string` | Nonempty physical node name for the replica |
 
 ```go
 replica, err := client.ReplicateCVM(ctx, "my-app", &phala.ReplicateCVMOptions{
-	NodeID: phala.Int(42),
+	Node: phala.String("usw5"),
 })
 if err != nil {
 	log.Fatal(err)
