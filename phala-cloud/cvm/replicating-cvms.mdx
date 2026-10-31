@@ -12,16 +12,19 @@ This guide focuses on the two workflows most users should use: the Phala Cloud d
 A replica is a **new, independent CVM instance** provisioned from a **source CVM**. It gets its own `vm_uuid`, endpoint, and attestation. It does not share storage, memory, or running state with the source.
 
 **Copied from source (you do not re-specify these):**
+
 - The compose file and pre-launch script (same `compose_hash`)
 - The application ID (all replicas of an app share one `app_id`)
 - The KMS type and chain
 - The encrypted environment variables
 
 **Things you can change at replication time:**
+
 - The target node (pin the replica to a specific node, or let the platform pick one)
 - The encrypted environment variables (optional override — pass a new encrypted blob to replace the inherited one)
 
 **Not carried over:**
+
 - Running processes, in-memory state
 - Contents of persistent volumes and any data written at runtime
 - Active network connections
@@ -88,12 +91,12 @@ phala login
 Replicate a CVM to a specific node:
 
 ```bash
-phala cvms replicate <cvm-id> --node-id prod6
+phala cvms replicate <cvm-id> --node prod6
 ```
 
-`--node-id` accepts either a numeric node ID or a node name as shown in `phala nodes ls` — for example `prod6`, `prod7`, or `use2`. Ambiguous names are rejected rather than guessed, so if a name matches more than one node the CLI asks you to use the numeric ID instead.
+`--node` accepts a physical node name, for example `prod6`, `prod7`, or `use2`.
 
-Omit `--node-id` to let the backend schedule the replica on any node with capacity and a compatible image:
+Omit `--node` to let the backend schedule the replica on any node with capacity and a compatible image:
 
 ```bash
 phala cvms replicate <cvm-id>
@@ -103,18 +106,18 @@ phala cvms replicate <cvm-id>
 
 On success the CLI prints the new replica's UUID, node, and dashboard URL:
 
-```
+```text
 Source CVM ID:   app_abc123
 Team:            my-workspace
 CVM UUID:        550e8400-e29b-41d4-a716-446655440000
-App ID:          0x1234...
+App ID:          0x1234567890abcdef1234567890abcdef12345678
 Name:            my-app-replica-1
 Status:          provisioning
 Node:            prod6 (ID: 5)
 vCPUs:           2
 Memory:          4096 MB
 Disk Size:       40 GB
-App URL:         https://cloud.phala.com/my-workspace/apps/0x1234.../instances/550e8400...
+App URL:         https://cloud.phala.com/my-workspace/apps/0x1234567890abcdef1234567890abcdef12345678/instances/550e8400-e29b-41d4-a716-446655440000
 ```
 
 ### Replicating with new environment variables
@@ -122,7 +125,7 @@ App URL:         https://cloud.phala.com/my-workspace/apps/0x1234.../instances/5
 By default the replica inherits the source CVM's encrypted environment. See [Environment Variables](/phala-cloud/cvm/set-secure-environment-variables) for the full encryption model and the rules around `allowed_envs`. To change an env var on the replica — for example, to give a staging replica a different database URL — pass `--env-file`:
 
 ```bash
-phala cvms replicate <cvm-id> --node-id prod6 --env-file .env.prod
+phala cvms replicate <cvm-id> --node prod6 --env-file .env.prod
 ```
 
 The CLI:
@@ -138,7 +141,7 @@ Plaintext env values never leave your machine. Only the running CVM, after the K
 
 When an app has multiple live CVMs with different compose hashes — for example, a canary deployment alongside the stable version — the CLI needs to know which configuration you want to replicate. Running the basic command with just the `app_id` fails:
 
-```
+```text
 $ phala cvms replicate app_abc123
 Error: ERR-03-009 — This app has multiple live CVM instances.
        Please specify compose_hash to choose which revision to replicate.
@@ -149,13 +152,13 @@ Two ways to fix it:
 - **Point at a specific source instance** by UUID. The UUID uniquely identifies one compose hash.
 
   ```bash
-  phala cvms replicate 550e8400-e29b-41d4-a716-446655440000 --node-id prod6
+  phala cvms replicate 550e8400-e29b-41d4-a716-446655440000 --node prod6
   ```
 
-- **Pass `--compose-hash` explicitly.** Look up the compose hash of the configuration you want (from the dashboard or `phala cvms list`) and pass it on the command line:
+- **Pass `--compose-hash` explicitly.** Look up the compose hash of the configuration you want (from the dashboard or `phala cvms list`), set `COMPOSE_HASH` to that value, and pass it on the command line:
 
   ```bash
-  phala cvms replicate app_abc123 --compose-hash 0xabcd... --node-id prod6
+  phala cvms replicate app_abc123 --compose-hash "$COMPOSE_HASH" --node prod6
   ```
 
 ### Onchain KMS: auto-registration
@@ -163,11 +166,11 @@ Two ways to fix it:
 When the source CVM uses Onchain KMS and you own the DstackApp through an EOA, you can register and replicate in one command by passing a private key. The CLI detects whether the target node's device and the compose hash are already allowlisted and only writes the transactions that are missing.
 
 ```bash
-export PRIVATE_KEY=0x...
+# Set PRIVATE_KEY securely before running this command.
 export ETH_RPC_URL=https://base-mainnet.example.com
 
 phala cvms replicate <cvm-id> \
-  --node-id prod6 \
+  --node prod6 \
   --private-key $PRIVATE_KEY \
   --rpc-url $ETH_RPC_URL
 ```
@@ -189,48 +192,28 @@ When the DstackApp owner is a Safe, a timelock, or any other contract that canno
 **Step 1. Prepare.** Ask the backend to reserve the replica and emit the on-chain payload:
 
 ```bash
-phala cvms replicate <cvm-id> --node-id prod6 --prepare-only
+phala cvms replicate <cvm-id> --node prod6 --prepare-only
 ```
 
-The command does not create the replica. Instead it prints a commit token and the values that need to be authorized on-chain:
-
-```
-CVM replica prepared successfully (pending on-chain approval).
-
-Compose Hash:    0xabcd1234...
-App ID:          0x1234...
-Device ID:       0xdevice...
-Commit Token:    prep_token_xyz...
-
-On-chain Status:
-  Compose Hash:  NOT registered
-  Device ID:     NOT registered
-
-To complete the replica after on-chain approval:
-  phala cvms replicate <cvm-id> \
-    --commit \
-    --token prep_token_xyz... \
-    --compose-hash 0xabcd1234... \
-    --transaction-hash <tx-hash>
-```
+The command does not create the replica. It prints a commit token, compose hash, app ID, device ID, and their on-chain registration status. Save the complete values for the next steps.
 
 The commit token is valid for 14 days. Save it somewhere your approvers can reach.
 
 **Step 2. Sign on-chain.** From your Safe (or whichever contract owns the DstackApp), call the missing writes on the DstackApp address printed above. Typically:
 
-- `addComposeHash(0xabcd1234...)` — if the `Compose Hash` line above shows `NOT registered`.
-- `addDevice(0xdevice...)` — if the `Device ID` line shows `NOT registered`.
+- `addComposeHash` with the returned compose hash — if it is not registered.
+- `addDevice` with the returned device ID — if it is not registered.
 
 Submit the transaction(s) through the Safe UI and wait for execution. Record the final transaction hash.
 
-**Step 3. Commit.** Pass the commit token, compose hash, and transaction hash back to the CLI:
+**Step 3. Commit.** Set `COMMIT_TOKEN` and `COMPOSE_HASH` to the values returned by the prepare step, and `TRANSACTION_HASH` to the executed transaction hash. Pass them back to the CLI:
 
 ```bash
 phala cvms replicate <cvm-id> \
   --commit \
-  --token prep_token_xyz... \
-  --compose-hash 0xabcd1234... \
-  --transaction-hash 0x5678...
+  --token "$COMMIT_TOKEN" \
+  --compose-hash "$COMPOSE_HASH" \
+  --transaction-hash "$TRANSACTION_HASH"
 ```
 
 If both writes are already on-chain and you just want to finalize, pass `--transaction-hash already-registered`. The backend re-reads the contract, verifies the state, and creates the replica.
@@ -248,7 +231,7 @@ Create a replica from a source CVM.
 | Field | Location | Required | Description |
 | --- | --- | --- | --- |
 | `cvm_id` | path | yes | Source CVM identifier. UUID, `app_id`, or unique name. |
-| `node_id` | body | no | Numeric target node ID. Omit to let the backend pick. The API only accepts numeric IDs; name resolution (e.g. `prod6`) is a CLI feature. |
+| `node` | body | no | Physical target node name, such as `prod6`. Omit to let the backend pick. |
 | `compose_hash` | body | no | Explicit compose hash. Required when the source app has more than one live configuration. |
 | `encrypted_env` | body | no | Hex-encoded encrypted env blob. Omit to inherit the source's env. |
 | `X-Prepare-Only` | header | no | Set to `true` to prepare the replica without creating it, for the manual approval flow. |
@@ -278,7 +261,7 @@ Replicate calls share the same structured error envelope as the rest of the Phal
 | Code | Meaning |
 | --- | --- |
 | `ERR-01-005` | Onchain KMS requires compose hash or device registration (HTTP 465). Use auto-registration or the prepare + commit flow. |
-| `ERR-02-003` / `ERR-02-004` / `ERR-02-005` | Target node is out of vCPU, memory, or slots. Drop `--node-id` or pick a different node. |
+| `ERR-02-003` / `ERR-02-004` / `ERR-02-005` | Target node is out of vCPU, memory, or slots. Drop `--node` or pick a different node. |
 | `ERR-03-006` | The source CVM's OS image is not available on the target node. |
 | `ERR-03-008` | The source instance is not visible in the current workspace. |
 | `ERR-03-009` | The source app has multiple live instances; pass `--compose-hash` or use a specific source UUID. |
