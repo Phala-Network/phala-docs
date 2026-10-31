@@ -22,10 +22,10 @@ Returns the available KMS contracts. This method always requests API version `20
 ```go
 contracts, err := client.ListKMSContracts(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 for _, contract := range contracts.Items {
-	fmt.Println(contract.ID, contract.ContractAddress, contract.NodeCount)
+    fmt.Println(contract.ID, contract.ContractAddress, contract.NodeCount)
 }
 ```
 
@@ -48,7 +48,7 @@ Returns one KMS contract by slug. A `kc_`-prefixed contract ID also resolves.
 ```go
 contract, err := client.GetKMSContract(ctx, "base")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Println(contract.ContractAddress)
 fmt.Println(contract.K256Pubkey, contract.CAPubkey)
@@ -60,8 +60,8 @@ fmt.Println(contract.K256Pubkey, contract.CAPubkey)
 
 ```go
 func (c *Client) ListKMSContractNodes(
-	ctx context.Context,
-	slug string,
+    ctx context.Context,
+    slug string,
 ) (*ListKMSContractNodesResponse, error)
 ```
 
@@ -74,10 +74,10 @@ Returns the KMS node replicas under a contract, including each node's RPC URL an
 ```go
 nodes, err := client.ListKMSContractNodes(ctx, "base")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 for _, node := range nodes.Items {
-	fmt.Println(node.ID, node.URL, node.Version)
+    fmt.Println(node.ID, node.URL, node.Version)
 }
 ```
 
@@ -100,9 +100,9 @@ Use `ListKMSContracts`, `GetKMSContract`, and `ListKMSContractNodes` for new cod
 
 ```go
 func (c *Client) GetAppEnvEncryptPubKey(
-	ctx context.Context,
-	kmsType string,
-	appID string,
+    ctx context.Context,
+    kmsType string,
+    appID string,
 ) (*AppEnvPubKeyResponse, error)
 ```
 
@@ -114,12 +114,12 @@ Returns the public key used to encrypt environment variables for an app.
 
 ```go
 key, err := client.GetAppEnvEncryptPubKey(
-	ctx,
-	"phala",
-	"ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+    ctx,
+    "phala",
+    "ff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Println(key)
 ```
@@ -141,7 +141,7 @@ Reserves app IDs from the Phala KMS for deterministic provisioning.
 ```go
 reserved, err := client.NextAppIDs(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Println(reserved)
 ```
@@ -152,8 +152,8 @@ fmt.Println(reserved)
 
 ```go
 func (c *Client) GetKMSOnChainDetail(
-	ctx context.Context,
-	chain string,
+    ctx context.Context,
+    chain string,
 ) (*KMSOnChainDetail, error)
 ```
 
@@ -166,13 +166,19 @@ Returns the contracts, registered devices, OS images, and verification anchors f
 ```go
 detail, err := client.GetKMSOnChainDetail(ctx, "base")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 for _, contract := range detail.Contracts {
-	fmt.Println(contract.ContractAddress)
-	fmt.Println(contract.K256Pubkey, contract.CAPubkey)
+    fmt.Println(contract.ContractAddress)
+    fmt.Println(contract.K256Pubkey, contract.CAPubkey)
 }
 ```
+
+## Compute a compose hash
+
+`GetComposeHash` normalizes an `AppCompose` before hashing by default. Pass `false` as the second argument to hash the typed compose without normalization. This default differs from older SDK behavior.
+
+`AppCompose` models only a subset of fields. For a complete decoded document, use `GetComposeHashFromMap`; it normalizes a copy without changing the input. Decode JSON with `json.Decoder.UseNumber` to preserve numeric values. `DumpAppComposeFromMap` returns the normalized canonical JSON used for hashing.
 
 ## Compute and verify mr_config_id
 
@@ -181,18 +187,18 @@ Use `GetMrConfigIdHex` when your inputs are hex strings:
 ```go
 func GetMrConfigId(input MrConfigIdInput) ([48]byte, error)
 func GetMrConfigIdHex(
-	composeHashHex string,
-	appIDHex string,
-	kp KeyProviderKind,
-	kpIDHex string,
+    composeHashHex string,
+    appIDHex string,
+    kp KeyProviderKind,
+    kpIDHex string,
 ) (string, error)
 func GetMrConfigIdV1(composeHash [32]byte) [48]byte
 func VerifyMrConfigId(
-	mrConfigIDHex string,
-	composeHashHex string,
-	appIDHex string,
-	kp KeyProviderKind,
-	kpIDHex string,
+    mrConfigIDHex string,
+    composeHashHex string,
+    appIDHex string,
+    kp KeyProviderKind,
+    kpIDHex string,
 ) (bool, error)
 ```
 
@@ -200,24 +206,24 @@ For `KeyProviderKMS`, set `kpIDHex` to the contract's `K256Pubkey`, not its `CAP
 
 ```go
 mrConfigID, err := phala.GetMrConfigIdHex(
-	"0x<64-hex-characters>",
-	"0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
-	phala.KeyProviderKMS,
-	"0x<kms-key-provider-id>",
+    "0x<64-hex-characters>",
+    "0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+    phala.KeyProviderKMS,
+    "0x<kms-key-provider-id>",
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 matches, err := phala.VerifyMrConfigId(
-	mrConfigID,
-	"0x<64-hex-characters>",
-	"0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
-	phala.KeyProviderKMS,
-	"0x<kms-key-provider-id>",
+    mrConfigID,
+    "0x<64-hex-characters>",
+    "0xff22c67f5d3b4c8a9e1f0a2b3c4d5e6f7a8b9c0d",
+    phala.KeyProviderKMS,
+    "0x<kms-key-provider-id>",
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Println(matches)
 ```

@@ -4,14 +4,14 @@ description: Functions for updating CVM resources, visibility, OS images, and co
 ---
 
 <Warning>
-**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+Some configuration updates restart the CVM. An unchanged compose update can be a no-op, and SSH key changes can remain pending until the next power-on. Check each operation's behavior before updating a running CVM.
 </Warning>
 
-Each `updateXxxx` method targets a single aspect of the CVM and calls a dedicated API endpoint. `patchCvm` is the unified method that can update multiple fields in a single request. Use `patchCvm` when you need to change several settings atomically; use the individual `updateXxxx` methods when you only need to change one thing.
+Each `updateXxxx` method targets a single aspect of the CVM. `patchCvm` is the unified method that can update multiple fields in a single request. Use `patchCvm` when you need to change several settings atomically; use the individual `updateXxxx` methods when you only need to change one thing.
 
 ## updateCvmResources
 
-`PATCH /cvms/{cvmId}/resources`
+`PATCH /cvms/{cvmId}`
 
 Updates CVM compute resources (vCPU, memory, disk).
 

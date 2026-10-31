@@ -6,10 +6,10 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 CVM configuration methods let you modify a running or stopped CVM without recreating it.
 
 <Warning>
-**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+Some configuration updates require a CVM restart. Check the operation's options and response before applying changes to a running CVM.
 </Warning>
 
-Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.) and calls a dedicated API endpoint. `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
+Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.). `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
 
 For CVMs using on-chain KMS, updates that affect the compose hash require an additional on-chain confirmation step.
 
@@ -43,7 +43,7 @@ func (c *Client) UpdateDockerCompose(ctx context.Context, cvmID, compose string,
 ```go
 result, err := client.UpdateDockerCompose(ctx, "my-app", composeYAML, nil)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -76,14 +76,32 @@ result, err := client.UpdatePreLaunchScript(ctx, "my-app", script, nil)
 
 ---
 
+## CommitCVMUpdate
+
+`POST /cvms/{cvmId}/commit-update`
+
+Commit a prepared on-chain update with its token, compose hash, and transaction hash. The response contains `CorrelationID` and `Status`.
+
+```go
+result, err := client.CommitCVMUpdate(ctx, "my-app", &phala.CommitCVMUpdateRequest{
+    Token:           token,
+    ComposeHash:     composeHash,
+    TransactionHash: transactionHash,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID, result.Status)
+```
+
 ## UpdateCVMResources
 
-`PATCH /cvms/{cvmId}/resources`
+`PATCH /cvms/{cvmId}`
 
 Updates the resource allocation (vCPUs, memory, disk) for a CVM. All fields are optional; only the fields you include will be changed.
 
 ```go
-func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *UpdateResourcesRequest) error
+func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *UpdateResourcesRequest) (*UpdateResourcesResponse, error)
 ```
 
 **UpdateResourcesRequest fields:**
@@ -96,15 +114,19 @@ func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *Upda
 | `InstanceType` | `*string` | Instance type override |
 | `AllowRestart` | `*bool` | Allow automatic restart if needed |
 
-**Returns:** `error` (no response body on success)
+**Returns:** `*UpdateResourcesResponse` with the operation status and correlation ID.
 
 ```go
-err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
-	VCPU:         phala.Int(4),
-	Memory:       phala.Int(8192),
-	DiskSize:     phala.Int(50),
-	AllowRestart: phala.Bool(true),
+result, err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
+    VCPU:         phala.Int(4),
+    Memory:       phala.Int(8192),
+    DiskSize:     phala.Int(50),
+    AllowRestart: phala.Bool(true),
 })
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID)
 ```
 
 <Note>
@@ -135,11 +157,11 @@ func (c *Client) UpdateCVMVisibility(ctx context.Context, cvmID string, req *Upd
 
 ```go
 visibility, err := client.UpdateCVMVisibility(ctx, "my-app", &phala.UpdateVisibilityRequest{
-	PublicSysinfo: phala.Bool(true),
-	PublicLogs:    phala.Bool(true),
+    PublicSysinfo: phala.Bool(true),
+    PublicLogs:    phala.Bool(true),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -149,7 +171,7 @@ if err != nil {
 
 `PATCH /cvms/{cvmId}/envs`
 
-Updates the encrypted environment variables for a CVM. Environment variables are encrypted client-side before being sent to the API.
+Updates the encrypted environment variables for a CVM. Environment variables are encrypted client-side before being sent to the API. `ProvisionComposeUpdateRequest.EncryptedEnv` has been removed; use `UpdateCVMEnvs` for environment changes instead.
 
 ```go
 func (c *Client) UpdateCVMEnvs(ctx context.Context, cvmID string, req *UpdateEnvsRequest) (*UpdateResult, error)
@@ -168,8 +190,8 @@ func (c *Client) UpdateCVMEnvs(ctx context.Context, cvmID string, req *UpdateEnv
 
 ```go
 result, err := client.UpdateCVMEnvs(ctx, "my-app", &phala.UpdateEnvsRequest{
-	EncryptedEnv: encryptedHex,
-	EnvKeys:      []string{"DATABASE_URL", "SECRET_KEY"},
+    EncryptedEnv: encryptedHex,
+    EnvKeys:      []string{"DATABASE_URL", "SECRET_KEY"},
 })
 ```
 
@@ -195,7 +217,7 @@ func (c *Client) UpdateOSImage(ctx context.Context, cvmID string, req *UpdateOSI
 
 ```go
 err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
-	OSImageName: "dstack-v0.4.0",
+    OSImageName: "dstack-v0.4.0",
 })
 ```
 
@@ -231,22 +253,24 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `OSImageName` | `*string` | OS image name |
 | `AllowRestart` | `*bool` | Allow automatic restart |
 
+A nil `AllowedEnvs` slice omits the field; an explicitly empty slice sends `[]` to clear it.
+
 **Returns:** `*PatchCVMResponse` — check `RequiresOnChainHash` to see if on-chain confirmation is needed.
 
 ```go
 compose := "services:\n  app:\n    image: nginx:latest\n"
 resp, err := client.PatchCVM(ctx, "my-app", &phala.PatchCVMRequest{
-	DockerComposeFile: &compose,
-	PublicSysinfo:     phala.Bool(true),
-	VCPU:              phala.Int(4),
+    DockerComposeFile: &compose,
+    PublicSysinfo:     phala.Bool(true),
+    VCPU:              phala.Int(4),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 if resp.RequiresOnChainHash {
-	// Handle on-chain confirmation — see ConfirmCVMPatch
-	fmt.Printf("On-chain confirmation needed. Compose hash: %s\n", resp.ComposeHash)
+    // Handle on-chain confirmation — see ConfirmCVMPatch
+    fmt.Printf("On-chain confirmation needed. Compose hash: %s\n", resp.ComposeHash)
 }
 ```
 
@@ -269,13 +293,19 @@ func (c *Client) ConfirmCVMPatch(ctx context.Context, cvmID string, req *Confirm
 | `ComposeHash` | `string` | Yes | Compose hash from PatchCVM response |
 | `TransactionHash` | `string` | Yes | On-chain transaction hash |
 
+The request sends an empty JSON object and supplies the hashes in the `X-Compose-Hash` and `X-Transaction-Hash` headers. The response retains the action fields and includes `CorrelationID`. `ConfirmCVMPatchV20260121` returns the earlier ID shape.
+
 **Returns:** `*CVMActionResponse`
 
 ```go
-_, err := client.ConfirmCVMPatch(ctx, "my-app", &phala.ConfirmCVMPatchRequest{
-	ComposeHash:     resp.ComposeHash,
-	TransactionHash: "0xabc123...",
+result, err := client.ConfirmCVMPatch(ctx, "my-app", &phala.ConfirmCVMPatchRequest{
+    ComposeHash:     resp.ComposeHash,
+    TransactionHash: transactionHash,
 })
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID)
 ```
 
 ---
@@ -309,17 +339,17 @@ func (c *Client) CommitCVMComposeFileUpdate(ctx context.Context, cvmID string, r
 ```go
 // Step 1: Provision the update
 provision, err := client.ProvisionCVMComposeFileUpdate(ctx, "my-app", &phala.ProvisionComposeUpdateRequest{
-	DockerComposeFile: newComposeYAML,
+    DockerComposeFile: newComposeYAML,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 // Step 2: Commit the update
 err = client.CommitCVMComposeFileUpdate(ctx, "my-app", &phala.CommitComposeUpdateRequest{
-	ComposeHash: provision.ComposeHash,
+    ComposeHash: provision.ComposeHash,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```

@@ -3,7 +3,7 @@ title: Authentication
 description: Configure API key authentication, environment variables, and custom headers for the Go SDK.
 ---
 
-Every request to the Phala Cloud API requires an API key. The Go SDK resolves the key from the option you pass to `NewClient`, or falls back to the `PHALA_CLOUD_API_KEY` environment variable. If neither is set, `NewClient` returns an error.
+Authenticate with an API key or a bearer token. `NewClient` returns an error if neither is configured.
 
 ## API Key via Option
 
@@ -11,10 +11,10 @@ The most explicit way to authenticate is passing `WithAPIKey` when creating the 
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
+    phala.WithAPIKey("phak_your_api_key"),
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -30,7 +30,7 @@ export PHALA_CLOUD_API_KEY="phak_your_api_key"
 // No WithAPIKey needed — reads from PHALA_CLOUD_API_KEY
 client, err := phala.NewClient()
 if err != nil {
-	log.Fatal(err) // Fails if env var is also unset
+    log.Fatal(err) // Fails if env var is also unset
 }
 ```
 
@@ -38,18 +38,38 @@ if err != nil {
 If you pass `WithAPIKey` explicitly, it always takes priority over the environment variable.
 </Note>
 
+## Bearer token and workspace
+
+Use `WithBearerToken` for bearer credentials, including an OIDC token, and `WithWorkspace` to select a workspace by slug. The SDK also reads `PHALA_OIDC_TOKEN` and `PHALA_CLOUD_WORKSPACE`. An API key takes precedence over a bearer token when both are configured. This also applies to credentials supplied with `WithHeader`: if the final request has an API key, the SDK removes its authorization header.
+
+```go
+client, err := phala.NewClient(
+    phala.WithBearerToken(os.Getenv("PHALA_OIDC_TOKEN")),
+    phala.WithWorkspace("my-workspace"),
+)
+if err != nil {
+    log.Fatal(err)
+}
+```
+
+## RevokeSelfToken
+
+`DELETE /tokens/self`
+
+`client.RevokeSelfToken(ctx)` revokes the API token used for the request. The token stops working immediately and cannot be restored.
+
 ## Custom Base URL
 
 You can override the API endpoint with `WithBaseURL` or the `PHALA_CLOUD_API_PREFIX` environment variable. The SDK defaults to `https://cloud-api.phala.com/api/v1`.
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithBaseURL("https://custom-api.example.com/api/v1"),
+    phala.WithAPIKey("phak_your_api_key"),
+    phala.WithBaseURL("https://custom-api.example.com/api/v1"),
 )
 ```
 
-The explicit option takes priority over the environment variable, just like the API key.
+The environment variable takes effect when the configured URL is the SDK default, including when that default is passed explicitly.
 
 ## Custom Headers
 
@@ -57,9 +77,9 @@ Use `WithHeader` to attach additional headers to every request. This is useful f
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithHeader("X-Request-ID", "trace-abc123"),
-	phala.WithHeader("X-Custom-Header", "my-value"),
+    phala.WithAPIKey("phak_your_api_key"),
+    phala.WithHeader("X-Request-ID", "trace-abc123"),
+    phala.WithHeader("X-Custom-Header", "my-value"),
 )
 ```
 
@@ -71,8 +91,8 @@ The SDK sends an API version header with every request. The default is `"2026-06
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithAPIVersion("2026-05-22"),
+    phala.WithAPIKey("phak_your_api_key"),
+    phala.WithAPIVersion("2026-05-22"),
 )
 ```
 
@@ -82,18 +102,18 @@ For advanced scenarios like custom TLS configuration, proxies, or instrumented t
 
 ```go
 transport := &http.Transport{
-	TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS13},
+    TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS13},
 }
 httpClient := &http.Client{Transport: transport}
 
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithHTTPClient(httpClient),
+    phala.WithAPIKey("phak_your_api_key"),
+    phala.WithHTTPClient(httpClient),
 )
 ```
 
 <Warning>
-When using `WithHTTPClient`, the `WithTimeout` option modifies the timeout on your provided client. If you want full control, set the timeout on your `*http.Client` directly.
+`WithHTTPClient` copies the provided client. `WithTimeout` modifies the SDK's copy, not the original client.
 </Warning>
 
 ## User Agent
@@ -102,8 +122,8 @@ The SDK sends a `User-Agent` header like `phala-cloud-sdk-go/0.2.0` by default. 
 
 ```go
 client, err := phala.NewClient(
-	phala.WithAPIKey("phak_your_api_key"),
-	phala.WithUserAgent("my-automation/2.0"),
+    phala.WithAPIKey("phak_your_api_key"),
+    phala.WithUserAgent("my-automation/2.0"),
 )
 ```
 
