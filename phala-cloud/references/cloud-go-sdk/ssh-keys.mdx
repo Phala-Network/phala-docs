@@ -58,10 +58,12 @@ func (c *Client) CreateSSHKey(ctx context.Context, req *CreateSSHKeyRequest) (*S
 
 **Returns:** `*SSHKey` — the created key with its assigned ID and fingerprint.
 
+Replace the sample public key with your own key before using it for access.
+
 ```go
 key, err := client.CreateSSHKey(ctx, &phala.CreateSSHKeyRequest{
     Name:      "my-laptop",
-    PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample...",
+    PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 if err != nil {
     log.Fatal(err)
