@@ -46,18 +46,18 @@ Adds a new SSH public key to your account.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | `str` | Yes | Display name for the key |
-| `public_key` | `str` | Yes | SSH public key content (e.g., `ssh-ed25519 AAAA...`) |
+| `public_key` | `str` | Yes | SSH public key content |
 
 **Returns:** The created SSH key object.
 
-**Example:**
+**Example:** Replace the sample public key with your own key before using it for access.
 
 <CodeGroup>
 
 ```python Sync
 key = client.create_ssh_key({
     "name": "my-laptop",
-    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 print(key.id)
 ```
@@ -65,7 +65,7 @@ print(key.id)
 ```python Async
 key = await client.create_ssh_key({
     "name": "my-laptop",
-    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 print(key.id)
 ```

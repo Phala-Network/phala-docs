@@ -45,12 +45,12 @@ Adds a new SSH public key to the user's account.
 
 **Returns:** `SshKey` — the created key with computed fingerprint.
 
-**Example:**
+**Example:** Replace the sample public key with your own key before using it for access.
 
 ```typescript
 const key = await client.createSshKey({
   name: "my-laptop",
-  public_key: "ssh-ed25519 AAAA... user@host",
+  public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 });
 console.log(key.fingerprint);
 ```
