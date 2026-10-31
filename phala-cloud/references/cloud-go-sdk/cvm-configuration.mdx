@@ -6,7 +6,7 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 CVM configuration methods let you modify a running or stopped CVM without recreating it.
 
 <Warning>
-**Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
+Some configuration updates require a CVM restart. Check the operation's options and response before applying changes to a running CVM.
 </Warning>
 
 Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.). `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
