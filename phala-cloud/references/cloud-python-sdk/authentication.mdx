@@ -76,10 +76,6 @@ client = create_client(use_cookie_auth=True)
 Cookie-based auth is primarily for internal use. Most users should stick with API key authentication.
 </Note>
 
-## Avoid conflicting authentication
-
-When the SDK selects an API key or bearer token, do not also configure HTTPX client or per-request authentication, or put credentials in URL userinfo. The SDK raises `RequestError` before sending the request. It also rejects requests containing both an API key header and an authorization header outside cookie mode. Cookie mode preserves explicitly configured authentication.
-
 ## revoke_current_api_token
 
 `DELETE /tokens/self`
