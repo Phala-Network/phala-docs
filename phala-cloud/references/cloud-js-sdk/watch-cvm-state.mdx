@@ -7,7 +7,7 @@ description: Watch CVM state changes via Server-Sent Events until a target statu
 
 `GET /cvms/{cvmId}/state` (Server-Sent Events)
 
-Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves when the CVM reaches the target status; rejects on timeout or abort. Automatically retries on connection timeouts.
+Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves when a completion event confirms the target status. A timeout applies to one attempt; the client retries by default without a limit. It also retries when the stream ends before completion. Cancellation aborts the watch.
 
 **Parameters:**
 
@@ -44,9 +44,9 @@ Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves wh
 | Error | Description |
 |-------|-------------|
 | `WatchAbortedError` | Thrown when the operation is cancelled via `AbortSignal` |
-| `MaxRetriesExceededError` | Thrown when retries are exhausted after timeout or a server error |
+| `MaxRetriesExceededError` | Thrown when retries are exhausted after a timeout or an incomplete stream |
 
-A server `error` event may be followed by more events. When `MaxRetriesExceededError` is raised, `lastServerError` may contain the latest server error event data, and `lastAttemptError` may contain the last transport error. If retries end on a transport error without a server diagnostic, that error is thrown directly.
+A server `error` event may be followed by more events. When `MaxRetriesExceededError` is raised, `lastServerError` may contain the latest server error event data, which is also included in the error message. `lastAttemptError` may contain the last transport error. If retries end on a transport error without a server diagnostic, that error is thrown directly.
 
 **Example — Wait for CVM to start:**
 
