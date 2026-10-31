@@ -167,6 +167,7 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | Method | Description |
 |--------|-------------|
 | `get_current_user()` | Get current user, workspace, and credits info |
+| `revoke_current_api_token()` | Revoke the token used for the request |
 
 ### CVM Query
 
@@ -210,6 +211,7 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `update_os_image(request)` | Update OS image |
 | `get_available_os_images(request)` | List available OS images |
 | `patch_cvm(request)` | Patch multiple CVM fields at once |
+| `commit_cvm_update(request)` | Commit a prepared CVM update |
 
 ### Apps
 
@@ -256,6 +258,8 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `delete_ssh_key(request)` | Remove an SSH key |
 | `import_github_profile_ssh_keys(request)` | Import SSH keys from GitHub profile |
 | `sync_github_ssh_keys()` | Sync SSH keys from GitHub |
+| `get_cvm_ssh_keys(request)` | Get the configured CVM SSH keys |
+| `update_cvm_ssh_keys(request)` | Replace the configured CVM SSH keys |
 
 ### Nodes & Instance Types
 
