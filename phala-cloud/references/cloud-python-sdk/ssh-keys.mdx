@@ -169,12 +169,14 @@ print(result.model_dump())
 
 `get_cvm_ssh_keys({"cvm_id": "my-app"})` reads `GET /cvms/{cvmId}/ssh-keys`. It returns a `CvmSshKeysResponse` with `keys` and `restart_required`. This is the stored configuration; use `get_cvm_user_config` for the running VM's configuration.
 
-`update_cvm_ssh_keys` sends `PUT /cvms/{cvmId}/ssh-keys` and replaces the configured key set. `ssh_key_ids` is required; optional `usernames` add members' resolved keys. Changes take effect at the next power-on, or immediately if `apply_now` restarts the CVM.
+`update_cvm_ssh_keys` sends `PUT /cvms/{cvmId}/ssh-keys` and replaces the configured key set. `ssh_key_ids` is required: include every selected key you want to retain. An empty list removes all selected keys unless `usernames` adds members' resolved keys. Changes take effect at the next power-on, or immediately if `apply_now` restarts the CVM.
+
+This example uses the key created above. Add any other key IDs you want to retain.
 
 ```python
 result = client.update_cvm_ssh_keys({
     "cvm_id": "my-app",
-    "ssh_key_ids": [],
+    "ssh_key_ids": [key.id],
     "apply_now": False,
 })
 print(result.restart_required)
