@@ -154,11 +154,13 @@ if err != nil {
 
 `GetCVMSSHKeys(ctx, cvmID)` reads `GET /cvms/{cvmId}/ssh-keys`. It returns the configured `Keys` and `RestartRequired`. This is the stored configuration; `GetCVMUserConfig` reads the running VM's configuration.
 
-`UpdateCVMSSHKeys(ctx, cvmID, req)` sends `PUT /cvms/{cvmId}/ssh-keys` and returns the same response type. `SSHKeyIDs` is the replacement set; pass an explicit empty slice to remove all selected keys. Optional `Usernames` add the resolved members' keys. Keys take effect at the next power-on, or immediately if `ApplyNow` restarts the CVM.
+`UpdateCVMSSHKeys(ctx, cvmID, req)` sends `PUT /cvms/{cvmId}/ssh-keys` and returns the same response type. `SSHKeyIDs` is the replacement set: include every selected key you want to retain. An explicit empty slice removes all selected keys unless `Usernames` adds members' resolved keys. Changes take effect at the next power-on, or immediately if `ApplyNow` restarts the CVM.
+
+This example uses the key created above. Add any other key IDs you want to retain.
 
 ```go
 result, err := client.UpdateCVMSSHKeys(ctx, "my-app", &phala.UpdateCVMSSHKeysRequest{
-    SSHKeyIDs: []string{},
+    SSHKeyIDs: []string{key.ID},
     ApplyNow:  false,
 })
 if err != nil {
