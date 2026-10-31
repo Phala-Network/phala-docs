@@ -303,7 +303,7 @@ Watches CVM state via Server-Sent Events. Both sync and async clients support th
 | `max_retries` | `int \| None` | No | Retries after a server timeout; default `None` is unlimited, `0` disables retries |
 | `retry_delay` | `float` | No | Delay between retries in seconds (default: `5.0`) |
 
-The SDK returns the `complete` event payload. For compatibility, if a stream ends without an error event and the last raw state has the target status, it can return that state instead. A raw state status is not necessarily the derived status used by the server to determine completion.
+The SDK returns the `complete` event payload. A raw state status is not necessarily the derived status used by the server to determine completion. A stream that ends without completion or a timeout event raises `RequestError`.
 
 The server may emit an `error` event and continue. If the stream ends after an error without completion, the SDK raises `RequestError` with the server error message. It retries server timeout events within the configured budget; exhausted retries raise `RequestError` rather than the older `TimeoutError`. HTTP errors use SDK error types, and network errors raise `RequestError` without retrying.
 
