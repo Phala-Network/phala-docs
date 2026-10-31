@@ -107,3 +107,39 @@ Syncs SSH keys with the authenticated user's linked GitHub account.
 **Parameters:** None
 
 **Returns:** `SyncGithubSshKeysResponse` — sync results.
+
+---
+
+## getCvmSshKeys
+
+`GET /cvms/{cvmId}/ssh-keys`
+
+Returns the SSH keys configured for a CVM and a `restart_required` flag. This is the stored configuration; use `getCvmUserConfig` to inspect the running VM's configuration.
+
+```typescript
+import { createClient, getCvmSshKeys } from "@phala/cloud";
+
+const client = createClient();
+const result = await getCvmSshKeys(client, { id: "my-app" });
+console.log(result.keys, result.restart_required);
+```
+
+## updateCvmSshKeys
+
+`PUT /cvms/{cvmId}/ssh-keys`
+
+Replaces the configured key set. `ssh_key_ids` is required. Optional `usernames` resolve to members' keys and are added to the set. Keys take effect at the next power-on; set `apply_now` to restart the CVM and apply them immediately.
+
+```typescript
+import { createClient, updateCvmSshKeys } from "@phala/cloud";
+
+const client = createClient();
+const result = await updateCvmSshKeys(client, {
+  id: "my-app",
+  ssh_key_ids: [process.env.SSH_KEY_ID!],
+  apply_now: false,
+});
+console.log(result.restart_required);
+```
+
+Both actions also have safe variants: `safeGetCvmSshKeys` and `safeUpdateCvmSshKeys`.
