@@ -40,6 +40,8 @@ const currentClient = createClient({ apiKey: "phak_your_api_key" });
 const legacyClient = currentClient.withVersion("2025-10-28");
 ```
 
+For custom extensions, the factory's client is typed with the `ApiVersion` union. After `withVersion()`, custom methods remain callable with their original parameters, but their return types are `unknown`. Check or narrow those values before using them. This avoids assuming the old version's response shape applies to the new version.
+
 ## Version-aware return types
 
 The client version controls the return type for versioned actions such as `getCvmList`, `getCvmInfo`, `getAppList`, and lifecycle operations.
