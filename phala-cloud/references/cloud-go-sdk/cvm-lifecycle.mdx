@@ -20,8 +20,8 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `Name` | `string` | Yes | Name for the CVM |
-| `InstanceType` | `string` | Yes | Instance type (e.g., `"tdx.small"`) |
-| `ComposeFile` | `*ComposeFile` | No | Docker Compose configuration |
+| `InstanceType` | `string` | No | Instance type; an empty value is omitted and the server selects a type |
+| `ComposeFile` | `*ComposeFile` | Yes | Compose configuration |
 | `VCPU` | `*int` | No | Number of vCPUs |
 | `Memory` | `*int` | No | Memory in MB |
 | `DiskSize` | `*int` | No | Disk size in GB |
@@ -32,6 +32,10 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | `Listed` | `*bool` | No | Whether the CVM is publicly listed |
 | `SecureTime` | `*bool` | No | Enable secure time |
 | `SSHAuthorizedKeys` | `[]string` | No | SSH public keys to authorize |
+
+Additional typed fields include `KMSContractID`, `AppID`, `EnvKeys`, `SSHKeyIDs`, `Ports`, `GPUs`, `EncryptedEnv`, and `UserConfig`. `ComposeFile` also supports fields such as `Runner`, `BashScript`, `AllowedEnvs`, `Requirements`, and `PortPolicy`.
+
+For slice fields with `omitzero`, a nil slice is omitted and an explicitly empty slice is sent as `[]`.
 
 **Returns:** `*ProvisionCVMResponse` with `AppID`, `ComposeHash`, `AppEnvEncryptPubkey`, and other provisioning details.
 
@@ -57,7 +61,7 @@ fmt.Printf("App ID: %s, Compose Hash: %s\n", provision.AppID, provision.ComposeH
 
 `POST /cvms`
 
-Commits a provisioned CVM, triggering the actual deployment. You must pass the `AppID` and `ComposeHash` from the provision step.
+Commits a provisioned CVM, triggering deployment. Pass the provision response's `Token`, or supply its `AppID` and `ComposeHash`.
 
 ```go
 func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvisionRequest) (*CommitCVMProvisionResponse, error)
@@ -67,8 +71,9 @@ func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvision
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `AppID` | `string` | Yes | App ID from provision response |
-| `ComposeHash` | `string` | Yes | Compose hash from provision response |
+| `Token` | `*string` | No | Commit token from the provision response |
+| `AppID` | `string` | Without token | App ID from the provision response |
+| `ComposeHash` | `string` | Without token | Compose hash from the provision response |
 | `TransactionHash` | `*string` | No | On-chain transaction hash (for on-chain KMS) |
 | `EncryptedEnv` | `*string` | No | Encrypted environment variables |
 | `EnvKeys` | `[]string` | No | Environment variable key names |

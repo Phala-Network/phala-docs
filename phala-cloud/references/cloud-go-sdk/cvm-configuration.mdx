@@ -9,7 +9,7 @@ CVM configuration methods let you modify a running or stopped CVM without recrea
 **Every configuration update triggers a CVM restart.** The CVM will be stopped, updated, and restarted automatically. Plan updates accordingly to minimize downtime.
 </Warning>
 
-Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.) and calls a dedicated API endpoint. `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
+Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.). `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
 
 For CVMs using on-chain KMS, updates that affect the compose hash require an additional on-chain confirmation step.
 
@@ -101,7 +101,7 @@ fmt.Println(result.CorrelationID, result.Status)
 Updates the resource allocation (vCPUs, memory, disk) for a CVM. All fields are optional; only the fields you include will be changed.
 
 ```go
-func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *UpdateResourcesRequest) error
+func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *UpdateResourcesRequest) (*UpdateResourcesResponse, error)
 ```
 
 **UpdateResourcesRequest fields:**
@@ -114,15 +114,19 @@ func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *Upda
 | `InstanceType` | `*string` | Instance type override |
 | `AllowRestart` | `*bool` | Allow automatic restart if needed |
 
-**Returns:** `error` (no response body on success)
+**Returns:** `*UpdateResourcesResponse` with the operation status and correlation ID.
 
 ```go
-err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
+result, err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
     VCPU:         phala.Int(4),
     Memory:       phala.Int(8192),
     DiskSize:     phala.Int(50),
     AllowRestart: phala.Bool(true),
 })
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID)
 ```
 
 <Note>
@@ -249,6 +253,8 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `OSImageName` | `*string` | OS image name |
 | `AllowRestart` | `*bool` | Allow automatic restart |
 
+A nil `AllowedEnvs` slice omits the field; an explicitly empty slice sends `[]` to clear it.
+
 **Returns:** `*PatchCVMResponse` — check `RequiresOnChainHash` to see if on-chain confirmation is needed.
 
 ```go
@@ -287,13 +293,19 @@ func (c *Client) ConfirmCVMPatch(ctx context.Context, cvmID string, req *Confirm
 | `ComposeHash` | `string` | Yes | Compose hash from PatchCVM response |
 | `TransactionHash` | `string` | Yes | On-chain transaction hash |
 
+The request sends an empty JSON object and supplies the hashes in the `X-Compose-Hash` and `X-Transaction-Hash` headers. The response retains the action fields and includes `CorrelationID`. `ConfirmCVMPatchV20260121` returns the earlier ID shape.
+
 **Returns:** `*CVMActionResponse`
 
 ```go
-_, err := client.ConfirmCVMPatch(ctx, "my-app", &phala.ConfirmCVMPatchRequest{
+result, err := client.ConfirmCVMPatch(ctx, "my-app", &phala.ConfirmCVMPatchRequest{
     ComposeHash:     resp.ComposeHash,
-    TransactionHash: "0xabc123...",
+    TransactionHash: transactionHash,
 })
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID)
 ```
 
 ---
