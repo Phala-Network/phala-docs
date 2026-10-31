@@ -43,7 +43,7 @@ func (c *Client) UpdateDockerCompose(ctx context.Context, cvmID, compose string,
 ```go
 result, err := client.UpdateDockerCompose(ctx, "my-app", composeYAML, nil)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -100,10 +100,10 @@ func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *Upda
 
 ```go
 err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
-	VCPU:         phala.Int(4),
-	Memory:       phala.Int(8192),
-	DiskSize:     phala.Int(50),
-	AllowRestart: phala.Bool(true),
+    VCPU:         phala.Int(4),
+    Memory:       phala.Int(8192),
+    DiskSize:     phala.Int(50),
+    AllowRestart: phala.Bool(true),
 })
 ```
 
@@ -135,11 +135,11 @@ func (c *Client) UpdateCVMVisibility(ctx context.Context, cvmID string, req *Upd
 
 ```go
 visibility, err := client.UpdateCVMVisibility(ctx, "my-app", &phala.UpdateVisibilityRequest{
-	PublicSysinfo: phala.Bool(true),
-	PublicLogs:    phala.Bool(true),
+    PublicSysinfo: phala.Bool(true),
+    PublicLogs:    phala.Bool(true),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -168,8 +168,8 @@ func (c *Client) UpdateCVMEnvs(ctx context.Context, cvmID string, req *UpdateEnv
 
 ```go
 result, err := client.UpdateCVMEnvs(ctx, "my-app", &phala.UpdateEnvsRequest{
-	EncryptedEnv: encryptedHex,
-	EnvKeys:      []string{"DATABASE_URL", "SECRET_KEY"},
+    EncryptedEnv: encryptedHex,
+    EnvKeys:      []string{"DATABASE_URL", "SECRET_KEY"},
 })
 ```
 
@@ -195,7 +195,7 @@ func (c *Client) UpdateOSImage(ctx context.Context, cvmID string, req *UpdateOSI
 
 ```go
 err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
-	OSImageName: "dstack-v0.4.0",
+    OSImageName: "dstack-v0.4.0",
 })
 ```
 
@@ -236,17 +236,17 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 ```go
 compose := "services:\n  app:\n    image: nginx:latest\n"
 resp, err := client.PatchCVM(ctx, "my-app", &phala.PatchCVMRequest{
-	DockerComposeFile: &compose,
-	PublicSysinfo:     phala.Bool(true),
-	VCPU:              phala.Int(4),
+    DockerComposeFile: &compose,
+    PublicSysinfo:     phala.Bool(true),
+    VCPU:              phala.Int(4),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 if resp.RequiresOnChainHash {
-	// Handle on-chain confirmation — see ConfirmCVMPatch
-	fmt.Printf("On-chain confirmation needed. Compose hash: %s\n", resp.ComposeHash)
+    // Handle on-chain confirmation — see ConfirmCVMPatch
+    fmt.Printf("On-chain confirmation needed. Compose hash: %s\n", resp.ComposeHash)
 }
 ```
 
@@ -273,8 +273,8 @@ func (c *Client) ConfirmCVMPatch(ctx context.Context, cvmID string, req *Confirm
 
 ```go
 _, err := client.ConfirmCVMPatch(ctx, "my-app", &phala.ConfirmCVMPatchRequest{
-	ComposeHash:     resp.ComposeHash,
-	TransactionHash: "0xabc123...",
+    ComposeHash:     resp.ComposeHash,
+    TransactionHash: "0xabc123...",
 })
 ```
 
@@ -309,17 +309,17 @@ func (c *Client) CommitCVMComposeFileUpdate(ctx context.Context, cvmID string, r
 ```go
 // Step 1: Provision the update
 provision, err := client.ProvisionCVMComposeFileUpdate(ctx, "my-app", &phala.ProvisionComposeUpdateRequest{
-	DockerComposeFile: newComposeYAML,
+    DockerComposeFile: newComposeYAML,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 // Step 2: Commit the update
 err = client.CommitCVMComposeFileUpdate(ctx, "my-app", &phala.CommitComposeUpdateRequest{
-	ComposeHash: provision.ComposeHash,
+    ComposeHash: provision.ComposeHash,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```

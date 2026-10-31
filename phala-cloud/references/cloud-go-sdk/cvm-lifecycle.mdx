@@ -39,14 +39,14 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 
 ```go
 provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
-	Name:         "my-app",
-	InstanceType: "tdx.small",
-	ComposeFile: &phala.ComposeFile{
-		DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
-	},
+    Name:         "my-app",
+    InstanceType: "tdx.small",
+    ComposeFile: &phala.ComposeFile{
+        DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
+    },
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("App ID: %s, Compose Hash: %s\n", provision.AppID, provision.ComposeHash)
 ```
@@ -80,23 +80,23 @@ func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvision
 ```go
 // Step 1: Provision
 provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
-	Name:         "my-app",
-	InstanceType: "tdx.small",
-	ComposeFile: &phala.ComposeFile{
-		DockerComposeFile: composeYAML,
-	},
+    Name:         "my-app",
+    InstanceType: "tdx.small",
+    ComposeFile: &phala.ComposeFile{
+        DockerComposeFile: composeYAML,
+    },
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 // Step 2: Commit
 cvm, err := client.CommitCVMProvision(ctx, &phala.CommitCVMProvisionRequest{
-	AppID:       provision.AppID,
-	ComposeHash: provision.ComposeHash,
+    AppID:       provision.AppID,
+    ComposeHash: provision.ComposeHash,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("CVM deployed: %s (status: %s)\n", cvm.CvmID(), cvm.Status)
 ```
@@ -124,7 +124,7 @@ func (c *Client) StartCVM(ctx context.Context, cvmID string) (*CVMActionResponse
 ```go
 result, err := client.StartCVM(ctx, "my-app")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Status: %s\n", result.Status)
 ```
@@ -231,7 +231,7 @@ This action is irreversible. All data associated with the CVM will be permanentl
 ```go
 err := client.DeleteCVM(ctx, "my-app")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -263,10 +263,10 @@ func (c *Client) ReplicateCVM(ctx context.Context, cvmID string, opts *Replicate
 
 ```go
 replica, err := client.ReplicateCVM(ctx, "my-app", &phala.ReplicateCVMOptions{
-	Node: phala.String("prod6"),
+    Node: phala.String("prod6"),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Replica status: %s\n", replica.Status)
 ```
