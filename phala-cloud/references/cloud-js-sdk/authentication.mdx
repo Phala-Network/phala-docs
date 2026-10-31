@@ -32,3 +32,18 @@ console.log(me.user.username, me.workspace.slug);
 <Note>
 Response shape varies by API version. The `v2026-01-21` response uses nested objects; the legacy `v2025-10-28` response uses a flat structure.
 </Note>
+
+## revokeCurrentApiToken
+
+`DELETE /tokens/self`
+
+Revokes the API token used for this request. This cannot be undone, and the token stops working immediately.
+
+```typescript
+import { createClient, revokeCurrentApiToken } from "@phala/cloud";
+
+const client = createClient();
+await revokeCurrentApiToken(client);
+```
+
+Use `safeRevokeCurrentApiToken` to receive a safe result instead of an exception.
