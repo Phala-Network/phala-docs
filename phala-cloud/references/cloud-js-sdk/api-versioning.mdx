@@ -33,7 +33,7 @@ const client = createClient({
 });
 ```
 
-Use `.withVersion()` to create another client with the same authentication and a different API version:
+Use `.withVersion()` to create another client with the same authentication and a different API version. The new client retains built-in actions and custom extensions, bound to the new version:
 
 ```typescript
 const currentClient = createClient({ apiKey: "phak_your_api_key" });
