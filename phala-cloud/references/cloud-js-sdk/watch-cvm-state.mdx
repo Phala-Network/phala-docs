@@ -44,7 +44,9 @@ Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves wh
 | Error | Description |
 |-------|-------------|
 | `WatchAbortedError` | Thrown when the operation is cancelled via `AbortSignal` |
-| `MaxRetriesExceededError` | Thrown when `maxRetries` is exceeded without reaching target |
+| `MaxRetriesExceededError` | Thrown when retries are exhausted after timeout or a server error |
+
+A server `error` event may be followed by more events. When `MaxRetriesExceededError` is raised, `lastServerError` may contain the latest server error event data, and `lastAttemptError` may contain the last transport error. If retries end on a transport error without a server diagnostic, that error is thrown directly.
 
 **Example — Wait for CVM to start:**
 
