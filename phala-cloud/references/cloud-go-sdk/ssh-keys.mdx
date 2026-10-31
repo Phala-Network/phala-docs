@@ -30,10 +30,10 @@ func (c *Client) ListSSHKeys(ctx context.Context) ([]SSHKey, error)
 ```go
 keys, err := client.ListSSHKeys(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 for _, key := range keys {
-	fmt.Printf("%s — %s (%s)\n", key.Name, key.ID, *key.KeyType)
+    fmt.Printf("%s — %s (%s)\n", key.Name, key.ID, *key.KeyType)
 }
 ```
 
@@ -60,11 +60,11 @@ func (c *Client) CreateSSHKey(ctx context.Context, req *CreateSSHKeyRequest) (*S
 
 ```go
 key, err := client.CreateSSHKey(ctx, &phala.CreateSSHKeyRequest{
-	Name:      "my-laptop",
-	PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample...",
+    Name:      "my-laptop",
+    PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample...",
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Created key: %s (fingerprint: %s)\n", key.ID, *key.Fingerprint)
 ```
@@ -92,7 +92,7 @@ func (c *Client) DeleteSSHKey(ctx context.Context, keyID string) error
 ```go
 err := client.DeleteSSHKey(ctx, "key-abc123")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -119,7 +119,7 @@ func (c *Client) ImportGithubProfileSSHKeys(ctx context.Context, username string
 ```go
 imported, err := client.ImportGithubProfileSSHKeys(ctx, "octocat")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -144,6 +144,23 @@ func (c *Client) SyncGithubSSHKeys(ctx context.Context) (*SyncGithubResponse, er
 ```go
 synced, err := client.SyncGithubSSHKeys(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
+```
+
+## CVM SSH keys
+
+`GetCVMSSHKeys(ctx, cvmID)` reads `GET /cvms/{cvmId}/ssh-keys`. It returns the configured `Keys` and `RestartRequired`. This is the stored configuration; `GetCVMUserConfig` reads the running VM's configuration.
+
+`UpdateCVMSSHKeys(ctx, cvmID, req)` sends `PUT /cvms/{cvmId}/ssh-keys` and returns the same response type. `SSHKeyIDs` is the replacement set; pass an explicit empty slice to remove all selected keys. Optional `Usernames` add the resolved members' keys. Keys take effect at the next power-on, or immediately if `ApplyNow` restarts the CVM.
+
+```go
+result, err := client.UpdateCVMSSHKeys(ctx, "my-app", &phala.UpdateCVMSSHKeysRequest{
+    SSHKeyIDs: []string{},
+    ApplyNow:  false,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.RestartRequired)
 ```

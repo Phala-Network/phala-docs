@@ -76,6 +76,24 @@ result, err := client.UpdatePreLaunchScript(ctx, "my-app", script, nil)
 
 ---
 
+## CommitCVMUpdate
+
+`POST /cvms/{cvmId}/commit-update`
+
+Commit a prepared on-chain update with its token, compose hash, and transaction hash. The response contains `CorrelationID` and `Status`.
+
+```go
+result, err := client.CommitCVMUpdate(ctx, "my-app", &phala.CommitCVMUpdateRequest{
+    Token:           token,
+    ComposeHash:     composeHash,
+    TransactionHash: transactionHash,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.CorrelationID, result.Status)
+```
+
 ## UpdateCVMResources
 
 `PATCH /cvms/{cvmId}`
