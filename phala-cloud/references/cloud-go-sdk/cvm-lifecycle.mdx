@@ -7,7 +7,7 @@ CVM lifecycle methods manage the full journey of a Confidential Virtual Machine,
 
 ## ProvisionCVM
 
-`POST /cvms/provision`
+`POST /cvms`
 
 Provisions a new CVM by reserving resources and generating a compose hash. This is the first step of the two-phase deployment flow. The returned `AppID` and `ComposeHash` are needed to commit the provision.
 
@@ -25,7 +25,7 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | `VCPU` | `*int` | No | Number of vCPUs |
 | `Memory` | `*int` | No | Memory in MB |
 | `DiskSize` | `*int` | No | Disk size in GB |
-| `TeepodID` | `*int` | No | Target teepod ID |
+| `Node` | `*string` | No | Physical node name for deployment |
 | `Image` | `*string` | No | OS image name |
 | `Region` | `*string` | No | Target region |
 | `KMSType` | `*string` | No | KMS type (e.g., `"phala"`) |
@@ -258,11 +258,12 @@ func (c *Client) ReplicateCVM(ctx context.Context, cvmID string, opts *Replicate
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `NodeID` | `*int` | Target node ID for the replica |
+| `Node` | `*string` | Physical node name; omit to inherit the source placement |
+| `OSImage` | `string` | OS image override |
 
 ```go
 replica, err := client.ReplicateCVM(ctx, "my-app", &phala.ReplicateCVMOptions{
-	NodeID: phala.Int(42),
+	Node: phala.String("prod6"),
 })
 if err != nil {
 	log.Fatal(err)

@@ -5,7 +5,7 @@ description: Provision a new CVM — first phase of the two-phase deployment flo
 
 ## provisionCvm
 
-`POST /cvms/provision`
+`POST /cvms`
 
 Provisions a new CVM. This is the **first phase** of the two-phase deployment flow — call [`commitCvmProvision`](/phala-cloud/references/cloud-js-sdk/commit-cvm-provision) to finalize.
 
@@ -16,7 +16,7 @@ Provisions a new CVM. This is the **first phase** of the two-phase deployment fl
 | `name` | `string` | Yes | CVM name (5-63 chars, must start with a letter) |
 | `compose_file` | `object` | Yes | Compose file configuration (see below) |
 | `instance_type` | `string` | No | Instance type (default: `"tdx.small"`) |
-| `node_id` | `number` | No | Deploy to a specific node |
+| `node` | `string` | No | Physical node name for deployment |
 | `region` | `string` | No | Region filter |
 | `image` | `string` | No | OS image name |
 | `disk_size` | `number` | No | Disk size in GB |
