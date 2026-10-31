@@ -36,6 +36,10 @@ Additional typed fields include `KMSContractID`, `AppID`, `EnvKeys`, `Ports`, `G
 
 For slice fields with `omitzero`, a nil slice is omitted and an explicitly empty slice is sent as `[]`.
 
+`ComposeFile.EncryptedEnv` has been removed. For creation, set `ProvisionCVMRequest.EncryptedEnv` instead. For changes to a CVM's encrypted environment, use `UpdateCVMEnvs`.
+
+The SDK accepts historical `init_script` values as either a string or an array when decoding a compose file. For new provisioning requests, use `ProvisionCVMRequest.InitScripts` to select platform-owned scripts.
+
 **Returns:** `*ProvisionCVMResponse` with `AppID`, `ComposeHash`, `AppEnvEncryptPubkey`, and other provisioning details.
 
 **Example:**
