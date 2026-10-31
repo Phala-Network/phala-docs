@@ -109,17 +109,17 @@ await client.deleteCvm({ id: "my-app" });
 
 ## replicateCvm
 
-`POST /cvms/{cvmId}/replicate`
+`POST /cvms/{cvmId}/replicas`
 
-Creates a copy of an existing CVM with a new name.
+Creates a replica of an existing CVM. If you omit `node`, the replica inherits the source placement.
 
 **Parameters:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `string` | Yes | Source CVM identifier |
-| `name` | `string` | No | Name for the replica |
-| `image` | `string` | No | OS image override |
+| `node` | `string` | No | Physical node name for the replica |
+| `os_image` | `string` | No | OS image override |
 
 **Returns:** Replicated CVM details.
 
@@ -128,6 +128,6 @@ Creates a copy of an existing CVM with a new name.
 ```typescript
 const replica = await client.replicateCvm({
   id: "my-app",
-  name: "my-app-replica",
+  node: "prod6",
 });
 ```

@@ -28,7 +28,7 @@ client.get_cvm_info({"cvm_id": "my-app"})
 
 ## provision_cvm
 
-`POST /cvms/provision`
+`POST /cvms`
 
 Creates a CVM provision request. This is step one of the two-step provisioning flow. The response includes a `compose_hash` that you use in `commit_cvm_provision`.
 
@@ -43,7 +43,7 @@ The request is a dictionary with the CVM configuration. The exact fields depend 
 | `vcpu` | `int` | No | Number of vCPUs |
 | `memory` | `int` | No | Memory in MB |
 | `disk_size` | `int` | No | Disk size in GB |
-| `teepod_id` | `int` | No | Target node ID |
+| `node` | `str` | No | Physical node name for deployment |
 
 **Returns:** Provision response with `compose_hash` and `app_id`.
 
@@ -60,7 +60,7 @@ result = client.provision_cvm({
     "vcpu": 2,
     "memory": 2048,
     "disk_size": 20,
-    "teepod_id": 3,
+    "node": "prod6",
 })
 print(result.compose_hash)
 ```
@@ -74,7 +74,7 @@ result = await client.provision_cvm({
     "vcpu": 2,
     "memory": 2048,
     "disk_size": 20,
-    "teepod_id": 3,
+    "node": "prod6",
 })
 print(result.compose_hash)
 ```
@@ -265,7 +265,8 @@ Creates a copy of an existing CVM. The replica shares the same compose configura
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `str` | Yes | Source CVM identifier |
-| `node_id` | `int` | No | Target node for the replica |
+| `node` | `str` | No | Physical node name; omit to inherit the source placement |
+| `os_image` | `str` | No | OS image override |
 
 **Returns:** Replicated CVM details.
 
@@ -274,11 +275,11 @@ Creates a copy of an existing CVM. The replica shares the same compose configura
 <CodeGroup>
 
 ```python Sync
-replica = client.replicate_cvm({"id": "my-app", "node_id": 5})
+replica = client.replicate_cvm({"id": "my-app", "node": "prod6"})
 ```
 
 ```python Async
-replica = await client.replicate_cvm({"id": "my-app", "node_id": 5})
+replica = await client.replicate_cvm({"id": "my-app", "node": "prod6"})
 ```
 
 </CodeGroup>
