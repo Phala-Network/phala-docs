@@ -30,7 +30,7 @@ client.get_cvm_info({"cvm_id": "my-app"})
 
 `POST /cvms`
 
-Creates a CVM provision request. This is step one of the two-step provisioning flow. The response includes a `compose_hash` that you use in `commit_cvm_provision`.
+Creates a CVM provision request. This is step one of the two-step provisioning flow. Use the response's `token` in `commit_cvm_provision`.
 
 **Parameters:**
 
@@ -45,7 +45,7 @@ The request is a dictionary with the CVM configuration. The exact fields depend 
 | `disk_size` | `int` | No | Disk size in GB |
 | `node` | `str` | No | Physical node name for deployment |
 
-**Returns:** Provision response with `compose_hash` and `app_id`.
+**Returns:** Provision response with `token`, `compose_hash`, and `app_id`.
 
 **Example:**
 
@@ -87,7 +87,7 @@ print(result.compose_hash)
 
 `POST /cvms`
 
-Commits a provisioned CVM, creating the actual instance. This is step two of the provisioning flow. Pass the `compose_hash` from the provision step along with on-chain transaction details.
+Commits a provisioned CVM, creating the actual instance. Pass the token returned by `provision_cvm`. For the legacy flow, pass the provision response's `app_id` and `compose_hash` instead. On-chain KMS deployments may also need a transaction hash.
 
 This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again returns the existing CVM. A different `compose_hash` for the same `app_id` raises a `ResourceError` with error code `CVM_APP_ID_CONFLICT`.
 
@@ -95,9 +95,10 @@ This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `app_id` | `str` | Yes | App ID from provision step |
-| `compose_hash` | `str` | Yes | Hash from provision step |
-| `transaction_hash` | `str` | Yes | On-chain transaction hash |
+| `token` | `str` | Preferred | Token from the provision response |
+| `app_id` | `str` | Without token | App ID from the provision response |
+| `compose_hash` | `str` | Without token | Hash from the provision response |
+| `transaction_hash` | `str` | For on-chain KMS when needed | Transaction hash for on-chain verification |
 
 **Returns:** Committed CVM details.
 
@@ -107,17 +108,13 @@ This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again
 
 ```python Sync
 cvm = client.commit_cvm_provision({
-    "app_id": "app-123",
-    "compose_hash": "0xabc...",
-    "transaction_hash": "0xdef...",
+    "token": result.token,
 })
 ```
 
 ```python Async
 cvm = await client.commit_cvm_provision({
-    "app_id": "app-123",
-    "compose_hash": "0xabc...",
-    "transaction_hash": "0xdef...",
+    "token": result.token,
 })
 ```
 
