@@ -297,12 +297,12 @@ Watches CVM state via Server-Sent Events. Both sync and async clients support th
 | `target` | `str` | Yes | Target state to wait for (e.g., `"running"`) |
 | `interval` | `int` | No | Polling interval in seconds (default: `5`, range: 5-30) |
 | `timeout` | `int` | No | Server-side timeout in seconds (default: `300`, range: 10-600) |
-| `max_retries` | `int \| None` | No | Retries after a server timeout; default `None` is unlimited, `0` disables retries |
+| `max_retries` | `int \| None` | No | Retries after an interrupted attempt; default `None` is unlimited, `0` disables retries |
 | `retry_delay` | `float` | No | Delay between retries in seconds (default: `5.0`) |
 
-The SDK returns the `complete` event payload. A raw state status is not necessarily the derived status used by the server to determine completion. A stream that ends without completion or a timeout event raises `RequestError`.
+The SDK returns the `complete` event payload. A raw state status is not necessarily the derived status used by the server to determine completion, and a matching state alone does not complete the watch.
 
-The server may emit an `error` event and continue. If the stream ends after an error without completion, the SDK raises `RequestError` with the server error message. It retries server timeout events within the configured budget; exhausted retries raise `RequestError` rather than the older `TimeoutError`. HTTP errors use SDK error types, and network errors raise `RequestError` without retrying.
+The server may emit an `error` event and continue. On a timeout event, an EOF without completion, or a transient transport error, the SDK reconnects within the retry budget. Exhausted retries raise `RequestError`, retaining the latest server error and transport diagnostics when available. HTTP errors use SDK error types and are not retried.
 
 The stream read timeout is `timeout + interval + 5` seconds. Other HTTPX timeout settings remain in effect. Cancelling an async task closes the stream and propagates cancellation. `maxRetries` and `retryDelay` are also accepted as aliases.
 
