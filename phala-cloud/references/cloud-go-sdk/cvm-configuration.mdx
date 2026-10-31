@@ -171,7 +171,7 @@ if err != nil {
 
 `PATCH /cvms/{cvmId}/envs`
 
-Updates the encrypted environment variables for a CVM. Environment variables are encrypted client-side before being sent to the API.
+Updates the encrypted environment variables for a CVM. Environment variables are encrypted client-side before being sent to the API. `ProvisionComposeUpdateRequest.EncryptedEnv` has been removed; use `UpdateCVMEnvs` for environment changes instead.
 
 ```go
 func (c *Client) UpdateCVMEnvs(ctx context.Context, cvmID string, req *UpdateEnvsRequest) (*UpdateResult, error)

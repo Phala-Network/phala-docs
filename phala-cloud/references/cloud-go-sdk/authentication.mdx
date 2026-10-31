@@ -40,7 +40,7 @@ If you pass `WithAPIKey` explicitly, it always takes priority over the environme
 
 ## Bearer token and workspace
 
-Use `WithBearerToken` for bearer credentials, including an OIDC token, and `WithWorkspace` to select a workspace by slug. The SDK also reads `PHALA_OIDC_TOKEN` and `PHALA_CLOUD_WORKSPACE`. An API key takes precedence over a bearer token when both are configured.
+Use `WithBearerToken` for bearer credentials, including an OIDC token, and `WithWorkspace` to select a workspace by slug. The SDK also reads `PHALA_OIDC_TOKEN` and `PHALA_CLOUD_WORKSPACE`. An API key takes precedence over a bearer token when both are configured. This also applies to credentials supplied with `WithHeader`: if the final request has an API key, the SDK removes its authorization header.
 
 ```go
 client, err := phala.NewClient(
