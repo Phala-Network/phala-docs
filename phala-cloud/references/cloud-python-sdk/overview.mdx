@@ -145,7 +145,7 @@ async with create_async_client(api_key="phak_your_api_key") as client:
 
 ## Safe Methods
 
-Every action method has a `safe_*` variant that returns a `SafeResult` instead of raising exceptions. This is useful when you want to handle errors as values rather than control flow.
+Most action methods have a `safe_*` variant that returns a `SafeResult` instead of raising exceptions. `watch_cvm_state` does not have a safe variant. This is useful when you want to handle errors as values rather than control flow.
 
 ```python
 result = client.safe_get_cvm_info({"id": "my-app"})
@@ -269,6 +269,7 @@ The SDK also exports standalone utility functions for working with CVM configura
 
 ```python
 from phala_cloud import (
+    async_encrypt_env_vars,
     encrypt_env_vars,
     get_compose_hash,
     get_mr_config_id_hex,
@@ -280,7 +281,8 @@ from phala_cloud import (
 
 | Function | Description |
 |----------|-------------|
-| `encrypt_env_vars(...)` | Encrypt environment variables for secure deployment |
+| `encrypt_env_vars(envs, public_key_hex)` | Encrypt environment variables synchronously |
+| `async_encrypt_env_vars(envs, public_key_hex)` | Encrypt environment variables asynchronously |
 | `get_compose_hash(...)` | Compute the hash of canonicalized `app-compose.json` |
 | `get_mr_config_id(...)` | Compute V2 `mr_config_id` from byte inputs |
 | `get_mr_config_id_hex(...)` | Compute V2 `mr_config_id` from hex inputs |
@@ -291,6 +293,27 @@ from phala_cloud import (
 | `parse_env_vars(content)` | Parse dotenv content string into key-value pairs |
 | `verify_webhook_signature(...)` | Verify HMAC-SHA256 webhook signature with timestamp tolerance |
 | `parse_webhook_event(...)` | Verify signature and parse webhook event in one step |
+
+### Encrypt environment variables
+
+Pass the output of `parse_env_vars` or a sequence of `dstack_sdk.EnvVar` objects to either helper. The public key must be a hex string.
+
+```python
+from phala_cloud import encrypt_env_vars, parse_env_vars
+
+envs = parse_env_vars("API_TOKEN=secret")
+encrypted = encrypt_env_vars(envs, public_key_hex)
+```
+
+In async code, use `await async_encrypt_env_vars(envs, public_key_hex)`. Both helpers return the encrypted string.
+
+<Warning>
+`encrypt_env_vars` now returns a string synchronously. If you previously awaited it, replace `await encrypt_env_vars(...)` with `await async_encrypt_env_vars(...)`.
+</Warning>
+
+### On-chain operations
+
+The Python SDK removed the nonfunctional `add_compose_hash` and `deploy_app_auth` wrappers and their safe variants. For on-chain registration, use the [JavaScript SDK](/phala-cloud/references/cloud-js-sdk/add-compose-hash) or your own web3 integration.
 
 ### Webhook Verification Example
 
