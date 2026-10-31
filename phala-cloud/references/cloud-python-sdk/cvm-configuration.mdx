@@ -163,6 +163,22 @@ Retrieves the compose file with metadata (including hash info and structure).
 
 ---
 
+## commit_cvm_update
+
+`POST /cvms/{cvmId}/commit-update`
+
+Commit a prepared update using its token. `compose_hash` and `transaction_hash` are optional request fields. The returned `CommitCvmUpdateResult` contains `correlation_id` and `status`.
+
+```python
+result = client.commit_cvm_update({
+    "cvm_id": "my-app",
+    "token": token,
+})
+print(result.correlation_id, result.status)
+```
+
+The async client supports `await client.commit_cvm_update(...)`. A `safe_commit_cvm_update` variant is also available.
+
 ## update_cvm_resources
 
 `PATCH /cvms/{cvmId}`

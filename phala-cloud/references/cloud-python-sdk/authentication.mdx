@@ -76,6 +76,16 @@ client = create_client(use_cookie_auth=True)
 Cookie-based auth is primarily for internal use. Most users should stick with API key authentication.
 </Note>
 
+## Avoid conflicting authentication
+
+When the SDK selects an API key or bearer token, do not also configure HTTPX client or per-request authentication, or put credentials in URL userinfo. The SDK raises `RequestError` before sending the request. It also rejects requests containing both an API key header and an authorization header outside cookie mode. Cookie mode preserves explicitly configured authentication.
+
+## revoke_current_api_token
+
+`DELETE /tokens/self`
+
+Call `client.revoke_current_api_token()` to revoke the API token used for the request. It returns `None`. The token stops working immediately and cannot be restored. The async client supports `await client.revoke_current_api_token()`; a `safe_revoke_current_api_token` variant is also available.
+
 ## Custom Headers
 
 You can add extra headers to every request. This is useful for tracing, debugging, or passing custom metadata.
