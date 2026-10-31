@@ -290,36 +290,50 @@ replica = await client.replicate_cvm({"id": "my-app", "node": "prod6"})
 
 `GET /cvms/{cvmId}/state` (SSE)
 
-Polls the CVM state via Server-Sent Events until it reaches a target status. This is useful for waiting until a CVM finishes starting or stopping. Only available on the sync client.
+Watches CVM state via Server-Sent Events. Both sync and async clients support this method.
 
 **Parameters:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `str` | Yes | CVM identifier |
-| `target` | `str` | Yes | Target state to wait for (e.g., `"Running"`) |
+| `target` | `str` | Yes | Target state to wait for (e.g., `"running"`) |
 | `interval` | `int` | No | Polling interval in seconds (default: `5`, range: 5-30) |
 | `timeout` | `int` | No | Server-side timeout in seconds (default: `300`, range: 10-600) |
-| `max_retries` | `int` | No | Maximum retry attempts |
+| `max_retries` | `int \| None` | No | Retries after a server timeout; default `None` is unlimited, `0` disables retries |
 | `retry_delay` | `float` | No | Delay between retries in seconds (default: `5.0`) |
 
-**Returns:** CVM state object when the target state is reached.
+The SDK returns the `complete` event payload. For compatibility, if a stream ends without an error event and the last raw state has the target status, it can return that state instead. A raw state status is not necessarily the derived status used by the server to determine completion.
 
-**Raises:** `TimeoutError` if max retries exceeded.
+The server may emit an `error` event and continue. If the stream ends after an error without completion, the SDK raises `RequestError` with the server error message. It retries server timeout events within the configured budget; exhausted retries raise `RequestError` rather than the older `TimeoutError`. HTTP errors use SDK error types, and network errors raise `RequestError` without retrying.
+
+The stream read timeout is `timeout + interval + 5` seconds. Other HTTPX timeout settings remain in effect. Cancelling an async task closes the stream and propagates cancellation. `maxRetries` and `retryDelay` are also accepted as aliases.
 
 **Example:**
 
-```python
-# Start a CVM and wait for it to be running
-client.start_cvm({"id": "my-app"})
-state = client.watch_cvm_state({
+<CodeGroup>
+
+```python Sync
+result = client.watch_cvm_state({
     "id": "my-app",
-    "target": "Running",
+    "target": "running",
     "timeout": 120,
     "max_retries": 3,
 })
-print(state.status)  # "Running"
+print(result.status)
 ```
+
+```python Async
+result = await client.watch_cvm_state({
+    "id": "my-app",
+    "target": "running",
+    "timeout": 120,
+    "max_retries": 3,
+})
+print(result.status)
+```
+
+</CodeGroup>
 
 ## Related
 
