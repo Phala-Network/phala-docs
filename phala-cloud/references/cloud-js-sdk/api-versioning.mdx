@@ -61,6 +61,8 @@ const olderCvm = await olderClient.getCvmInfo({ id: "my-cvm" });
 
 Versions `2026-05-22` and `2026-06-23` share the same CVM and app response types. Version `2026-06-23` changes the KMS resource model from individual KMS nodes to KMS contracts.
 
+The client's `version` overrides any `X-Phala-Version` value in `config.headers`, regardless of header casing. An action can still explicitly pin its own request to a different version, as the KMS methods below do.
+
 ## Contract-centric KMS methods
 
 The following methods always request API version `2026-06-23`, even when the client uses an older version:
