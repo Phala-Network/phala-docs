@@ -82,9 +82,11 @@ client = create_client(
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `api_key` | `str` | `PHALA_CLOUD_API_KEY` env var | API key for authentication |
+| `bearer_token` | `str` | `PHALA_OIDC_TOKEN` env var | Bearer token; API key takes precedence |
+| `workspace` | `str` | `PHALA_CLOUD_WORKSPACE` env var | Workspace slug |
 | `base_url` | `str` | `https://cloud-api.phala.com/api/v1` | API base URL (or `PHALA_CLOUD_API_PREFIX` env var) |
 | `version` | `ApiVersion` | `"2026-06-23"` | API version to use |
-| `timeout` | `float` | `30.0` | Request timeout in seconds |
+| `timeout` | `float` | `60.0` | Request timeout in seconds |
 | `use_cookie_auth` | `bool` | `False` | Use cookie-based auth instead of API key |
 | `headers` | `dict[str, str]` | `None` | Additional request headers |
 | `http_client` | `httpx.Client` / `httpx.AsyncClient` | `None` | Bring your own httpx client |
