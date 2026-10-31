@@ -34,6 +34,8 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 
 Additional typed fields include `KMSContractID`, `AppID`, `EnvKeys`, `Ports`, `GPUs`, `EncryptedEnv`, and `UserConfig`. `ComposeFile` also supports fields such as `Runner`, `BashScript`, `AllowedEnvs`, `Requirements`, and `PortPolicy`.
 
+`ProvisionCVMRequest.KMSType` and `ProvisionCVMRequest.SSHAuthorizedKeys` remain in the Go type, but the current backend ignores these top-level fields. Use `KMS` to select the KMS type and `SSHKeyIDs` to authorize registered SSH keys.
+
 For slice fields with `omitzero`, a nil slice is omitted and an explicitly empty slice is sent as `[]`.
 
 `ComposeFile.EncryptedEnv` has been removed. For creation, set `ProvisionCVMRequest.EncryptedEnv` instead. For changes to a CVM's encrypted environment, use `UpdateCVMEnvs`.
