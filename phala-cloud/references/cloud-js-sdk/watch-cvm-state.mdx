@@ -17,7 +17,7 @@ Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves wh
 | `target` | `string` | Yes | Target status to wait for (e.g., `"running"`, `"stopped"`) |
 | `interval` | `number` | No | Polling interval in seconds (5-30, default: 5) |
 | `timeout` | `number` | No | Per-attempt timeout in seconds (10-600, default: 300) |
-| `maxRetries` | `number` | No | Maximum retry attempts (default: `Infinity`) |
+| `maxRetries` | `number` | No | Maximum retries after the first request (default: `Infinity`); `0` still makes one request |
 | `retryDelay` | `number` | No | Delay between retries in ms (default: 5000) |
 
 **Options:**
@@ -27,14 +27,14 @@ Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves wh
 | `signal` | `AbortSignal` | Cancellation signal |
 | `onEvent` | `(event) => void` | Callback for each SSE event |
 
-**Returns:** `CvmState` — the final state when target is reached.
+**Returns:** `CvmState` — the latest state received when a completion event confirms the target. The state's raw `status` can differ from the derived status used for that comparison.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | `string` | CVM ID |
 | `instance_id` | `string` | Instance ID |
 | `name` | `string` | CVM name |
-| `status` | `string` | Final status (matches `target`) |
+| `status` | `string` | Raw CVM status |
 | `uptime` | `string?` | Uptime duration |
 | `boot_progress` | `string?` | Boot progress |
 | `boot_error` | `string?` | Boot error if failed |
@@ -49,32 +49,40 @@ Watches CVM state changes in real-time via Server-Sent Events (SSE). Resolves wh
 **Example — Wait for CVM to start:**
 
 ```typescript
-const state = await client.watchCvmState({
+import { createClient, watchCvmState } from "@phala/cloud";
+
+const client = createClient();
+const state = await watchCvmState(client, {
   id: "my-app",
   target: "running",
   timeout: 120,
+}, {
   onEvent: (event) => {
-    console.log(`Status: ${event.status}, Progress: ${event.boot_progress}`);
+    if (event.type === "state") {
+      console.log(`Status: ${event.data.status}`);
+    }
   },
 });
 
-console.log(`CVM is now ${state.status}`);
+console.log(`Latest raw CVM status: ${state.status}`);
 ```
 
 **Example — With abort support:**
 
 ```typescript
+import { createClient, watchCvmState, WatchAbortedError } from "@phala/cloud";
+
+const client = createClient();
 const controller = new AbortController();
 
 // Cancel after 60 seconds
 setTimeout(() => controller.abort(), 60_000);
 
 try {
-  const state = await client.watchCvmState({
+  const state = await watchCvmState(client, {
     id: "my-app",
     target: "running",
-    signal: controller.signal,
-  });
+  }, { signal: controller.signal });
 } catch (error) {
   if (error instanceof WatchAbortedError) {
     console.log("Watch was cancelled");
