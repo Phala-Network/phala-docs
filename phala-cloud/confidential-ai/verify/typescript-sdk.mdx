@@ -98,6 +98,17 @@ organization reviewed that release. When you have an authenticated allowlist,
 pass its hashes as `policy.acceptedComposeHashes`. Never copy a hash from the
 endpoint and trust it on first use.
 
+Each production release of the gateway at `inference.phala.com` is published as a
+`gateway-prod-<date>` release in
+[`Dstack-TEE/private-ai-gateway`](https://github.com/Dstack-TEE/private-ai-gateway/releases).
+It lists the compose hash, OS and KMS values, and TLS keys, and attaches the exact
+measured `app_compose.json` so you can recompute the compose hash yourself. A change
+to these values is published as a prerelease at least 3 days before the rollout.
+KMS values are the exception: `mr-kms` is recorded when a replica boots and can
+change without notice, so pin the KMS root key instead. The
+[release measurements page](https://docs.redpill.ai/guides/release-measurements)
+lists the current values and the full notice policy.
+
 Without a compose allowlist, the client verifies that the measured compose ran
 in a genuine TDX workload. It does not claim that Phala reviewed that release.
 For a production security decision, pair compose appraisal with a dstack
