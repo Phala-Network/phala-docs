@@ -28,12 +28,14 @@ The implementation is public in the [gateway provider verifiers](https://github.
 | Provider | TEE | Channel binding | Zero data retention |
 | --- | --- | --- | --- |
 | Tinfoil | AMD SEV-SNP (or TDX) | `tls_spki_sha256` | Yes |
-| NEAR AI | Intel TDX | `tls_spki_sha256` | Yes |
-| Chutes | Intel TDX | `e2ee_public_key_sha256` | Yes |
-| Phala | Intel TDX | `tls_spki_sha256` | Yes |
+| NEAR AI | Intel TDX; optional NVIDIA CC evidence (supplemental check; JWT signatures not verified) | `tls_spki_sha256` | Yes |
+| Chutes | Intel TDX + NVIDIA CC (supplemental check; JWT signatures not verified) | `e2ee_public_key_sha256` | Yes |
+| Phala | Intel TDX + NVIDIA CC (supplemental check; JWT signatures not verified) | `tls_spki_sha256` | Yes |
 | Privatemode | Contrast-attested secret path via a measured proxy | `proxy_image_sha256` | Not in the ZDR routing allowlist |
 | 0G | See session evidence | `e2ee_public_key_sha256` | Not in the ZDR routing allowlist |
 | ArmetAI (`fortanix`) | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Not in the ZDR routing allowlist |
+
+The GPU qualifiers follow the [Phala-direct](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/phala-direct/verification.md), [Chutes](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/chutes/verification.md), and [NEAR AI](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/near-ai/verification.md) verifier paths. They describe supplemental GPU checks, not authenticated GPU identity; NEAR AI preserves its optional result in `claims.extra.gateway_gpu_check` while leaving `gpu_attested` unknown.
 
 - A `tls_spki_sha256` binding pins the upstream HTTPS connection to the verified TLS key.
 - An `e2ee_public_key_sha256` binding encrypts the request body to the verified enclave key, so only

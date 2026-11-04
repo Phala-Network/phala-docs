@@ -96,7 +96,13 @@ The full verification procedure is in [Verify a response](/phala-cloud/confident
 
 `GET /v1/attestation/report?nonce=...&signing_algo=ecdsa` is a compatibility endpoint for legacy clients. `signing_algo` selects `ecdsa` (default) or `ed25519`; the response includes the legacy `signing_address`, `signing_algo`, and `signing_public_key`, plus an `all_attestations` compatibility entry.
 
-Its hardware quote uses a legacy signer-and-nonce binding, rather than the canonical ACI keyset-and-nonce statement. With `version=1` (default), report data is the signer identity right-padded to 32 bytes followed by the 32-byte nonce. With `version=2`, the first half is SHA-256 of the signer identity concatenated with the TLS SPKI fingerprint. The signer identity is the ECDSA Ethereum address or Ed25519 public key. Legacy signing keys are resolved separately from canonical receipt-signing keys.
+Its hardware quote uses a legacy signer-and-nonce binding, rather than the canonical ACI keyset-and-nonce statement. With `version=1` (default), report data is the signer identity right-padded to 32 bytes followed by a 32-byte nonce field. With `version>=2`, the first half is SHA-256 of the signer identity concatenated with the TLS SPKI fingerprint. The signer identity is the ECDSA Ethereum address or Ed25519 public key. Legacy signing keys are resolved separately from canonical receipt-signing keys.
+
+The nonce field is constructed as follows:
+
+- A 64-character hexadecimal nonce is decoded to its 32 raw bytes.
+- Any other non-empty nonce string is hashed with SHA-256 over its UTF-8 bytes.
+- If the nonce is omitted or empty, the gateway first generates 32 random bytes, encodes them as 64 hexadecimal characters, and binds the decoded bytes.
 
 Use this legacy report only to verify the [legacy signature wrapper](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#legacy-alias) under its legacy rules. Canonical ACI verifiers must fetch `/v1/aci/attestation` and follow the canonical statement above; do not apply that statement check to a legacy quote. Upstream verification for a response is recorded in the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and cited [session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
 
