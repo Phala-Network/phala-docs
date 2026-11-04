@@ -41,8 +41,8 @@ A claim is not just a boolean. It has a status, a source, and often a reason.
 | `tee_attested` | An attested TEE identity is bound to the channel, directly or through the measured proxy; inspect `source`. |
 | `tcb_up_to_date` | The platform Trusted Computing Base is current. |
 | `os_known_good` | The OS or platform image maps to reviewed source or known measurements. |
-| `serving_software_known_good` | Serving software maps to reviewed source or build provenance. |
-| `gpu_attested` | NVIDIA confidential-computing GPU evidence was verified and nonce-bound. |
+| `serving_software_known_good` | Serving software meets the verifier’s acceptance policy, such as Sigstore provenance or an operator measurement pin. Inspect the reason. |
+| `gpu_attested` | Provider-specific GPU check outcome; inspect the verifier and reason before treating it as authenticated evidence. |
 | `model_weights_provenance` | Model weights and quantization match a reviewed provenance chain. |
 
 Privatemode reports `tee_attested: asserted` with `source: verifier_derived` under verifier
@@ -52,17 +52,19 @@ Its other common claims are `unknown`.
 
 ## TCB Freshness
 
-`tcb_up_to_date` is intentionally tri-state:
+For verifiers that expose a TCB status, `tcb_up_to_date` is tri-state:
 
 - Up-to-date evidence asserts the claim.
 - Stale evidence refutes the claim and records the stale status.
 - Missing evidence leaves the claim `unknown`.
 
-Your verifier policy decides whether a refuted TCB is acceptable. The receipt's job is to expose the fact.
+Tinfoil is an exception: its verifier requires an up-to-date TCB but exposes no separate TCB status, so the claim is asserted as `verifier_derived`. Your policy decides whether a refuted TCB is acceptable; inspect the cited session’s reason and source.
 
 ## GPU Attestation
 
-`gpu_attested` proves a confidential-computing GPU attestation was verified for the provider's evidence. It does not by itself prove model weights, serving software, or CPU-to-GPU binding for every provider. Read it as supplemental evidence unless your policy says otherwise.
+The assurance depends on the provider verifier. For Phala and Chutes, `gpu_attested: asserted` records an accepted, nonce-matched supplemental NVIDIA check. Those paths decode JWTs without verifying their signatures, so this claim does not authenticate GPU identity or bind it to the serving CPU TEE.
+
+ArmetAI instead requires an NRAS-signed GPU result and commits the exact GPU evidence into the CPU quote’s report data. Its claim has the same `verifier_derived` source label, but a different evidence boundary. Inspect the reason and raw session evidence. Neither path proves model-weight provenance or continued use of a particular GPU for your request. See [Providers](/phala-cloud/confidential-ai/confidential-model/providers).
 
 ## Suggested Policy
 
@@ -70,7 +72,7 @@ Your verifier policy decides whether a refuted TCB is acceptable. The receipt's 
 2. Require `upstream.verified.result = verified` and `required = true` for sensitive prompts.
 3. Treat `unknown` as not proven.
 4. Decide whether to reject `tcb_up_to_date: refuted`.
-5. Use `serving_software_known_good` and `gpu_attested` to increase assurance when available.
+5. Appraise the reason and provider-specific evidence for `serving_software_known_good` and `gpu_attested`; an asserted status alone does not establish provenance or authenticated GPU identity.
 
 ## Related
 

@@ -71,7 +71,7 @@ binding.
 ## Claims
 
 A session never says "trusted". It carries a fixed set of claims, each with a `status`, a `source`,
-and a plain `reason`, so a hardware-proven fact and an operator's assertion never look alike.
+and an optional `reason`, so a hardware-proven fact and an operator's assertion never look alike.
 
 ```json
 {
@@ -101,19 +101,14 @@ and a plain `reason`, so a hardware-proven fact and an operator's assertion neve
 | `tee_attested` | Is this a genuine CPU TEE with an identity bound to the channel? |
 | `tcb_up_to_date` | Is the platform's Trusted Computing Base current? |
 | `os_known_good` | Does the OS or platform image map to reviewed source? |
-| `serving_software_known_good` | Does the serving software map to reviewed source? |
-| `gpu_attested` | Is a genuine confidential-computing GPU attested and nonce-bound? |
+| `serving_software_known_good` | Does the serving software meet this verifier’s software acceptance policy? |
+| `gpu_attested` | What provider-specific GPU check was accepted, and what does its evidence establish? |
 | `model_weights_provenance` | Are the served weights and quantization what they claim to be? |
 
 Two claims need care when you read them:
 
-- `tcb_up_to_date` is read from the verifier's reported TCB status. An up-to-date platform asserts
-  it, a stale platform refutes it, and an absent status leaves it `unknown`. Freshness comes from the
-  evidence, never from policy.
-- `gpu_attested` is `asserted` with source `verifier_derived` when the provider's NVIDIA
-  confidential-computing GPU attestation is verified and bound to the nonce. It proves a genuine
-  confidential GPU exists for that nonce, not that the GPU is bound to the CPU TEE serving your
-  request. The typed claim is supplemental; a provider verifier may still require GPU evidence to accept its own provider boundary.
+- When a verifier exposes a TCB status, `UpToDate` asserts `tcb_up_to_date`, another reported status refutes it, and an absent status leaves it `unknown`. Tinfoil instead asserts a `verifier_derived` claim because its verifier requires an up-to-date TCB without exposing a separate status.
+- `gpu_attested` is provider-specific. Phala and Chutes record supplemental nonce-matched NVIDIA checks; those paths decode JWTs without verifying their signatures and do not authenticate GPU identity or bind it to the serving CPU TEE. ArmetAI uses a separate mandatory NRAS-signed check whose exact evidence is committed into the CPU quote. Both produce `verifier_derived` claims, so inspect the reason and evidence rather than inferring assurance from that label. Neither proves continued use of a particular GPU for the request.
 
 To use claims in a decision: require `tee_attested` to be `asserted` with source `hardware_proven`;
 treat `serving_software_known_good: asserted` as stronger than any `provider_asserted` claim about
@@ -134,7 +129,7 @@ For a Phala-direct session:
 | `production_os_image` | `true` | |
 | `compose_hash_verified` | `true` | The measured compose matches what was declared |
 | `report_data_nonce_matched` | `true` | The upstream evidence matches the upstream verifier's challenge; this is separate from your gateway-attestation nonce |
-| `gpu_evidence_nonce_matched` | `true` | GPU evidence is nonce-bound too |
+| `gpu_evidence_nonce_matched` | `true` when GPU evidence is present | Supplemental GPU payload matches the challenge; this does not authenticate its JWT signature or GPU identity |
 | `tls_spki_from_report_data` | `true` | The TLS channel binding comes from hardware measurement, not a spoken claim |
 | `trust_boundary` | `phala-dstack-cvm` | |
 

@@ -45,7 +45,7 @@ The `type` field is the machine-readable discriminator.
 | `502` | Upstream provider unavailable. |
 | `503` | Service temporarily unavailable, including required upstream verification failure (`upstream_verification_failed`). |
 
-Budget denials use `402`; a regular key is not denied solely because credits are zero. Check the Phala dashboard for workspace Balance and key limits.
+Account quota or API key budget exhaustion returns `402 insufficient_quota`. Check the Phala dashboard for workspace Balance and key limits.
 
 ## SDK Handling
 

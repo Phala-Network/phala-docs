@@ -94,13 +94,11 @@ The full verification procedure is in [Verify a response](/phala-cloud/confident
 
 ## Legacy alias
 
-`GET /v1/attestation/report?nonce=…` returns the same gateway attestation for clients written
-against earlier API versions, with two differences: top-level `signing_address`, `signing_algo`, and
-`signing_public_key` derived from the gateway keyset (`?signing_algo=ecdsa`, the default, or
-`ed25519` selects the key), and `all_attestations` collapsed to a single entry. Earlier API versions
-returned the upstream model's attestation here; the upstream verification for a response is now in
-the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and the [attested session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). New
-integrations should use `/v1/aci/attestation`.
+`GET /v1/attestation/report?nonce=...&signing_algo=ecdsa` is a compatibility endpoint for legacy clients. `signing_algo` selects `ecdsa` (default) or `ed25519`; the response includes the legacy `signing_address`, `signing_algo`, and `signing_public_key`, plus an `all_attestations` compatibility entry.
+
+Its hardware quote uses a legacy signer-and-nonce binding, rather than the canonical ACI keyset-and-nonce statement. With `version=1` (default), report data is the signer identity right-padded to 32 bytes followed by the 32-byte nonce. With `version=2`, the first half is SHA-256 of the signer identity concatenated with the TLS SPKI fingerprint. The signer identity is the ECDSA Ethereum address or Ed25519 public key. Legacy signing keys are resolved separately from canonical receipt-signing keys.
+
+Use this legacy report only to verify the [legacy signature wrapper](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#legacy-alias) under its legacy rules. Canonical ACI verifiers must fetch `/v1/aci/attestation` and follow the canonical statement above; do not apply that statement check to a legacy quote. Upstream verification for a response is recorded in the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and cited [session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
 
 ## Related
 

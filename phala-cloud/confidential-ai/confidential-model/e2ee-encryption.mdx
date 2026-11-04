@@ -30,9 +30,22 @@ X25519 is recommended for browser-native clients. The secp256k1 suite remains su
 | `/v1/chat/completions` | Buffered and streaming |
 | `/v1/completions` | Buffered and streaming |
 | `/v1/embeddings` | Buffered |
-| `/v1/responses`, `/v1/messages`, `/v1/systemone` | Rejected with `400` and `e2ee_unsupported_endpoint` |
 
-Encrypt at least one content-bearing request field. Use the [protocol's field locations](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/e2ee-v2.md#5-encrypted-fields) for chat messages, completion prompts, and embedding input. Response content fields are encrypted back to the client's key.
+Only these three inference endpoints support E2EE v2. Every other inference endpoint implemented by this gateway rejects authenticated E2EE requests with `400 e2ee_unsupported_endpoint`. This includes Responses, Messages, System One, and the image and audio routes. Authentication checks can run first; the image and audio handlers return `401` when the bearer token is missing.
+
+Encrypt at least one content-bearing request field. Use the [protocol's field locations](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/e2ee-v2.md#5-encrypted-fields) for chat messages, completion prompts, and embedding input.
+
+## Encrypted response fields
+
+The gateway encrypts the following fields, when present, to the client's `X-Client-Pub-Key`. Fields outside this table are not covered by the response-encryption contract.
+
+| Endpoint | Buffered response | Streaming response, per SSE chunk |
+| --- | --- | --- |
+| `/v1/chat/completions` | `choices.{i}.message.content`, `choices.{i}.message.reasoning`, `choices.{i}.message.reasoning_content`, `choices.{i}.message.audio.data` | `choices.{i}.delta.content`, `choices.{i}.delta.reasoning`, `choices.{i}.delta.reasoning_content`; an empty-string content delta may be omitted |
+| `/v1/completions` | `choices.{i}.text` | `choices.{i}.text` |
+| `/v1/embeddings` | Only `data.{i}.embedding`, after compact JSON serialization of its value | Not supported |
+
+`{i}` is the entry's `index` when present, otherwise its array position. Embeddings use buffered responses even if the client sends `stream: true`.
 
 ## Request headers
 

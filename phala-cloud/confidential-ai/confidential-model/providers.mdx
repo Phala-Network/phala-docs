@@ -13,8 +13,8 @@ These are the providers in the live catalog. Availability changes; the catalog a
 
 | Catalog provider | What the gateway verifier checks and binds | Evidence boundary |
 | --- | --- | --- |
-| `phala` | dstack TDX quote, nonce and signing-address/TLS-SPKI report-data binding, measured compose, and available GPU evidence; pins upstream TLS. | A Phala dstack model CVM. GPU claims depend on verified, nonce-bound evidence. |
-| `chutes` | Instance TDX evidence and verified instance encryption keys; binds forwarding to a verified ML-KEM E2EE key. | Model instance. Inspect the session for GPU evidence and claim status rather than assuming a CPU-to-GPU binding. |
+| `phala` | dstack TDX quote, nonce and signing-address/TLS-SPKI report-data binding, measured compose, and available GPU evidence; pins upstream TLS. | A Phala dstack model CVM. GPU claims are supplemental nonce-matched checks; the generic GPU path does not authenticate JWT signatures or GPU identity. |
+| `chutes` | Instance TDX evidence and verified instance encryption keys; binds forwarding to a verified ML-KEM E2EE key. | Model instance. Supplemental GPU checks do not authenticate JWT signatures or GPU identity; inspect the session without assuming a CPU-to-GPU binding. |
 | `tinfoil` | The official verifier checks enclave evidence, release/code measurements, and router TLS SPKI. | The confidential model router. The gateway does not independently attest each model worker through this verifier. |
 | `near-ai` | Nonce-bound gateway TDX evidence and TLS SPKI; pins the verified gateway channel. | The NEAR AI gateway. Per-model backend verification is delegated to that gateway. |
 | `privatemode` | The official proxy is co-deployed in the gateway's measured compose. Its readiness follows initial Contrast verification and secret exchange; requests and successful responses use Privatemode OAE protection. | The measured proxy and its Contrast-attested secret path. The observed dynamic manifest is not bound to the active inference secret and is not proof of a particular serving manifest. |
@@ -27,10 +27,10 @@ The implementation is public in the [gateway provider verifiers](https://github.
 
 | Provider | TEE | Channel binding | Zero data retention |
 | --- | --- | --- | --- |
-| Tinfoil | AMD SEV-SNP (or TDX) + NVIDIA CC | `tls_spki_sha256` | Yes |
-| NEAR AI | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Yes |
-| Chutes | Intel TDX + NVIDIA CC | `e2ee_public_key_sha256` | Yes |
-| Phala | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Yes |
+| Tinfoil | AMD SEV-SNP (or TDX) | `tls_spki_sha256` | Yes |
+| NEAR AI | Intel TDX | `tls_spki_sha256` | Yes |
+| Chutes | Intel TDX | `e2ee_public_key_sha256` | Yes |
+| Phala | Intel TDX | `tls_spki_sha256` | Yes |
 | Privatemode | Contrast-attested secret path via a measured proxy | `proxy_image_sha256` | Not in the ZDR routing allowlist |
 | 0G | See session evidence | `e2ee_public_key_sha256` | Not in the ZDR routing allowlist |
 | ArmetAI (`fortanix`) | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Not in the ZDR routing allowlist |
@@ -59,7 +59,7 @@ it; anything not established is `Unknown`. See
 | `tcb_up_to_date` | Verifier-derived | Tri-state | Tri-state | Tri-state | Unknown | Tri-state | Tri-state |
 | `os_known_good` | Unknown | Unknown | Unknown | Verifier-derived | Unknown | Unknown | Unknown |
 | `serving_software_known_good` | Verifier-derived (Sigstore) | Unknown | Unknown | Unknown | Unknown | Unknown | Verifier-derived (operator pin) |
-| `gpu_attested` | Unknown | Unknown | Verifier-derived | Verifier-derived | Unknown | Unknown | Verifier-derived |
+| `gpu_attested` | Unknown | Unknown | Verifier-derived (supplemental) | Verifier-derived (supplemental) | Unknown | Unknown | Verifier-derived (NRAS-signed) |
 | `model_weights_provenance` | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown |
 
 Notes:
@@ -74,9 +74,7 @@ Notes:
   production image. The other providers in this table leave it `Unknown`.
 - **`serving_software_known_good`** is asserted for Tinfoil by comparing its launch measurement
   against published Sigstore golden values for the build. ArmetAI instead asserts it against an operator pin; the remaining providers leave it `Unknown`.
-- **`gpu_attested`** asserts when the provider's NVIDIA confidential-computing GPU attestation is
-  verified and nonce-bound. It attests a genuine confidential GPU, not its binding to the serving CPU
-  TEE, so the claim is verifier-derived. Provider verifiers can impose additional requirements; ArmetAI requires valid nonce-bound NRAS evidence before emitting a verified result.
+- **`gpu_attested`** has provider-specific assurance. Phala and Chutes record accepted, nonce-matched supplemental NVIDIA checks; their generic GPU path decodes JWTs without verifying signatures and does not authenticate GPU identity or bind it to the serving CPU. ArmetAI requires a separate NRAS-signed check before emitting a verified result and binds the exact GPU evidence into CPU report data. The shared `verifier_derived` label does not make these checks equivalent.
 
 
 ArmetAI’s `armet-ai` verifier asserts serving software against a configured operator measurement pin and GPU evidence against nonce-bound NRAS reports. The pin does not independently prove reproducible software or model-weight provenance. Its TCB claim is tri-state and OS provenance remains unknown. See the [ArmetAI verification contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/armet-ai/verification.md#session-claims).
@@ -98,7 +96,7 @@ Claims have lowercase statuses `asserted`, `refuted`, or `unknown`, and a source
 - `tee_attested` describes the verified TEE boundary above. Check its `source` as well as its `status`: Privatemode reports `verifier_derived`, based on the measured proxy and its Contrast-attested secret path, rather than `hardware_proven`.
 - `tcb_up_to_date` can be `refuted` for a stale TCB; successful verification does not silently turn it into an up-to-date claim.
 - `serving_software_known_good` depends on the verifier's measurement/provenance policy.
-- `gpu_attested` depends on provider evidence. A genuine GPU attestation alone does not establish its binding to the serving CPU TEE.
+- `gpu_attested` depends on the provider verifier and evidence. Supplemental Phala/Chutes results do not authenticate GPU identity; inspect the reason and evidence for the actual assurance boundary.
 - `model_weights_provenance` is not generally proven. Treat `unknown` as unproven.
 
 Zero data retention is a separate property. Send `provider: {"zdr": true}` when the provider must not keep prompt or completion content after serving. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).

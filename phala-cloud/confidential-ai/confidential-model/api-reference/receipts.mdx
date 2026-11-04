@@ -107,16 +107,28 @@ See [Verify a response](/phala-cloud/confidential-ai/verify/verify-signature) fo
 `GET /v1/signature/{id}` returns the same receipt wrapped in a legacy envelope, for clients written
 against earlier API versions. `{id}` is a receipt id or a response id.
 
+```http
+GET /v1/signature/{id}?signing_algo=ecdsa
+```
+
+| Query parameter | Accepted values | Default |
+| --- | --- | --- |
+| `signing_algo` | `ecdsa` or `ed25519` | `ecdsa` |
+
+This query parameter selects the legacy wrapper signer. The canonical receipt retains its own `key_id` and signature independently of this selection.
+
 | Field | Description |
 | --- | --- |
 | `api_version` | ACI version token, for example `aci/1`. |
 | `signing_algo` | Signature algorithm, for example `ecdsa`. |
-| `signing_address` | Address that signed `text`. |
+| `signing_address` | ECDSA Ethereum address or Ed25519 public key that signed `text`. |
 | `text` | `"<request body hash>:<response hash>"`, the signed message. |
 | `signature` | Signature over `text`. |
 | `receipt` | The full receipt object, identical to this endpoint's response. |
 
-New integrations should use `/v1/aci/receipts/{id}`.
+Legacy clients must verify the wrapper's `signature` over `text` using the selected algorithm, then bind `signing_address` to a fresh, verified legacy attestation report from `GET /v1/attestation/report?signing_algo=ecdsa&nonce=...` (or `signing_algo=ed25519`). Check the hardware quote's legacy signer-and-nonce binding; comparing the reported address alone is insufficient. ECDSA uses Ethereum personal-message signing; Ed25519 signs the UTF-8 `text` bytes directly.
+
+Legacy wrapper keys are separate from canonical receipt-signing keys. New integrations should use `/v1/aci/receipts/{id}` and verify the canonical receipt with the fresh canonical attestation at `/v1/aci/attestation`, following the checks above.
 
 ## Related
 

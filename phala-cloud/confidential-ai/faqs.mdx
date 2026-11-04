@@ -35,8 +35,7 @@ description: "Common questions about the platform's attestation, receipts, confi
   <Accordion title="Which verification endpoints should I use?" icon="terminal">
     The canonical endpoints live under `/v1/aci/`: `GET /v1/aci/attestation`,
     `GET /v1/aci/receipts/{id}`, and `GET /v1/aci/sessions/{id}`. The older
-    `GET /v1/attestation/report` and `GET /v1/signature/{id}` remain as legacy compatibility aliases that return the same data in a legacy envelope. Use the `/v1/aci/*`
-    endpoints for new integrations.
+    `GET /v1/attestation/report` and `GET /v1/signature/{id}` remain for legacy compatibility. The signature endpoint wraps a canonical receipt; the legacy attestation uses a separate signer-and-nonce quote binding. Use the `/v1/aci/*` endpoints and canonical verification rules for new integrations.
   </Accordion>
 
   <Accordion title="How do I prove a response was genuinely confidential?" icon="circle-check">
@@ -106,8 +105,7 @@ description: "Common questions about the platform's attestation, receipts, confi
 
   <Accordion title="Does verified serving prove current firmware, GPU binding, and reviewed software and weights?" icon="certificate">
     These are separate claims, not an automatic consequence of verified serving. Inspect each claim's
-    status, source, and reason; `unknown` leaves that property unproven. A verified GPU report proves a
-    genuine confidential-computing GPU for that nonce, not its binding to the serving CPU TEE.
+    status, source, and reason; `unknown` leaves that property unproven. Phala and Chutes GPU claims record supplemental nonce-matched checks whose JWT signatures are not verified by those paths; they do not authenticate GPU identity. ArmetAI uses a separate mandatory signed NRAS check tied to the CPU quote. No GPU claim alone proves continued use of that GPU for your request.
 
     Apply your own policy to TCB freshness, serving-software integrity, and model-weight provenance.
     See [Claims](/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims) for what each claim establishes and how to
