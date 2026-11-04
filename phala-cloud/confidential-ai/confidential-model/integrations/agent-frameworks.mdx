@@ -1,0 +1,174 @@
+---
+title: "Agent frameworks"
+description: "Run CrewAI, PydanticAI, or the OpenAI Agents SDK on Phala through the Chat Completions API."
+---
+
+Each framework takes an OpenAI-compatible base URL and key. Pick a model whose `supported_features`
+include `tools` in [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models). This Phala endpoint requires verified serving for every request.
+
+```bash
+export PHALA_AI_API_KEY="YOUR_API_KEY"
+```
+
+<Tabs>
+  <Tab title="CrewAI">
+
+CrewAI uses LiteLLM internally. Prefix the Phala model id with `openai/` so LiteLLM selects its
+OpenAI-compatible adapter; Phala receives `z-ai/glm-5.3`.
+
+```bash
+pip install crewai
+```
+
+```python
+import os
+
+from crewai import Agent, Crew, LLM, Process, Task
+
+llm = LLM(
+    model="openai/z-ai/glm-5.3",
+    base_url="https://inference.phala.com/v1",
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    temperature=0,
+)
+
+reviewer = Agent(
+    role="Code reviewer",
+    goal="Identify correctness and security risks",
+    backstory="A senior engineer who reports concrete findings.",
+    llm=llm,
+    max_iter=3,
+)
+
+review = Task(
+    description="Review the supplied change summary: {change_summary}",
+    expected_output="A prioritized list of findings with suggested fixes.",
+    agent=reviewer,
+)
+
+crew = Crew(agents=[reviewer], tasks=[review], process=Process.sequential)
+result = crew.kickoff(inputs={"change_summary": "Adds token refresh without retry limits."})
+print(result)
+```
+
+| Symptom | Check |
+| --- | --- |
+| LiteLLM cannot select a provider | Keep the `openai/` prefix before the Phala model id. |
+| Crew loops too long | Reduce `max_iter` and add task-level execution limits. |
+
+[CrewAI LLM connections](https://docs.crewai.com/en/learn/llm-connections)
+
+  </Tab>
+  <Tab title="PydanticAI">
+
+PydanticAI exposes an OpenAI-compatible provider directly. Use `OpenAIChatModel` for the Chat
+Completions endpoint.
+
+```bash
+pip install pydantic-ai
+```
+
+```python
+import os
+
+from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.usage import UsageLimits
+
+model = OpenAIChatModel(
+    "z-ai/glm-5.3",
+    provider=OpenAIProvider(
+        base_url="https://inference.phala.com/v1",
+        api_key=os.environ["PHALA_AI_API_KEY"],
+    ),
+)
+
+agent = Agent(model, system_prompt="Be concise and state uncertainty.")
+
+
+@agent.tool_plain
+def deployment_status(service: str) -> str:
+    """Return a sample deployment status."""
+    return f"{service}: healthy"
+
+
+result = agent.run_sync(
+    "Check the gateway deployment status.",
+    usage_limits=UsageLimits(request_limit=3, tool_calls_limit=1),
+)
+print(result.output)
+```
+
+| Symptom | Check |
+| --- | --- |
+| Provider initialization fails | Use `OpenAIProvider` with the `/v1` base URL. |
+| Tool calls exceed expectations | Lower `request_limit` and `tool_calls_limit`. |
+
+[PydanticAI OpenAI models](https://ai.pydantic.dev/models/openai/)
+
+  </Tab>
+  <Tab title="OpenAI Agents SDK">
+
+The SDK uses the Responses API by default. Wrap a custom `AsyncOpenAI` client in
+`OpenAIChatCompletionsModel`. Tracing is disabled because the default exporter needs an OpenAI
+platform key; configure another trace processor if you need tracing.
+
+```bash
+pip install openai-agents
+```
+
+```python
+import os
+
+from agents import (
+    Agent,
+    OpenAIChatCompletionsModel,
+    Runner,
+    function_tool,
+    set_tracing_disabled,
+)
+from openai import AsyncOpenAI
+
+set_tracing_disabled(True)
+
+client = AsyncOpenAI(
+    base_url="https://inference.phala.com/v1",
+    api_key=os.environ["PHALA_AI_API_KEY"],
+)
+model = OpenAIChatCompletionsModel(model="z-ai/glm-5.3", openai_client=client)
+
+
+@function_tool
+def deployment_status(service: str) -> str:
+    """Return a sample deployment status."""
+    return f"{service}: healthy"
+
+
+agent = Agent(
+    name="Operations assistant",
+    instructions="Use the tool to check deployment status.",
+    model=model,
+    tools=[deployment_status],
+)
+
+result = Runner.run_sync(agent, "Check the gateway deployment status.", max_turns=3)
+print(result.final_output)
+```
+
+| Symptom | Check |
+| --- | --- |
+| SDK calls the wrong API shape | Wrap the client with `OpenAIChatCompletionsModel`. |
+| Default tracing reports errors | Disable tracing or configure a compatible trace processor. |
+
+[OpenAI Agents SDK models](https://openai.github.io/openai-agents-python/models/)
+
+  </Tab>
+</Tabs>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Function calling" icon="function" href="/phala-cloud/confidential-ai/confidential-model/tool-calling" />
+  <Card title="LangChain" icon="link" href="/phala-cloud/confidential-ai/confidential-model/migration-and-integrations#langchain" />
+</CardGroup>

@@ -42,7 +42,7 @@ Generate vector embeddings for retrieval, semantic search, clustering, and simil
 <CodeGroup>
 ```bash cURL
 curl https://inference.phala.com/v1/embeddings \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "qwen/qwen3-embedding-8b",
@@ -51,10 +51,11 @@ curl https://inference.phala.com/v1/embeddings \
 ```
 
 ```python Python
+import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="<API_KEY>",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -71,7 +72,7 @@ print(len(vector))
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "<API_KEY>",
+  apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
@@ -104,4 +105,53 @@ console.log(response.data[0].embedding.length);
 }
 ```
 
-Use [List Embedding Models](/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models) for the live embedding catalog.
+## List embedding models
+
+### Endpoint
+
+```bash
+GET https://inference.phala.com/v1/embeddings/models
+```
+
+Returns models designed for vector embeddings. Use this endpoint when selecting embedding models for retrieval, RAG, clustering, or similarity search. No API key is required.
+
+### Query parameters
+
+<ParamField query="zdr" type="string">
+  Set to `true` to return only embedding models that can be served under zero data retention.
+
+  `true` is the only accepted value. Any other value returns `400`. Omit the parameter to list the full embedding catalog.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/embeddings/models?zdr=true"
+```
+
+<ParamField query="tee" type="string">
+  This host always returns TEE-capable embedding models. `tee=false` and `tee=1` cannot relax the host policy and still return the TEE-only catalog. `zdr` remains a separate filter that accepts only `true`.
+</ParamField>
+
+```bash
+curl "https://inference.phala.com/v1/embeddings/models?tee=true"
+```
+
+Response entries have the same shape as the unfiltered catalog. There is no `zdr` field on a model object.
+
+### Example
+
+```bash
+curl https://inference.phala.com/v1/embeddings/models
+```
+
+### Response fields
+
+| Field | Description |
+|-------|-------------|
+| `id` | Model identifier for `POST /v1/embeddings` |
+| `name` | Human-readable model name |
+| `input_modalities` | Input types accepted by the model |
+| `output_modalities` | Output types produced by the model |
+| `context_length` | Maximum input context length |
+| `max_output_length` | Embedding dimensions or max output size |
+| `pricing.prompt` | Input price per token |
+| `description` | Model description and use case |

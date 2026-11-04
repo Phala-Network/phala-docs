@@ -22,7 +22,7 @@ Add the `provider` block to the request. Every inference endpoint accepts it: `/
 
 ```bash
 curl https://inference.phala.com/v1/chat/completions \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "z-ai/glm-5.3",
@@ -58,7 +58,7 @@ List the sessions that can serve your model. The unfiltered list covers every up
 
 ```bash
 curl -s "https://inference.phala.com/v1/aci/sessions?model=z-ai/glm-5.3" \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   | jq -r '.sessions[] | "\(.session_id)  \(.upstream_name)  \(.endpoint)"'
 ```
 
@@ -70,7 +70,7 @@ Pin a request to one or more of them. The example id below was obtained from the
 
 ```bash
 curl https://inference.phala.com/v1/chat/completions \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "z-ai/glm-5.3",
@@ -95,6 +95,8 @@ Listing several ids means any one of them may serve the request. If none of them
 
 A session id is tied to one verified channel, and the gateway re-verifies periodically. When it re-verifies, the evidence changes and the id changes with it. Read a current id shortly before you pin it, and expect a pinned id to stop matching. A pin that stops matching is a failure, never a silent fallback to a different channel.
 
+Every session id must be exactly 64 lowercase hexadecimal characters; duplicate ids are collapsed.
+
 `aci_session_ids` implies `aci_verified`. Passing session ids together with `"aci_verified": false` is rejected as a contradiction rather than resolved in either direction.
 
 ## List the models you can use
@@ -111,7 +113,7 @@ curl -s "https://inference.phala.com/v1/embeddings/models?tee=true" \
   | jq -r '.data[].id'
 ```
 
-`true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter for the full catalog.
+This host always filters to TEE-capable models, even with `tee=false` or `tee=1`. Omit the query to get the same TEE-only catalog. The separate `zdr` filter accepts only `true`; other values return `400`.
 
 <Warning>
 `?tee=true` and `provider: {"aci_verified": true}` read different properties. The catalog filter reports a model's own `is_tee` capability flag. The routing constraint is enforced against the provider actually serving the request.
@@ -129,7 +131,7 @@ The gateway parses the attestation fields itself and rejects anything it cannot 
 | `"provider": {"aci_verified": false}` | No extra request constraint; endpoint policy still applies. |
 | `"provider": {"aci_verified": "yes"}` | `400`, expected a boolean. |
 | `"provider": {"aci_session_ids": []}` | `400`, must not be empty. |
-| `"provider": {"aci_session_ids": [""]}` | `400`, expected non-empty strings. |
+| `"provider": {"aci_session_ids": [""]}` | `400`, each id must be exactly 64 lowercase hexadecimal characters. |
 | `"provider": {"aci_verified": false, "aci_session_ids": ["<64 lowercase hex>"]}` | `400`, contradictory. |
 | `"provider": ["aci_verified"]` | `400`, the block must be an object. |
 
@@ -154,7 +156,7 @@ A successful attested request returns `x-receipt-id`. Fetch that receipt and rea
 
 ```bash
 curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   | jq '.event_log[] | select(.type == "upstream.verified")'
 ```
 
@@ -169,6 +171,8 @@ curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
 ```
 
 These fields record the gateway's assertion that the constraint held. Inspection alone does not verify it; verify the receipt signature, hashes, and cited session with the [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy). `session_id` names the channel that served the request, and is the id to pin for follow-up requests. The cited session holds `channel_binding`, typed claims, and evidence; inspect its `upstream_name` rather than assuming a catalog provider name. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+
+For Phala-direct sessions, inspect `extra.canonical_model_id` as well as the public request model. Provider names may differ from catalog ids; accept a mapping only when it satisfies your policy.
 
 The request you sent is bound into the same receipt through `request.received.body_hash`, so you can prove which constraint you asked for alongside the result you got.
 

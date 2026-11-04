@@ -27,11 +27,7 @@ curl "https://inference.phala.com/v1/models?zdr=true"
 ```
 
 <ParamField query="tee" type="string">
-  Set to `true` to return only models that are offered confidentially, meaning the model object carries `is_tee: true`.
-
-  This filter reports a model's own capability. It does not promise that a given request will reach an attested provider, which depends on the deployment serving it. To require attestation for a request, send `provider: {"aci_verified": true}`. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
-
-  `true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter to list the full catalog.
+  This host always filters to `is_tee: true` models. The host policy overrides this query parameter, including `tee=false` and `tee=1`; neither enables non-TEE models. Attested serving is also required for every inference request. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy).
 </ParamField>
 
 ```bash

@@ -9,15 +9,16 @@ Private AI supports structured output, enabling you to receive responses in spec
 
 ### Example of Structured Output
 
-Replace `<API_KEY>` with your actual API key in the examples below.
+Set `PHALA_AI_API_KEY` in your environment before running the examples.
 
 ```python
+import os
 import requests
 
 response = requests.post(
     "https://inference.phala.com/v1/chat/completions",
     headers={
-        "Authorization": "Bearer <API_KEY>",
+        "Authorization": f"Bearer {os.environ['PHALA_AI_API_KEY']}",
         "Content-Type": "application/json",
     },
     json={
@@ -76,4 +77,38 @@ print(info)
 ```bash
 curl -s https://inference.phala.com/v1/models \
   | jq -r '.data[] | select((.supported_features // []) | index("structured_outputs")) | .id'
+```
+
+## Pydantic models
+
+```python
+import os
+from openai import OpenAI
+from pydantic import BaseModel
+
+client = OpenAI(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com/v1"
+)
+
+class CalendarEvent(BaseModel):
+    name: str
+    date: str
+    participants: list[str]
+
+response = client.beta.chat.completions.parse(
+    model="z-ai/glm-5.3",
+    messages=[
+        {"role": "system", "content": "Extract calendar events from text"},
+        {"role": "user", "content": "Team meeting tomorrow at 2pm with Alice and Bob"}
+    ],
+    response_format=CalendarEvent
+)
+
+event = response.choices[0].message.parsed
+if event is not None:
+    print(event.name)
+    print(event.participants)
+else:
+    print(response.choices[0].message.refusal)
 ```

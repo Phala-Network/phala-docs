@@ -1,0 +1,156 @@
+---
+title: "OpenAI SDK"
+description: "Use Phala through the OpenAI SDK, with optional local ACI verification on Node and Bun."
+---
+
+Phala supports the OpenAI SDK's Responses, Chat Completions, and Embeddings resources. Set the
+base URL to `https://inference.phala.com/v1` and use an exact Phala model ID.
+
+<Warning>
+Changing only the base URL does not make the SDK a local ACI verifier.
+</Warning>
+
+<CodeGroup>
+
+```bash Python
+pip install openai
+```
+
+```bash TypeScript
+npm install openai
+```
+
+</CodeGroup>
+
+```bash
+export PHALA_AI_API_KEY="YOUR_API_KEY"
+```
+
+## Responses
+
+<CodeGroup>
+
+```python Python
+import os
+
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com/v1",
+)
+response = client.responses.create(
+    model="z-ai/glm-5.3",
+    input="Explain attestation in one sentence.",
+)
+print(response.output_text)
+```
+
+```typescript TypeScript
+import OpenAI from "openai";
+
+const apiKey = process.env.PHALA_AI_API_KEY;
+if (!apiKey) throw new Error("PHALA_AI_API_KEY is required");
+
+const client = new OpenAI({
+  apiKey,
+  baseURL: "https://inference.phala.com/v1",
+});
+const response = await client.responses.create({
+  model: "z-ai/glm-5.3",
+  input: "Explain attestation in one sentence.",
+});
+console.log(response.output_text);
+```
+
+</CodeGroup>
+
+## Chat completions
+
+Use Chat Completions when an existing application expects that API shape:
+
+```typescript
+const response = await client.chat.completions.create({
+  model: "z-ai/glm-5.3",
+  messages: [{ role: "user", content: "Reply with: connected" }],
+});
+console.log(response.choices[0]?.message.content);
+```
+
+Pass `stream=True` in Python or `stream: true` in TypeScript for server-sent events. See
+[Streaming](/phala-cloud/confidential-ai/confidential-model/streaming) and [Function calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) for complete loops.
+
+## Embeddings
+
+Embedding models use a separate catalog:
+
+```bash
+curl -s https://inference.phala.com/v1/embeddings/models \
+  | jq -r '.data[] | [.id, .is_tee, .context_length] | @tsv'
+```
+
+```python
+response = client.embeddings.create(
+    model="qwen/qwen3-embedding-8b",
+    input="Receipts bind requests and responses to the serving path.",
+)
+embedding = response.data[0].embedding
+```
+
+## Verified Node and Bun transport
+
+Node 20.18+ and Bun 1.4+ can inject the same ACI runtime `fetch`:
+
+```bash
+npm install openai @phala/aci-verifier
+```
+
+```typescript
+import OpenAI from "openai";
+import { connectAci } from "@phala/aci-verifier/runtime";
+
+const apiKey = process.env.PHALA_AI_API_KEY;
+if (!apiKey) throw new Error("PHALA_AI_API_KEY is required");
+
+const aci = await connectAci({
+  baseURL: "https://inference.phala.com/v1",
+  serving: { requireVerified: true, requireReceipt: true },
+});
+
+try {
+  if (!aci.identity.transcript.verdict.verified) {
+    throw new Error(aci.identity.transcript.verdict.line);
+  }
+
+  const client = new OpenAI({ apiKey, baseURL: aci.baseURL, fetch: aci.fetch });
+  const response = await client.chat.completions.create({
+    model: "z-ai/glm-5.3",
+    messages: [{ role: "user", content: "Explain attestation briefly." }],
+  });
+
+  const audit = await aci.verifyReceipt();
+  if (!audit.transcript.verdict.verified) {
+    throw new Error(audit.transcript.verdict.line);
+  }
+  console.log(response.choices[0]?.message.content);
+} finally {
+  await aci.close();
+}
+```
+
+The connection verifies the TDX quote, measured compose, identity expiry, hostname, and attested TLS
+SPKI before model traffic. `verifyReceipt()` checks the latest retained exchange, signed receipt,
+wire hashes, and cited session.
+
+See [Release policy](/phala-cloud/confidential-ai/verify/typescript-sdk#release-policy) for compose allowlists and OS-image assurance.
+
+## Production checks
+
+This endpoint rejects non-TEE models and requires verified upstream serving. Set timeouts and bounded retries, and do not expose raw upstream errors to users.
+
+## Related
+
+- [OpenAI Python SDK](https://github.com/openai/openai-python)
+- [OpenAI TypeScript SDK](https://github.com/openai/openai-node)
+- [Verify a response](/phala-cloud/confidential-ai/verify/typescript-sdk)
+- [Phala Responses API](/phala-cloud/confidential-ai/confidential-model/api-reference/responses)

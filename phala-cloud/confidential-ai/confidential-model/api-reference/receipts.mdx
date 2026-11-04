@@ -1,7 +1,7 @@
 ---
 title: "Receipt"
 description: "The signed receipt for a response, with the full transparency event log."
-api: "GET /aci/receipts/{id}"
+api: "GET https://inference.phala.com/v1/aci/receipts/{id}"
 ---
 
 Returns the signed receipt for a response: a transparency event log that binds the request and
@@ -77,16 +77,30 @@ GET /v1/aci/receipts/{id}
 
 ## Verifying the receipt
 
-1. Confirm `workload_keyset_digest` matches a verified
-   [attestation report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
-2. Resolve `key_id` in the attested `receipt_signing_keys` and verify `signature` over the JCS (RFC 8785) form of the receipt with only `signature` removed. The baseline is a hex-encoded Ed25519 signature.
-3. Confirm `request.received.body_hash` matches the request you sent and `response.returned.body_hash`
-   matches the response you received.
-4. On this TEE-only endpoint, upstream verification is required (`required: true`). A failed check refuses forwarding instead of returning unverified inference. Read `upstream.verified`: `result = verified` and `required = true` indicate a confidential model
-   served from a verified, channel-bound upstream. Follow `session_id` to the
-   [attested session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
+These checks follow [ACI spec §§9.1–9.3](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/aci.md#9-verification-procedure),
+starting with an established gateway identity.
 
-See [Verify a response](/phala-cloud/confidential-ai/verify/verify-signature) for the full walkthrough.
+| # | Check | Inputs |
+| - | --- | --- |
+| 1 | Established keyset | §9.1: hardware quote, nonce binding, expiry, provenance, private-key custody, and channel binding, including `workload_keyset_digest == sha256(JCS(workload_keyset))` |
+| 2 | Receipt signature | `keyset.receipt_signing_keys[key_id]` over `JCS(receipt minus signature)` |
+| 3 | Receipt document | `receipt.api_version == "aci/1"`; `receipt.workload_keyset_digest` equals the established digest |
+| 4 | Request hash | `request.received.body_hash == sha256(raw bytes you sent)` |
+| 5 | Response hash | `response.returned.body_hash == sha256(raw bytes you received)` |
+| 6 | Required upstream verification succeeded | `upstream.verified.result == "verified"` and `required == true` |
+| 7 | Cited session | `session.api_version == "aci/1"`; `sha256(JCS(full session document)) == upstream.verified.session_id`; `served_at` is within its validity window; id is in your pinned set, if supplied |
+| 8 | Session evidence and policy | Decode `evidence.data`, hash the exact bytes to `evidence.digest`, and appraise channel bindings, claims and provider evidence under your policy |
+
+A signature-valid receipt is not the same as a successful verification: `upstream.verified` can
+record `result: "failed"` and carry no `session_id`. Assert the result explicitly before looking
+for a session.
+
+`JCS` is RFC 8785 (JSON Canonicalization Scheme). Use an RFC 8785 implementation or the SDK's helpers;
+sorted-key `json.dumps` is not sufficient. Canonicalize ACI documents, but hash HTTP bodies and decoded
+evidence as exact bytes. For E2EE requests, follow the
+[decrypted-body hashing rules](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption#receipts-with-e2ee).
+
+See [Verify a response](/phala-cloud/confidential-ai/verify/verify-signature) for the artifact walkthrough.
 
 ## Legacy alias
 

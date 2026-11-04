@@ -34,15 +34,18 @@ The `type` field is the machine-readable discriminator.
 
 | Status | Meaning |
 | --- | --- |
-| `400` | Bad request, unknown model, or invalid parameter. |
+| `400` | Malformed request or invalid parameter. |
 | `401` | Missing or invalid API key. |
-| `403` | Forbidden, for example your Balance is too low to fund Private AI. Top up, and calls work again within about 5 minutes. |
-| `404` | No eligible route under the request constraints, or an unknown/expired receipt or session. |
+| `402` | Account quota or API key budget exhausted (`insufficient_quota`). |
+| `403` | Authenticated identity lacks permission. |
+| `404` | Unknown or non-TEE model, no eligible route under the request constraints, or an unknown/expired receipt or session. |
 | `412` | No requested attested session is currently accepted (`session_not_accepted`). |
 | `429` | Rate limited. |
 | `500` | Gateway server error. |
 | `502` | Upstream provider unavailable. |
 | `503` | Service temporarily unavailable, including required upstream verification failure (`upstream_verification_failed`). |
+
+Budget denials use `402`; a regular key is not denied solely because credits are zero. Check the Phala dashboard for workspace Balance and key limits.
 
 ## SDK Handling
 
@@ -97,7 +100,7 @@ def with_retry(call, max_retries=3):
 
 <AccordionGroup>
   <Accordion title="Invalid API key">
-    Confirm the `Authorization: Bearer <API_KEY>` header, check for whitespace, and create a fresh key from the Phala dashboard if needed.
+    Confirm the `Authorization: Bearer $PHALA_AI_API_KEY` header, check for whitespace, and create a fresh key from the Phala dashboard if needed.
   </Accordion>
   <Accordion title="Unknown model">
     List valid model ids with [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models). Do not assume a model id exists until it appears in the catalog.

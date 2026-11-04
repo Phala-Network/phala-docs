@@ -34,6 +34,22 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
   Sampling temperature. Typical range is `0` to `2`.
 </ParamField>
 
+<ParamField body="top_p" type="number">
+  Nucleus sampling probability, when supported by the model.
+</ParamField>
+
+<ParamField body="n" type="integer">
+  Number of completion choices, when supported by the model.
+</ParamField>
+
+<ParamField body="presence_penalty" type="number">
+  Penalizes tokens already present in the conversation, when supported.
+</ParamField>
+
+<ParamField body="frequency_penalty" type="number">
+  Penalizes tokens according to their frequency, when supported.
+</ParamField>
+
 <ParamField body="max_tokens" type="integer">
   Maximum number of output tokens for most open models and GPU TEE models.
 </ParamField>
@@ -85,7 +101,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
   {"provider": {"aci_verified": true, "aci_session_ids": ["50b1e4ac17b1f10906595d322269b69e75ba15e03adb147490fa28eba4de8fc1"]}}
   ```
 
-  Session ids imply `aci_verified`. Passing them with `"aci_verified": false` returns `400`, as does an empty array or a non-string entry. Both fields are read by the gateway and removed before the request reaches a provider. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
+  Session ids imply `aci_verified`. Passing them with `"aci_verified": false` returns `400`, as does an empty array or any entry that is not exactly 64 lowercase hexadecimal characters. Duplicate ids are collapsed. Both fields are read by the gateway and removed before the request reaches a provider. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
 </ParamField>
 
 ## Examples
@@ -94,7 +110,7 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 ```bash cURL
 curl https://inference.phala.com/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <API_KEY>" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -d '{
     "model": "z-ai/glm-5.3",
     "messages": [
@@ -104,10 +120,11 @@ curl https://inference.phala.com/v1/chat/completions \
 ```
 
 ```python Python
+import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="<API_KEY>",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -125,7 +142,7 @@ print(response.choices[0].message.content)
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "<API_KEY>",
+  apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
@@ -171,7 +188,8 @@ Raw HTTP responses include verification headers. Use `x-receipt-id` with [Get Re
 | Header | Meaning |
 | --- | --- |
 | `x-receipt-id` | Signed receipt id for this response. |
-| `x-aci-identity` | Attested gateway workload identity. |
+| `x-aci-version` | ACI version, for example `aci/1`. |
+| `x-e2ee-applied`, `x-e2ee-version`, `x-e2ee-algo` | E2EE response hints; see [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption). |
 | `x-aci-keyset-digest` | Digest of the attested gateway keyset. |
 
 ## Feature Notes

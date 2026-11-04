@@ -44,6 +44,12 @@ The Privatemode proxy owns Contrast verification, secret exchange, and body encr
 
 Verify the receipt and its session, then require the claims your workload needs. Add a compose allowlist from authenticated release metadata when you need reviewed gateway releases. Add zero data retention when post-request storage matters. Use a custom GPU TEE deployment when you need control over the complete serving workload.
 
+## Middleware and control-plane metadata
+
+Optional routing and business middleware inside the attested deployment can see plaintext after decryption. It cannot create upstream verification facts or bypass backend channel binding.
+
+The external control plane receives `apiKeyHash` (the SHA-256 hash of the bearer token) for authenticated requests and, when request features are enabled, tool presence, input modalities, token estimates, reasoning intent, response format, and optional `prefixHash` at `/consult/pre`. `prefixHash` is a keyed HMAC cache-affinity digest that can link requests with the same cache key or conversation opening. `/consult/post` receives usage, timing, and `prefixHash` when present. These fields contain no prompt text, but they are metadata, and their retention is separate from receipt storage. See the [control-plane contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/control-plane-contract.md).
+
 ## Related
 
 <CardGroup cols={2}>

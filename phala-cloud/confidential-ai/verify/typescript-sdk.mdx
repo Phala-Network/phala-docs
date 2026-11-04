@@ -33,6 +33,10 @@ const aci = await connectAci({
 });
 
 try {
+  if (!aci.identity.transcript.verdict.verified) {
+    throw new Error(aci.identity.transcript.verdict.line);
+  }
+
   const client = new OpenAI({
     baseURL: aci.baseURL,
     apiKey,

@@ -18,7 +18,7 @@ Every model on this endpoint runs in a TEE. These clients do not verify attestat
 
 ## Continue
 
-Add a model to your local `~/.continue/config.yaml` using Continue's [OpenAI-compatible configuration](https://docs.continue.dev/customize/model-providers/top-level/openai). Keep any other models already in the file:
+Add a model to your local `~/.continue/config.yaml` using Continue's [OpenAI-compatible configuration](https://docs.continue.dev/customize/model-providers/top-level/openai). Keep any other models already in the file. Set `PHALA_AI_API_KEY` in `~/.continue/.env` using Continue’s [local secrets](https://docs.continue.dev/faqs#managing-local-secrets-and-environment-variables) before using the reference below:
 
 ```yaml
 name: Phala
@@ -29,7 +29,7 @@ models:
     provider: openai
     model: z-ai/glm-5.3
     apiBase: https://inference.phala.com/v1
-    apiKey: YOUR_PHALA_API_KEY
+    apiKey: ${{ secrets.PHALA_AI_API_KEY }}
 ```
 
 ## Zed
@@ -56,7 +56,7 @@ Add this provider under `language_models` in your settings file using Zed's [Ope
 
 ## GitHub Copilot (VS Code BYOK)
 
-Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example uses the model's context window from the catalog and reserves 65,536 tokens for output, within the model's 1,048,576-token output maximum:
+Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**, name the group `Phala`, enter your Phala API key, and select **Chat Completions**. In the generated `chatLanguageModels.json`, keep the API-key input reference created by VS Code and configure the model as below. See the [Custom Endpoint documentation](https://code.visualstudio.com/docs/agent-customization/language-models#_add-a-custom-endpoint-model). This example uses the model's context window from the catalog and reserves 65,536 tokens for output, so the configured input and output total the catalog’s 1,048,576-token context window:
 
 ```json
 [
@@ -70,7 +70,7 @@ Run **Chat: Manage Language Models**, choose **Add Models → Custom Endpoint**,
         "name": "Phala GLM 5.3",
         "url": "https://inference.phala.com/v1/chat/completions",
         "toolCalling": true,
-        "contextWindow": 1048576,
+        "maxInputTokens": 983040,
         "maxOutputTokens": 65536
       }
     ]
@@ -92,29 +92,24 @@ aider --model openai/z-ai/glm-5.3
 
 ## Goose
 
-Save the following as `phala.json` in Goose's [`custom_providers` directory](https://goose-docs.ai/docs/getting-started/providers/#configure-custom-provider): `~/.config/goose/custom_providers/` on macOS/Linux, or `%APPDATA%\Block\goose\config\custom_providers\` on Windows. If you set `GOOSE_PATH_ROOT`, use `<GOOSE_PATH_ROOT>/config/custom_providers/` instead. Create the directory if needed:
+Use Goose’s [custom-provider CLI setup](https://goose-docs.ai/docs/getting-started/providers/#configure-custom-provider):
 
-```json
-{
-  "name": "phala",
-  "engine": "openai",
-  "display_name": "Phala",
-  "description": "OpenAI-compatible confidential inference from Phala.",
-  "api_key_env": "PHALA_AI_API_KEY",
-  "base_url": "https://inference.phala.com/v1",
-  "dynamic_models": true,
-  "models": [],
-  "supports_streaming": true,
-  "model_doc_link": "https://docs.phala.com/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
-  "setup_steps": [
-    "Sign in to the Phala dashboard",
-    "Open Private AI, then API Keys, and create an API key",
-    "Copy the key and paste it above"
-  ]
-}
+```bash
+goose configure
 ```
 
-With `PHALA_AI_API_KEY` set, run `goose configure`, choose **Configure Providers → Phala**, and select `z-ai/glm-5.3`. Dynamic discovery also lists the non-chat `jaredpalmer/kev-4b` decision model; choose a chat model.
+Choose **Custom Providers → Add A Custom Provider**, select **OpenAI Compatible**, and enter:
+
+| Prompt | Value |
+| --- | --- |
+| Name | Phala |
+| API URL | `https://inference.phala.com/v1/chat/completions` |
+| Authentication required | Yes |
+| Credential source | API key from `PHALA_AI_API_KEY` |
+| Model | `z-ai/glm-5.3` |
+| Context limit | `1048576`, or the selected model’s live `context_length` |
+
+Use the full Chat Completions endpoint. Then choose **Configure Providers → Phala** and select the chat model. Decision models use a different API and cannot be used for this chat integration.
 
 ## AnythingLLM
 

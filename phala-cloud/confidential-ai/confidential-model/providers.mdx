@@ -23,6 +23,64 @@ These are the providers in the live catalog. Availability changes; the catalog a
 
 The implementation is public in the [gateway provider verifiers](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/src/aci/verifier) and [provider evidence bridges](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/scripts/provider_verifier).
 
+## Providers and bindings
+
+| Provider | TEE | Channel binding | Zero data retention |
+| --- | --- | --- | --- |
+| Tinfoil | AMD SEV-SNP (or TDX) + NVIDIA CC | `tls_spki_sha256` | Yes |
+| NEAR AI | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Yes |
+| Chutes | Intel TDX + NVIDIA CC | `e2ee_public_key_sha256` | Yes |
+| Phala | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Yes |
+| Privatemode | Contrast-attested secret path via a measured proxy | `proxy_image_sha256` | Not in the ZDR routing allowlist |
+| 0G | See session evidence | `e2ee_public_key_sha256` | Not in the ZDR routing allowlist |
+| ArmetAI (`fortanix`) | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Not in the ZDR routing allowlist |
+
+- A `tls_spki_sha256` binding pins the upstream HTTPS connection to the verified TLS key.
+- An `e2ee_public_key_sha256` binding encrypts the request body to the verified enclave key, so only
+  that enclave can decrypt it.
+- A `proxy_image_sha256` binding records `provider`, `proxy_image_digest`, and `credential_sha256`
+  for Privatemode's co-deployed proxy. The gateway checks the credential and forwards only to the
+  private proxy in its measured deployment; the proxy verifies and encrypts the provider hop.
+- Zero data retention means the provider does not keep prompt or completion content after serving a
+  request. It rests on the provider's contract or published policy, not on the attestation report.
+  The ZDR column describes the routing allowlist, not an attestation claim; absence from that list does not establish a provider’s retention policy. To enforce the
+  property per request, send `provider: {"zdr": true}`. See
+  [Zero data retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
+## What each provider attests
+
+Claims are honest about their source. A claim is asserted only when that provider's verifier backs
+it; anything not established is `Unknown`. See
+[Claims](/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims) for the vocabulary.
+
+| Claim | Tinfoil | NEAR AI | Chutes | Phala | Privatemode | 0G | ArmetAI |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `tee_attested` | Hardware-proven | Hardware-proven | Hardware-proven | Hardware-proven | Verifier-derived | Hardware-proven | Hardware-proven |
+| `tcb_up_to_date` | Verifier-derived | Tri-state | Tri-state | Tri-state | Unknown | Tri-state | Tri-state |
+| `os_known_good` | Unknown | Unknown | Unknown | Verifier-derived | Unknown | Unknown | Unknown |
+| `serving_software_known_good` | Verifier-derived (Sigstore) | Unknown | Unknown | Unknown | Unknown | Unknown | Verifier-derived (operator pin) |
+| `gpu_attested` | Unknown | Unknown | Verifier-derived | Verifier-derived | Unknown | Unknown | Verifier-derived |
+| `model_weights_provenance` | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown |
+
+Notes:
+
+- **`tee_attested` is hardware-proven** for Tinfoil, NEAR AI, Chutes, Phala, ArmetAI, and 0G: a genuine TEE
+  quote is verified and the request channel is bound to it. Privatemode's claim is verifier-derived
+  by `privatemode-proxy/co-deployed-contrast/v1`, based on its co-deployed proxy and channel binding.
+- **`tcb_up_to_date`** is tri-state when the verifier reports a TCB status: an up-to-date platform
+  asserts it, a stale platform refutes it, and an absent status is `Unknown`. Tinfoil's verifier
+  requires an up-to-date TCB but exposes no separate status, so its claim is verifier-derived.
+- **`os_known_good`** is verifier-derived for Phala when the attested OS image resolves to a known
+  production image. The other providers in this table leave it `Unknown`.
+- **`serving_software_known_good`** is asserted for Tinfoil by comparing its launch measurement
+  against published Sigstore golden values for the build. ArmetAI instead asserts it against an operator pin; the remaining providers leave it `Unknown`.
+- **`gpu_attested`** asserts when the provider's NVIDIA confidential-computing GPU attestation is
+  verified and nonce-bound. It attests a genuine confidential GPU, not its binding to the serving CPU
+  TEE, so the claim is verifier-derived. Provider verifiers can impose additional requirements; ArmetAI requires valid nonce-bound NRAS evidence before emitting a verified result.
+
+
+ArmetAI’s `armet-ai` verifier asserts serving software against a configured operator measurement pin and GPU evidence against nonce-bound NRAS reports. The pin does not independently prove reproducible software or model-weight provenance. Its TCB claim is tri-state and OS provenance remains unknown. See the [ArmetAI verification contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/armet-ai/verification.md#session-claims).
+
 ## Binding methods
 
 | Binding | Meaning |

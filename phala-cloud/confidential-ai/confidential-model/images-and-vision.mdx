@@ -11,13 +11,14 @@ Private AI supports various images and vision models, enabling you to leverage t
 
 You can use vision models to analyze images, including image recognition, object detection, and image classification.
 
-Replace `<API_KEY>` with your actual API key in the examples below.
+Set `PHALA_AI_API_KEY` in your environment before running the examples.
 
 ```python
+import os
 from openai import OpenAI
 client = OpenAI(
     base_url="https://inference.phala.com/v1",
-    api_key="<API_KEY>",
+    api_key=os.environ["PHALA_AI_API_KEY"],
 )
 response = client.chat.completions.create(
     model="qwen/qwen3-vl-30b-a3b-instruct",
@@ -58,4 +59,48 @@ The overall impression is of a cute and peaceful scene with baby pandas enjoying
 ```bash
 curl -s https://inference.phala.com/v1/models \
   | jq -r '.data[] | select((.input_modalities // []) | index("image")) | .id'
+```
+
+## Base64 images
+
+```python
+import base64
+
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+base64_image = encode_image("photo.jpg")
+
+response = client.chat.completions.create(
+    model="qwen/qwen3-vl-30b-a3b-instruct",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Describe this image"},
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{base64_image}"
+                }
+            }
+        ]
+    }]
+)
+```
+
+## Multiple images
+
+```python
+response = client.chat.completions.create(
+    model="qwen/qwen3-vl-30b-a3b-instruct",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Compare these images"},
+            {"type": "image_url", "image_url": {"url": "https://example.com/1.jpg"}},
+            {"type": "image_url", "image_url": {"url": "https://example.com/2.jpg"}}
+        ]
+    }]
+)
 ```

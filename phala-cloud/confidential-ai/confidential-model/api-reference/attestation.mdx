@@ -1,7 +1,7 @@
 ---
 title: "Attestation report"
 description: "The gateway TEE attestation report, bound to a caller-supplied nonce."
-api: "GET /aci/attestation"
+api: "GET https://inference.phala.com/v1/aci/attestation"
 ---
 
 Returns the gateway's attestation report: the hardware-backed proof of which TEE workload is serving
@@ -64,7 +64,10 @@ For brevity, the example shows a subset of the E2EE/TLS keys and omits custody e
       "subject": null,
       "not_after": 1795221116,
       "receipt_signing_keys": [ { "key_id": "dstack-kms-receipt-ed25519-v1", "algo": "ed25519", "public_key": "211c…" } ],
-      "e2ee_public_keys": [ { "key_id": "dstack-kms-e2ee-v1", "algo": "secp256k1-aes-256-gcm-hkdf-sha256", "public_key": "0494…" } ],
+      "e2ee_public_keys": [
+        { "key_id": "dstack-kms-e2ee-x25519-v1", "algo": "x25519-aes-256-gcm-hkdf-sha256", "public_key": "8b7e…" },
+        { "key_id": "dstack-kms-e2ee-v1", "algo": "secp256k1-aes-256-gcm-hkdf-sha256", "public_key": "0494…" }
+      ],
       "tls_public_keys": [ { "spki_sha256": "943c…", "domain": "inference.phala.com" } ]
     },
     "evidence": { "quote": "040002008100…", "quote_report_data": "7b7daf…", "event_log": "[{…}]", "vm_config": "{…}", "app_compose": "{…}", "downstream_tls_binding": { "domain": "inference.phala.com", "spki_sha256": "943c…" }, "key_custody": { "provider": "dstack-kms", "keys": [] } }
@@ -72,6 +75,8 @@ For brevity, the example shows a subset of the E2EE/TLS keys and omits custody e
   "service_capabilities": { "supported_e2ee_versions": ["2"], "serving": "aggregator" }
 }
 ```
+
+`not_after` is part of the JCS-encoded keyset. Changing it changes `workload_keyset_digest`, even when the public keys stay the same. Cache and verify the complete keyset.
 
 ## Verifying the report
 

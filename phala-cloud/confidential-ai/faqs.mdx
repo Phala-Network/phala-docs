@@ -1,39 +1,116 @@
 ---
-description: Frequently asked questions about Private AI.
-title: FAQs
+title: "FAQ"
+description: "Common questions about the platform's attestation, receipts, confidential models, routing constraints, logging, and trust boundary."
 ---
 
 <AccordionGroup>
-<Accordion title="What is the relationship between dstack Private ML SDK, and what's the vllm-proxy doing there?">
-The Private ML SDK leverages the TEE features provided by Intel and NVIDIA GPUs to support running any GPU workload as a Docker container in a GPU TEE. In the Private ML SDK, dstack is a framework that can run Docker containers, while vllm-proxy is a specific container within it. The vllm-proxy container operates as a server that forwards requests to a vllm container (hosting a large language model) and generates quotes to attach to responses. This separation allows vllm to remain unmodified and compatible with its latest versions.
-</Accordion>
+  <Accordion title="What is Attested Confidential Inference (ACI)?" icon="microchip">
+    It is inference served by a gateway running in a TEE that proves its own identity with an
+    [attestation report](/phala-cloud/confidential-ai/verify/verify-attestation) and signs a per-response
+    [receipt](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions) binding your request and response to that attested workload.
+    You verify the proofs yourself rather than trusting an API's word.
+  </Accordion>
 
-<Accordion title="Do I need CUDA or NVIDIA drivers on the host for Private ML SDK with GPU support?">
-  No, CUDA and NVIDIA drivers are not required on the host for the Private ML
-  SDK with GPU support. The host should not have NVIDIA drivers installed to
-  avoid conflicts with TDX and VFIO passthrough. Drivers (e.g., 550.54.15) and
-  CUDA (e.g., 12.4) are loaded inside the guest CVM via Docker containers (e.g.,
-  kvin/cuda-notebook). The vllm and vllm-proxy services also run entirely within
-  the TEE guest, not on the host.
-</Accordion>
+  <Accordion title="Which base URL should I use, and how do I troubleshoot connection failures?" icon="plug">
+    Use `https://inference.phala.com/v1`. This host always requires confidential models and verified upstream serving. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy).
 
-<Accordion title="Is CUDA directly accessible in Phala GPU TEE?">
-  Yes, CUDA works in the GPU TEE environment. By default, you don't need to
-  install it on the host environment when using private-ml-sdk to create a CVM.
-  If you want to use CUDA in your CVM, you can install it manually inside the
-  CVM. You can refer to our benchmark analysis with Succinct, where the SP1 VM
-  also involves CUDA.
-</Accordion>
+    If a connection fails, check the hostname, DNS resolution, and network access, and check whether
+    your client appends `/v1` on its own. When you contact support, include the client name and
+    version, a timestamp with its time zone, the model ID, and a redacted error. A successful catalog lookup proves
+    connectivity only; account authorization and model availability need their own checks.
+  </Accordion>
 
-<Accordion title="Can I run my app in a docker container with access to GPU TEE under Intel TDX? Is this similar to Google Cloud's Confidential Space?">
-  Yes, you can build your application into a docker image and prepare a
-  docker-compose file. The SDK will create a TDX-based virtual machine to launch
-  your application. However, unlike Google Cloud's Confidential Space, which
-  uses virtual machines, dstack and private-ml-sdk require a bare-metal
-  environment.
-</Accordion>
+  <Accordion title="What does this endpoint require?" icon="shield-check">
+    Every model is TEE-capable and every request requires a verified, channel-bound upstream. A non-TEE or unknown model returns `404`; if no attested provider is available, the gateway returns `503` before forwarding. See [How it works](/phala-cloud/confidential-ai/confidential-model/how-it-works).
+  </Accordion>
 
-<Accordion title="Is dstack-based including private-ml-sdk's CVM running on bare metal or a hypervisor?">
-dstack is launched on a bare-metal environment. However, for CVMs created by dstack, a hypervisor (qemu) is used to launch the VM with TDX enabled.
-</Accordion>
+  <Accordion title="How do I verify the gateway before sending a prompt?" icon="shield-check">
+    Use an ACI-aware client that verifies a fresh nonce-bound hardware quote, checks workload
+    measurements against your policy, and pins the actual TLS connection to the attested SPKI. The
+    Node and Bun integration supplies that transport through `aci.fetch`. See
+    [Verify a response](/phala-cloud/confidential-ai/verify/typescript-sdk#create-a-verified-connection) for setup and
+    [release policy](/phala-cloud/confidential-ai/verify/typescript-sdk#release-policy) for SDK policy limits.
+  </Accordion>
+
+  <Accordion title="Which verification endpoints should I use?" icon="terminal">
+    The canonical endpoints live under `/v1/aci/`: `GET /v1/aci/attestation`,
+    `GET /v1/aci/receipts/{id}`, and `GET /v1/aci/sessions/{id}`. The older
+    `GET /v1/attestation/report` and `GET /v1/signature/{id}` remain as legacy compatibility aliases that return the same data in a legacy envelope. Use the `/v1/aci/*`
+    endpoints for new integrations.
+  </Accordion>
+
+  <Accordion title="How do I prove a response was genuinely confidential?" icon="circle-check">
+    Establish the gateway's identity before sending, then verify the receipt signature, request and
+    response hashes, and cited session under your policy. Require `upstream.verified.result = verified`
+    with `required = true`; a valid signature alone does not establish confidential serving.
+
+    The full procedure is in [Verify a response](/phala-cloud/confidential-ai/verify/typescript-sdk),
+    with the checks in the [receipt reference](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#verifying-the-receipt).
+  </Accordion>
+
+  <Accordion title="How do I verify a streaming response?" icon="arrow-right-arrow-left">
+    Capture the exact response-body bytes and wait for the stream to finish before retrieving and
+    verifying its receipt. See [Streaming receipts](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions#streaming) for what to hash.
+    Preserve the request bytes too; with E2EE, follow the
+    [decrypted-body hashing rules](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption#receipts-with-e2ee).
+
+    If your application must verify before displaying content, buffer the output until the required
+    checks pass.
+  </Accordion>
+
+  <Accordion title="What does the nonce in the attestation report do?" icon="shuffle">
+    The gateway binds your nonce into the hardware-signed quote's `report_data`. A report that commits
+    to a nonce you just generated cannot be a replay of an older capture, which is how you prove
+    freshness. Use a new random nonce each time.
+  </Accordion>
+
+  <Accordion title="How do I require an attested upstream for every request?" icon="shield-halved">
+    Use `https://inference.phala.com/v1`; attested serving is always required on this host. You can also send `provider: {"aci_verified": true}` explicitly. The constraint requires verified, channel-bound serving and applies to
+    fallback candidates too. See [Attested routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
+  </Accordion>
+
+  <Accordion title="How do I restrict requests to the upstream sessions I have approved?" icon="list-check">
+    Inspect the current sessions for your model, verify their evidence independently, and allow only
+    those that satisfy your policy with `provider.aci_session_ids`. Session IDs change when evidence
+    is refreshed, so reappraise replacements and preserve the same restrictions across retries. See
+    [Pin a request to one attested channel](/phala-cloud/confidential-ai/confidential-model/attested-routing#pin-a-request-to-one-attested-channel).
+  </Accordion>
+
+  <Accordion title="Which providers run confidential models?" icon="server">
+    Tinfoil, NEAR AI, Chutes, and Phala-backed enclaves, among others the platform adds over time. Each
+    enforces a [channel binding](/phala-cloud/confidential-ai/confidential-model/verified-upstreams#channel-binding) and records a set of
+    [typed claims](/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims). The receipt cites an attested `session_id`; fetch
+    that session to see which provider served the request. See [Providers](/phala-cloud/confidential-ai/confidential-model/providers).
+  </Accordion>
+
+  <Accordion title="Can the platform read my prompts, including with E2EE?" icon="eye">
+    Plaintext is visible to the **attested** gateway after TLS termination or E2EE decryption, because
+    it has to process the request. Optional middleware inside the same deployment shares that boundary.
+    E2EE binds the decryption key to the attested workload; it does not hide your request from it. See
+    [Trust boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary).
+
+    `X-Model-Pub-Key` identifies the gateway encryption key from its attested keyset.
+    `X-Client-Pub-Key` supplies your key, which the gateway uses to encrypt response fields back to you.
+    See [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption) for the headers and encryption flow.
+  </Accordion>
+
+  <Accordion title="What does the gateway store and log?" icon="database">
+    Receipts hold hashes and request-path metadata; sessions hold upstream identity, channel
+    bindings, and evidence. The gateway's
+    [control-plane reports](https://github.com/Dstack-TEE/private-ai-gateway/blob/b3036d1ebdaef9d9b12e0f43156b11e71a165cc2/docs/control-plane-contract.md)
+    include `apiKeyHash` for authenticated requests and optional request features (`prefixHash`,
+    tool presence, modalities, token estimates) at `/consult/pre`, then usage, timing, and
+    `prefixHash` when present at `/consult/post`. These hashes and metadata can link requests; see
+    the [trust boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary) for retention and middleware limits.
+  </Accordion>
+
+  <Accordion title="Does verified serving prove current firmware, GPU binding, and reviewed software and weights?" icon="certificate">
+    These are separate claims, not an automatic consequence of verified serving. Inspect each claim's
+    status, source, and reason; `unknown` leaves that property unproven. A verified GPU report proves a
+    genuine confidential-computing GPU for that nonce, not its binding to the serving CPU TEE.
+
+    Apply your own policy to TCB freshness, serving-software integrity, and model-weight provenance.
+    See [Claims](/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims) for what each claim establishes and how to
+    interpret it.
+  </Accordion>
 </AccordionGroup>
