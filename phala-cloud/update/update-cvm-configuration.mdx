@@ -30,7 +30,7 @@ If you only sent compose settings and they match what the CVM already runs, noth
 { "message": "Compose configuration unchanged", "correlation_id": "", "status": "no_change" }
 ```
 
-The other update endpoints answer the same way when nothing would change: full compose replacement (`/compose_file`), `/envs` and redeploying a revision.
+`/envs`, redeploying a revision and the one-step full compose replacement (`POST /cvms/{cvm_id}/compose_file`) also answer `no_change` when nothing would change. In the two-step replacement, `POST /cvms/{cvm_id}/compose_file/provision` reports `compose_unchanged` instead; the second step, `PATCH /cvms/{cvm_id}/compose_file`, does not check again.
 
 Only one operation can run on a CVM at a time. If another one is still running, the request fails with `409`. Wait for it to finish, then send again.
 
