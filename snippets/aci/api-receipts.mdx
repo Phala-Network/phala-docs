@@ -20,9 +20,9 @@ GET /v1/aci/receipts/{id}
 
 ## Authentication and ownership
 
-Use the same bearer API key that made the inference request. Receipt lookup without a bearer token
-returns `401`; lookup with a different token returns `404`, so another key cannot discover the
-receipt. This also applies to the legacy alias.
+For a request made with an API key, use the same key: lookup without a bearer token returns `401`,
+and a different token returns `404`, so another key cannot discover the receipt. Anonymous receipts
+may be publicly retrievable; an unknown receipt id returns `404`. This also applies to the legacy alias.
 
 ## Response
 
@@ -50,7 +50,7 @@ receipt. This also applies to the legacy alias.
 | `middleware.forwarded` | `body_hash` |
 | `route.selected` | `target_route_id` |
 | `request.forwarded` | `body_hash` |
-| `upstream.verified` | `model_id`, `result`, `required`, `session_id` |
+| `upstream.verified` | `model_id`, `result`, `required`, `session_id` (verified); `reason` and optional `upstream_name` (failed) |
 | `response.received` | `body_hash` |
 | `response.returned` | `body_hash` |
 

@@ -8,8 +8,8 @@ the attested gateway protects and where plaintext and metadata are visible.
 - **Per-response integrity**: A signed <a href={site.paths.apiReceipts}>receipt</a> binds request and response hashes to that keyset.
 - **No body retention**: The gateway does not store request or response bodies. Receipts contain
   hashes and verification facts rather than prompt or response bodies.
-- **Confidential upstreams**: For confidential models, the gateway verifies the provider boundary
-  and enforces channel binding before forwarding, fail-closed.
+- **Confidential upstreams**: When endpoint or request policy requires verified serving, the gateway verifies the provider
+  boundary and enforces channel binding before forwarding, fail-closed.
 - **Optional retention constraint**: `provider: {"zdr": true}` restricts routing to the ZDR allowlist on either endpoint type. TEE-only serving does not itself imply provider non-retention. See <a href={site.paths.zdr}>Zero Data Retention</a>.
 
 ## Limits
@@ -47,4 +47,14 @@ Verify the receipt and its session, then require the claims your workload needs.
 
 Optional routing and business middleware inside the attested deployment can see plaintext after decryption. It cannot create upstream verification facts or bypass backend channel binding.
 
-The external control plane receives `apiKeyHash` (the SHA-256 hash of the bearer token) for authenticated requests and, when request features are enabled, tool presence, input modalities, token estimates, reasoning intent, response format, and optional `prefixHash` at `/consult/pre`. `prefixHash` is a keyed HMAC cache-affinity digest that can link requests with the same cache key or conversation opening. `/consult/post` receives usage, timing, and `prefixHash` when present. These fields contain no prompt text, but they are metadata, and their retention is separate from receipt storage. See the [control-plane contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/control-plane-contract.md).
+The external control plane receives the endpoint, requested model, the request’s `provider` block,
+`tee` when the endpoint is TEE-only, and `apiKeyHash` (the SHA-256 hash of the bearer token) for
+authenticated requests. When request features are enabled, it also receives tool presence, input
+modalities, token estimates, reasoning intent, response format, and optional `prefixHash` with
+`sessionKind` at `/consult/pre`. `prefixHash` is a keyed HMAC cache-affinity digest that can link
+requests with the same cache key or conversation opening.
+
+`/consult/post` receives the endpoint, status, requested model, selected route, usage, timing,
+pricing, account identifiers, and `prefixHash`/`sessionKind` when present. These reports carry
+metadata whose retention is separate from receipt storage. See the
+[control-plane contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/77fac1267000b27f09e2058923f7492e5330bb49/docs/control-plane-contract.md).

@@ -22,11 +22,11 @@ GET /v1/aci/sessions?upstream_name={upstream_name}&model={model}
 | --- | --- | --- |
 | `api_version` | string | ACI version token. |
 | `upstream_name` | string | The service-chosen upstream label for this channel. |
-| `endpoint` | string | The verified upstream origin. |
+| `endpoint` | string or null | The verified upstream origin, or `null` when the channel has no single origin. |
 | `verifier_id` | string | The verifier that produced this result. |
-| `established_at` | number | When the material was verified (Unix seconds). |
-| `expires_at` | number | Retention deadline (Unix seconds). |
-| `identity` | object | Verified upstream identity keys (for example a signing address). |
+| `established_at` | number | When the session was established (Unix seconds). |
+| `expires_at` | number | End of validity for new forwarding decisions (Unix seconds), not a retention deadline. A session stays retrievable while any retained receipt cites it. |
+| `identity` | object | Verified upstream identity keys (for example a signing address), when the verifier established one. |
 | `channel_binding` | array | The enforceable binding(s): `tls_spki_sha256`, `e2ee_public_key_sha256`, or `proxy_image_sha256` (Privatemode). |
 | `claims` | object | Typed claims (below). |
 | `evidence` | object | Byte-preserving evidence the verifier checked (`digest` + data URI). |
@@ -41,9 +41,9 @@ GET /v1/aci/sessions?upstream_name={upstream_name}&model={model}
 
 ### Typed claims
 
-Each claim carries a `status` (`asserted` / `refuted` / `unknown`), a `source`
-(`hardware_proven` / `verifier_derived` / `provider_asserted` / `operator_asserted`), and a `reason`. The
-claim set: `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_known_good`,
+Each claim carries a `status` (`asserted` / `refuted` / `unknown`). Claims that are not `unknown`
+also carry a `source` (`hardware_proven` / `verifier_derived` / `provider_asserted` /
+`operator_asserted`) and a `reason`. The claim set: `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_known_good`,
 `gpu_attested`, `model_weights_provenance`, plus provider-specific entries in `extra`. See
 <a href={site.paths.upstreams + "#claims"}>Claims</a>.
 
@@ -60,7 +60,7 @@ claim set: `tee_attested`, `tcb_up_to_date`, `os_known_good`, `serving_software_
   ],
   "claims": {
     "tee_attested": { "status": "asserted", "source": "hardware_proven", "reason": "verified TDX quote" },
-    "tcb_up_to_date": { "status": "asserted", "source": "hardware_proven" },
+    "tcb_up_to_date": { "status": "asserted", "source": "hardware_proven", "reason": "UpToDate platform TCB" },
     "gpu_attested": { "status": "unknown" }
   },
   "evidence": { "digest": "sha256:…", "data": "data:application/json;base64,…" }

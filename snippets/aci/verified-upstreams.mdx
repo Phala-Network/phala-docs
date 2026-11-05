@@ -5,8 +5,8 @@ export const VerifiedUpstreamsExample1 = ({ site }) => <CodeBlock language="bash
           | .app_compose | fromjson | .docker_compose_file] | join("\\n")' \\
 | grep -E 'image:|--served-model-name'`}</CodeBlock>;
 
-For confidential serving, the gateway verifies the upstream enclave before it sends your prompt, and
-refuses to send if it cannot. Verification produces three things: a **channel binding** the gateway
+When verified serving is required, the gateway verifies the upstream before it sends your prompt
+and refuses to send if it cannot. Verification produces three things: a **channel binding** the gateway
 enforces on the wire, an **attested session** it records, and the **typed claims** inside that
 session. The receipt's `upstream.verified` event ties a response to all three.
 
@@ -25,12 +25,13 @@ verifies is the value it enforces on the connection before forwarding.
 The proxy binding covers the measured proxy deployment, not the specific provider workload that
 served a request. An observed provider manifest alone does not establish that workload binding.
 
-Every confidential provider produces exactly one binding, and it lives inside the verified
-attestation. A "verified" result without an enforceable binding is rejected in the gateway itself:
+Every verified session carries at least one enforceable binding. A "verified" result without an enforceable binding is rejected in the gateway itself:
 a provider can never be verified but unpinned. Which provider uses which binding is on the
 <a href={site.paths.providers}>Confidential providers</a> page.
 
-For confidential serving, `upstream.verified.required` is `true`. If the gateway cannot verify the
+The receipt’s `upstream.verified.required` records endpoint or request policy. It is `true` on a
+TEE-only endpoint or with an ACI serving constraint; otherwise it is `false`, even when verification
+succeeds. When verification is required, if the gateway cannot verify the
 upstream or enforce the binding on the actual connection, it does not send your prompt. If the
 binding stops matching, the gateway re-verifies before forwarding; retries cannot bypass this.
 
@@ -42,6 +43,8 @@ flowchart TD
 ```
 
 ### Confirm the binding
+
+For a fail-closed client policy:
 
 1. Verify the gateway attestation report and receipt signature, including the exact request and
    response hashes.
@@ -79,16 +82,16 @@ session   → { binding, claims (+ reasons), evidence }
 
 Fetch <a href={site.paths.apiSessions}><code>GET /v1/aci/sessions/&#123;session_id&#125;</code></a> for the provider, binding,
 claims, and evidence. You do not enforce the binding yourself; you confirm after the fact that the
-gateway did: `result` is `verified`, `required` is `true`, and the cited session carries the
-binding.
+gateway did: `result` is `verified` and the cited session carries the binding. Check `required`
+to distinguish demanded verification (`true`) from a best-effort verified result (`false`).
 
 ## Claims
 
 Claims are in the session cited by the receipt; the receipt’s `upstream.verified` event does not
 embed the complete claim set. TCB means Trusted Computing Base.
 
-A session never says "trusted". It carries a fixed set of claims, each with a `status`, a `source`,
-and an optional `reason`, so a hardware-proven fact and an operator's assertion never look alike.
+A session never says "trusted". It carries a fixed set of claims, each with a `status` and, unless `unknown`,
+a `source` and a `reason`, so a hardware-proven fact and an operator's assertion never look alike.
 
 ```json
 {

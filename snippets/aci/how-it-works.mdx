@@ -46,7 +46,7 @@ flowchart LR
 1. You call the API over TLS, or add <a href={site.paths.e2ee}>E2EE</a>
    for field-level encryption.
 2. The gateway records your request and computes its hash.
-3. For confidential serving, the backend verifies the upstream provider and enforces a
+3. When verified serving is required, the backend verifies the upstream provider and enforces a
    <a href={site.paths.upstreams + "#channel-binding"}>channel binding</a> before forwarding. If it cannot, it does not
    send your prompt (fail-closed).
 4. The response returns through the gateway, which signs the receipt after it has observed the final

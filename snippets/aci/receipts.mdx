@@ -14,8 +14,9 @@ unconstrained, non-E2EE streams on a mixed endpoint; see [Streaming](#streaming)
 
 
 `{id}` accepts the receipt id (`rcpt-…`) or the response `id` (chat id). See
-<a href={site.paths.apiReceipts}><code>GET /v1/aci/receipts/&#123;id&#125;</code></a> for the response shape. Use the same API key
-that made the request: a missing bearer token returns `401`, and a different token returns `404`.
+<a href={site.paths.apiReceipts}><code>GET /v1/aci/receipts/&#123;id&#125;</code></a> for the response shape. For a request made with an API key, use the same key: a missing bearer token
+returns `401`, and a different token returns `404`. Anonymous receipts may be publicly retrievable;
+an unknown receipt id returns `404`.
 
 ## What a receipt commits to
 
@@ -76,11 +77,11 @@ The provider boundary and its evidence are in that session:
 
 The session id is a snapshot from the public sessions list; use the id in your own receipt.
 
-- For a <a href={site.paths.models}>confidential model</a>, `result` is `verified`,
-  `required` is `true`, and `session_id` references the
+- For a verified response, `result` is `verified` and `session_id` references the
   <a href={site.paths.upstreams + "#attested-sessions"}>attested session</a> the channel was bound to.
 
-On a TEE-only endpoint, every successful inference requires `result: "verified"`, `required: true`,
+`required` records policy, not the verification result: on a mixed endpoint without an ACI
+constraint it is `false`, even when `result` is `verified`. On a TEE-only endpoint, every successful inference requires `result: "verified"`, `required: true`,
 and a `session_id`. On an endpoint that also serves non-TEE models, a non-attested routed response
 records `result: "failed"`, `required: false`, and no `session_id`. Requiring verified serving
 prevents that response rather than allowing an unverified fallback.

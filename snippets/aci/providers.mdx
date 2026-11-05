@@ -1,5 +1,5 @@
 A <a href={site.paths.models}>confidential model</a> is served by an upstream provider whose
-enclave the gateway verifies before forwarding your prompt. Each provider produces one enforceable
+enclave the gateway verifies before forwarding your prompt. Each provider produces an enforceable
 <a href={site.paths.upstreams + "#channel-binding"}>channel binding</a> and a set of
 <a href={site.paths.upstreams + "#claims"}>typed claims</a>. This page summarizes what each provider proves.
 
@@ -91,6 +91,6 @@ ArmetAI’s `armet-ai` verifier asserts serving software against a configured op
 ## Router-backed providers
 
 Some providers (NEAR AI, Tinfoil) front many models behind one TEE gateway. The gateway verifies that
-gateway channel, so it produces one <a href={site.paths.upstreams + "#attested-sessions"}>attested session</a> per
-router, and the served model is recorded on the receipt. Per-model coverage is delegated to the
-verified router, which attests its own backend model enclaves.
+gateway channel, so models can share an <a href={site.paths.upstreams + "#attested-sessions"}>attested session</a>
+for that channel; the served model is recorded on the receipt. Per-model coverage is delegated to the verified router; the gateway does not independently verify
+the router’s backend model enclaves.

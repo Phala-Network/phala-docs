@@ -22,7 +22,7 @@ export const ApiAttestationExample1 = ({ site }) => <CodeBlock language="json">{
     },
     "evidence": { "quote": "040002008100…", "quote_report_data": "7b7daf…", "event_log": "[{…}]", "vm_config": "{…}", "app_compose": "{…}", "downstream_tls_binding": { "domain": "${new URL(site.baseUrl).hostname}", "spki_sha256": "943c…" }, "key_custody": { "provider": "dstack-kms", "keys": [] } }
   },
-  "service_capabilities": { "supported_e2ee_versions": ["2"], "serving": "aggregator" }
+  "service_capabilities": { "supported_e2ee_versions": ["2"], "supported_multipart_constraint_endpoints": ["/v1/audio/transcriptions"], "serving": "aggregator" }
 }`}</CodeBlock>;
 
 Returns the gateway's attestation report: the hardware-backed proof of which TEE workload is serving
@@ -52,7 +52,7 @@ GET /v1/aci/attestation?nonce={nonce}
 | `api_version` | string | ACI version token, for example `aci/1`. |
 | `workload_keyset_digest` | string | `sha256:…` digest over the published keyset. |
 | `attestation` | object | The attestation evidence and keyset (below). |
-| `service_capabilities` | object | `supported_e2ee_versions` and the `serving` mode. |
+| `service_capabilities` | object | `supported_e2ee_versions`, `supported_multipart_constraint_endpoints`, and the `serving` mode. |
 
 ### `attestation` object
 

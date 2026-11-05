@@ -52,7 +52,9 @@ Two levels of constraint are available:
 
 Add the `provider` block to the request. The following JSON inference endpoints accept it:
 `/v1/chat/completions`, `/v1/messages`, `/v1/responses`, `/v1/embeddings`, and
-`/v1/completions`.
+`/v1/completions`, `/v1/images/generations`, and `/v1/systemone`. Multipart
+`/v1/audio/transcriptions` carries the same constraints in `X-ACI-Provider`, as advertised by
+`service_capabilities.supported_multipart_constraint_endpoints`.
 
 <AttestedRoutingExample1 site={site} />
 
@@ -116,9 +118,10 @@ verified channel, the request fails with `412` and no prompt is sent:
 }
 ```
 
-A session id is tied to one verified channel, and the gateway re-verifies periodically. When it
-re-verifies, the evidence changes and the id changes with it. Read a current id shortly before you
-pin it, and expect a pinned id to stop matching. A pin that stops matching is a failure, never a
+A session id is tied to one verified channel and validity period. Re-verification can reuse an
+unexpired session when the verified material is equivalent. Changed material, or verification
+after the session expires, produces a new id. Read a current id shortly before you pin it, and
+expect a pinned id to stop matching. A pin that stops matching is a failure, never a
 silent fallback to a different channel.
 
 Do not retry a `412` with the same unavailable pins; inspect current sessions and approve a new set

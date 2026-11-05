@@ -17,6 +17,9 @@ The `type` field is the machine-readable discriminator. Common values:
 
 | `type` | When |
 | --- | --- |
+| `unauthorized` | An owned receipt is fetched without the original bearer token (401). |
+| `not_found` | Unknown or expired receipt/session, or a receipt fetched with a different key (404). |
+| `service_unavailable` | The control plane is unavailable (503). |
 | `authentication_error` | Missing or invalid API key (401). |
 | `invalid_request_error` | Malformed body or an unsupported parameter (400). |
 | `model_not_found` | The `model` id is unknown or has no route for this endpoint (404). |
