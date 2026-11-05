@@ -4,7 +4,7 @@ description: Functions for updating CVM resources, visibility, OS images, and co
 ---
 
 <Warning>
-**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
+**Every configuration update restarts a running CVM.** The CVM is stopped, updated, and started again. A stopped CVM stays stopped and runs the new configuration at its next start. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
 </Warning>
 
 `patchCvm` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `updateCvmResources` and `updateCvmVisibility` send a subset of fields to the same endpoint. The other `updateXxxx` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.

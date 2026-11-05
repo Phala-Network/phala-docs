@@ -6,7 +6,7 @@ description: Update Docker Compose files, environment variables, resources, visi
 Configuration methods let you modify a CVM after it has been provisioned. You can update the Docker Compose file, environment variables, resource allocation, visibility settings, and OS image independently.
 
 <Warning>
-**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
+**Every configuration update restarts a running CVM.** The CVM is stopped, updated, and started again. A stopped CVM stays stopped and runs the new configuration at its next start. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
 </Warning>
 
 `patch_cvm` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `update_cvm_resources` and `update_cvm_visibility` send a subset of fields to the same endpoint. The other `update_*` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.

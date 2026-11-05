@@ -30,6 +30,8 @@ If you only sent compose settings and they match what the CVM already runs, noth
 { "message": "Compose configuration unchanged", "correlation_id": "", "status": "no_change" }
 ```
 
+The other update endpoints answer the same way when nothing would change: full compose replacement (`/compose_file`), `/envs` and redeploying a revision.
+
 Only one operation can run on a CVM at a time. If another one is still running, the request fails with `409`. Wait for it to finish, then send again.
 
 ## Which fields can I send?
@@ -105,12 +107,14 @@ You can still send them. A value equal to the current one is accepted, so you ca
 
 ## Does an update restart my CVM?
 
-Yes. The update stops the CVM, applies the change and starts it again. This happens even when only one field changes. A CVM that was stopped before the update is running after it.
+Yes, if it is running. The update stops the CVM, applies the change and starts it again. This happens even when only one field changes.
 
-Two cases do not restart the CVM:
+A CVM that was stopped before the update stays stopped. It runs the new configuration when you next start it.
+
+These cases do not restart the CVM:
 
 - Compose settings that match what the CVM already runs. The API answers `no_change`.
-- Endpoints that only change records in Phala Cloud or on the host: the name, the Trust Center listing, the [app launch token](/phala-cloud/cvm/launch-token) and [annotations](/phala-cloud/cvm/advanced-settings#annotations).
+- Endpoints that only change records in Phala Cloud or on the host: the name, the Trust Center listing, the [KMS and gateway URLs](#can-i-change-the-kms-and-gateway-urls-a-cvm-uses), the [app launch token](/phala-cloud/cvm/launch-token) and [annotations](/phala-cloud/cvm/advanced-settings#annotations).
 
 To shorten the downtime, set `shutdown_timeout`. To stop at once without a clean shutdown, set `allow_force_stop` to `true`.
 
@@ -140,6 +144,14 @@ Turning it off removes the CVM from the gateway once the update finishes, so its
 ```
 
 Port policy only covers the gateway. Ports mapped directly on the host are set with `PUT /cvms/{cvm_id}/ports`.
+
+## Can I change the KMS and gateway URLs a CVM uses?
+
+Yes, with `PATCH /cvms/{cvm_id}/network-config`. Send `kms_urls`, `gateway_urls` or both. The CVM picks them up at its next boot.
+
+Phala Cloud keeps these URLs. Later updates send them instead of the URLs Phala Cloud would pick for the CVM's node. To go back to Phala Cloud's URLs, send an empty list for that field. Moving the CVM to another node removes both.
+
+`GET /cvms/{cvm_id}/network` shows the whole network setup in one answer: the gateway settings from the compose (`ingress`), the ports mapped on the host (`port_mappings`) and the KMS and gateway URLs (`endpoints`). In `endpoints`, `kms_urls_overridden` and `gateway_urls_overridden` say whether you set the URLs yourself.
 
 ## What changes for a CVM on Onchain KMS?
 
