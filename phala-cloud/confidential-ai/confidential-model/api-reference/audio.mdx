@@ -2,7 +2,6 @@
 title: Audio Transcription
 description: Transcribe audio with multipart uploads and billing per started second through the attested gateway.
 api: "POST /audio/transcriptions"
-playground: "simple"
 ---
 
 ## Endpoint
@@ -140,7 +139,7 @@ pap curl https://inference.phala.com/v1/audio/transcriptions -- \
 
 For Voxtral, replace the model with `mistralai/voxtral-small-24b-2507` and keep `response_format=json`.
 
-For the [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) example, create `auth-headers.txt` containing `Authorization: Bearer <API_KEY>`, restrict its permissions to your user, and remove it after use. No manual `X-ACI-Provider` header is needed for this request on the Phala TEE-only endpoint. `pap curl` verifies the gateway and pins its TLS channel; it does not audit response receipts. Use `pap serve` or an ACI verifier SDK for receipt audits. Ordinary cURL and OpenAI SDK clients do not verify the gateway or audit receipts.
+For the [Private AI Proxy example](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/apps/desktop/docs/cli.md#one-pinned-curl-request), create `auth-headers.txt` containing `Authorization: Bearer <API_KEY>`, restrict its permissions to your user, and remove it after use. No manual `X-ACI-Provider` header is needed for this request on the Phala TEE-only endpoint. `pap curl` verifies the gateway and pins its TLS channel; it does not audit response receipts. Use `pap serve` or an ACI verifier SDK for receipt audits. Ordinary cURL and OpenAI SDK clients do not verify the gateway or audit receipts.
 
 ## Response
 
