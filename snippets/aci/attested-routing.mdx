@@ -64,7 +64,7 @@ never receives the prompt as a fallback.
 
 Admission can reject a request earlier: a TEE-only endpoint rejects an existing non-TEE model with
 `404`, and routing constraints such as `provider.zdr` can leave no eligible route (`404`). An unknown
-model follows the normal `400 model_not_found` path.
+model returns `404 model_not_found`.
 
 On an endpoint that also serves non-TEE models, setting `"aci_verified": false` or omitting it adds
 no request-level attestation constraint. A TEE-only endpoint forces verification even when the

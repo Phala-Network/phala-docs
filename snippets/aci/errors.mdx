@@ -19,7 +19,7 @@ The `type` field is the machine-readable discriminator. Common values:
 | --- | --- |
 | `authentication_error` | Missing or invalid API key (401). |
 | `invalid_request_error` | Malformed body or an unsupported parameter (400). |
-| `model_not_found` | The `model` id is not available (400). |
+| `model_not_found` | The `model` id is unknown or has no route for this endpoint (404). |
 | `insufficient_quota` | The account quota or key budget is exhausted (402). |
 | `rate_limit_error` | Over the requests or tokens per minute limit (429). |
 | `not_found_error` | An existing non-TEE model on a TEE-only endpoint, or a model with no provider under the request’s routing constraints, for example <a href={site.paths.zdr}><code>{'provider: {"zdr": true}'}</code></a> (404). |
@@ -31,19 +31,19 @@ The `type` field is the machine-readable discriminator. Common values:
 
 | Status | Meaning |
 | --- | --- |
-| 400 | Bad request (invalid parameters or unknown model) |
+| 400 | Bad request (invalid parameters) |
 | 401 | Unauthorized (missing or invalid API key) |
 | 402 | Account quota or key budget exhausted |
 | 403 | Forbidden |
-| 404 | An existing non-TEE model on a TEE-only endpoint, no eligible route under request constraints, or an unknown/expired receipt or session |
+| 404 | An unknown model (`model_not_found`), an existing non-TEE model on a TEE-only endpoint, no eligible route under request constraints, or an unknown/expired receipt or session |
 | 412 | None of the pinned attested sessions could serve the request (`session_not_accepted`) |
 | 429 | Rate limit exceeded |
 | 500 | Server error |
 | 502 | Upstream provider unavailable |
 | 503 | Service temporarily unavailable, including required upstream verification failure (`upstream_verification_failed`) |
 
-A TEE-only endpoint rejects an existing non-TEE model with `404`; an unknown model follows the
-normal `400 model_not_found` path. On an endpoint that also serves non-TEE models, requesting
+A TEE-only endpoint rejects an existing non-TEE model with `404`; an unknown model returns
+`404 model_not_found`. On an endpoint that also serves non-TEE models, requesting
 verified serving for a routed model fails with `503 upstream_verification_failed` after admission.
 On either endpoint type, a model admitted for verified serving can return that `503` when no
 eligible upstream verifies. A separate routing constraint, such as `provider.zdr`, can instead
