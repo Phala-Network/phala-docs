@@ -96,8 +96,8 @@ description: "Common questions about the platform's attestation, receipts, confi
   <Accordion title="What does the gateway store and log?" icon="database">
     Receipts hold hashes and request-path metadata; sessions hold upstream identity, channel
     bindings, and evidence. The gateway's
-    [control-plane reports](https://github.com/Dstack-TEE/private-ai-gateway/blob/b3036d1ebdaef9d9b12e0f43156b11e71a165cc2/docs/control-plane-contract.md)
-    include `apiKeyHash` for authenticated requests and optional request features (`prefixHash`,
+    [control-plane reports](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/control-plane-contract.md)
+    include `apiKeyHash` for authenticated requests, the endpoint, model ID, provider object, TEE-only host flag, and optional request features (`prefixHash`,
     tool presence, modalities, token estimates) at `/consult/pre`, then usage, timing, and
     `prefixHash` when present at `/consult/post`. These hashes and metadata can link requests; see
     the [trust boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary) for retention and middleware limits.

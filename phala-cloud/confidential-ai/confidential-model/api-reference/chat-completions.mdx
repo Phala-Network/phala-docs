@@ -1,6 +1,7 @@
 ---
 title: Chat Completions
 description: Create OpenAI-compatible chat completion responses with Private AI models.
+api: "POST https://inference.phala.com/v1/chat/completions"
 ---
 
 ## Endpoint
@@ -51,11 +52,11 @@ Creates a response for a chat conversation. Use the same OpenAI-compatible reque
 </ParamField>
 
 <ParamField body="max_tokens" type="integer">
-  Maximum number of output tokens for most open models and GPU TEE models.
+  Maximum number of output tokens when supported by the selected model and serving route.
 </ParamField>
 
 <ParamField body="max_completion_tokens" type="integer">
-  Maximum output tokens for newer OpenAI reasoning models that do not accept `max_tokens`.
+  Output-token limit for models and serving routes that accept this parameter. Check the catalog’s advertised parameters and handle unsupported-parameter errors from the request.
 </ParamField>
 
 <ParamField body="stream" type="boolean">

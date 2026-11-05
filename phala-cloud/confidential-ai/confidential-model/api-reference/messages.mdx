@@ -80,7 +80,7 @@ curl https://inference.phala.com/v1/messages \
 }
 ```
 
-Read assistant text from `content[].text` on blocks with `type: "text"`. `stop_reason` is usually `end_turn`, `max_tokens`, `stop_sequence`, or `tool_use`.
+Read assistant text from `content[].text` on blocks with `type: "text"`. `stop_reason` can be `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`, or `refusal`; provider-native responses may include other values.
 
 ## Verification
 

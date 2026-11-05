@@ -3,16 +3,20 @@ description: Frequently asked questions about GPU CVM workloads and the Private 
 title: GPU CVM FAQs
 ---
 
+<Note>
+The [Private ML SDK](https://github.com/nearai/private-ml-sdk) and [vllm-proxy](https://github.com/nearai/vllm-proxy) projects are archived. The SDK answers below describe that legacy setup. For current dstack-based deployment, use [GPU CVM deploy and verify](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify).
+</Note>
+
 <AccordionGroup>
 <Accordion title="What is the relationship between dstack Private ML SDK, and what's the vllm-proxy doing there?">
-The Private ML SDK leverages the TEE features provided by Intel and NVIDIA GPUs to support running any GPU workload as a Docker container in a GPU TEE. In the Private ML SDK, dstack is a framework that can run Docker containers, while vllm-proxy is a specific container within it. The vllm-proxy container operates as a server that forwards requests to a vllm container (hosting a large language model) and generates quotes to attach to responses. This separation allows vllm to remain unmodified and compatible with its latest versions.
+The Private ML SDK leverages the TEE features provided by Intel and NVIDIA GPUs to support running any GPU workload as a Docker container in a GPU TEE. In the Private ML SDK, dstack is a framework that can run Docker containers, while vllm-proxy is a specific container within it. The vllm-proxy container operates as a server that forwards requests to a vllm container (hosting a large language model). This separation allows vllm to remain unmodified and compatible with its latest versions.
 </Accordion>
 
 <Accordion title="Do I need CUDA or NVIDIA drivers on the host for Private ML SDK with GPU support?">
   No, CUDA and NVIDIA drivers are not required on the host for the Private ML
   SDK with GPU support. The host should not have NVIDIA drivers installed to
-  avoid conflicts with TDX and VFIO passthrough. Drivers (e.g., 550.54.15) and
-  CUDA (e.g., 12.4) are loaded inside the guest CVM via Docker containers (e.g.,
+  avoid conflicts with TDX and VFIO passthrough. Drivers and
+  CUDA are loaded inside the guest CVM via Docker containers (e.g.,
   kvin/cuda-notebook). The vllm and vllm-proxy services also run entirely within
   the TEE guest, not on the host.
 </Accordion>

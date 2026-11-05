@@ -16,8 +16,7 @@ Account quota or API key budget exhaustion returns `402 insufficient_quota`. Che
 
 ```python
 import os
-import time
-from openai import OpenAI, AuthenticationError, RateLimitError, APIError
+from openai import OpenAI, AuthenticationError, RateLimitError, APIStatusError
 
 client = OpenAI(
     base_url="https://inference.phala.com/v1",
@@ -33,7 +32,7 @@ except AuthenticationError:
     print("Invalid API key")
 except RateLimitError:
     print("Rate limited; retry with backoff")
-except APIError as e:
+except APIStatusError as e:
     print(f"API error {e.status_code}: {e.message}")
 ```
 
@@ -47,6 +46,7 @@ Retry only transient errors:
 - If a confidential upstream verification fails, treat it as a failed security condition, not a normal retry loop, unless the API response documents it as transient.
 
 ```python
+import time
 from openai import RateLimitError, APIError
 
 def with_retry(call, max_retries=3):
@@ -74,7 +74,7 @@ def with_retry(call, max_retries=3):
     A request with `provider: {"zdr": true}` returns `404` when the selected model has no available zero-data-retention route. Query [`GET /v1/models?zdr=true`](/phala-cloud/confidential-ai/confidential-model/api-reference/models#query-parameters) before sending sensitive prompts that require this property.
   </Accordion>
   <Accordion title="Unsupported parameter">
-    Some models support `max_tokens`; others require `max_completion_tokens`. Check `supported_parameters` in `/v1/models`.
+    Parameter support depends on the model and serving route. The catalog advertises `supported_parameters`; handle unsupported-parameter errors returned by the request rather than assuming every advertised combination works.
   </Accordion>
   <Accordion title="Rate limited">
     Back off and retry. For sustained high volume, use dedicated GPU TEE capacity.

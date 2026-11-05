@@ -3,8 +3,9 @@ title: "Overview"
 description: "Base URL, authentication, and the full list of API endpoints."
 ---
 
-The API is OpenAI-compatible. Point an OpenAI or Anthropic client at the base URL and send your key
-as a bearer token.
+The API is OpenAI-compatible. Point an OpenAI client at `https://inference.phala.com/v1`,
+or an Anthropic client at `https://inference.phala.com` (its SDK appends `/v1/messages`), and send
+your key as a bearer token.
 
 ## Base URL
 
@@ -120,13 +121,17 @@ To select a model, set the `model` field in the request body. For end-to-end enc
 
 ## Errors
 
-Errors return a JSON body with an appropriate HTTP status:
+Errors return a JSON body with an appropriate HTTP status. `/v1/messages` uses the Anthropic error
+envelope, with top-level `type: "error"`, an `error` object, and a `request_id`. Other endpoints use
+the OpenAI-compatible shape shown here:
 
 ```json
 {
   "error": {
-    "message": "Invalid API key",
-    "type": "authentication_error"
+    "message": "Invalid API key provided",
+    "type": "authentication_error",
+    "code": null,
+    "param": null
   }
 }
 ```

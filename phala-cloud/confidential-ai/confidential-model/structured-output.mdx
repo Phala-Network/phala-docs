@@ -96,7 +96,7 @@ class CalendarEvent(BaseModel):
     date: str
     participants: list[str]
 
-response = client.beta.chat.completions.parse(
+response = client.chat.completions.parse(
     model="z-ai/glm-5.3",
     messages=[
         {"role": "system", "content": "Extract calendar events from text"},

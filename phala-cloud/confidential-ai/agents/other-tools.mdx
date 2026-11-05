@@ -105,11 +105,12 @@ Choose **Custom Providers → Add A Custom Provider**, select **OpenAI Compatibl
 | Name | Phala |
 | API URL | `https://inference.phala.com/v1/chat/completions` |
 | Authentication required | Yes |
-| Credential source | API key from `PHALA_AI_API_KEY` |
-| Model | `z-ai/glm-5.3` |
-| Context limit | `1048576`, or the selected model’s live `context_length` |
+| Credential | Static API key: paste your Phala API key |
+| Available models | `z-ai/glm-5.3` |
+| Streaming support | Yes |
+| API base path | Leave empty |
 
-Use the full Chat Completions endpoint. Then choose **Configure Providers → Phala** and select the chat model. Decision models use a different API and cannot be used for this chat integration.
+Use the full Chat Completions endpoint. To set a model context limit, edit its `context_limit` in the provider JSON under `~/.config/goose/custom_providers/` (`%APPDATA%\Block\goose\config\custom_providers\` on Windows), using the model’s live `context_length`. Then choose **Configure Providers → Phala** and select the chat model. Decision models use a different API and cannot be used for this chat integration.
 
 ## AnythingLLM
 
@@ -124,7 +125,7 @@ Model context window: 1048576
 
 ## Cherry Studio
 
-Open **Settings → Model Services → + Add Provider** and add a [custom provider](https://docs.cherryai.com.cn/docs/en-us/pre-basic/providers/zi-ding-yi-fu-wu-shang) with the values below. Enter the base URL in the OpenAI-compatible endpoint/API address row. Select **Add**, then **Get model list** and add `z-ai/glm-5.3`:
+Open **Settings → Model Provider → + Add Provider** and add a [custom provider](https://cherryai.com/docs/en/) with the values below. Enter the base URL in **API Host**, select **Check** to test the connection, then **Sync models** and add `z-ai/glm-5.3`:
 
 ```text
 Provider Name: Phala

@@ -46,7 +46,7 @@ Check the catalog for current availability and pricing. Audio is billed per star
 </ParamField>
 
 <ParamField body="response_format" type="string">
-  `json` by default. Whisper also accepts `verbose_json`; Voxtral supports `json` only and returns `400 invalid_request_error` for `verbose_json`. Text and subtitle formats are not supported.
+  `json` by default. Whisper requests may also set `verbose_json`; successful responses require a usable upstream duration. Use `json` for the examples below. Text and subtitle formats are not supported.
 </ParamField>
 
 <ParamField body="timestamp_granularities[]" type="string[]">
@@ -143,7 +143,7 @@ For the [Private AI Proxy example](https://github.com/Dstack-TEE/private-ai-gate
 
 ## Response
 
-Example JSON response for three billable seconds of Whisper audio at the current rate:
+Illustrative JSON response for three billable seconds of Whisper audio at the current rate:
 
 ```json
 {
@@ -152,7 +152,7 @@ Example JSON response for three billable seconds of Whisper audio at the current
 }
 ```
 
-`json` returns `text`, `usage`, and optional `languages: [{"code":"en"}]`. Whisper's `verbose_json` response includes `duration` and `language` alongside `text` and `usage`. Word-level timestamps are not returned. With `verbose_json`, Whisper responses may include `segments`; they can be absent. A segment's `no_speech_prob` field may also be missing.
+`json` returns `text`, `usage`, and optional `languages: [{"code":"en"}]`. A successful Whisper `verbose_json` response includes `duration` and `language` alongside `text` and `usage`. Word-level timestamps are not returned. With `verbose_json`, Whisper responses may include `segments`; they can be absent.
 
 `usage.seconds` is an integer rounded up to the next whole second; verbose `duration` retains the raw value. The gateway adds `usage.cost` in USD when audio pricing is available: billable seconds times the model's `pricing.audio_transcription` rate. Without a valid duration, the transcript is withheld with `502` and no audio is billed.
 
@@ -168,7 +168,6 @@ Errors use a JSON `error` object, with `error.code` and `error.param` where appl
 | --- | --- | --- |
 | 400 | `code: unknown_parameter` | Unrecognized form field; `param` names the field. |
 | 400 | `code: invalid_parameter` | Missing or invalid required fields, filename extension, response format, timestamp options, duplicate scalar fields, invalid UTF-8, malformed multipart, or exceeded multipart metadata limits. |
-| 400 | `type: invalid_request_error`, `code: null`, `param: null` | Voxtral with `verbose_json`: `Currently do not support verbose_json for voxtral-small-24b`. |
 | 400 | `type: invalid_request_error` | Invalid or duplicate `X-ACI-Provider` header, including malformed constraints. |
 | 400 | `type: e2ee_unsupported_endpoint` | E2EE headers are present. |
 | 404 | `type: model_not_found` | No eligible route supports transcription for the model. |

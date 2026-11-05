@@ -13,8 +13,8 @@ export PHALA_AI_API_KEY="YOUR_API_KEY"
 <Tabs>
   <Tab title="CrewAI">
 
-CrewAI uses LiteLLM internally. Prefix the Phala model id with `openai/` so LiteLLM selects its
-OpenAI-compatible adapter; Phala receives `z-ai/glm-5.3`.
+With a custom `base_url`, CrewAI sends an `openai/`-prefixed model id through its native OpenAI
+client, which removes that prefix; Phala receives `z-ai/glm-5.3`.
 
 ```bash
 pip install crewai
@@ -53,7 +53,7 @@ print(result)
 
 | Symptom | Check |
 | --- | --- |
-| LiteLLM cannot select a provider | Keep the `openai/` prefix before the Phala model id. |
+| CrewAI asks for LiteLLM or another provider | Keep the `openai/` prefix and set `base_url`. |
 | Crew loops too long | Reduce `max_iter` and add task-level execution limits. |
 
 [CrewAI LLM connections](https://docs.crewai.com/en/learn/llm-connections)

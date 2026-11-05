@@ -65,6 +65,14 @@ curl -s https://inference.phala.com/v1/models \
 
 ```python
 import base64
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://inference.phala.com/v1",
+    api_key=os.environ["PHALA_AI_API_KEY"],
+)
+
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
@@ -92,6 +100,14 @@ response = client.chat.completions.create(
 ## Multiple images
 
 ```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://inference.phala.com/v1",
+    api_key=os.environ["PHALA_AI_API_KEY"],
+)
+
 response = client.chat.completions.create(
     model="qwen/qwen3-vl-30b-a3b-instruct",
     messages=[{

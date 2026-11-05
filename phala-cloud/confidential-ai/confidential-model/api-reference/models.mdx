@@ -1,6 +1,7 @@
 ---
 title: List Models
 description: List available Private AI models, modalities, context windows, and pricing metadata.
+api: "GET https://inference.phala.com/v1/models"
 ---
 
 ## Endpoints
@@ -69,7 +70,7 @@ curl https://inference.phala.com/v1/models
 | `pricing.prompt` | Input token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.completion` | Output token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.input_cache_read` | Cached input price per token when the model exposes cache pricing |
-| `providers` | Serving routes available for the model. |
+| `providers` | Provider identifiers for active deployments that can serve the model; confidentiality is described by `is_tee`, not by this field alone. |
 | `input_modalities` | Supported input types, such as `text` or `image` |
 | `output_modalities` | Supported output types, such as `text`, `embeddings`, or `decisions` |
 | `supported_parameters` | Request parameters accepted by the model |
