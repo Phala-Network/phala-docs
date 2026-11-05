@@ -331,7 +331,7 @@ A batch update method that can modify multiple CVM fields in a single request. T
 **Returns:** A dict with `requires_on_chain_hash` (bool). When it is `False`, the dict has `correlation_id`. When it is `True`, it has `compose_hash`, `app_id`, `device_id` and `kms_info`, plus `commit_token`, `commit_url`, `api_commit_url` and `onchain_status` for a `prepare_only` call.
 
 <Note>
-On Onchain KMS, a change to the compose returns `requires_on_chain_hash: True`. Register `compose_hash` on-chain, then call `confirm_cvm_patch` with the compose hash and transaction hash. With `prepare_only`, anyone holding `commit_token` can finish the update instead. See [Multisig and Governance](/phala-cloud/key-management/multisig-governance).
+On Onchain KMS, a change to the compose returns `requires_on_chain_hash: True` only when the new compose hash is not on the app contract yet (HTTP 465). If the hash is already allowed, or the patch does not change the compose (for example a resize), the update starts at once and you get `correlation_id`. After a 465, register `compose_hash` on-chain, then call `confirm_cvm_patch` with the compose hash and transaction hash. With `prepare_only`, the 465 result also carries `commit_token`, and anyone holding it can finish the update. `prepare_only` is not a dry run: an update that needs no registration starts right away. See [Multisig and Governance](/phala-cloud/key-management/multisig-governance).
 </Note>
 
 ---

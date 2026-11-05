@@ -6,7 +6,7 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 CVM configuration methods let you modify a running or stopped CVM without recreating it.
 
 <Warning>
-**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
+**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. Two cases do not restart it: a compose change that matches what the CVM already runs (the API answers `no_change` and does nothing), and metadata-only updates such as [`UpdateCVMListed`](#updatecvmlisted).
 </Warning>
 
 `PatchCVM` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `UpdateCVMResources` and `UpdateCVMVisibility` send a subset of fields to the same endpoint. The other `UpdateXxxx` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.
@@ -222,7 +222,7 @@ func (c *Client) UpdateOSImage(ctx context.Context, cvmID string, req *UpdateOSI
 |-------|------|----------|-------------|
 | `OSImageName` | `string` | Yes | Name of the target OS image |
 
-**Returns:** `error` (no response body on success)
+**Returns:** `error`. The API answers with `{message, correlation_id, status}`, but `UpdateOSImage` discards it.
 
 ```go
 err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
@@ -265,7 +265,7 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `OSImageName` | `*string` | Deprecated. Sent as `image`; an error if it differs from `Image`. |
 | `ShutdownTimeout` | `*int` | Seconds to wait for a clean shutdown (10 to 1200) |
 | `AllowForceStop` | `*bool` | Skip the clean shutdown and stop the CVM at once |
-| `PrepareOnly` | `bool` | Sent as the `X-Prepare-Only: true` header. On Onchain KMS, the response then carries a commit token for multisig approval. |
+| `PrepareOnly` | `bool` | Sent as the `X-Prepare-Only: true` header. When the API answers 465 (the new compose hash is not on the app contract yet), the response also carries a commit token for multisig approval. It is not a dry run: if no on-chain registration is needed, the update starts. |
 
 **Returns:** `*PatchCVMResponse`. A 465 answer is not an error: `RequiresOnChainHash` is `true` and the response carries `ComposeHash`, `AppID`, `DeviceID` and `KMSInfo`, plus `CommitToken`, `CommitURL`, `APICommitURL` and `OnchainStatus` with `PrepareOnly`. Otherwise it carries `CorrelationID` and `Status`.
 

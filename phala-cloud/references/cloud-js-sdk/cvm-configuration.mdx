@@ -103,7 +103,7 @@ Updates the OS image for a CVM. The CVM will restart with the new image.
 | `id` | `string` | Yes | CVM identifier |
 | `os_image_name` | `string` | Yes | OS image name |
 
-**Returns:** Nothing. The API accepts the update with `202` and no body.
+**Returns:** `undefined`. The API answers `202` with `{ message, correlation_id, status }`, but `updateOsImage` discards it.
 
 ---
 

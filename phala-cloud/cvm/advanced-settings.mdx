@@ -66,7 +66,7 @@ They are host configuration, not part of your app. They never reach the CVM, are
 ### How do I set annotations?
 
 - At create: add an `annotations` map to the create request.
-- On an existing CVM: `PUT /cvms/{cvm_id}/annotations` with `{"annotations": {"memory_tier": "fast"}}`. This replaces all annotations, and `{}` clears them.
+- On an existing CVM: `PUT /cvms/{cvm_id}/annotations` with `{"annotations": {"memory_tier": "fast"}}`. This replaces all annotations. To clear them, send `{"annotations": {}}`.
 - To read them: `GET /cvms/{cvm_id}/annotations`.
 
 Keys must not be empty. The node must run dstack VMM 0.6.1 or newer, or the request fails with `ERR-03-050`.
@@ -75,7 +75,7 @@ Setting annotations does not restart the CVM. Some host tools read them only whe
 
 ### Do annotations follow the CVM?
 
-Phala Cloud keeps no copy of them. Only the node holds them:
+Phala Cloud does not keep annotations as part of the CVM's state and never restores them. The node holds them. The audit record of a create request may include the annotations it carried.
 
 - A replica starts without annotations. Set them again on the replica.
 - A CVM moved to another node keeps whatever its VM settings on the node carry.
