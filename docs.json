@@ -783,6 +783,8 @@
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/responses",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/messages",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/completions",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/images",
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/audio",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/systemone",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
