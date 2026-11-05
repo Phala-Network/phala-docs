@@ -1,0 +1,50 @@
+Confidential computing establishes specific workload and channel facts. This page describes what
+the attested gateway protects and where plaintext and metadata are visible.
+
+## What the gateway protects
+
+- **Gateway identity**: A fresh <a href={site.paths.apiAttestation}>attestation report</a> binds the gateway keyset to hardware evidence. A reviewed-release claim also requires
+  an independently authenticated compose-hash allowlist.
+- **Per-response integrity**: A signed <a href={site.paths.apiReceipts}>receipt</a> binds request and response hashes to that keyset.
+- **No body retention**: The gateway does not store request or response bodies. Receipts contain
+  hashes and verification facts rather than prompt or response bodies.
+- **Confidential upstreams**: For confidential models, the gateway verifies the provider boundary
+  and enforces channel binding before forwarding, fail-closed.
+- **Optional retention constraint**: `provider: {"zdr": true}` restricts routing to the ZDR allowlist on either endpoint type. TEE-only serving does not itself imply provider non-retention. See <a href={site.paths.zdr}>Zero Data Retention</a>.
+
+## Limits
+
+- **Plaintext is processed in the gateway TEE**: TLS terminates there. Field-level <a href={site.paths.e2ee}>E2EE</a> encrypts to an attested gateway key and decrypts inside that gateway.
+- **Upstream coverage varies**: Some verifiers cover a model CVM, others a router or broker. Read the cited session's claims; gateway attestation does not independently attest every upstream model worker, GPU link, or model weight.
+- **Client verification is explicit**: Ordinary clients do not verify the quote, pin TLS to the attested key, or audit receipts. Use the <a href={site.paths.verify}>TypeScript SDK</a> or <a href={site.paths.proxy}>Private AI Proxy</a>.
+- **Receipts are not a permanent public log**: Fetch them promptly and archive them if durable evidence is required.
+- **Local tools remain separate**: Agent tools, MCP servers, browser automation, and telemetry can expose data outside the inference boundary.
+
+## Where plaintext exists
+
+| Stage | Plaintext boundary |
+| --- | --- |
+| Client to gateway | TLS protects transit; optional E2EE protects selected fields to the gateway's attested key. |
+| Inside gateway TEE | The attested workload processes the request after TLS termination or E2EE decryption. |
+| Gateway to provider | Pinned TLS, provider-specific E2EE, or a measured co-deployed proxy binding enforces the provider path. |
+| Inside provider | Depends on the verified model-instance, router, or broker boundary and the session's evidence. |
+
+## Upstream binding boundaries
+
+| Binding | Boundary |
+| --- | --- |
+| `tls_spki_sha256` | The verified upstream TLS key. |
+| `e2ee_public_key_sha256` | The verified provider encryption key. |
+| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
+
+The Privatemode proxy owns Contrast verification, secret exchange, and body encryption after that internal hop. Its dynamic manifest observation is not bound to the active inference secret.
+
+## Apply a policy
+
+Verify the receipt and its session, then require the claims your workload needs. Add a compose allowlist from authenticated release metadata when you need reviewed gateway releases. Add zero data retention when post-request storage matters. Appraise the provider session when you need assurance about the complete serving workload.
+
+## Middleware and control-plane metadata
+
+Optional routing and business middleware inside the attested deployment can see plaintext after decryption. It cannot create upstream verification facts or bypass backend channel binding.
+
+The external control plane receives `apiKeyHash` (the SHA-256 hash of the bearer token) for authenticated requests and, when request features are enabled, tool presence, input modalities, token estimates, reasoning intent, response format, and optional `prefixHash` at `/consult/pre`. `prefixHash` is a keyed HMAC cache-affinity digest that can link requests with the same cache key or conversation opening. `/consult/post` receives usage, timing, and `prefixHash` when present. These fields contain no prompt text, but they are metadata, and their retention is separate from receipt storage. See the [control-plane contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/control-plane-contract.md).

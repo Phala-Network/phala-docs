@@ -3,87 +3,12 @@ title: End-to-End Encryption
 description: Field-level encryption to an attested gateway key, supported endpoints, and receipt hashing.
 ---
 
-End-to-end encryption (E2EE) encrypts selected request and response fields between your client and the attested gateway, on top of TLS. Decryption happens inside that gateway so it can process the request. E2EE binds the decryption key to the measured workload; it does not hide plaintext from that workload or its in-process middleware. See [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary).
+import SharedContent from "/snippets/aci/e2ee.mdx";
+import { site } from "/snippets/site.jsx";
 
-## Get an attested encryption key
+Every model on Phala's TEE-only endpoint uses a verified upstream. E2EE adds client-to-gateway field encryption to that serving policy.
 
-Verify a fresh [attestation report](/phala-cloud/confidential-ai/verify/verify-attestation), then select a key from `attestation.workload_keyset.e2ee_public_keys`. This command inspects the keys; it does not verify the report:
-
-```bash
-curl -fsS "https://inference.phala.com/v1/aci/attestation?nonce=$(openssl rand -hex 32)" \
-  | jq '.attestation.workload_keyset.e2ee_public_keys'
-```
-
-The service advertises `"2"` in `service_capabilities.supported_e2ee_versions`.
-
-| Key id | Algorithm | Ephemeral public-key encoding |
-| --- | --- | --- |
-| `dstack-kms-e2ee-x25519-v1` | `x25519-aes-256-gcm-hkdf-sha256` | 32 raw bytes |
-| `dstack-kms-e2ee-v1` | `secp256k1-aes-256-gcm-hkdf-sha256` | 65-byte uncompressed SEC1 |
-
-X25519 is recommended for browser-native clients. The secp256k1 suite remains supported for existing EVM and dstack clients. Both use ECDH, HKDF-SHA256, and AES-256-GCM. Select the suite from the attested key entry's `algo`; browser document verification alone cannot pin the actual TLS certificate SPKI.
-
-## Supported endpoints
-
-| Endpoint | E2EE v2 |
-| --- | --- |
-| `/v1/chat/completions` | Buffered and streaming |
-| `/v1/completions` | Buffered and streaming |
-| `/v1/embeddings` | Buffered |
-
-Only these three inference endpoints support E2EE v2. Every other inference endpoint implemented by this gateway rejects authenticated E2EE requests with `400 e2ee_unsupported_endpoint`. This includes Responses, Messages, System One, and the image and audio routes. Authentication checks can run first; the image and audio handlers return `401` when the bearer token is missing.
-
-Encrypt at least one content-bearing request field. Use the [protocol's field locations](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/e2ee-v2.md#5-encrypted-fields) for chat messages, completion prompts, and embedding input.
-
-## Encrypted response fields
-
-The gateway encrypts the following fields, when present, to the client's `X-Client-Pub-Key`. Fields outside this table are not covered by the response-encryption contract.
-
-| Endpoint | Buffered response | Streaming response, per SSE chunk |
-| --- | --- | --- |
-| `/v1/chat/completions` | `choices.{i}.message.content`, `choices.{i}.message.reasoning`, `choices.{i}.message.reasoning_content`, `choices.{i}.message.audio.data` | `choices.{i}.delta.content`, `choices.{i}.delta.reasoning`, `choices.{i}.delta.reasoning_content`; an empty-string content delta may be omitted |
-| `/v1/completions` | `choices.{i}.text` | `choices.{i}.text` |
-| `/v1/embeddings` | Only `data.{i}.embedding`, after compact JSON serialization of its value | Not supported |
-
-`{i}` is the entry's `index` when present, otherwise its array position. Embeddings use buffered responses even if the client sends `stream: true`.
-
-## Request headers
-
-| Header | Value |
-| --- | --- |
-| `X-E2EE-Version` | `2` |
-| `X-Client-Pub-Key` | Your public key, hex encoded on the selected suite's curve |
-| `X-Model-Pub-Key` | The gateway encryption key selected from the verified keyset |
-| `X-E2EE-Nonce` | Fresh 32-byte replay token as exactly 64 hexadecimal characters, with no `0x` prefix |
-| `X-E2EE-Timestamp` | Current Unix seconds; the protocol allows at most 300 seconds of skew |
-
-Do not send `X-Signing-Algo`; it selects the legacy compatibility path. Generate a fresh nonce for every request.
-
-## Ciphertext format
-
-Each field is lowercase hex encoding of:
-
-```text
-ephemeral_public_key || aes_gcm_nonce (12 bytes) || ciphertext || tag (16 bytes)
-```
-
-Use a fresh ephemeral key and AES-GCM nonce per field. AEAD associated data binds the version, direction, algorithm, exact request model, field path, request nonce, timestamp, and, for responses, response id. Use the official client helpers when available; implementations must follow the [E2EE v2 specification](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/e2ee-v2.md) and its test vectors exactly.
-
-## Response headers
-
-| Header | Meaning |
-| --- | --- |
-| `X-E2EE-Applied` | `true` when response fields were encrypted |
-| `X-E2EE-Version` | `2` when encryption was applied |
-| `X-E2EE-Algo` | Selected gateway key's `algo` |
-
-These are unauthenticated hints. The quote-bound keyset, AEAD tags, and signed receipt provide the cryptographic bindings.
-
-## Receipts with E2EE
-
-`request.received.body_hash` covers the compact JSON serialization after encrypted fields are decrypted and restored. Reproduce it by restoring those values and compactly serializing the body according to the protocol. Hashing encrypted request bytes or applying JCS to that HTTP body will not reproduce it.
-
-`response.returned.body_hash` covers the exact JSON or SSE bytes emitted on the wire, including ciphertext and streaming framing. Capture those bytes before decrypting response fields. A stream's order and truncation are checked against the receipt over the complete wire body. See [Receipt verification](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#verifying-the-receipt).
+<SharedContent site={site} />
 
 ## Related
 

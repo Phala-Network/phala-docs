@@ -815,18 +815,17 @@
                   "/phala-cloud/confidential-ai/verify/typescript-sdk",
                   "/phala-cloud/confidential-ai/verify/verify-attestation",
                   "/phala-cloud/confidential-ai/verify/verify-signature",
-                  "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
-                  "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims"
+                  "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions"
                 ]
               },
               {
                 "group": "Security Model",
                 "pages": [
                   "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
-                  "/phala-cloud/confidential-ai/confidential-model/channel-binding",
                   "/phala-cloud/confidential-ai/confidential-model/verified-upstreams",
                   "/phala-cloud/confidential-ai/confidential-model/providers",
                   "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
+                  "/phala-cloud/confidential-ai/confidential-model/e2ee-guide",
                   "/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source"
                 ]
               },
@@ -947,6 +946,14 @@
     ]
   },
   "redirects": [
+    {
+      "source": "/phala-cloud/confidential-ai/confidential-model/channel-binding",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/verified-upstreams"
+    },
+    {
+      "source": "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/verified-upstreams"
+    },
     {
       "destination": "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
       "source": "/phala-cloud/confidential-ai/confidential-model/api-reference/signature"

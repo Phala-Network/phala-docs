@@ -46,7 +46,7 @@ Every gateway attestation report includes `attestation.source_provenance`:
 }
 ```
 
-These are workload-declared inspection labels, not a trust root. Replay the measured event log to RTMR3, match `sha256(app_compose)` to the measured compose hash, and require an independently obtained compose allowlist for reviewed-release enforcement. Each production compose hash is published in [`gateway-prod-<date>` releases](https://github.com/Dstack-TEE/private-ai-gateway/releases) in `Dstack-TEE/private-ai-gateway`; see the [release policy](/phala-cloud/confidential-ai/verify/typescript-sdk#release-policy). See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
+These are workload-declared inspection labels, not a trust root. Replay the measured event log to RTMR3, match `sha256(app_compose)` to the measured compose hash, and require an independently obtained compose allowlist for reviewed-release enforcement. Each production compose hash is published in [`gateway-prod-<date>` releases](https://github.com/Dstack-TEE/private-ai-gateway/releases) in `Dstack-TEE/private-ai-gateway`; see the [release policy](/phala-cloud/confidential-ai/verify/verify-signature#release-policy). See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
 
 ## Relevant Repositories
 

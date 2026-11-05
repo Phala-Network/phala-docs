@@ -3,47 +3,12 @@ title: Error Handling
 description: Handle Private AI API errors, retries, unsupported parameters, and upstream failures.
 ---
 
-## Error Response Format
+import SharedErrors from "/snippets/aci/errors.mdx";
+import { site } from "/snippets/site.jsx";
 
-Errors return a JSON body with an `error` object and an HTTP status code:
+<SharedErrors site={site} />
 
-```json
-{
-  "error": {
-    "message": "Invalid API key provided",
-    "type": "authentication_error",
-    "code": null,
-    "param": null
-  }
-}
-```
-
-The `type` field is the machine-readable discriminator.
-
-| `type` | Meaning |
-| --- | --- |
-| `authentication_error` | Missing or invalid API key. |
-| `invalid_request_error` | Malformed request body or unsupported parameter. |
-| `model_not_found` | The requested model id is unavailable. |
-| `not_found_error` | The model exists but no serving route can satisfy the request constraints, for example `provider: {"zdr": true}`. |
-| `session_not_accepted` | None of the requested attested session ids is currently accepted (`412`); refresh and verify the session before retrying. |
-| `upstream_verification_failed` | Required upstream verification failed or no eligible attested upstream is available (`503`); no prompt is forwarded. |
-| `upstream_error` | The upstream provider failed or timed out. |
-
-## Status Codes
-
-| Status | Meaning |
-| --- | --- |
-| `400` | Malformed request or invalid parameter. |
-| `401` | Missing or invalid API key. |
-| `402` | Account quota or API key budget exhausted (`insufficient_quota`). |
-| `403` | Authenticated identity lacks permission. |
-| `404` | Unknown or non-TEE model, no eligible route under the request constraints, or an unknown/expired receipt or session. |
-| `412` | No requested attested session is currently accepted (`session_not_accepted`). |
-| `429` | Rate limited. |
-| `500` | Gateway server error. |
-| `502` | Upstream provider unavailable. |
-| `503` | Service temporarily unavailable, including required upstream verification failure (`upstream_verification_failed`). |
+The Phala host is TEE-only: unknown or non-TEE models return `404`. No request option relaxes the endpoint policy.
 
 Account quota or API key budget exhaustion returns `402 insufficient_quota`. Check the Phala dashboard for workspace Balance and key limits.
 

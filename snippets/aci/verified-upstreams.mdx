@@ -1,0 +1,178 @@
+export const VerifiedUpstreamsExample1 = ({ site }) => <CodeBlock language="bash">{`curl -fsS "${site.baseUrl}/aci/sessions/$SID" \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+| jq -r '.evidence.data' | sed 's|^data:application/json;base64,||' | base64 -d \\
+| jq -r '[.all_attestations[] | .info.tcb_info | (if type=="string" then fromjson else . end)
+          | .app_compose | fromjson | .docker_compose_file] | join("\\n")' \\
+| grep -E 'image:|--served-model-name'`}</CodeBlock>;
+
+For confidential serving, the gateway verifies the upstream enclave before it sends your prompt, and
+refuses to send if it cannot. Verification produces three things: a **channel binding** the gateway
+enforces on the wire, an **attested session** it records, and the **typed claims** inside that
+session. The receipt's `upstream.verified` event ties a response to all three.
+
+## Channel binding
+
+Verifying an upstream's attestation is not enough on its own: a genuine enclave could exist while
+the gateway talks to a different server. Channel binding closes that gap. The value the gateway
+verifies is the value it enforces on the connection before forwarding.
+
+| Binding | What it is | How the gateway enforces it |
+| --- | --- | --- |
+| `tls_spki_sha256` | SHA-256 of the upstream's TLS public key (SPKI). | Pins the upstream HTTPS connection to that key. |
+| `e2ee_public_key_sha256` | SHA-256 of the upstream's end-to-end public key. | Encrypts the request body to that key, so only the attested enclave can decrypt it. |
+| `proxy_image_sha256` (Privatemode) | `provider`, `proxy_image_digest`, and `credential_sha256` identify a co-deployed proxy and its credential. | Checks the credential and forwards only to the private proxy pinned in the gateway's measured deployment; the proxy verifies and encrypts the provider hop. |
+
+The proxy binding covers the measured proxy deployment, not the specific provider workload that
+served a request. An observed provider manifest alone does not establish that workload binding.
+
+Every confidential provider produces exactly one binding, and it lives inside the verified
+attestation. A "verified" result without an enforceable binding is rejected in the gateway itself:
+a provider can never be verified but unpinned. Which provider uses which binding is on the
+<a href={site.paths.providers}>Confidential providers</a> page.
+
+For confidential serving, `upstream.verified.required` is `true`. If the gateway cannot verify the
+upstream or enforce the binding on the actual connection, it does not send your prompt. If the
+binding stops matching, the gateway re-verifies before forwarding; retries cannot bypass this.
+
+```mermaid
+flowchart TD
+  A["Confidential request"] --> B{"Upstream verified<br/>and binding enforceable?"}
+  B -->|"Yes"| C["Forward prompt over bound channel"]
+  B -->|"No"| D["Reject. Prompt is not sent."]
+```
+
+### Confirm the binding
+
+1. Verify the gateway attestation report and receipt signature, including the exact request and
+   response hashes.
+2. Require `upstream.verified.result: verified`, `required: true`, and a `session_id`.
+3. Fetch the full session, verify its content address and evidence digest, and appraise
+   `channel_binding` under your policy.
+
+The <a href={site.paths.verify}>ACI TypeScript SDK</a> and
+<a href={site.paths.proxy}>Private AI Proxy</a> implement client checks. cURL inspection alone does
+not establish channel binding. On a TEE-only endpoint verification is required for every inference
+request; a mixed endpoint can also serve non-attested routed requests unless the client requires
+verified serving.
+
+## Attested sessions
+
+When the gateway verifies an upstream, it records an **attested session**: an immutable snapshot of
+the verified channel. A session is the channel, not a model. One channel can serve many models, so a
+router-backed provider produces one session and the served model is recorded on the receipt. A
+session captures:
+
+- the verified upstream identity and endpoint;
+- the enforced channel binding;
+- the typed claims about the TEE, each with its source; and
+- the byte-preserving evidence the verifier checked.
+
+The `session_id` is the SHA-256 of the full session document in canonical JCS form, as 64 lowercase
+hex characters. Any change to the document produces a different id, so recomputing the hash proves
+the session you fetched is exactly the one the receipt cited.
+
+```text
+response  → x-receipt-id
+receipt   → upstream.verified { result, required, model_id, session_id }
+session   → { binding, claims (+ reasons), evidence }
+```
+
+Fetch <a href={site.paths.apiSessions}><code>GET /v1/aci/sessions/&#123;session_id&#125;</code></a> for the provider, binding,
+claims, and evidence. You do not enforce the binding yourself; you confirm after the fact that the
+gateway did: `result` is `verified`, `required` is `true`, and the cited session carries the
+binding.
+
+## Claims
+
+Claims are in the session cited by the receipt; the receipt’s `upstream.verified` event does not
+embed the complete claim set. TCB means Trusted Computing Base.
+
+A session never says "trusted". It carries a fixed set of claims, each with a `status`, a `source`,
+and an optional `reason`, so a hardware-proven fact and an operator's assertion never look alike.
+
+```json
+{
+"tee_attested": {
+  "status": "asserted",
+  "source": "hardware_proven",
+  "reason": "verified the TEE quote and bound the request channel"
+}
+}
+```
+
+| `status` | Meaning |
+| --- | --- |
+| `asserted` | The verifier's evidence backs this claim. |
+| `refuted` | The evidence contradicts the claim, for example a stale platform TCB. Recorded, not hidden. |
+| `unknown` | The claim was not established. Never a silent pass. |
+
+| `source` | Assurance |
+| --- | --- |
+| `hardware_proven` | From the verified TEE quote or its collateral. Strongest. |
+| `verifier_derived` | Computed by the verifier from verified evidence. |
+| `provider_asserted` | Published by the provider, not independently proven. |
+| `operator_asserted` | Declared by the gateway operator. Weakest. |
+
+| Claim | Asks |
+| --- | --- |
+| `tee_attested` | Is a TEE identity bound to the channel, directly or through a measured proxy? Inspect the source. |
+| `tcb_up_to_date` | Is the platform's Trusted Computing Base current? |
+| `os_known_good` | Does the OS or platform image map to reviewed source? |
+| `serving_software_known_good` | Does the serving software meet this verifier’s software acceptance policy? |
+| `gpu_attested` | Which provider-specific GPU checks were accepted, and what do they establish? |
+| `model_weights_provenance` | Are the served weights and quantization what they claim to be? |
+
+Privatemode reports `tee_attested: asserted` with `source: verifier_derived` under
+`privatemode-proxy/co-deployed-contrast/v1`. It relies on the measured co-deployed proxy and its
+Contrast-attested secret path rather than a provider quote verified directly by the gateway.
+Its other common claims remain `unknown`.
+
+### TCB freshness
+
+When a verifier reports a separate TCB status, `tcb_up_to_date` is tri-state: `UpToDate` asserts
+it, another reported status refutes it, and an absent status leaves it `unknown`. Tinfoil is an
+exception: its verifier requires an up-to-date TCB but exposes no separate status, so a verified
+result asserts the claim with source `verifier_derived`.
+
+### GPU attestation
+
+`gpu_attested` is provider-specific. For Phala and Chutes, an asserted `verifier_derived` claim
+records an accepted, nonce-matched supplemental NVIDIA check. These paths decode JWTs without
+verifying their signatures. They do not authenticate GPU identity, bind it to the serving CPU
+TEE, or prove continued use of a particular GPU. ArmetAI uses a separate, mandatory signed NRAS
+check, with the GPU evidence committed in the CPU quote's report data.
+Neither path proves model-weight provenance or continued use of a particular GPU for your request. See the
+[claim mappings](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/src/aggregator/service/claims.rs).
+
+For direct hardware proof, require `tee_attested` to be `asserted` with source `hardware_proven`
+(this policy excludes Privatemode’s `verifier_derived` sessions);
+treat `serving_software_known_good: asserted` as stronger than any `provider_asserted` claim about
+software; decide your own policy on `tcb_up_to_date: refuted`; appraise `gpu_attested` using the
+provider-specific limits above; and treat every `unknown` as not proven. Which provider asserts which claim is on the
+<a href={site.paths.providers}>Confidential providers</a> page.
+
+### Fields to check in `extra`
+
+For a Phala-direct session:
+
+| Field | Expected | Meaning |
+| --- | --- | --- |
+| `canonical_model_id` | Acceptable model mapping under your policy | **Verify this.** Naming may differ; see <a href={site.paths.routing + "#list-the-models-you-can-use"}>model ids</a> |
+| `tcb_status` | Acceptable under your policy | Platform TCB status reported by quote collateral; `OutOfDate` is not a freshness pass |
+| `tdx_debug_mode` | `false` | `true` means debug mode, and confidentiality does not hold |
+| `os_image_is_dev` | `false` | Reject development images in production |
+| `production_os_image` | `true` | |
+| `compose_hash_verified` | `true` | The measured compose matches what was declared |
+| `report_data_nonce_matched` | `true` | The upstream evidence matches the upstream verifier's challenge; this is separate from your gateway-attestation nonce |
+| `gpu_evidence_nonce_matched` | `true` when GPU evidence is present | Supplemental check reports a nonce match; not authenticated GPU identity or CPU binding |
+| `tls_spki_from_report_data` | `true` | The TLS channel binding comes from hardware measurement, not a spoken claim |
+| `trust_boundary` | `phala-dstack-cvm` | |
+
+Which keys appear in `extra` depends on the upstream provider that served the session, so treat this
+list as a starting point rather than a fixed schema.
+
+### Inspecting the images in the measured compose
+
+For a Phala-direct JSON evidence bundle, set `SID` to the session id cited by your receipt:
+
+<VerifiedUpstreamsExample1 site={site} />

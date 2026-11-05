@@ -1,0 +1,136 @@
+Returns the signed receipt for a response: a transparency event log that binds the request and
+response hashes to the attested gateway, signed by a key from the attested
+<a href={site.paths.apiAttestation}>keyset</a>. This is the canonical per-response proof. Look up a receipt by
+the `x-receipt-id` header on the inference response, or by the response `id`. For how to read the
+event log, see <a href={site.paths.receipts}>Receipts</a>.
+
+```http
+GET /v1/aci/receipts/{id}
+```
+
+## Request
+
+<ParamField path="id" type="string" required>
+  A receipt id (`rcpt-…`) or the response `id` (chat id). The receipt id is returned in the
+  `x-receipt-id` response header on `/v1/chat/completions`. Only unconstrained, non-E2EE streams
+  on an endpoint that also serves non-TEE models can be early-committed and omit it; for those,
+  use the response `id` after a successful stream. ACI-constrained and E2EE streams are never
+  early-committed, including all inference streams on a TEE-only endpoint.
+</ParamField>
+
+## Authentication and ownership
+
+Use the same bearer API key that made the inference request. Receipt lookup without a bearer token
+returns `401`; lookup with a different token returns `404`, so another key cannot discover the
+receipt. This also applies to the legacy alias.
+
+## Response
+
+`200 OK`, `application/json`. The bare canonical receipt:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `api_version` | string | ACI version token, for example `aci/1`. |
+| `receipt_id` | string | The receipt id (`rcpt-…`). |
+| `chat_id` | string or null | The response/chat id, when the upstream returns one. |
+| `workload_keyset_digest` | string | Must match the attestation report. |
+| `model` | string or null | Model requested by the client. |
+| `endpoint` | string | The route served, for example `/v1/chat/completions`. |
+| `method` | string | HTTP method. |
+| `served_at` | number | Unix seconds. |
+| `event_log` | array | Ordered transparency events (below). |
+| `key_id` | string | Selects a receipt-signing key from the attested keyset. |
+| `signature` | string | Signature over the receipt, by a key in the attested keyset. |
+
+### `event_log` entries
+
+| `type` | Key fields |
+| --- | --- |
+| `request.received` | `body_hash` |
+| `middleware.forwarded` | `body_hash` |
+| `route.selected` | `target_route_id` |
+| `request.forwarded` | `body_hash` |
+| `upstream.verified` | `model_id`, `result`, `required`, `session_id` |
+| `response.received` | `body_hash` |
+| `response.returned` | `body_hash` |
+
+### Example (truncated)
+
+```json
+{
+  "api_version": "aci/1",
+  "receipt_id": "rcpt-e0eefe63b3673e2a5984951f",
+  "chat_id": "d3ad808b20a444c29e798db35f112033",
+  "workload_keyset_digest": "sha256:3eff0836…",
+  "model": "phala/gemma-4-26b-a4b-uncensored",
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "served_at": 1781588857,
+  "event_log": [
+    { "type": "request.received", "body_hash": "sha256:111d08a5…" },
+    { "type": "route.selected", "target_route_id": "phala:gemma-4" },
+    { "type": "upstream.verified", "model_id": "phala/gemma-4-26b-a4b-uncensored",
+      "result": "verified", "required": true, "session_id": "ecda679a01d29724ccb12f24e5007f536a50668b544d9c87d04c5ef8a1bddd3a" },
+    { "type": "response.returned", "body_hash": "sha256:07703fb4…" }
+  ],
+  "key_id": "dstack-kms-receipt-ed25519-v1",
+  "signature": "…"
+}
+```
+
+The session id is a snapshot from the public sessions list; use the id in your own receipt.
+
+## Verifying the receipt
+
+These checks follow [ACI spec §§9.1–9.3](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/spec/aci.md#9-verification-procedure),
+starting with an established gateway identity.
+
+| # | Check | Inputs |
+| - | --- | --- |
+| 1 | Established keyset | §9.1: hardware quote, nonce binding, expiry, provenance, private-key custody, and channel binding, including `workload_keyset_digest == sha256(JCS(workload_keyset))` |
+| 2 | Receipt signature | `keyset.receipt_signing_keys[key_id]` over `JCS(receipt minus signature)` |
+| 3 | Receipt document | `receipt.api_version == "aci/1"`; `receipt.workload_keyset_digest` equals the established digest |
+| 4 | Request hash | `request.received.body_hash == sha256(raw bytes you sent)` |
+| 5 | Response hash | `response.returned.body_hash == sha256(raw bytes you received)` |
+| 6 | Required upstream verification succeeded | `upstream.verified.result == "verified"` and `required == true` |
+| 7 | Cited session | `session.api_version == "aci/1"`; `sha256(JCS(full session document)) == upstream.verified.session_id`; `served_at` is within its validity window; id is in your pinned set, if supplied |
+| 8 | Session evidence and policy | Decode `evidence.data`, hash the exact bytes to `evidence.digest`, and appraise channel bindings, claims and provider evidence under your policy |
+
+A signature-valid receipt is not the same as a successful verification: `upstream.verified` can
+record `result: "failed"` and carry no `session_id`. Assert the result explicitly before looking
+for a session.
+
+`JCS` is RFC 8785 (JSON Canonicalization Scheme). Use an RFC 8785 implementation or the SDK's helpers;
+sorted-key `json.dumps` is not sufficient. Canonicalize ACI documents, but hash HTTP bodies and decoded
+evidence as exact bytes. For E2EE requests, follow the
+<a href={site.paths.e2ee + "#receipts-with-e2ee"}>decrypted-body hashing rules</a>.
+
+See <a href={site.paths.verify + "#inspect-the-artifacts-by-hand"}>Verify a response</a> for the artifact walkthrough.
+
+## Legacy alias
+
+`GET /v1/signature/{id}` returns the same receipt wrapped in a legacy envelope, for clients written
+against earlier API versions. `{id}` is a receipt id or a response id.
+
+```http
+GET /v1/signature/{id}?signing_algo=ecdsa
+```
+
+| Query parameter | Accepted values | Default |
+| --- | --- | --- |
+| `signing_algo` | `ecdsa` or `ed25519` | `ecdsa` |
+
+This query parameter selects the legacy wrapper signer. The canonical receipt retains its own `key_id` and signature independently of this selection.
+
+| Field | Description |
+| --- | --- |
+| `api_version` | ACI version token, for example `aci/1`. |
+| `signing_algo` | Signature algorithm, for example `ecdsa`. |
+| `signing_address` | ECDSA Ethereum address or Ed25519 public key that signed `text`. |
+| `text` | `"<request body hash>:<response hash>"`, the signed message. |
+| `signature` | Signature over `text`. |
+| `receipt` | The full receipt object, identical to this endpoint's response. |
+
+Legacy clients must verify the wrapper's `signature` over `text` using the selected algorithm, then bind `signing_address` to a fresh, verified legacy attestation report from `GET /v1/attestation/report?signing_algo=ecdsa&nonce=...` (or `signing_algo=ed25519`). Check the hardware quote's legacy signer-and-nonce binding; comparing the reported address alone is insufficient. ECDSA uses Ethereum personal-message signing; Ed25519 signs the UTF-8 `text` bytes directly.
+
+Legacy wrapper keys are separate from canonical receipt-signing keys. New integrations should use `/v1/aci/receipts/{id}` and verify the canonical receipt with the fresh canonical attestation at `/v1/aci/attestation`, following the checks above.
