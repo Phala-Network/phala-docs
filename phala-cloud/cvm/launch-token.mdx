@@ -1,0 +1,72 @@
+---
+title: Launch Token
+description: Require a secret token before a CVM can boot your app and get its keys, and learn what the token does and does not protect against.
+---
+
+A launch token is a secret your CVM must have before it can boot your app. On every boot, the guest OS checks the token against a hash in your compose. If they do not match, the CVM stops before it gets any keys.
+
+Launch tokens need dstack OS 0.6.0 or newer.
+
+## What does a launch token protect against?
+
+Your compose is public. Anyone can read it, and it holds only the token's hash, not the token. Someone who has your compose but not the token cannot start a CVM that boots it, because the boot check fails.
+
+The token does not change your app's keys, app ID or instance ID. It only decides whether the CVM may start.
+
+## What does it not protect against?
+
+The token does not hide anything from the host. Phala Cloud passes the token to the CVM through its user config, which Phala Cloud and the node operator can read. Do not treat it as a secret the host cannot see.
+
+## How do I create a CVM with a launch token?
+
+Add one of these fields to the create request (`POST /cvms`):
+
+- `"launch_token": "<your token>"` to use your own token. It must be at least 32 bytes long.
+- `"generate_launch_token": true` to have Phala Cloud make one.
+
+Phala Cloud writes the token's hash into `compose_file.requirements.launch_token_hash` for you. When the create stores a new token on the app, the create response returns it once, in `launch_token`. Save it.
+
+The token belongs to the app, not to one CVM. If the app already has a token, a create uses it. Sending a different token fails with `ERR-03-044`.
+
+## Do replicas need their own token?
+
+No. Every CVM of an app shares the app's token, and Phala Cloud gives it to each replica. A replica of a CVM whose compose requires a token fails if the app has no token.
+
+## How do I see the token later?
+
+Call `GET /cvms/{cvm_id}/user_config`. When the CVM's compose requires a token, the response includes `launch_token`. Any workspace member who can read the CVM can see it. CVM lists never show it.
+
+## How do I add a token to an app that already runs?
+
+1. Set the app's token with `POST /apps/{app_id}/launch-token`. Send `{"launch_token": "<your token>"}`, or an empty body to have Phala Cloud make one. The response returns `launch_token` and `launch_token_hash` once.
+2. Update each CVM of the app to require it, with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration):
+
+   ```json
+   { "compose": { "requirements": { "launch_token_hash": "<launch_token_hash>" } } }
+   ```
+
+The update restarts the CVM. A hash that does not match the app's token fails with `ERR-03-043`.
+
+## How do I rotate the token?
+
+Rotation works the same way: set a new token on the app with `POST /apps/{app_id}/launch-token`, then update each CVM's `launch_token_hash` to the new hash.
+
+Between those two steps, a CVM that restarts fails to boot. It gets the new token, but its compose still has the old hash. Update every CVM right after you set the new token, and avoid restarting CVMs until you are done.
+
+## How do I remove the token?
+
+Remove it in two steps, in this order:
+
+1. Update each CVM to drop the hash:
+
+   ```json
+   { "compose": { "requirements": { "launch_token_hash": null } } }
+   ```
+
+2. Clear the app's token with `DELETE /apps/{app_id}/launch-token`.
+
+If you clear the app's token first, every CVM whose compose still has the hash fails at its next boot.
+
+## Does this work with Onchain KMS?
+
+Yes. Adding, changing or removing the hash is a compose change, so it gives the CVM a new compose hash. Register that hash on your app contract as for any other update. See [What changes for a CVM on Onchain KMS?](/phala-cloud/update/update-cvm-configuration#what-changes-for-a-cvm-on-onchain-kms)

@@ -1,0 +1,101 @@
+---
+title: Advanced CVM Settings
+description: Init scripts, ephemeral data disks, annotations, other runners and raw app-compose input for CVMs created or updated through the API.
+---
+
+These settings are set through the API, on the create request (`POST /cvms`) or with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration). Some of them are available on request: [contact support](/phala-cloud/support) to turn them on for your workspace.
+
+## Init scripts
+
+Init scripts are small scripts Phala Cloud provides. The CVM runs them on every boot, before your containers start. You pick them by name:
+
+| Name | What it does | Needs |
+| --- | --- | --- |
+| `docker_cleanup` | Erases every local container store on each boot: images, volumes and all containerd namespaces. Each boot pulls images again and starts with empty Docker volumes. | dstack OS 0.6.x, `ext4` storage, the `docker-compose` runner |
+| `env_merge` | On each boot, merges the encrypted environment variables you sent into the ones the CVM stored before, limited to `allowed_envs`. | dstack OS 0.6.0 or newer. Available on request. |
+
+The scripts always run in this order: `docker_cleanup`, then `env_merge`.
+
+### How do I choose init scripts?
+
+Send the full list. It replaces the scripts the CVM runs now, and `[]` removes them all:
+
+```json
+{ "init_scripts": ["docker_cleanup", "env_merge"] }
+```
+
+Use the same field on create and on `PATCH /cvms/{cvm_id}`. The create request still accepts the older forms `init_scripts: {"env_merge": true}` and `enabled_init_scripts_docker_cleanup`.
+
+Storage is fixed when you create a CVM, and the default is `zfs`. To use `docker_cleanup`, create the CVM with `ext4` storage.
+
+### Why does turning on docker_cleanup ask for confirmation?
+
+Because the next boot erases your images and Docker volumes, and every boot after that does it again. On an existing CVM, the update fails with `ERR-03-048` unless you also send `"confirm_data_wipe": true`. Back up any data in Docker volumes before you turn it on.
+
+### Does each CVM have its own init scripts?
+
+Yes. Init scripts are part of each CVM's compose. Changing them is a compose change: the CVM gets a new compose hash and restarts, and on Onchain KMS the new hash must be registered. Redeploying an older revision brings back that revision's init scripts.
+
+To see what a CVM runs and what you could pick, call `GET /cvms/{cvm_id}/init-scripts`. Each item says whether the CVM runs the script (`selected`), whether you can pick it (`selectable`) and, if not, why (`reason`).
+
+## Ephemeral data disk
+
+With `requirements.ephemeral_data_disk` set to `true`, the CVM starts every boot with an empty data disk. The guest formats the disk before any app code runs, so nothing from earlier boots is left. Use it for workloads that must not keep data between boots.
+
+It needs dstack OS 0.6.3 or newer.
+
+To turn it on at create, put it in `compose_file.requirements`. To turn it on for an existing CVM, confirm the wipe:
+
+```json
+{
+  "compose": { "requirements": { "ephemeral_data_disk": true } },
+  "confirm_data_wipe": true
+}
+```
+
+Without `confirm_data_wipe`, the update fails with `ERR-03-048`. Turning it off needs no confirmation.
+
+## Annotations
+
+Annotations are available on request.
+
+Annotations are key/value labels for tools on the host, for example a wrapper that reads the VM's settings to place its memory or pin its vCPUs. The node keeps them with the VM.
+
+They are host configuration, not part of your app. They never reach the CVM, are not measured and are not part of the compose hash, so attestation does not cover them. Do not rely on them for security.
+
+### How do I set annotations?
+
+- At create: add an `annotations` map to the create request.
+- On an existing CVM: `PUT /cvms/{cvm_id}/annotations` with `{"annotations": {"memory_tier": "fast"}}`. This replaces all annotations, and `{}` clears them.
+- To read them: `GET /cvms/{cvm_id}/annotations`.
+
+Keys must not be empty. The node must run dstack VMM 0.6.1 or newer, or the request fails with `ERR-03-050`.
+
+Setting annotations does not restart the CVM. Some host tools read them only when the VM starts. For those, restart the CVM after you change them.
+
+### Do annotations follow the CVM?
+
+Phala Cloud keeps no copy of them. Only the node holds them:
+
+- A replica starts without annotations. Set them again on the replica.
+- A CVM moved to another node keeps whatever its VM settings on the node carry.
+- Other updates to the CVM never change them.
+
+## Other runners
+
+The runner is the program that starts your app inside the CVM. The default is `docker-compose`, and it is the only runner open to everyone. These two are available on request:
+
+- `nerdctl-compose` runs your Docker Compose YAML with nerdctl. It needs dstack OS 0.6.0 or newer. It cannot build images, so the YAML must not have `build:` sections. It is the only runner that accepts `snapshotter`.
+- `bash` runs the script in `bash_script` instead of Docker Compose YAML. There are no containers, so the CVM has no container list or container logs, and `docker_cleanup` is not available. If you turn on `requirements.health_check`, you must also set `requirements.health_status_file`.
+
+Set the runner in `compose_file.runner` when you create the CVM. It cannot change afterwards.
+
+## Raw app-compose input
+
+Raw app-compose input is available on request.
+
+Instead of `compose_file`, a create request can send `compose_file_raw`: a whole app-compose JSON file as one string. Send one or the other, not both.
+
+Phala Cloud reads the file with the same rules as `compose_file` and rejects fields it does not know. It then writes the compose the same way it writes any other. The bytes the CVM runs, and the compose hash, come from that output, not from the bytes you sent.
+
+After create, the CVM is like any other. Update it with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration).

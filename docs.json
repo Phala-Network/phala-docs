@@ -213,11 +213,14 @@
                   "/phala-cloud/cvm/create-with-private-docker-image",
                   "/phala-cloud/cvm/multi-replica-scaling",
                   "/phala-cloud/cvm/replicating-cvms",
+                  "/phala-cloud/cvm/launch-token",
+                  "/phala-cloud/cvm/advanced-settings",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
                   "/phala-cloud/cvm/image/overview",
                   "/phala-cloud/storage/access-database",
                   "/phala-cloud/update/upgrade-application",
-                  "/phala-cloud/update/resize-resource"
+                  "/phala-cloud/update/resize-resource",
+                  "/phala-cloud/update/update-cvm-configuration"
                 ]
               },
               {
