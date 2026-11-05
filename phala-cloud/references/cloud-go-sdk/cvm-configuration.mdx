@@ -6,10 +6,10 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 CVM configuration methods let you modify a running or stopped CVM without recreating it.
 
 <Warning>
-Some configuration updates require a CVM restart. Check the operation's options and response before applying changes to a running CVM.
+**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
 </Warning>
 
-Each `UpdateXxxx` method targets a single aspect of the CVM (compose file, resources, visibility, etc.). `PatchCVM` is the unified method that can update multiple fields in a single request — internally it calls `PATCH /cvms/{cvmId}`. Use `PatchCVM` when you need to change several settings atomically; use the individual `UpdateXxxx` methods when you only need to change one thing.
+`PatchCVM` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `UpdateCVMResources` and `UpdateCVMVisibility` send a subset of fields to the same endpoint. The other `UpdateXxxx` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.
 
 For CVMs using on-chain KMS, updates that affect the compose hash require an additional on-chain confirmation step.
 
@@ -110,28 +110,23 @@ func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *Upda
 |-------|------|-------------|
 | `VCPU` | `*int` | Number of vCPUs |
 | `Memory` | `*int` | Memory in MB |
-| `DiskSize` | `*int` | Disk size in GB |
+| `DiskSize` | `*int` | Disk size in GB. A disk cannot shrink. |
 | `InstanceType` | `*string` | Instance type override |
-| `AllowRestart` | `*bool` | Allow automatic restart if needed |
+| `AllowRestart` | `*bool` | Deprecated and not sent. The CVM restarts whenever a resize needs it. |
 
-**Returns:** `*UpdateResourcesResponse` with the operation status and correlation ID.
+**Returns:** `*UpdateResourcesResponse`, an alias of `CVMUpdateResponse` (`Message`, `CorrelationID`, `Status`).
 
 ```go
-result, err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
-    VCPU:         phala.Int(4),
-    Memory:       phala.Int(8192),
-    DiskSize:     phala.Int(50),
-    AllowRestart: phala.Bool(true),
+resp, err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
+	VCPU:     phala.Int(4),
+	Memory:   phala.Int(8192),
+	DiskSize: phala.Int(50),
 })
 if err != nil {
     log.Fatal(err)
 }
 fmt.Println(result.CorrelationID)
 ```
-
-<Note>
-Resource changes may require a CVM restart. Set `AllowRestart` to `true` if you want the restart to happen automatically.
-</Note>
 
 ---
 
@@ -142,7 +137,7 @@ Resource changes may require a CVM restart. Set `AllowRestart` to `true` if you 
 Controls which information about a CVM is publicly accessible. All fields are optional.
 
 ```go
-func (c *Client) UpdateCVMVisibility(ctx context.Context, cvmID string, req *UpdateVisibilityRequest) (*CVMVisibility, error)
+func (c *Client) UpdateCVMVisibility(ctx context.Context, cvmID string, req *UpdateVisibilityRequest) (*CVMUpdateResponse, error)
 ```
 
 **UpdateVisibilityRequest fields:**
@@ -153,16 +148,30 @@ func (c *Client) UpdateCVMVisibility(ctx context.Context, cvmID string, req *Upd
 | `PublicLogs` | `*bool` | Make logs public |
 | `PublicTcbinfo` | `*bool` | Make TCB info public |
 
-**Returns:** `*CVMVisibility` with the updated visibility settings.
+**Returns:** `*CVMUpdateResponse` (`Message`, `CorrelationID`, `Status`). `Status` is `"no_change"` with an empty `CorrelationID` when the settings already match.
+
+These settings are part of the compose hash. For a CVM on Onchain KMS, the API answers HTTP 465 until the new hash is registered on-chain. Use [`PatchCVM`](#patchcvm), which returns the hash to register.
 
 ```go
-visibility, err := client.UpdateCVMVisibility(ctx, "my-app", &phala.UpdateVisibilityRequest{
-    PublicSysinfo: phala.Bool(true),
-    PublicLogs:    phala.Bool(true),
+resp, err := client.UpdateCVMVisibility(ctx, "my-app", &phala.UpdateVisibilityRequest{
+	PublicSysinfo: phala.Bool(true),
+	PublicLogs:    phala.Bool(true),
 })
 if err != nil {
     log.Fatal(err)
 }
+```
+
+---
+
+## UpdateCVMListed
+
+`PATCH /cvms/{cvmId}/listed`
+
+Sets whether the app is listed on the public Trust Center. The listing applies to every CVM of the app. It only changes a record in Phala Cloud: no compose change and no restart.
+
+```go
+func (c *Client) UpdateCVMListed(ctx context.Context, cvmID string, listed bool) error
 ```
 
 ---
@@ -227,7 +236,9 @@ err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
 
 `PATCH /cvms/{cvmId}`
 
-Applies a multi-field update to a CVM in a single request. This is the most flexible update method — you can change compose, resources, visibility, and more in one call.
+Applies a multi-field update to a CVM in a single request. You can change compose, resources, visibility, and more in one call.
+
+`PatchCVM` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly. To change the Trust Center listing, use [`UpdateCVMListed`](#updatecvmlisted).
 
 ```go
 func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMRequest) (*PatchCVMResponse, error)
@@ -244,18 +255,19 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `PublicSysinfo` | `*bool` | Make system info public |
 | `PublicLogs` | `*bool` | Make logs public |
 | `PublicTcbinfo` | `*bool` | Make TCB info public |
-| `SecureTime` | `*bool` | Enable/disable secure time |
-| `Listed` | `*bool` | Publicly listed |
+| `UserConfig` | `*string` | User configuration string |
+| `GPUs` | `*GPUConfig` | GPU assignment: `GPUs []GPUSpec{Slot, ProductID}` and `AttachMode`. `AttachMode` `"all"` attaches every GPU on the node. |
 | `VCPU` | `*int` | Number of vCPUs |
 | `Memory` | `*int` | Memory in MB |
 | `DiskSize` | `*int` | Disk size in GB |
 | `InstanceType` | `*string` | Instance type |
-| `OSImageName` | `*string` | OS image name |
-| `AllowRestart` | `*bool` | Allow automatic restart |
+| `Image` | `*string` | OS image name or slug, as listed by `GetAvailableOSImages` |
+| `OSImageName` | `*string` | Deprecated. Sent as `image`; an error if it differs from `Image`. |
+| `ShutdownTimeout` | `*int` | Seconds to wait for a clean shutdown (10 to 1200) |
+| `AllowForceStop` | `*bool` | Skip the clean shutdown and stop the CVM at once |
+| `PrepareOnly` | `bool` | Sent as the `X-Prepare-Only: true` header. On Onchain KMS, the response then carries a commit token for multisig approval. |
 
-A nil `AllowedEnvs` slice omits the field; an explicitly empty slice sends `[]` to clear it.
-
-**Returns:** `*PatchCVMResponse` — check `RequiresOnChainHash` to see if on-chain confirmation is needed.
+**Returns:** `*PatchCVMResponse`. A 465 answer is not an error: `RequiresOnChainHash` is `true` and the response carries `ComposeHash`, `AppID`, `DeviceID` and `KMSInfo`, plus `CommitToken`, `CommitURL`, `APICommitURL` and `OnchainStatus` with `PrepareOnly`. Otherwise it carries `CorrelationID` and `Status`.
 
 ```go
 compose := "services:\n  app:\n    image: nginx:latest\n"

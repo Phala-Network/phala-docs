@@ -4,16 +4,16 @@ description: Functions for updating CVM resources, visibility, OS images, and co
 ---
 
 <Warning>
-Some configuration updates restart the CVM. An unchanged compose update can be a no-op, and SSH key changes can remain pending until the next power-on. Check each operation's behavior before updating a running CVM.
+**Every configuration update restarts the CVM.** The CVM is stopped, updated, and started again. The only exception is a compose change that matches what the CVM already runs: the API answers `no_change` and does nothing.
 </Warning>
 
-Each `updateXxxx` method targets a single aspect of the CVM. `patchCvm` is the unified method that can update multiple fields in a single request. Use `patchCvm` when you need to change several settings atomically; use the individual `updateXxxx` methods when you only need to change one thing.
+`patchCvm` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `updateCvmResources` and `updateCvmVisibility` send a subset of fields to the same endpoint. The other `updateXxxx` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.
 
 ## updateCvmResources
 
 `PATCH /cvms/{cvmId}`
 
-Updates CVM compute resources (vCPU, memory, disk).
+Updates CVM compute resources (vCPU, memory, disk, instance type). It sends only these four fields.
 
 **Parameters:**
 
@@ -22,9 +22,11 @@ Updates CVM compute resources (vCPU, memory, disk).
 | `id` | `string` | Yes | CVM identifier |
 | `vcpu` | `number` | No | Number of vCPUs |
 | `memory` | `number` | No | Memory in MB |
-| `disk_size` | `number` | No | Disk size in GB |
+| `disk_size` | `number` | No | Disk size in GB. A disk cannot shrink. |
+| `instance_type` | `string` | No | Instance type, for example `tdx.medium` |
+| `allow_restart` | `boolean` | No | Deprecated and not sent. The CVM restarts whenever a resize needs it. |
 
-**Returns:** Updated CVM details.
+**Returns:** `{ message, correlation_id, status }`. `correlation_id` tracks the update.
 
 **Example:**
 
@@ -43,16 +45,22 @@ await client.updateCvmResources({
 
 `PATCH /cvms/{cvmId}`
 
-Updates CVM visibility settings (public listing, public TCB info).
+Sets what the public can see about the CVM: system info, logs and TCB info.
 
 **Parameters:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `string` | Yes | CVM identifier |
-| `listed` | `boolean` | No | List in public directory |
+| `public_sysinfo` | `boolean` | Yes | Make system info public |
+| `public_logs` | `boolean` | Yes | Make container logs public |
+| `public_tcbinfo` | `boolean` | No | Make TCB info public |
 
-**Returns:** Updated CVM details.
+**Returns:** `{ message, correlation_id, status }`. `status` is `"in_progress"`, or `"no_change"` with an empty `correlation_id` when the settings already match.
+
+These settings are part of the compose hash. For a CVM on Onchain KMS, the request fails with HTTP 465 until the new hash is registered on-chain. Register it and call again, or use [`patchCvm`](#patchcvm), which returns the hash to register and supports `prepareOnly`.
+
+The Trust Center listing is not a visibility setting. Change it with `PATCH /cvms/{cvmId}/listed`.
 
 ---
 
@@ -93,9 +101,9 @@ Updates the OS image for a CVM. The CVM will restart with the new image.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `string` | Yes | CVM identifier |
-| `image` | `string` | Yes | OS image name |
+| `os_image_name` | `string` | Yes | OS image name |
 
-**Returns:** Updated CVM details.
+**Returns:** Nothing. The API accepts the update with `202` and no body.
 
 ---
 
@@ -230,7 +238,9 @@ Commits a compose file update — the second phase. For on-chain KMS, the `compo
 
 `PATCH /cvms/{cvmId}`
 
-Applies partial updates to a CVM via the unified PATCH endpoint. Only fields present in the request body are applied, giving you true PATCH semantics. You can update compose files, environment variables, resources, visibility, and OS images all in a single call.
+Applies partial updates to a CVM via the unified PATCH endpoint. Only fields present in the request body are applied. You can update compose files, environment variables, resources, visibility, and OS images all in a single call.
+
+`patchCvm` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly.
 
 For CVMs with on-chain KMS (ETHEREUM/BASE), any change that affects the compose hash triggers a two-phase flow. The first call returns `{ requiresOnChainHash: true, composeHash, ... }` with the hash you need to register on-chain. After registration, call [`confirmCvmPatch`](#confirmcvmpatch) with the transaction proof.
 
@@ -247,14 +257,15 @@ For CVMs with on-chain KMS (ETHEREUM/BASE), any change that affects the compose 
 | `public_tcbinfo` | `boolean` | No | Make TCB info public |
 | `encrypted_env` | `string` | No | Hex-encoded encrypted env vars |
 | `user_config` | `string` | No | User configuration string |
-| `gpus` | `object` | No | GPU config: `{ count, product_name? }` |
+| `gpus` | `object` | No | GPU assignment: `{ gpus: [{ slot, product_id? }], attach_mode? }`. `attach_mode: "all"` attaches every GPU on the node instead of the listed slots. |
 | `vcpu` | `number` | No | Number of vCPUs |
 | `memory` | `number` | No | Memory in MB |
 | `disk_size` | `number` | No | Disk size in GB |
+| `instance_type` | `string` | No | Instance type, for example `tdx.medium` |
 | `image` | `string` | No | OS image name |
-| `shutdown_timeout` | `number` | No | Shutdown timeout in seconds |
-| `allow_force_stop` | `boolean` | No | Allow force stop on timeout |
-| `prepareOnly` | `boolean` | No | Prepare-only mode for multisig workflows |
+| `shutdown_timeout` | `number` | No | Seconds to wait for a clean shutdown (10 to 1200) |
+| `allow_force_stop` | `boolean` | No | Skip the clean shutdown and stop the CVM at once |
+| `prepareOnly` | `boolean` | No | Sent as the `X-Prepare-Only: true` header. On Onchain KMS, the hash-required result then carries a commit token for multisig approval. |
 
 **Returns:** Discriminated union on `requiresOnChainHash`:
 
@@ -275,7 +286,8 @@ For CVMs with on-chain KMS (ETHEREUM/BASE), any change that affects the compose 
 | `deviceId` | `string` | Device ID |
 | `kmsInfo` | `KmsInfo` | KMS details for chain interaction |
 | `commitToken` | `string?` | One-time token for multisig commit |
-| `commitUrl` | `string?` | Commit URL |
+| `commitUrl` | `string?` | Dashboard page where the update can be committed |
+| `apiCommitUrl` | `string?` | API URL for [`commitCvmUpdate`](#commitcvmupdate) |
 | `onchainStatus` | `object?` | Current on-chain allowance status |
 
 **Example — simple update (PHALA KMS):**
