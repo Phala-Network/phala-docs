@@ -1,0 +1,188 @@
+---
+title: Audio Transcription
+description: Transcribe audio with multipart uploads and billing per started second through the attested gateway.
+api: "POST /audio/transcriptions"
+playground: "simple"
+---
+
+## Endpoint
+
+```bash
+POST https://inference.phala.com/v1/audio/transcriptions
+```
+
+Transcribe an audio file using `multipart/form-data`. Responses are buffered JSON with an `x-receipt-id` header for verification.
+
+## Models and Pricing
+
+The live [model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) lists transcription models with `transcription` in `output_modalities` and USD-per-second rates in `pricing.audio_transcription`.
+
+| Model ID | Provider | Response formats | Current price per second |
+| --- | --- | --- | --- |
+| `openai/whisper-large-v3` | NEAR AI | `json`, `verbose_json` | $0.0001 |
+| `mistralai/voxtral-small-24b-2507` | Tinfoil | `json` only | $0.00005 |
+
+Check the catalog for current availability and pricing. Audio is billed per started second: `2.965` seconds is billed as `3` seconds.
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Transcription model ID: `openai/whisper-large-v3` or `mistralai/voxtral-small-24b-2507`.
+</ParamField>
+
+<ParamField body="file" type="file" required>
+  Exactly one nonempty file, up to 25 MiB (26,214,400 bytes). The filename must include a supported extension: `flac`, `mp3`, `mp4`, `mpeg`, `mpga`, `m4a`, `ogg`, `wav`, or `webm`.
+</ParamField>
+
+<ParamField body="language" type="string">
+  Language code of 2–3 lowercase ASCII letters, for example `en`.
+</ParamField>
+
+<ParamField body="prompt" type="string">
+  Optional context for transcription, up to 4,096 Unicode characters.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature from `0` through `1`.
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  `json` by default. Whisper also accepts `verbose_json`; Voxtral supports `json` only and returns `400 invalid_request_error` for `verbose_json`. Text and subtitle formats are not supported.
+</ParamField>
+
+<ParamField body="timestamp_granularities[]" type="string[]">
+  Accepted values are `word` and/or `segment`, once each, with Whisper and `response_format=verbose_json`. Repeat the form field for both. The spelling `timestamp_granularities` is also accepted; do not mix spellings. Word-level timestamps are not returned; segments can be absent.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Omit this field or send the literal form value `false`. Streaming is not supported; other values return `400`.
+</ParamField>
+
+<ParamField body="user" type="string">
+  Accepted for SDK compatibility but removed before forwarding upstream.
+</ParamField>
+
+Duplicate scalar fields, malformed multipart, and invalid UTF-8 text return `400`. Unknown form fields, including `provider`, `chunking_strategy`, `include[]`, and speaker fields, return `400 unknown_parameter`. ACI E2EE is not supported on this endpoint. The upload must complete within 60 seconds; oversized files or request bodies return `413`.
+
+## Routing Constraints
+
+The Phala TEE-only endpoint requires verified serving for audio requests. A `provider` form field is not accepted.
+
+<ParamField header="X-ACI-Provider" type="string">
+  Optional JSON object with the same routing constraints as the JSON [provider field](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions#param-provider), for example `{"aci_verified":true}`. The gateway consumes this header and does not forward it upstream. The header must appear once, contain only ASCII bytes, and be at most 8,192 bytes.
+</ParamField>
+
+Before sending explicit multipart constraints, verify the gateway and confirm that its attestation report lists `/v1/audio/transcriptions` in `service_capabilities.supported_multipart_constraint_endpoints`. Refuse the upload if support is absent. Session pins must intersect locally accepted sessions; verify the receipt's cited session against the effective policy. Receipt body hashes do not commit to this header. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
+
+## Examples
+
+Let the client set the multipart `Content-Type` boundary. Node SDK uploads need an explicit filename: `toFile(buf)` alone uses `unknown_file`, which has no supported extension and returns `400 invalid_parameter` with `param: file`.
+
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body --silent --show-error \
+  https://inference.phala.com/v1/audio/transcriptions \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -D audio-headers.txt \
+  -F 'model=openai/whisper-large-v3' \
+  -F 'file=@audio.wav' \
+  -F 'response_format=json'
+```
+
+```python Python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com/v1",
+)
+
+with open("audio.wav", "rb") as audio:
+    response = client.audio.transcriptions.create(
+        model="openai/whisper-large-v3",
+        file=audio,
+        response_format="json",
+    )
+print(response.text)
+```
+
+```typescript TypeScript
+import { readFile } from "node:fs/promises";
+import OpenAI, { toFile } from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.PHALA_AI_API_KEY,
+  baseURL: "https://inference.phala.com/v1",
+});
+
+const buf = await readFile("audio.wav");
+const response = await client.audio.transcriptions.create({
+  model: "openai/whisper-large-v3",
+  file: await toFile(buf, "audio.wav"),
+  response_format: "json",
+});
+console.log(response.text);
+```
+
+```bash Private AI Proxy
+pap curl https://inference.phala.com/v1/audio/transcriptions -- \
+  --fail-with-body --silent --show-error \
+  -H @auth-headers.txt \
+  -D audio-headers.txt \
+  -F 'model=openai/whisper-large-v3' \
+  -F 'file=@audio.wav' \
+  -F 'response_format=json'
+```
+
+</CodeGroup>
+
+For Voxtral, replace the model with `mistralai/voxtral-small-24b-2507` and keep `response_format=json`.
+
+For the [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) example, create `auth-headers.txt` containing `Authorization: Bearer <API_KEY>`, restrict its permissions to your user, and remove it after use. No manual `X-ACI-Provider` header is needed for this request on the Phala TEE-only endpoint. `pap curl` verifies the gateway and pins its TLS channel; it does not audit response receipts. Use `pap serve` or an ACI verifier SDK for receipt audits. Ordinary cURL and OpenAI SDK clients do not verify the gateway or audit receipts.
+
+## Response
+
+Example JSON response for three billable seconds of Whisper audio at the current rate:
+
+```json
+{
+  "text": "Hello, world.",
+  "usage": { "type": "duration", "seconds": 3, "cost": 0.0003 }
+}
+```
+
+`json` returns `text`, `usage`, and optional `languages: [{"code":"en"}]`. Whisper's `verbose_json` response includes `duration` and `language` alongside `text` and `usage`. Word-level timestamps are not returned. With `verbose_json`, Whisper responses may include `segments`; they can be absent. A segment's `no_speech_prob` field may also be missing.
+
+`usage.seconds` is an integer rounded up to the next whole second; verbose `duration` retains the raw value. The gateway adds `usage.cost` in USD when audio pricing is available: billable seconds times the model's `pricing.audio_transcription` rate. Without a valid duration, the transcript is withheld with `502` and no audio is billed.
+
+## Verification
+
+Capture `x-receipt-id` and fetch `GET /v1/aci/receipts/{id}` with the same bearer token. Audio receipts have `chat_id: null`; use the receipt ID. See [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
+
+## Errors
+
+Errors use a JSON `error` object, with `error.code` and `error.param` where applicable.
+
+| Status | Error field | Condition |
+| --- | --- | --- |
+| 400 | `code: unknown_parameter` | Unrecognized form field; `param` names the field. |
+| 400 | `code: invalid_parameter` | Missing or invalid required fields, filename extension, response format, timestamp options, duplicate scalar fields, invalid UTF-8, malformed multipart, or exceeded multipart metadata limits. |
+| 400 | `type: invalid_request_error`, `code: null`, `param: null` | Voxtral with `verbose_json`: `Currently do not support verbose_json for voxtral-small-24b`. |
+| 400 | `type: invalid_request_error` | Invalid or duplicate `X-ACI-Provider` header, including malformed constraints. |
+| 400 | `type: e2ee_unsupported_endpoint` | E2EE headers are present. |
+| 404 | `type: model_not_found` | No eligible route supports transcription for the model. |
+| 408 | `code: upload_timeout` | Upload exceeds the 60-second deadline; the connection closes. |
+| 413 | `code: request_too_large` | File or whole-body limit exceeded; the connection closes. |
+| 429 | `type: rate_limit_error`, `code: rate_limit_exceeded` | Capacity is full or a rate limit is reached; respect `Retry-After` when present. |
+| 502 | `type: upstream_error` | Upstream failure, response over 8 MiB, missing string `text`, or invalid duration. |
+
+Authentication, budget, and other routing errors follow [Error Handling](/phala-cloud/confidential-ai/confidential-model/error-handling).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="List Models" icon="list" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models" />
+  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
+</CardGroup>

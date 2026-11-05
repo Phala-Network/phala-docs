@@ -1,0 +1,172 @@
+---
+title: Images
+description: Generate images with inline base64 output and per-image billing through the attested gateway.
+api: "POST /images/generations"
+---
+
+## Endpoint
+
+```bash
+POST https://inference.phala.com/v1/images/generations
+```
+
+Generate images from a text prompt. Responses are buffered JSON with inline base64 image data and an `x-receipt-id` header for verification.
+
+## Models and Pricing
+
+The live [model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) lists image models with `image` in `output_modalities`. It currently offers `black-forest-labs/flux.2-klein-4b` at **$0.015 per returned image**, published as `pricing.image_generation` in USD per image. Check the catalog for current availability and pricing.
+
+## Request Body
+
+<ParamField body="model" type="string" required>
+  Image model ID, for example `black-forest-labs/flux.2-klein-4b`.
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  Text describing the image, up to 32,000 Unicode characters.
+</ParamField>
+
+<ParamField body="n" type="integer">
+  Maximum number of images to generate, from `1` through `10`. Defaults to `1`. Providers may return fewer images; billing uses the returned count.
+</ParamField>
+
+<ParamField body="size" type="string">
+  Image dimensions, for example `512x512`, or `auto` if supported by the model.
+</ParamField>
+
+<ParamField body="quality" type="string">
+  Model-specific quality setting.
+</ParamField>
+
+<ParamField body="background" type="string">
+  Model-specific background setting.
+</ParamField>
+
+<ParamField body="output_format" type="string">
+  Requested image encoding, subject to model support. The current FLUX route returns JPEG bytes even when `png` is requested. Save its output as `.jpg`; do not infer the encoding from this parameter.
+</ParamField>
+
+<ParamField body="output_compression" type="integer">
+  Compression setting from `0` through `100`, if supported by the model and encoding.
+</ParamField>
+
+<ParamField body="moderation" type="string">
+  Model-specific moderation setting.
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  Omit this field or set it to `b64_json`. The gateway requests inline base64 output. Image URLs are not supported.
+</ParamField>
+
+<ParamField body="safety_identifier" type="string">
+  Accepted for SDK compatibility but removed before forwarding upstream.
+</ParamField>
+
+<ParamField body="provider" type="object">
+  The same routing constraints as [Chat Completions](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions#param-provider), including `zdr`, `aci_verified`, and `aci_session_ids`. The Phala endpoint requires verified serving independently of request-level constraints.
+</ParamField>
+
+The gateway validates option types; supported values and defaults depend on the model. `user` and `style` are accepted as strings but removed before forwarding. Unknown fields, including `seed`, are rejected. Omit `stream` and `partial_images` entirely, including `stream: false`. Streaming and ACI E2EE are not supported on this endpoint.
+
+## Examples
+
+Both examples save the first FLUX image as `image.jpg`. The cURL example also saves the raw response and headers, including the receipt ID.
+
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body --silent --show-error \
+  https://inference.phala.com/v1/images/generations \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -D image-headers.txt -o image-response.json \
+  -d '{
+    "model": "black-forest-labs/flux.2-klein-4b",
+    "prompt": "A blue circle on a white background.",
+    "size": "512x512"
+  }' && \
+python3 - <<'PY'
+import base64
+import json
+from pathlib import Path
+
+response = json.loads(Path("image-response.json").read_text())
+image = base64.b64decode(response["data"][0]["b64_json"], validate=True)
+Path("image.jpg").write_bytes(image)
+PY
+```
+
+```python Python
+import base64
+import os
+from pathlib import Path
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com/v1",
+)
+
+response = client.images.generate(
+    model="black-forest-labs/flux.2-klein-4b",
+    prompt="A blue circle on a white background.",
+    size="512x512",
+)
+if not response.data or not response.data[0].b64_json:
+    raise ValueError("The response did not contain an inline image")
+image = base64.b64decode(response.data[0].b64_json, validate=True)
+Path("image.jpg").write_bytes(image)
+```
+
+</CodeGroup>
+
+## Response
+
+Example for one FLUX image at the current rate. The base64 data is shortened.
+
+```json
+{
+  "created": 1793859850,
+  "data": [
+    { "b64_json": "/9j/4AAQSkZJRg..." }
+  ],
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "input_tokens_details": { "text_tokens": 0, "image_tokens": 0 },
+    "cost": 0.015
+  }
+}
+```
+
+`created` is a Unix timestamp in seconds. `data` is a nonempty array of images with `b64_json`; an item may also contain `revised_prompt` as a string or `null`. The current FLUX response does not include top-level `size` or `output_format` fields.
+
+When present, `usage` includes integer token counts, with missing counts filled with `0`. The gateway adds `usage.cost` in USD when pricing is available: returned image count times the per-image rate, plus token charges if token usage and rates are available. Zero token counts do not imply free image generation.
+
+## Verification
+
+Capture `x-receipt-id` from the response headers and fetch `GET /v1/aci/receipts/{id}` with the same bearer token. Image receipts have `chat_id: null`; use the receipt ID. See [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature). Ordinary cURL and OpenAI SDK clients do not verify the gateway or audit receipts.
+
+## Errors
+
+Errors use a JSON `error` object, with `error.code` and `error.param` where applicable.
+
+| Status | Error field | Condition |
+| --- | --- | --- |
+| 400 | `code: unknown_parameter` | Unrecognized field, such as `seed`; `param` names the field. |
+| 400 | `code: invalid_parameter` | Missing required strings, invalid option types or ranges, `n` outside `1`–`10` or not an integer, `response_format: "url"`, any `stream` or `partial_images` field, or a prompt over 32,000 characters. |
+| 400 | `type: invalid_request_error` | Invalid JSON or malformed routing constraints. |
+| 400 | `type: e2ee_unsupported_endpoint` | E2EE headers are present. |
+| 404 | `type: model_not_found` | No eligible route supports image generation for the model. |
+| 429 | `type: rate_limit_error`, `code: rate_limit_exceeded` | Capacity is full or a rate limit is reached; respect `Retry-After` when present. |
+| 502 | `type: upstream_error` | Upstream failure, buffered response over 64 MiB, or malformed response, including empty `data`, too many images, or missing inline image data. |
+
+Authentication, budget, and other routing errors follow [Error Handling](/phala-cloud/confidential-ai/confidential-model/error-handling).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="List Models" icon="list" href="/phala-cloud/confidential-ai/confidential-model/api-reference/models" />
+  <Card title="Get Receipt" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/api-reference/receipts" />
+</CardGroup>

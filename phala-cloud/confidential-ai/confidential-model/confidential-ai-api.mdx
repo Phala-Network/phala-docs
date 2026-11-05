@@ -140,6 +140,8 @@ The legacy [Signature](/phala-cloud/confidential-ai/confidential-model/api-refer
 
 Private AI usage is charged to your workspace Balance. The response's `usage.cost` reports the request charge in USD when present. Token prices are published in the live catalog. Cached input tokens are charged at `pricing.input_cache_read` when a model exposes that rate, otherwise at its normal prompt rate; see [Prompt Caching](/phala-cloud/confidential-ai/confidential-model/prompt-caching).
 
+[Image generation](/phala-cloud/confidential-ai/confidential-model/api-reference/images) is charged per returned image at the catalog's `pricing.image_generation` rate in USD per image. [Audio transcription](/phala-cloud/confidential-ai/confidential-model/api-reference/audio) is charged per started second of input audio at `pricing.audio_transcription` in USD per second: `2.965` seconds is billed as `3` seconds. Zero token counts do not imply that image or audio requests are free.
+
 ## Next Steps
 
 Use the API reference and feature guides for the next step:
