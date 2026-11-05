@@ -50,11 +50,11 @@ The single command maps to the following sequence, in order:
 For reference when reading CI/CD logs, the flow maps to these backend and on-chain calls in order:
 
 1. `GET /api/v1/cvms/<id>` — read existing CVM metadata.
-2. `POST /api/v1/cvms/<id>` (patch) — send new compose file and encrypted env. Backend returns new `composeHash`, `deviceId`, and `requiresOnChainHash: true`.
+2. `PATCH /api/v1/cvms/<id>` — send new compose file and encrypted env. When the new hash is not on the contract yet, the backend answers HTTP 465 with the new `compose_hash` and `device_id`. The CLI reports this as `requiresOnChainHash: true`.
 3. Read-only chain call — `DstackApp.allowedDeviceIds(deviceId)` and `DstackApp.allowedComposeHashes(composeHash)` batched through a single RPC.
 4. If needed, on-chain `DstackApp.addDevice(deviceId)` signed by `--private-key`.
 5. On-chain `DstackApp.addComposeHash(composeHash)` signed by `--private-key`. The CLI waits for one confirmation.
-6. `POST /api/v1/cvms/<id>/confirm-patch` — the backend verifies the receipt, re-reads the contract state, and rolls the CVM onto the new compose.
+6. `PATCH /api/v1/cvms/<id>` again, with the `X-Compose-Hash` and `X-Transaction-Hash` headers — the backend verifies the receipt, re-reads the contract state, and rolls the CVM onto the new compose.
 
 ## What Changes and What Does Not
 
