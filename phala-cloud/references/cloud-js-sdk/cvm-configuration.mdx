@@ -242,7 +242,7 @@ Applies partial updates to a CVM via the unified PATCH endpoint. Only fields pre
 
 `patchCvm` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly.
 
-For CVMs with on-chain KMS (ETHEREUM/BASE), any change that affects the compose hash triggers a two-phase flow. The first call returns `{ requiresOnChainHash: true, composeHash, ... }` with the hash you need to register on-chain. After registration, call [`confirmCvmPatch`](#confirmcvmpatch) with the transaction proof.
+For CVMs with on-chain KMS (ETHEREUM/BASE), a change to the compose needs a second step only when the new compose hash is not on the app contract yet. The API then answers HTTP 465, and `patchCvm` returns `{ requiresOnChainHash: true, composeHash, ... }` with the hash to register. After registration, call [`confirmCvmPatch`](#confirmcvmpatch) with the transaction proof. If the hash is already allowed, or the patch does not change the compose (for example a resize), the update starts at once and you get `correlationId`. `prepareOnly` is not a dry run: an update that needs no registration starts right away.
 
 **Parameters:**
 

@@ -26,7 +26,7 @@ Updates the Docker Compose configuration for a CVM. If the CVM has on-chain hash
 | `compose_hash` | `str` | No | On-chain compose hash (if required) |
 | `transaction_hash` | `str` | No | On-chain transaction hash (if required) |
 
-**Returns:** `InProgressResponse` on success, or `ComposeHashPreconditionResponse` if on-chain verification is needed.
+**Returns:** A `CloudModel` with the API response when the update is accepted. For an on-chain KMS CVM whose new compose hash is not registered yet, the API answers HTTP 465 and the method returns a `CloudModel` with `status="precondition_required"` and `compose_hash`, `app_id`, `device_id` and `kms_info`, instead of raising. The sync and async clients behave the same.
 
 **Example:**
 
@@ -92,8 +92,8 @@ pubkey_resp = client.get_app_env_encrypt_pub_key({
 })
 
 encrypted = encrypt_env_vars(
-    env_vars=[{"key": "SECRET", "value": "my-secret"}],
-    public_key=pubkey_resp.app_env_encrypt_pubkey,
+    envs=[{"key": "SECRET", "value": "my-secret"}],
+    public_key_hex=pubkey_resp.public_key,
 )
 
 client.update_cvm_envs({

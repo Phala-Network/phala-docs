@@ -38,12 +38,16 @@ func (c *Client) UpdateDockerCompose(ctx context.Context, cvmID, compose string,
 | `ComposeHash` | `string` | Compose hash for on-chain verification (sent as `X-Compose-Hash`) |
 | `TransactionHash` | `string` | On-chain transaction hash (sent as `X-Transaction-Hash`) |
 
-**Returns:** `*UpdateResult` which may indicate that on-chain confirmation is needed.
+**Returns:** `*UpdateResult` when the update is accepted. For an on-chain KMS CVM whose new compose hash is not registered yet, the API answers HTTP 465 and the method returns an `*APIError`. Call `ComposePrecondition()` on it to read the compose hash to register, then call again with `opts`.
 
 ```go
 result, err := client.UpdateDockerCompose(ctx, "my-app", composeYAML, nil)
-if err != nil {
-    log.Fatal(err)
+var apiErr *phala.APIError
+if errors.As(err, &apiErr) && apiErr.IsComposePrecondition() {
+	precondition, _ := apiErr.ComposePrecondition()
+	fmt.Println("Register compose hash:", precondition.ComposeHash)
+} else if err != nil {
+	log.Fatal(err)
 }
 ```
 
