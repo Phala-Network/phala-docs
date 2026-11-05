@@ -7,6 +7,8 @@ api: "GET https://inference.phala.com/v1/aci/receipts/{id}"
 import SharedContent from "/snippets/aci/api-receipts.mdx";
 import { site } from "/snippets/site.jsx";
 
+`https://inference.phala.com/v1` is a TEE-only endpoint, so its inference streams are never
+early-committed and always return `x-receipt-id`.
 
 <SharedContent site={site} />
 
