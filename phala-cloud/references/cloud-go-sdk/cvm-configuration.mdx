@@ -44,10 +44,10 @@ func (c *Client) UpdateDockerCompose(ctx context.Context, cvmID, compose string,
 result, err := client.UpdateDockerCompose(ctx, "my-app", composeYAML, nil)
 var apiErr *phala.APIError
 if errors.As(err, &apiErr) && apiErr.IsComposePrecondition() {
-	precondition, _ := apiErr.ComposePrecondition()
-	fmt.Println("Register compose hash:", precondition.ComposeHash)
+    precondition, _ := apiErr.ComposePrecondition()
+    fmt.Println("Register compose hash:", precondition.ComposeHash)
 } else if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -122,14 +122,14 @@ func (c *Client) UpdateCVMResources(ctx context.Context, cvmID string, req *Upda
 
 ```go
 resp, err := client.UpdateCVMResources(ctx, "my-app", &phala.UpdateResourcesRequest{
-	VCPU:     phala.Int(4),
-	Memory:   phala.Int(8192),
-	DiskSize: phala.Int(50),
+    VCPU:     phala.Int(4),
+    Memory:   phala.Int(8192),
+    DiskSize: phala.Int(50),
 })
 if err != nil {
     log.Fatal(err)
 }
-fmt.Println(result.CorrelationID)
+fmt.Println(resp.CorrelationID)
 ```
 
 ---
@@ -158,8 +158,8 @@ These settings are part of the compose hash. For a CVM on Onchain KMS, the API a
 
 ```go
 resp, err := client.UpdateCVMVisibility(ctx, "my-app", &phala.UpdateVisibilityRequest{
-	PublicSysinfo: phala.Bool(true),
-	PublicLogs:    phala.Bool(true),
+    PublicSysinfo: phala.Bool(true),
+    PublicLogs:    phala.Bool(true),
 })
 if err != nil {
     log.Fatal(err)
@@ -274,17 +274,19 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `AllowForceStop` | `*bool` | Skip the clean shutdown and stop the CVM at once |
 | `PrepareOnly` | `bool` | Sent as the `X-Prepare-Only: true` header. When the API answers 465 (the new compose hash is not on the app contract yet), the response also carries a commit token for multisig approval. It is not a dry run: if no on-chain registration is needed, the update starts. |
 
+A nil `AllowedEnvs` slice omits the field; an explicitly empty slice sends `[]` to clear it.
+
 **Returns:** `*PatchCVMResponse`. A 465 answer is not an error: `RequiresOnChainHash` is `true` and the response carries `ComposeHash`, `AppID`, `DeviceID` and `KMSInfo`, plus `CommitToken`, `CommitURL`, `APICommitURL` and `OnchainStatus` with `PrepareOnly`. Otherwise it carries `CorrelationID` and `Status`; `Status` is `"no_change"` with an empty `CorrelationID` when nothing had to change.
 
 ```go
 compose := "services:\n  app:\n    image: nginx:latest\n"
 resp, err := client.PatchCVM(ctx, "my-app", &phala.PatchCVMRequest{
-	DockerComposeFile: &compose,
-	PublicSysinfo:     phala.Bool(true),
-	VCPU:              phala.Int(4),
-	Compose: &phala.ComposePatch{
-		SwapSize: phala.PatchValue("2G"),
-	},
+    DockerComposeFile: &compose,
+    PublicSysinfo:     phala.Bool(true),
+    VCPU:              phala.Int(4),
+    Compose: &phala.ComposePatch{
+        SwapSize: phala.PatchValue("2G"),
+    },
 })
 if err != nil {
     log.Fatal(err)
