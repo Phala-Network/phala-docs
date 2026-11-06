@@ -181,7 +181,7 @@ Each `PATCH /cvms/{cvm_id}` restarts a running CVM. To collect several changes, 
 
 Compose changes are applied in the order you staged them. For other fields, such as `vcpu` or `encrypted_env`, the last staged value wins. Phala Cloud checks the compose that the staged changes produce each time you stage one, so a compose change the update would reject is refused right away.
 
-Once an apply starts the update, or answers `no_change`, the staged changes are cleared. To throw them away instead, call `DELETE /cvms/{cvm_id}/draft`. Staged changes are kept for 14 days after the last change. A CVM with nothing staged answers `404` with `ERR-03-052`.
+Once an apply starts the update, or answers `no_change`, the staged changes it applied are cleared. A change someone stages while the apply runs stays staged. The CVM has moved by then, so applying it fails with `ERR-03-053`: discard it, or apply it again with the current hash. To throw them away instead, call `DELETE /cvms/{cvm_id}/draft`. Staged changes are kept for 14 days after the last change. A CVM with nothing staged answers `404` with `ERR-03-052`.
 
 ### What if the CVM changed after I staged?
 
@@ -193,7 +193,7 @@ Check the staged changes against the CVM as it is now. If you still want them, a
 { "base_compose_hash": "<current_compose_hash>" }
 ```
 
-If someone else stages or discards a change at the same moment as you, your request fails with `409` and `ERR-03-054`. Load the staged changes again and retry.
+If your stage or discard request conflicts with another write to the staged changes, it fails with `409` and `ERR-03-054`. Load the staged changes again and retry.
 
 ### How does apply work on Onchain KMS?
 
