@@ -91,6 +91,20 @@ The runner is the program that starts your app inside the CVM. The default is `d
 
 Set the runner in `compose_file.runner` when you create the CVM. It cannot change afterwards.
 
+### Why does my bash CVM stay in processing?
+
+Because your script has not exited. The CVM runs `bash_script` in the foreground and finishes booting only after the script returns. Until then, the CVM stays in `processing` with the boot step "running main script", and it never reaches `running`. A script such as `while true; do sleep 300; done` keeps the CVM booting forever.
+
+Start long-running work in the background and let the script return:
+
+```bash
+(my-server --port 8080) >/dev/null 2>&1 &
+```
+
+A bash CVM has no containers, so `phala ps` lists none and there are no container logs. The script's output is in the CVM's service journal.
+
+The Python and Go SDKs cannot send `compose.bash_script` yet; use the API or the JavaScript SDK.
+
 ## Raw app-compose input
 
 Raw app-compose input sits behind the same feature flag as the other runners. Without it, the create request fails with `ERR-03-045`.

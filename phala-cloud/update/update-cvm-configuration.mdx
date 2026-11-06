@@ -205,6 +205,6 @@ If you finish a prepared apply with `POST /cvms/{cvm_id}/commit-update`, the sta
 
 ## Can I use the SDKs or the CLI?
 
-The [JavaScript](/phala-cloud/references/cloud-js-sdk/cvm-configuration#patchcvm), [Python](/phala-cloud/references/cloud-python-sdk/cvm-configuration#patch_cvm) and [Go](/phala-cloud/references/cloud-go-sdk/cvm-configuration#patchcvm) SDKs send this request, including `compose`, `init_scripts` and `confirm_data_wipe`, and handle the `465` answer for you. The Python and Go SDKs cannot send `compose.bash_script` yet, and no SDK has methods for staged changes yet. For those, call the API directly.
+The [JavaScript](/phala-cloud/references/cloud-js-sdk/cvm-configuration#patchcvm), [Python](/phala-cloud/references/cloud-python-sdk/cvm-configuration#patch_cvm) and [Go](/phala-cloud/references/cloud-go-sdk/cvm-configuration#patchcvm) SDKs send this request, including `compose`, `init_scripts` and `confirm_data_wipe`, and handle the `465` answer for you. No SDK has methods for staged changes yet; call the API directly. The Python and Go SDKs cannot send `compose.bash_script` yet.
 
 The CLI updates a CVM with [`phala deploy --cvm-id`](/phala-cloud/phala-cloud-cli/deploy). Flags such as `--init-script`, `--clear-init-scripts`, `--launch-token-hash`, `--gateway`, `--ephemeral-data-disk`, `--event-log-version` and `--confirm-data-wipe` map to the fields on this page. Flags that set how a CVM is created, such as `--kms`, `--fs` or `--name`, fail on an update instead of being ignored.
