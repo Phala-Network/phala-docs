@@ -3,7 +3,7 @@ title: Advanced CVM Settings
 description: Init scripts, ephemeral data disks, annotations, other runners and raw app-compose input for CVMs created or updated through the API.
 ---
 
-These settings are set through the API, on the create request (`POST /cvms`) or with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration). Some of them are available on request: [contact support](/phala-cloud/support) to turn them on for your workspace.
+These settings are set through the API, on the create request (`POST /cvms`) or with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration), or with the matching [`phala deploy`](/phala-cloud/phala-cloud-cli/deploy) flags. Some of them sit behind a feature flag and are available on request: [contact support](/phala-cloud/support) to turn them on for your workspace.
 
 ## Init scripts
 
@@ -57,7 +57,7 @@ Without `confirm_data_wipe`, the update fails with `ERR-03-048`. Turning it off 
 
 ## Annotations
 
-Annotations are available on request.
+Annotations sit behind a feature flag and are available on request. Without it, every annotations request, and a create request that carries annotations, fails with `403` and `ERR-03-049`.
 
 Annotations are key/value labels for tools on the host, for example a wrapper that reads the VM's settings to place its memory or pin its vCPUs. The node keeps them with the VM.
 
@@ -68,6 +68,7 @@ They are host configuration, not part of your app. They never reach the CVM, are
 - At create: add an `annotations` map to the create request.
 - On an existing CVM: `PUT /cvms/{cvm_id}/annotations` with `{"annotations": {"memory_tier": "fast"}}`. This replaces all annotations. To clear them, send `{"annotations": {}}`.
 - To read them: `GET /cvms/{cvm_id}/annotations`.
+- From the CLI: [`phala annotations`](/phala-cloud/phala-cloud-cli/annotations) shows them, and `phala annotations <cvm-id> memory_tier=fast` sets a key and keeps the others.
 
 Keys must not be empty. The node must run dstack VMM 0.6.1 or newer, or the request fails with `ERR-03-050`.
 
@@ -83,16 +84,16 @@ Phala Cloud does not keep annotations as part of the CVM's state and never resto
 
 ## Other runners
 
-The runner is the program that starts your app inside the CVM. The default is `docker-compose`, and it is the only runner open to everyone. These two are available on request:
+The runner is the program that starts your app inside the CVM. The default is `docker-compose`, and it is the only runner open to everyone. These two sit behind a feature flag and are available on request. Without it, a create request that picks one fails with `ERR-03-045`.
 
 - `nerdctl-compose` runs your Docker Compose YAML with nerdctl. It needs dstack OS 0.6.0 or newer. It cannot build images, so the YAML must not have `build:` sections. It is the only runner that accepts `snapshotter`.
-- `bash` runs the script in `bash_script` instead of Docker Compose YAML. There are no containers, so the CVM has no container list or container logs, and `docker_cleanup` is not available. If you turn on `requirements.health_check`, you must also set `requirements.health_status_file`.
+- `bash` runs the script in `bash_script` instead of Docker Compose YAML. There are no containers, so the CVM has no container list or container logs, and `docker_cleanup` is not available. If you turn on `requirements.health_check`, you must also set `requirements.health_status_file`. To change the script later, send `{"compose": {"bash_script": "..."}}` with `PATCH /cvms/{cvm_id}`.
 
 Set the runner in `compose_file.runner` when you create the CVM. It cannot change afterwards.
 
 ## Raw app-compose input
 
-Raw app-compose input is available on request.
+Raw app-compose input sits behind the same feature flag as the other runners. Without it, the create request fails with `ERR-03-045`.
 
 Instead of `compose_file`, a create request can send `compose_file_raw`: a whole app-compose JSON file as one string. Send one or the other, not both.
 

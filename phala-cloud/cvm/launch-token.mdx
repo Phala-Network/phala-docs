@@ -24,7 +24,9 @@ Add one of these fields to the create request (`POST /cvms`):
 - `"launch_token": "<your token>"` to use your own token. It must be at least 32 bytes long.
 - `"generate_launch_token": true` to have Phala Cloud make one.
 
-Phala Cloud writes the token's hash into `compose_file.requirements.launch_token_hash` for you. When the create stores a new token on the app, the create response returns it once, in `launch_token`. Save it.
+Phala Cloud writes the token's hash into `compose_file.requirements.launch_token_hash` for you. When the create stores a new token on the app, the response that creates the CVM returns it once, in `launch_token`. Save it.
+
+With the CLI, use `phala deploy --launch-token <your token>` or `phala deploy --generate-launch-token`.
 
 The token belongs to the app, not to one CVM. If the app already has a token, a create uses it. Sending a different token fails with `ERR-03-044`.
 
@@ -38,14 +40,16 @@ Call `GET /cvms/{cvm_id}/user_config`. When the CVM's compose requires a token, 
 
 ## How do I add a token to an app that already runs?
 
-1. Set the app's token with `POST /apps/{app_id}/launch-token`. Send `{"launch_token": "<your token>"}`, or an empty body to have Phala Cloud make one. The response returns `launch_token` and `launch_token_hash` once.
+1. Set the app's token with `POST /apps/{app_id}/launch-token`. Send `{"launch_token": "<your token>"}`, or an empty body to have Phala Cloud make one. The response returns `launch_token` and `launch_token_hash` once. With the CLI: [`phala apps launch-token set <app-id>`](/phala-cloud/phala-cloud-cli/apps/launch-token).
 2. Update each CVM of the app to require it, with [`PATCH /cvms/{cvm_id}`](/phala-cloud/update/update-cvm-configuration):
 
    ```json
    { "compose": { "requirements": { "launch_token_hash": "<launch_token_hash>" } } }
    ```
 
-The update restarts the CVM. A hash that does not match the app's token fails with `ERR-03-043`.
+   With the CLI: `phala deploy --cvm-id <cvm-id> --launch-token-hash <launch_token_hash>`.
+
+The update restarts a running CVM. A stopped CVM stays stopped and checks the token at its next start. A hash that does not match the app's token fails with `ERR-03-043`.
 
 ## How do I rotate the token?
 
@@ -63,7 +67,9 @@ Remove it in two steps, in this order:
    { "compose": { "requirements": { "launch_token_hash": null } } }
    ```
 
-2. Clear the app's token with `DELETE /apps/{app_id}/launch-token`.
+   With the CLI: `phala deploy --cvm-id <cvm-id> --launch-token-hash ""`.
+
+2. Clear the app's token with `DELETE /apps/{app_id}/launch-token`, or `phala apps launch-token clear <app-id>`.
 
 If you clear the app's token first, every CVM whose compose still has the hash fails at its next boot.
 
