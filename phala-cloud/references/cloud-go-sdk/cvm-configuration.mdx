@@ -6,7 +6,7 @@ description: Update Docker Compose, pre-launch scripts, resources, visibility, e
 CVM configuration methods let you modify a running or stopped CVM without recreating it.
 
 <Warning>
-**Every configuration update restarts a running CVM.** The CVM is stopped, updated, and started again. A stopped CVM stays stopped and runs the new configuration at its next start. Two cases do not restart it: a compose change that matches what the CVM already runs (the API answers `no_change` and does nothing), and metadata-only updates such as [`UpdateCVMListed`](#updatecvmlisted).
+**Some configuration updates restart a running CVM.** A change applied through `PATCH /cvms/{cvmId}` or the compose, environment and OS image endpoints stops the CVM, applies the change and starts it again. A stopped CVM stays stopped and runs the new configuration at its next start. A compose change that matches what the CVM already runs does not restart it: the API answers `no_change` and does nothing. [`UpdateCVMListed`](#updatecvmlisted) and annotations (`UpdateCVMAnnotations`) never restart the CVM, and SSH key changes without `ApplyNow` stay pending until the next power-on.
 </Warning>
 
 `PatchCVM` sends any set of changes in one request to `PATCH /cvms/{cvmId}`. `UpdateCVMResources` and `UpdateCVMVisibility` send a subset of fields to the same endpoint. The other `UpdateXxxx` methods call their own endpoints. See [Update CVM Configuration](/phala-cloud/update/update-cvm-configuration) for what each field does and which settings cannot change after create.
