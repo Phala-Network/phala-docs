@@ -1,6 +1,6 @@
 ---
 title: Update CVM Configuration
-description: Change a running CVM's compose, environment, resources, OS image and gateway settings with one PATCH request.
+description: Change a CVM's compose, environment, resources, OS image and gateway settings with one PATCH request, or stage several changes and apply them with one restart.
 ---
 
 You change an existing CVM with one request: `PATCH /cvms/{cvm_id}`. Send only the fields you want to change. Fields you leave out keep their current value.
@@ -30,7 +30,7 @@ If you only sent compose settings and they match what the CVM already runs, noth
 { "message": "Compose configuration unchanged", "correlation_id": "", "status": "no_change" }
 ```
 
-`/envs`, redeploying a revision and the one-step full compose replacement (`POST /cvms/{cvm_id}/compose_file`) also answer `no_change` when nothing would change. In the two-step replacement, `POST /cvms/{cvm_id}/compose_file/provision` reports `compose_unchanged` instead; the second step, `PATCH /cvms/{cvm_id}/compose_file`, does not check again.
+`PATCH /cvms/{cvm_id}/docker-compose`, `PATCH /cvms/{cvm_id}/pre-launch-script`, `PATCH /cvms/{cvm_id}/envs`, redeploying a revision and the one-step full compose replacement (`POST /cvms/{cvm_id}/compose_file`) also answer `no_change` when nothing would change. In the two-step replacement, `POST /cvms/{cvm_id}/compose_file/provision` reports `compose_unchanged` instead; the second step, `PATCH /cvms/{cvm_id}/compose_file`, does not check again.
 
 Only one operation can run on a CVM at a time. If another one is still running, the request fails with `409`. Wait for it to finish, then send again.
 
@@ -83,6 +83,7 @@ You can send these keys in `compose`:
 | `storage_discard` | Return unused data-disk blocks to the host. Turn it off if the host must not learn when you allocate or delete files. |
 | `snapshotter` | `overlayfs` or `stargz`. Only for CVMs that use the `nerdctl-compose` runner. |
 | `event_log_version` | Event log format, `1` or `2`. Move to `2` only after every verifier that checks your app's attestation supports it. |
+| `bash_script` | The script a CVM with the `bash` runner runs. See [Other runners](/phala-cloud/cvm/advanced-settings#other-runners) |
 | `requirements.health_check`, `requirements.health_status_file` | Health check the guest runs |
 | `requirements.platforms` | Attestation platforms the app accepts |
 | `requirements.tdx_measure_acpi_tables` | Whether TDX measures the ACPI tables |
@@ -114,7 +115,8 @@ A CVM that was stopped before the update stays stopped. It runs the new configur
 These cases do not restart the CVM:
 
 - Compose settings that match what the CVM already runs. The API answers `no_change`.
-- Endpoints that only change records in Phala Cloud or on the host: the name, the Trust Center listing, the [KMS and gateway URLs](#can-i-change-the-kms-and-gateway-urls-a-cvm-uses), the [app launch token](/phala-cloud/cvm/launch-token) and [annotations](/phala-cloud/cvm/advanced-settings#annotations).
+- Endpoints that only change records in Phala Cloud or on the host: the name, the Trust Center listing, the [KMS and gateway URLs](#can-i-change-the-kms-and-gateway-urls-a-cvm-uses) (unless you ask for a restart), the [app launch token](/phala-cloud/cvm/launch-token) and [annotations](/phala-cloud/cvm/advanced-settings#annotations).
+- [Staging a change](#how-do-i-stage-several-changes-and-restart-once). The CVM restarts once, when you apply the staged changes.
 
 To shorten the downtime, set `shutdown_timeout`. To stop at once without a clean shutdown, set `allow_force_stop` to `true`.
 
@@ -147,7 +149,9 @@ Port policy only covers the gateway. Ports mapped directly on the host are set w
 
 ## Can I change the KMS and gateway URLs a CVM uses?
 
-Yes, with `PATCH /cvms/{cvm_id}/network-config`. Send `kms_urls`, `gateway_urls` or both. The CVM picks them up at its next boot.
+Yes, with `PATCH /cvms/{cvm_id}/network-config`. Send `kms_urls`, `gateway_urls` or both. The CVM picks them up at its next boot. To restart it now, also send `"restart": true`.
+
+Changing `kms_urls` is available on request. Without it, a request that sends `kms_urls` fails with `403`.
 
 Phala Cloud keeps these URLs. Later updates send them instead of the URLs Phala Cloud would pick for the CVM's node. To go back to Phala Cloud's URLs, send an empty list for that field. Moving the CVM to another node removes both.
 
@@ -167,8 +171,40 @@ When someone else signs the transaction, such as a Safe or a timelock, add the h
 
 The prepared update is kept for 14 days. After that, the second request fails with `ERR-01-006` and you start again. [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms) covers the CLI path and the other error codes.
 
+## How do I stage several changes and restart once?
+
+Each `PATCH /cvms/{cvm_id}` restarts a running CVM. To collect several changes, possibly from several people, and restart only once, stage them first and apply them together.
+
+1. Stage a change with `PATCH /cvms/{cvm_id}/draft`. The body is the same as for `PATCH /cvms/{cvm_id}`. The CVM does not restart. Repeat for each change. Any workspace member who can update the CVM can add to the staged changes.
+2. Check them with `GET /cvms/{cvm_id}/draft`. The answer lists each staged change with who sent it and when (`entries`), the one update that applying them sends (`patch`), and the compose hash the CVM will run afterwards (`preview_compose_hash`).
+3. Apply them with `POST /cvms/{cvm_id}/draft/apply`. This sends one update, so a running CVM restarts once and a stopped CVM stays stopped. The answer is the same as for `PATCH /cvms/{cvm_id}`, including `no_change`.
+
+Compose changes are applied in the order you staged them. For other fields, such as `vcpu` or `encrypted_env`, the last staged value wins. Phala Cloud checks the compose that the staged changes produce each time you stage one, so a compose change the update would reject is refused right away.
+
+Once an apply starts the update, or answers `no_change`, the staged changes are cleared. To throw them away instead, call `DELETE /cvms/{cvm_id}/draft`. Staged changes are kept for 14 days after the last change. A CVM with nothing staged answers `404` with `ERR-03-052`.
+
+### What if the CVM changed after I staged?
+
+The first staged change records the CVM's compose hash (`base_compose_hash`). If the CVM's compose changes before you apply, for example through a direct `PATCH`, the apply fails with `409` and `ERR-03-053`, and nothing is applied. The error's `details` carry `base_compose_hash`, `current_compose_hash` and `changed_fields`, the compose fields that differ.
+
+Check the staged changes against the CVM as it is now. If you still want them, apply again with the current hash:
+
+```json
+{ "base_compose_hash": "<current_compose_hash>" }
+```
+
+If someone else stages or discards a change at the same moment as you, your request fails with `409` and `ERR-03-054`. Load the staged changes again and retry.
+
+### How does apply work on Onchain KMS?
+
+Apply takes the same headers as `PATCH /cvms/{cvm_id}`: `X-Prepare-Only`, `X-Compose-Hash` and `X-Transaction-Hash`. See [What changes for a CVM on Onchain KMS?](#what-changes-for-a-cvm-on-onchain-kms) You can register `preview_compose_hash` on your app contract before you apply.
+
+The staged changes stay until the second step of the apply starts the update. If someone stages another change between the two steps, the second step fails with `ERR-03-054`. Apply again without the headers to get the new hash.
+
+If you finish a prepared apply with `POST /cvms/{cvm_id}/commit-update`, the staged changes are not cleared. The CVM now runs them, so the next apply fails with `ERR-03-053`. Discard them with `DELETE /cvms/{cvm_id}/draft`.
+
 ## Can I use the SDKs or the CLI?
 
-The [JavaScript](/phala-cloud/references/cloud-js-sdk/cvm-configuration#patchcvm), [Python](/phala-cloud/references/cloud-python-sdk/cvm-configuration#patch_cvm) and [Go](/phala-cloud/references/cloud-go-sdk/cvm-configuration#patchcvm) SDKs send this request and handle the `465` answer for you. They do not send `compose`, `init_scripts` or `confirm_data_wipe` yet. For those, call the API directly.
+The [JavaScript](/phala-cloud/references/cloud-js-sdk/cvm-configuration#patchcvm), [Python](/phala-cloud/references/cloud-python-sdk/cvm-configuration#patch_cvm) and [Go](/phala-cloud/references/cloud-go-sdk/cvm-configuration#patchcvm) SDKs send this request, including `compose`, `init_scripts` and `confirm_data_wipe`, and handle the `465` answer for you. The Python and Go SDKs cannot send `compose.bash_script` yet, and no SDK has methods for staged changes yet. For those, call the API directly.
 
-The CLI updates a CVM with [`phala deploy --cvm-id`](/phala-cloud/phala-cloud-cli/deploy). Flags that set how a CVM is created, such as `--kms`, `--fs` or `--name`, fail on an update instead of being ignored.
+The CLI updates a CVM with [`phala deploy --cvm-id`](/phala-cloud/phala-cloud-cli/deploy). Flags such as `--init-script`, `--clear-init-scripts`, `--launch-token-hash`, `--gateway`, `--ephemeral-data-disk`, `--event-log-version` and `--confirm-data-wipe` map to the fields on this page. Flags that set how a CVM is created, such as `--kms`, `--fs` or `--name`, fail on an update instead of being ignored.
