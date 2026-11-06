@@ -51,6 +51,17 @@ Deploy new CVM or update existing one
 | `--custom-app-id <value>` | Custom App ID (requires --nonce for PHALA KMS) |
 | `--nonce <value>` | Nonce for deterministic app_id (requires --custom-app-id, PHALA KMS only) |
 | `--pre-launch-script <value>` | Path to pre-launch script |
+| `--runner <value>` | App runner: docker-compose (default), nerdctl-compose, or bash. With bash, --compose is the script to run. nerdctl-compose and bash need the compose_advanced feature. Create only. |
+| `--app-compose <value>` | Path to a whole app-compose JSON file, sent instead of --compose and the compose flags. Needs the compose_advanced feature. Create only. |
+| `--init-script <value>` | Platform init script to run on every boot: docker_cleanup or env_merge (repeatable). On update, replaces the current set. |
+| `--clear-init-scripts` | Remove every platform init script from an existing CVM. Cannot be combined with --init-script. Update only. |
+| `--launch-token <value>` | Launch token (at least 32 bytes) the CVM must boot with. Create only. |
+| `--generate-launch-token` | Gate the CVM with a launch token Phala Cloud generates for a new app (shown once), or with the app's existing token. Create only. |
+| `--launch-token-hash <value>` | Set requirements.launch_token_hash of an existing CVM to the hash printed by `phala apps launch-token set`; "" removes it. Update only. |
+| `--event-log-version <value>` | Event log digest format: 1 or 2 (dstack OS 0.6.0+) |
+| `--ephemeral-data-disk, --no-ephemeral-data-disk` | Format the data disk on every boot (dstack OS 0.6.3+). Turning it on for an existing CVM needs --confirm-data-wipe. |
+| `--gateway, --no-gateway` | Route the CVM through the gateway (default: true) |
+| `--confirm-data-wipe` | Confirm an update that turns on docker_cleanup or --ephemeral-data-disk, which erase data on every boot. Update only. |
 | `--private-key <value>` | Private key for signing on-chain transactions (or set PRIVATE_KEY env var) |
 | `--rpc-url <value>` | RPC URL for on-chain KMS transactions (or set ETH_RPC_URL env var) |
 | `--prepare-only` | Prepare the update and generate a commit token. Skips all on-chain operations. Intended for multisig workflows. |
@@ -115,6 +126,18 @@ phala deploy --instance-type tdx.medium
 phala deploy --region us-west
 ```
 
+* Deploy from a whole app-compose file
+
+```bash
+phala deploy --app-compose app-compose.json
+```
+
+* Deploy with a generated launch token
+
+```bash
+phala deploy --generate-launch-token
+```
+
 * Deploy with Ethereum KMS
 
 ```bash
@@ -155,6 +178,12 @@ phala deploy --no-public-logs --no-public-sysinfo
 
 ```bash
 phala deploy --listed
+```
+
+* Turn on container cleanup for an existing CVM
+
+```bash
+phala deploy --cvm-id app_123 --init-script docker_cleanup --confirm-data-wipe
 ```
 
 * Update existing CVM to disable logs

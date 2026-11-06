@@ -257,6 +257,7 @@
                   {
                     "group": "CVM Operations",
                     "pages": [
+                      "/phala-cloud/phala-cloud-cli/annotations",
                       "/phala-cloud/phala-cloud-cli/cp",
                       "/phala-cloud/phala-cloud-cli/logs",
                       "/phala-cloud/phala-cloud-cli/ps",
@@ -267,7 +268,13 @@
                   {
                     "group": "Resources",
                     "pages": [
-                      "/phala-cloud/phala-cloud-cli/apps",
+                      {
+                        "group": "apps",
+                        "pages": [
+                          "/phala-cloud/phala-cloud-cli/apps",
+                          "/phala-cloud/phala-cloud-cli/apps/launch-token"
+                        ]
+                      },
                       {
                         "group": "instances",
                         "pages": [

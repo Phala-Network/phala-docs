@@ -1,0 +1,93 @@
+---
+title: "apps launch-token"
+description: "Set, rotate or clear an app's launch token"
+---
+
+## Command: `phala apps launch-token`
+
+### Syntax
+
+```
+phala apps launch-token <command> [options]
+```
+
+### Description
+
+Set, rotate or clear an app's launch token. See [Launch Token](/phala-cloud/cvm/launch-token) for what the token protects against and how to roll it out to each CVM.
+
+### Subcommands
+
+| Command | Description |
+| ------- | ----------- |
+| `set` | Set or rotate the app's launch token and print it and its hash once |
+| `clear` | Remove the app's launch token. Remove launch_token_hash from every CVM of the app first. |
+
+## Command: `phala apps launch-token set`
+
+### Syntax
+
+```
+phala apps launch-token set [options] <app_id>
+```
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<app_id>` | App ID (hex) |
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--token <value>` | Token to set (at least 32 bytes). Omit to have Phala Cloud generate one. |
+
+### Examples
+
+* Generate a new token
+
+```bash
+phala apps launch-token set 0123456789abcdef0123456789abcdef01234567
+```
+
+* Then point a CVM at the new hash
+
+```bash
+phala deploy --cvm-id app_123 --launch-token-hash <hash>
+```
+
+## Command: `phala apps launch-token clear`
+
+### Syntax
+
+```
+phala apps launch-token clear <app_id>
+```
+
+### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `<app_id>` | App ID (hex) |
+
+### Examples
+
+* Remove the hash from a CVM, then clear the token
+
+```bash
+phala deploy --cvm-id app_123 --launch-token-hash "" && phala apps launch-token clear 0123456789abcdef0123456789abcdef01234567
+```
+
+### Global Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-h, --help` | Show help information for the current command |
+| `-v, --version` | Show CLI version |
+| `--api-token TOKEN, --api-key TOKEN` | API token for authenticating with Phala Cloud |
+| `-j, --json, --no-json` | Output in JSON format |
+| `--interactive` | Enable interactive mode for commands that support it |
+| `--cvm-id <value>` | CVM identifier (UUID, app_id, instance_id, or name) |
+| `--profile PROFILE` | Temporarily use a different auth profile for this command |
+| `--api-version <value>` | API version to use (e.g. 2026-01-21, 2026-05-22, 2026-06-23) |
+| `--timeout SECONDS` | Request timeout in seconds (default 60) |
