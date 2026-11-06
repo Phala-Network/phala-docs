@@ -178,7 +178,7 @@ for _, contract := range detail.Contracts {
 
 `GetComposeHash` normalizes an `AppCompose` before hashing by default. Pass `false` as the second argument to hash the typed compose without normalization. This default differs from older SDK behavior.
 
-`AppCompose` models only a subset of fields. For a complete decoded document, use `GetComposeHashFromMap`; it normalizes a copy without changing the input. Decode JSON with `json.Decoder.UseNumber` to preserve numeric values. `DumpAppComposeFromMap` returns the normalized canonical JSON used for hashing.
+`AppCompose` models only a subset of fields. For a complete decoded document, use `GetComposeHashFromMap`; it normalizes a copy without changing the input. Decode JSON with `json.Decoder.UseNumber` to preserve numeric values. `DumpAppComposeFromMap` returns the normalized canonical JSON used for hashing. These two hash `manifest_version` and `init_script` as given. To get the hash Phala Cloud computes for a CVM, use `GetComposeHashFromMapForOSImage` (or `DumpAppComposeFromMapForOSImage`) with the CVM's OS image version, for example `"0.6.0"`: below 0.6.0 the compose carries `manifest_version` 2 and a single `init_script` string, from 0.6.0 `manifest_version` "3" and a list.
 
 ## Compute and verify mr_config_id
 
