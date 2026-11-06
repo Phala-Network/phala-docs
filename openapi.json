@@ -20113,7 +20113,14 @@
       "TcbInfo": {
         "properties": {
           "mrtd": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Mrtd"
           },
           "rootfs_hash": {
@@ -20128,19 +20135,47 @@
             "title": "Rootfs Hash"
           },
           "rtmr0": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Rtmr0"
           },
           "rtmr1": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Rtmr1"
           },
           "rtmr2": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Rtmr2"
           },
           "rtmr3": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Rtmr3"
           },
           "event_log": {
@@ -20157,11 +20192,6 @@
         },
         "type": "object",
         "required": [
-          "mrtd",
-          "rtmr0",
-          "rtmr1",
-          "rtmr2",
-          "rtmr3",
           "event_log",
           "app_compose"
         ],
