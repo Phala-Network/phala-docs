@@ -335,7 +335,7 @@ Checks whether a CVM's current deployment is allowed by its on-chain dstack App 
 |-------|------|----------|-------------|
 | `cvmId` | `string` | Yes | CVM identifier |
 | `compose_hash` | `string` | No | Override compose hash to check |
-| `node_id` | `number` | No | Override node ID (resolves device ID) |
+| `node` | `string` | No | Nonempty physical node name used to resolve the device ID |
 | `device_id` | `string` | No | Override device ID (hex) |
 
 **Returns:** `IsAllowedResult`

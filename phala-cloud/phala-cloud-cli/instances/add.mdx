@@ -25,7 +25,7 @@ Create a new instance under an existing app
 | ------ | ----------- |
 | `--app-id <value>` | App ID (hex identifier). Defaults to app_id in phala.toml. |
 | `--name <value>` | Custom CVM name for the new instance. |
-| `--node-id <value>, --teepod-id <value>` | Target node ID for the new instance. |
+| `--node <value>` | Physical node name for the new instance. |
 | `-c, --compose-file <value>` | Path to Docker Compose file. |
 | `--pre-launch-script <value>` | Path to pre-launch script file. |
 | `-e, --env-file <value>` | Path to environment file. |
@@ -61,25 +61,25 @@ Create a new instance under an existing app
 * Add instance with existing compose
 
 ```bash
-phala instances add --app-id <app-id> --node-id 5
+phala instances add --app-id <app-id> --node usw5
 ```
 
 * Add instance with custom name
 
 ```bash
-phala instances add --app-id <app-id> --name redis-0 --node-id 5
+phala instances add --app-id <app-id> --name redis-0 --node usw5
 ```
 
 * Add instance with new Docker Compose
 
 ```bash
-phala instances add --app-id <app-id> --node-id 5 --compose-file docker-compose.yml
+phala instances add --app-id <app-id> --node usw5 --compose-file docker-compose.yml
 ```
 
 * Prepare for multisig approval
 
 ```bash
-phala instances add --app-id <app-id> --node-id 5 --compose-file docker-compose.yml --prepare-only
+phala instances add --app-id <app-id> --node usw5 --compose-file docker-compose.yml --prepare-only
 ```
 
 * Commit a prepared instance

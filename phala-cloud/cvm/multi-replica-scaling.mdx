@@ -22,7 +22,7 @@ Replicas are created one at a time from an existing source, not as an atomic gro
 
 **Failure isolation.** If one replica's node goes down for maintenance, the others keep serving. A single CVM has no such fallback.
 
-**Regional placement.** You can pin different replicas to nodes in different regions by passing a `node_id` when you replicate, which reduces latency for geographically distributed users.
+**Regional placement.** You can pin different replicas to nodes in different regions by passing a physical node name with `node` when you replicate, which reduces latency for geographically distributed users.
 
 **Independent attestation.** Each replica produces its own TDX quote. A relying party can verify any individual replica without trusting the others, which matters when the attestation is part of your security story.
 

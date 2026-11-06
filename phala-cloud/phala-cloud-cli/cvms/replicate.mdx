@@ -29,7 +29,7 @@ Create a replica of an existing CVM
 
 | Option | Description |
 | ------ | ----------- |
-| `--node-id <value>, --teepod-id <value>` | Target node ID for the replica. |
+| `--node <value>` | Physical node name for the replica. |
 | `--compose-hash <value>` | Compose hash to replicate. Required when the source app has multiple live instances. |
 | `-e, --env-file <value>` | Path to environment file. |
 
@@ -63,13 +63,13 @@ Create a replica of an existing CVM
 * Replicate a CVM
 
 ```bash
-phala cvms replicate 1234 --node-id 5
+phala cvms replicate 1234 --node usw5
 ```
 
 * Prepare a replica for multisig approval
 
 ```bash
-phala cvms replicate 1234 --node-id 5 --compose-hash <hash> --prepare-only
+phala cvms replicate 1234 --node usw5 --compose-hash <hash> --prepare-only
 ```
 
 * Commit a prepared replica
