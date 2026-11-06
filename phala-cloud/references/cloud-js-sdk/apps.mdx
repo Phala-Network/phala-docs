@@ -271,3 +271,25 @@ batch.results.forEach(r => {
   console.log(`CVM ${r.cvm_id}: allowed=${r.is_allowed}`);
 });
 ```
+
+---
+
+## setAppLaunchToken / clearAppLaunchToken
+
+`POST /apps/{appId}/launch-token` / `DELETE /apps/{appId}/launch-token`
+
+`setAppLaunchToken` sets or rotates the app's launch token and returns it once, with its hash. Leave out `launchToken` to have Phala Cloud generate one. Then update each CVM's `requirements.launch_token_hash` to the returned hash with [`patchCvm`](/phala-cloud/references/cloud-js-sdk/cvm-configuration#patchcvm). `clearAppLaunchToken` removes the token; remove the hash from every CVM first. Phala Cloud and the node operator can read the token. See [Launch Token](/phala-cloud/cvm/launch-token).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `appId` | `string` | Yes | App ID (hex) |
+| `launchToken` | `string` | No | `setAppLaunchToken` only. Token to set, at least 32 bytes. |
+
+**Returns:** `setAppLaunchToken` returns `{ launch_token, launch_token_hash }`. `clearAppLaunchToken` returns nothing.
+
+```typescript
+const { launch_token_hash } = await client.setAppLaunchToken({ appId: "0123...cdef" });
+await client.patchCvm({ id: "my-app", compose: { requirements: { launch_token_hash } } });
+```

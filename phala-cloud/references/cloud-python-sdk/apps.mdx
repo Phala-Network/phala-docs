@@ -241,6 +241,29 @@ Batch-checks whether all CVMs under an app are allowed to run.
 
 **Returns:** Batch allowance check response.
 
+## set_app_launch_token / clear_app_launch_token
+
+`POST /apps/{appId}/launch-token` / `DELETE /apps/{appId}/launch-token`
+
+`set_app_launch_token` sets or rotates the app's launch token and returns it once, with its hash. Leave out `launch_token` to have Phala Cloud generate one. Then update each CVM's `requirements.launch_token_hash` to the returned hash with [`patch_cvm`](/phala-cloud/references/cloud-python-sdk/cvm-configuration#patch_cvm). `clear_app_launch_token` removes the token; remove the hash from every CVM first. Phala Cloud and the node operator can read the token. See [Launch Token](/phala-cloud/cvm/launch-token).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `app_id` | `str` | Yes | App ID (hex). Also accepted as `appId`. |
+| `launch_token` | `str` | No | `set_app_launch_token` only. Token to set, at least 32 bytes. |
+
+**Returns:** `set_app_launch_token` returns `AppLaunchTokenResponse` with `launch_token` and `launch_token_hash`. `clear_app_launch_token` returns `None`.
+
+```python
+token = client.set_app_launch_token({"app_id": "0123...cdef"})
+client.patch_cvm({
+    "id": "my-app",
+    "compose": {"requirements": {"launch_token_hash": token.launch_token_hash}},
+})
+```
+
 ## Related
 
 - [CVM Lifecycle](/phala-cloud/references/cloud-python-sdk/cvm-lifecycle) — managing individual CVMs

@@ -240,7 +240,7 @@ Commits a compose file update — the second phase. For on-chain KMS, the `compo
 
 Applies partial updates to a CVM via the unified PATCH endpoint. Only fields present in the request body are applied. You can update compose files, environment variables, resources, visibility, and OS images all in a single call.
 
-`patchCvm` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly.
+`compose` is a JSON Merge Patch of the app compose: a key you set changes that value, `null` removes the key, and a key you leave out stays as it is. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys and the settings that cannot change after create.
 
 For CVMs with on-chain KMS (ETHEREUM/BASE), a change to the compose needs a second step only when the new compose hash is not on the app contract yet. The API then answers HTTP 465, and `patchCvm` returns `{ requiresOnChainHash: true, composeHash, ... }` with the hash to register. After registration, call [`confirmCvmPatch`](#confirmcvmpatch) with the transaction proof. If the hash is already allowed, or the patch does not change the compose (for example a resize), the update starts at once and you get `correlationId`. `prepareOnly` is not a dry run: an update that needs no registration starts right away.
 
@@ -255,6 +255,9 @@ For CVMs with on-chain KMS (ETHEREUM/BASE), a change to the compose needs a seco
 | `public_logs` | `boolean` | No | Make logs publicly accessible |
 | `public_sysinfo` | `boolean` | No | Make system info public |
 | `public_tcbinfo` | `boolean` | No | Make TCB info public |
+| `compose` | `ComposePatch` | No | Other compose settings as a merge patch, for example `{ swap_size: "2G", requirements: { health_check: true } }` |
+| `init_scripts` | `("docker_cleanup" \| "env_merge")[]` | No | Platform init scripts the CVM runs, replacing the current set. `[]` removes them all. |
+| `confirm_data_wipe` | `boolean` | No | Confirms turning on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot |
 | `encrypted_env` | `string` | No | Hex-encoded encrypted env vars |
 | `user_config` | `string` | No | User configuration string |
 | `gpus` | `object` | No | GPU assignment: `{ gpus: [{ slot, product_id? }], attach_mode? }`. `attach_mode: "all"` attaches every GPU on the node instead of the listed slots. |
@@ -274,7 +277,7 @@ For CVMs with on-chain KMS (ETHEREUM/BASE), a change to the compose needs a seco
 | Field | Type | Description |
 |-------|------|-------------|
 | `requiresOnChainHash` | `false` | Update accepted directly |
-| `correlationId` | `string` | Tracking ID |
+| `correlationId` | `string` | Tracking ID. Empty when the API answers `no_change`. |
 
 **Hash required (`requiresOnChainHash: true`):**
 
@@ -326,6 +329,34 @@ if (result.requiresOnChainHash) {
     transactionHash: tx.transactionHash,
   });
 }
+```
+
+---
+
+## getCvmInitScripts
+
+`GET /cvms/{cvmId}/init-scripts`
+
+Lists the platform init scripts, in run order, and for each one whether the CVM runs it (`selected`), whether you can pick it for this CVM (`selectable`) and, if not, why (`reason`). Change the selection with `patchCvm`'s `init_scripts`. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts).
+
+**Parameters:** `id` (CVM identifier).
+
+**Returns:** `{ items: [{ slug, selected, selectable, reason }] }`
+
+---
+
+## getCvmAnnotations / updateCvmAnnotations
+
+`GET /cvms/{cvmId}/annotations` / `PUT /cvms/{cvmId}/annotations`
+
+Reads or replaces the CVM's annotations: key/value settings for tools on the host. They are not measured and attestation does not cover them. `updateCvmAnnotations` replaces every annotation, and `{}` clears them. It does not restart the CVM. Annotations sit behind a feature flag; without it, both calls fail with `ERR-03-049`. See [Annotations](/phala-cloud/cvm/advanced-settings#annotations).
+
+**Parameters:** `id` (CVM identifier), plus `annotations` (`Record<string, string>`) for `updateCvmAnnotations`.
+
+**Returns:** `{ annotations }`, the annotations the node now stores.
+
+```typescript
+await client.updateCvmAnnotations({ id: "my-app", annotations: { memory_tier: "fast" } });
 ```
 
 ---

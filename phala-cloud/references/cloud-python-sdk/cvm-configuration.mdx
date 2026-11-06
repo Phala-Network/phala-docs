@@ -303,7 +303,7 @@ Lists OS images available for a specific CVM. The available images depend on the
 
 A batch update method that can modify multiple CVM fields in a single request. This is useful when you need to change several settings atomically.
 
-`patch_cvm` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly.
+`compose` is a JSON Merge Patch of the app compose, typed as `ComposePatch`. Only the keys you set are sent, and a key set to `None` is sent as `null`, which removes it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. `ComposePatch` has no `bash_script` key yet; to change a `bash` runner's script, call the API directly.
 
 **Parameters:**
 
@@ -316,6 +316,9 @@ A batch update method that can modify multiple CVM fields in a single request. T
 | `public_logs` | `bool` | No | Whether logs are public |
 | `public_sysinfo` | `bool` | No | Whether system info is public |
 | `public_tcbinfo` | `bool` | No | Whether TCB info is public |
+| `compose` | `ComposePatch` | No | Other compose settings as a merge patch, for example `{"swap_size": "2G", "requirements": {"health_check": True}}` |
+| `init_scripts` | `list[str]` | No | Platform init scripts the CVM runs (`"docker_cleanup"`, `"env_merge"`), replacing the current set. `[]` removes them all. |
+| `confirm_data_wipe` | `bool` | No | Confirms turning on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot |
 | `encrypted_env` | `str` | No | Encrypted environment variables |
 | `user_config` | `str` | No | User configuration string |
 | `gpus` | `dict` | No | GPU assignment: `{"gpus": [{"slot": ..., "product_id": ...}], "attach_mode": ...}`. `attach_mode: "all"` attaches every GPU on the node. Other shapes fail validation. |
@@ -328,11 +331,39 @@ A batch update method that can modify multiple CVM fields in a single request. T
 | `allow_force_stop` | `bool` | No | Skip the clean shutdown and stop the CVM at once |
 | `prepare_only` | `bool` | No | Sent as the `X-Prepare-Only: true` header, not in the body. Also accepted as `prepareOnly`. |
 
-**Returns:** A dict with `requires_on_chain_hash` (bool). When it is `False`, the dict has `correlation_id`. When it is `True`, it has `compose_hash`, `app_id`, `device_id` and `kms_info`, plus `commit_token`, `commit_url`, `api_commit_url` and `onchain_status` for a `prepare_only` call.
+**Returns:** A dict with `requires_on_chain_hash` (bool). When it is `False`, the dict has `correlation_id`, which is empty when the API answers `no_change`. When it is `True`, it has `compose_hash`, `app_id`, `device_id` and `kms_info`, plus `commit_token`, `commit_url`, `api_commit_url` and `onchain_status` for a `prepare_only` call.
 
 <Note>
 On Onchain KMS, a change to the compose returns `requires_on_chain_hash: True` only when the new compose hash is not on the app contract yet (HTTP 465). If the hash is already allowed, or the patch does not change the compose (for example a resize), the update starts at once and you get `correlation_id`. After a 465, register `compose_hash` on-chain, then call `confirm_cvm_patch` with the compose hash and transaction hash. With `prepare_only`, the 465 result also carries `commit_token`, and anyone holding it can finish the update. `prepare_only` is not a dry run: an update that needs no registration starts right away. See [Multisig and Governance](/phala-cloud/key-management/multisig-governance).
 </Note>
+
+---
+
+## get_cvm_init_scripts
+
+`GET /cvms/{cvmId}/init-scripts`
+
+Lists the platform init scripts, in run order, and for each one whether the CVM runs it (`selected`), whether you can pick it for this CVM (`selectable`) and, if not, why (`reason`). Change the selection with `patch_cvm`'s `init_scripts`. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts).
+
+**Parameters:** `id` (CVM identifier).
+
+**Returns:** `CvmInitScriptsResponse` with `items`.
+
+---
+
+## get_cvm_annotations / update_cvm_annotations
+
+`GET /cvms/{cvmId}/annotations` / `PUT /cvms/{cvmId}/annotations`
+
+Reads or replaces the CVM's annotations: key/value settings for tools on the host. They are not measured and attestation does not cover them. `update_cvm_annotations` replaces every annotation, and `{}` clears them. It does not restart the CVM. Annotations sit behind a feature flag; without it, both calls fail with `ERR-03-049`. See [Annotations](/phala-cloud/cvm/advanced-settings#annotations).
+
+**Parameters:** `id` (CVM identifier), plus `annotations` (`dict[str, str]`) for `update_cvm_annotations`.
+
+**Returns:** `CvmAnnotationsResponse` with `annotations`, the annotations the node now stores.
+
+```python
+client.update_cvm_annotations({"id": "my-app", "annotations": {"memory_tier": "fast"}})
+```
 
 ---
 

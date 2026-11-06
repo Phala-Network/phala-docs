@@ -242,7 +242,7 @@ err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
 
 Applies a multi-field update to a CVM in a single request. You can change compose, resources, visibility, and more in one call.
 
-`PatchCVM` does not send the API's `compose`, `init_scripts` and `confirm_data_wipe` fields yet. To use them, call [`PATCH /cvms/{cvmId}`](/phala-cloud/update/update-cvm-configuration) directly. To change the Trust Center listing, use [`UpdateCVMListed`](#updatecvmlisted).
+`Compose` is a JSON Merge Patch of the app compose. Each `ComposePatch` key is a `Patch[T]`: leave it zero to keep the value, use `phala.PatchValue(v)` to set it, or `phala.PatchNull[T]()` to remove it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. `ComposePatch` has no `bash_script` key yet; to change a `bash` runner's script, call the API directly. To change the Trust Center listing, use [`UpdateCVMListed`](#updatecvmlisted).
 
 ```go
 func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMRequest) (*PatchCVMResponse, error)
@@ -259,6 +259,9 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `PublicSysinfo` | `*bool` | Make system info public |
 | `PublicLogs` | `*bool` | Make logs public |
 | `PublicTcbinfo` | `*bool` | Make TCB info public |
+| `Compose` | `*ComposePatch` | Other compose settings as a merge patch |
+| `InitScripts` | `[]InitScriptSlug` | Platform init scripts the CVM runs (`InitScriptDockerCleanup`, `InitScriptEnvMerge`), replacing the current set. `nil` keeps them; an empty non-nil slice removes them all. |
+| `ConfirmDataWipe` | `bool` | Confirms turning on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot |
 | `UserConfig` | `*string` | User configuration string |
 | `GPUs` | `*GPUConfig` | GPU assignment: `GPUs []GPUSpec{Slot, ProductID}` and `AttachMode`. `AttachMode` `"all"` attaches every GPU on the node. |
 | `VCPU` | `*int` | Number of vCPUs |
@@ -271,14 +274,17 @@ func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMReques
 | `AllowForceStop` | `*bool` | Skip the clean shutdown and stop the CVM at once |
 | `PrepareOnly` | `bool` | Sent as the `X-Prepare-Only: true` header. When the API answers 465 (the new compose hash is not on the app contract yet), the response also carries a commit token for multisig approval. It is not a dry run: if no on-chain registration is needed, the update starts. |
 
-**Returns:** `*PatchCVMResponse`. A 465 answer is not an error: `RequiresOnChainHash` is `true` and the response carries `ComposeHash`, `AppID`, `DeviceID` and `KMSInfo`, plus `CommitToken`, `CommitURL`, `APICommitURL` and `OnchainStatus` with `PrepareOnly`. Otherwise it carries `CorrelationID` and `Status`.
+**Returns:** `*PatchCVMResponse`. A 465 answer is not an error: `RequiresOnChainHash` is `true` and the response carries `ComposeHash`, `AppID`, `DeviceID` and `KMSInfo`, plus `CommitToken`, `CommitURL`, `APICommitURL` and `OnchainStatus` with `PrepareOnly`. Otherwise it carries `CorrelationID` and `Status`; `Status` is `"no_change"` with an empty `CorrelationID` when nothing had to change.
 
 ```go
 compose := "services:\n  app:\n    image: nginx:latest\n"
 resp, err := client.PatchCVM(ctx, "my-app", &phala.PatchCVMRequest{
-    DockerComposeFile: &compose,
-    PublicSysinfo:     phala.Bool(true),
-    VCPU:              phala.Int(4),
+	DockerComposeFile: &compose,
+	PublicSysinfo:     phala.Bool(true),
+	VCPU:              phala.Int(4),
+	Compose: &phala.ComposePatch{
+		SwapSize: phala.PatchValue("2G"),
+	},
 })
 if err != nil {
     log.Fatal(err)
@@ -289,6 +295,33 @@ if resp.RequiresOnChainHash {
     fmt.Printf("On-chain confirmation needed. Compose hash: %s\n", resp.ComposeHash)
 }
 ```
+
+---
+
+## GetCVMInitScripts
+
+`GET /cvms/{cvmId}/init-scripts`
+
+Lists the platform init scripts, in run order, and for each one whether the CVM runs it (`Selected`), whether you can pick it for this CVM (`Selectable`) and, if not, why (`Reason`). Change the selection with `PatchCVM`'s `InitScripts`. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts).
+
+```go
+func (c *Client) GetCVMInitScripts(ctx context.Context, cvmID string) (*CVMInitScriptsResponse, error)
+```
+
+---
+
+## GetCVMAnnotations / UpdateCVMAnnotations
+
+`GET /cvms/{cvmId}/annotations` / `PUT /cvms/{cvmId}/annotations`
+
+Reads or replaces the CVM's annotations: key/value settings for tools on the host. They are not measured and attestation does not cover them. `UpdateCVMAnnotations` replaces every annotation, and an empty map clears them. It does not restart the CVM. Annotations sit behind a feature flag; without it, both calls fail with `ERR-03-049`. See [Annotations](/phala-cloud/cvm/advanced-settings#annotations).
+
+```go
+func (c *Client) GetCVMAnnotations(ctx context.Context, cvmID string) (*CVMAnnotationsResponse, error)
+func (c *Client) UpdateCVMAnnotations(ctx context.Context, cvmID string, annotations map[string]string) (*CVMAnnotationsResponse, error)
+```
+
+**Returns:** `*CVMAnnotationsResponse` with `Annotations`, the annotations the node now stores.
 
 ---
 
