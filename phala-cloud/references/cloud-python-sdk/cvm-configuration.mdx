@@ -303,7 +303,7 @@ Lists OS images available for a specific CVM. The available images depend on the
 
 A batch update method that can modify multiple CVM fields in a single request. This is useful when you need to change several settings atomically.
 
-`compose` is a JSON Merge Patch of the app compose, typed as `ComposePatch`. Only the keys you set are sent, and a key set to `None` is sent as `null`, which removes it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. `ComposePatch` has no `bash_script` key yet; to change a `bash` runner's script, call the API directly.
+`compose` is a JSON Merge Patch of the app compose, typed as `ComposePatch`. Only the keys you set are sent, and a key set to `None` is sent as `null`, which removes it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. To change a `bash` runner's script, set `ComposePatch(bash_script=...)`.
 
 **Parameters:**
 

@@ -103,8 +103,6 @@ Start long-running work in the background and let the script return:
 
 A bash CVM has no containers, so `phala ps` lists none and there are no container logs. The script's output is in the CVM's service journal.
 
-The Python and Go SDKs cannot send `compose.bash_script` yet; use the API or the JavaScript SDK.
-
 ## Raw app-compose input
 
 Raw app-compose input sits behind the same feature flag as the other runners. Without it, the create request fails with `ERR-03-045`.

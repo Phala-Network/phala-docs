@@ -242,7 +242,7 @@ err := client.UpdateOSImage(ctx, "my-app", &phala.UpdateOSImageRequest{
 
 Applies a multi-field update to a CVM in a single request. You can change compose, resources, visibility, and more in one call.
 
-`Compose` is a JSON Merge Patch of the app compose. Each `ComposePatch` key is a `Patch[T]`: leave it zero to keep the value, use `phala.PatchValue(v)` to set it, or `phala.PatchNull[T]()` to remove it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. `ComposePatch` has no `bash_script` key yet; to change a `bash` runner's script, call the API directly. To change the Trust Center listing, use [`UpdateCVMListed`](#updatecvmlisted).
+`Compose` is a JSON Merge Patch of the app compose. Each `ComposePatch` key is a `Patch[T]`: leave it zero to keep the value, use `phala.PatchValue(v)` to set it, or `phala.PatchNull[T]()` to remove it. See [How does the compose patch work?](/phala-cloud/update/update-cvm-configuration#how-does-the-compose-patch-work) for the keys. To change a `bash` runner's script, set `ComposePatch.BashScript`. To change the Trust Center listing, use [`UpdateCVMListed`](#updatecvmlisted).
 
 ```go
 func (c *Client) PatchCVM(ctx context.Context, cvmID string, req *PatchCVMRequest) (*PatchCVMResponse, error)
