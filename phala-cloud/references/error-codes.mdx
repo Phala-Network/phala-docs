@@ -74,6 +74,21 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-03-008` | `ReplicaSourceInstanceNotAccessibleError` | The source CVM instance was not found in this workspace or access is denied<br/>*Raised when the replica source CVM instance is not visible in the current workspace (HTTP 404).* |
 | `ERR-03-009` | `ReplicaComposeHashRequiredError` | This app has multiple live CVM instances. Please specify compose_hash to choose which revision to replicate.<br/>*Raised when replicate needs an explicit compose_hash due to multiple live instances.* |
 | `ERR-03-010` | `MultipleCvmsForIdentifierError` | Multiple CVMs match this identifier in the workspace<br/>*Raised when an identifier (e.g. app_id) matches multiple CVMs in a workspace.* |
+| `ERR-03-040` | `ComposeFieldImmutableError` | (dynamic:  cannot be changed on an existing CVM....)<br/>*A compose update changes a field that is fixed when the CVM is created.* |
+| `ERR-03-041` | `ComposeFieldNotAllowedOnCreateError` | tproxy_enabled cannot be set when creating a CVM. Use gateway_enabled instead.<br/>*A create request sets tproxy_enabled, the legacy alias of gateway_enabled.* |
+| `ERR-03-042` | `ComposeGpuPolicyNotAllowedError` | requirements.gpu_policy is not enabled for this account or workspace.<br/>*requirements.gpu_policy is set or changed without the compose_gpu_policy grant.* |
+| `ERR-03-043` | `LaunchTokenHashMismatchError` | requirements.launch_token_hash does not match this app's launch token.<br/>*requirements.launch_token_hash does not match the app's launch token.* |
+| `ERR-03-044` | `LaunchTokenConflictError` | This app already has a different launch token.<br/>*A create sends a launch token other than the one the app already has.* |
+| `ERR-03-045` | `ComposeAdvancedNotAllowedError` | (dynamic:  is not enabled for this account or workspace....)<br/>*A create uses a non-default runner or raw compose input without compose_advanced.* |
+| `ERR-03-046` | `ComposeRunnerNotSupportedError` | (dynamic: Runner ...)<br/>*The compose names a runner the dstack guest does not run.* |
+| `ERR-03-047` | `ComposeFieldRequiredError` | (dynamic: The ...)<br/>*The compose's runner needs a field the caller did not send.* |
+| `ERR-03-048` | `ComposeDataWipeNotConfirmedError` | (dynamic: Turning on ...)<br/>*An update turns on a setting that wipes data on every boot without confirming it.* |
+| `ERR-03-049` | `CvmAnnotationsNotEnabledError` | CVM annotations are not enabled for this account or workspace.<br/>*The cvm_annotations feature flag is off for the workspace and the caller.* |
+| `ERR-03-050` | `CvmAnnotationsVmmUnsupportedError` | (dynamic: The node runs dstack VMM ...)<br/>*The node's dstack VMM predates per-VM annotations (added in 0.6.1).* |
+| `ERR-03-051` | `CvmAnnotationsVmmRequestFailedError` | (dynamic: The node could not read or update the CVM annotati...)<br/>*The node's VMM did not return or did not accept the CVM's annotations.* |
+| `ERR-03-052` | `CvmDraftNotFoundError` | This CVM has no staged changes.<br/>*The CVM has no draft to show, apply or discard.* |
+| `ERR-03-053` | `CvmDraftOutdatedError` | The CVM changed after these changes were staged.<br/>*The CVM's compose changed after its draft was opened; nothing was applied.* |
+| `ERR-03-054` | `CvmDraftChangedError` | The staged changes were changed by another request. Load them and try again.<br/>*Another request changed the draft while this one ran, or after its apply was prepared.* |
 
 
 ## Module 04: Workspace

@@ -262,3 +262,39 @@ func (c *Client) GetAppFilterOptions(ctx context.Context) (*AppFilterOptions, er
 ```go
 filters, err := client.GetAppFilterOptions(ctx)
 ```
+
+---
+
+## SetAppLaunchToken / ClearAppLaunchToken
+
+`POST /apps/{appId}/launch-token` / `DELETE /apps/{appId}/launch-token`
+
+`SetAppLaunchToken` sets or rotates the app's launch token and returns it once, with its hash. Leave `LaunchToken` nil, or pass a nil request, to have Phala Cloud generate one. Then update each CVM's `requirements.launch_token_hash` to the returned hash with [`PatchCVM`](/phala-cloud/references/cloud-go-sdk/cvm-configuration#patchcvm). `ClearAppLaunchToken` removes the token; remove the hash from every CVM first. Phala Cloud and the node operator can read the token. See [Launch Token](/phala-cloud/cvm/launch-token).
+
+```go
+func (c *Client) SetAppLaunchToken(ctx context.Context, appID string, req *SetAppLaunchTokenRequest) (*AppLaunchTokenResponse, error)
+func (c *Client) ClearAppLaunchToken(ctx context.Context, appID string) error
+```
+
+**SetAppLaunchTokenRequest fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `LaunchToken` | `*string` | Token to set, at least 32 bytes |
+
+**Returns:** `*AppLaunchTokenResponse` with `LaunchToken` and `LaunchTokenHash`.
+
+```go
+token, err := client.SetAppLaunchToken(ctx, "0123...cdef", nil)
+if err != nil {
+	log.Fatal(err)
+}
+_, err = client.PatchCVM(ctx, "my-app", &phala.PatchCVMRequest{
+	Compose: &phala.ComposePatch{
+		Requirements: phala.PatchValue(phala.ComposeRequirementsPatch{
+			LaunchTokenHash: phala.PatchValue(token.LaunchTokenHash),
+		}),
+	},
+})
+```
+

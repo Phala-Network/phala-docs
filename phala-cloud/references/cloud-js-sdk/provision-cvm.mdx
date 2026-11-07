@@ -14,7 +14,7 @@ Provisions a new CVM. This is the **first phase** of the two-phase deployment fl
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | CVM name (5-63 chars, must start with a letter) |
-| `compose_file` | `object` | Yes | Compose file configuration (see below) |
+| `compose_file` | `object` | Yes, unless `compose_file_raw` is sent | Compose file configuration (see below) |
 | `instance_type` | `string` | No | Instance type (default: `"tdx.small"`) |
 | `node` | `string` | No | Physical node name for deployment |
 | `region` | `string` | No | Region filter |
@@ -26,6 +26,11 @@ Provisions a new CVM. This is the **first phase** of the two-phase deployment fl
 | `nonce` | `number` | No | Nonce for deterministic `app_id` (PHALA KMS only) |
 | `app_id` | `string` | No | Expected `app_id` (must match nonce) |
 | `listed` | `boolean` | No | List CVM in public directory |
+| `init_scripts` | `("docker_cleanup" \| "env_merge")[]` | No | Platform init scripts the CVM runs on every boot: `docker_cleanup` (needs dstack OS 0.6.x, `ext4` storage and the `docker-compose` runner) and `env_merge` (dstack OS 0.6.0 or newer, available on request). The list is the whole set; Phala Cloud runs them in a fixed order, `docker_cleanup` first. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). |
+| `launch_token` | `string` | No | Launch token, at least 32 bytes, that the CVM must have on every boot. See [Launch Token](/phala-cloud/cvm/launch-token). |
+| `generate_launch_token` | `boolean` | No | Have Phala Cloud generate the launch token for a new app, or use the app's existing token. A new token is returned once, as `launch_token` in the commit response. |
+| `annotations` | `Record<string, string>` | No | Host-side settings for tools on the node, not measured. Needs a feature flag (`ERR-03-049` without it) and dstack VMM 0.6.1 or newer on the node (`ERR-03-050`). See [Annotations](/phala-cloud/cvm/advanced-settings#annotations). |
+| `compose_file_raw` | `string` | No | A whole app-compose JSON file as one string, sent instead of `compose_file`. Needs a feature flag. Phala Cloud parses it with the same rules and writes it the same way, so the compose hash comes from that output, not from your bytes. See [Raw app-compose input](/phala-cloud/cvm/advanced-settings#raw-app-compose-input). |
 
 **`compose_file` object:**
 

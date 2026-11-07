@@ -70,7 +70,7 @@ jobs:
       - name: Deploy to Phala Cloud
         env:
           PHALA_CLOUD_API_KEY: ${{ secrets.PHALA_CLOUD_API_KEY }}
-        run: phala deploy -c docker-compose.yml -n my-tee-app --wait
+        run: phala deploy --cvm-id my-tee-app -c docker-compose.yml --wait
 ```
 
 Your `docker-compose.yml` should reference the image variable:
@@ -83,7 +83,7 @@ services:
       - "80:80"
 ```
 
-The CLI detects existing CVMs by name. If `my-tee-app` already exists, it updates in place. Otherwise, it creates a new one.
+`--cvm-id` names the CVM to update, so each push updates `my-tee-app` in place and `--wait` waits for the update to finish. The CLI does not look up an existing CVM by `--name`: `phala deploy -n my-tee-app` always creates a new CVM, and `--wait` has no effect on it. Create the CVM once before the first pipeline run, for example with `phala deploy -n my-tee-app -c docker-compose.yml`.
 
 ## GitHub Actions with JS SDK
 
@@ -220,7 +220,7 @@ deploy:
   script:
     - npm install -g phala
     - sed -i "s|\${DOCKER_IMAGE}|$IMAGE_TAG|g" docker-compose.yml
-    - phala deploy -c docker-compose.yml -n my-tee-app --wait
+    - phala deploy --cvm-id my-tee-app -c docker-compose.yml --wait
   variables:
     PHALA_CLOUD_API_KEY: "$PHALA_CLOUD_API_KEY"
   only:
@@ -314,6 +314,6 @@ phala cvms get my-tee-app
 
 **Build failures:** Ensure your Dockerfile builds locally with `docker build .` before pushing to CI.
 
-**Deploy timeouts:** If `--wait` times out, the CVM may still be starting. Check the dashboard or run `phala cvms get` to see the current status. Increase the timeout with `--wait-timeout` if your app takes longer to boot.
+**Deploy timeouts:** If `--wait` times out, the update may still be running. Check the dashboard or run `phala cvms get my-tee-app` to see the current status.
 
 **Image pull errors:** Verify the image tag in your compose file matches what was pushed to the registry. For private registries, set `DSTACK_DOCKER_USERNAME` and `DSTACK_DOCKER_PASSWORD` as [encrypted secrets](/phala-cloud/cvm/set-secure-environment-variables) on the CVM.

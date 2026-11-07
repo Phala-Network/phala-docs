@@ -82,6 +82,36 @@ These attributes control compose-level runtime behavior. Changing any of them tr
 | `gateway_enabled` | Boolean | — | Enable public gateway routing. |
 | `secure_time` | Boolean | — | Enable secure time mode. |
 
+### Compose Settings, Init Scripts, Annotations and Launch Token
+
+<Note>
+These attributes are in the provider's unreleased changes (after 0.3.0-beta.4). No released provider version has them yet.
+</Note>
+
+The provider sends every compose change of one apply as a single [`PATCH /cvms/{id}`](/phala-cloud/update/update-cvm-configuration) merge patch. Only changed keys are sent, and compose keys the provider does not manage stay as they are. The provider keeps these settings as configured in state and does not read them back from Phala Cloud.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `port_policy` | Object | Which guest ports the gateway forwards: `restrict_mode` (Boolean) and `ports` (list of `{ port, pp }`, where `pp` sends the PROXY protocol header). |
+| `swap_size` | String | Guest swap size, for example `2G`. |
+| `storage_discard` | Boolean | Pass discard (TRIM) through to the data disk. |
+| `snapshotter` | String | `overlayfs` or `stargz`. Only with `runner = "nerdctl-compose"`. |
+| `event_log_version` | Number | Event log format, `1` or `2`. Every verifier that checks the app must support the version you pick. |
+| `requirements` | Object | Guest requirements: `health_check`, `health_status_file`, `platforms`, `tdx_measure_acpi_tables`, `ephemeral_data_disk` and `gpu_policy`. Only the keys you set are written. `gpu_policy` needs a feature flag and is **force-new**. |
+| `init_scripts` | Set of String | Platform init scripts every CVM of the app runs on boot: `docker_cleanup` and `env_merge` (feature-flagged). See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). |
+| `confirm_data_wipe` | Boolean | Confirms an update that turns on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot. Not needed on create. |
+| `runner` | String | `docker-compose` (default), `nerdctl-compose` or `bash`. The other runners need a feature flag. **Force-new.** |
+| `bash_script` | String | Script the `bash` runner runs; set `docker_compose = ""` with it. **Force-new.** |
+| `annotations` | Map of String | Host-side settings for the app's CVMs, behind a feature flag. Not measured, so attestation does not cover them. See [Annotations](/phala-cloud/cvm/advanced-settings#annotations). |
+| `launch_token` | String (Sensitive) | App launch token, at least 32 bytes. Stored in state. Phala Cloud and the node operator can read it. See [Launch Token](/phala-cloud/cvm/launch-token). |
+| `generate_launch_token` | Boolean | Have Phala Cloud generate the launch token when `launch_token` is not set. The generated token is stored in state. |
+
+Changing `port_policy`, `swap_size`, `storage_discard`, `snapshotter`, `event_log_version`, `requirements` (except `gpu_policy`) or `init_scripts` updates the app in place and restarts its running CVMs.
+
+`annotations` are applied to the bootstrap CVM at create. A change replaces the whole map on the app's existing CVMs, without a restart or a compose change. CVMs added later, such as `phala_app_instance` slots, start without them. Removing the attribute clears them.
+
+Changing `launch_token` sets the new token on the app first, then updates each CVM's `requirements.launch_token_hash`. A CVM that restarts in between fails to boot until its compose is updated. Removing it removes the hash from every CVM, then clears the token.
+
 ### Environment Variables
 
 The provider offers two modes for managing environment variables. You must pick one — they cannot be combined in the same resource.
@@ -165,6 +195,7 @@ Changing any of these attributes destroys the existing resource and creates a ne
 - `custom_app_id`
 - `nonce`
 - `node_id`
+- `runner`, `bash_script` and `requirements.gpu_policy` (unreleased, see [above](#compose-settings-init-scripts-annotations-and-launch-token))
 
 ### In-Place Updates
 
@@ -178,6 +209,7 @@ These attributes can be updated without replacement:
 - `replicas`
 - `env` / `encrypted_env`
 - Compose runtime settings (`public_logs`, `public_sysinfo`, `public_tcbinfo`, `gateway_enabled`, `secure_time`)
+- Unreleased: the compose settings, `init_scripts`, `annotations` and `launch_token` described [above](#compose-settings-init-scripts-annotations-and-launch-token)
 
 ### Replica Scaling
 

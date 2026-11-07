@@ -21,7 +21,7 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 |-------|------|----------|-------------|
 | `Name` | `string` | Yes | Name for the CVM |
 | `InstanceType` | `string` | No | Instance type; an empty value is omitted and the server selects a type |
-| `ComposeFile` | `*ComposeFile` | Yes | Compose configuration |
+| `ComposeFile` | `*ComposeFile` | Yes, unless `ComposeFileRaw` is set | Compose configuration |
 | `VCPU` | `*int` | No | Number of vCPUs |
 | `Memory` | `*int` | No | Memory in MB |
 | `DiskSize` | `*int` | No | Disk size in GB |
@@ -31,6 +31,11 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | `KMS` | `*string` | No | KMS type |
 | `Listed` | `*bool` | No | Whether the CVM is publicly listed |
 | `SSHKeyIDs` | `[]string` | No | SSH key IDs to authorize |
+| `InitScripts` | `[]InitScriptSlug` | No | Platform init scripts the CVM runs on every boot: `InitScriptDockerCleanup` (needs dstack OS 0.6.x, `ext4` storage and the `docker-compose` runner) and `InitScriptEnvMerge` (dstack OS 0.6.0 or newer, available on request). The list is the whole set; Phala Cloud runs them in a fixed order, `docker_cleanup` first. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). `EnabledInitScriptsDockerCleanup` is deprecated. |
+| `LaunchToken` | `*string` | No | Launch token, at least 32 bytes, that the CVM must have on every boot. See [Launch Token](/phala-cloud/cvm/launch-token). |
+| `GenerateLaunchToken` | `*bool` | No | Have Phala Cloud generate the launch token for a new app, or use the app's existing token. A new token is returned once, in `CommitCVMProvisionResponse.LaunchToken`. |
+| `Annotations` | `map[string]string` | No | Host-side settings for tools on the node, not measured. Needs a feature flag (`ERR-03-049` without it) and dstack VMM 0.6.1 or newer on the node (`ERR-03-050`). See [Annotations](/phala-cloud/cvm/advanced-settings#annotations). |
+| `ComposeFileRaw` | `*string` | No | A whole app-compose JSON file as one string, sent instead of `ComposeFile`. Needs a feature flag. Phala Cloud parses it with the same rules and writes it the same way, so the compose hash comes from that output, not from your bytes. See [Raw app-compose input](/phala-cloud/cvm/advanced-settings#raw-app-compose-input). |
 
 Additional typed fields include `KMSContractID`, `AppID`, `EnvKeys`, `Ports`, `GPUs`, `EncryptedEnv`, and `UserConfig`. `ComposeFile` also supports fields such as `Runner`, `BashScript`, `AllowedEnvs`, `Requirements`, and `PortPolicy`.
 
