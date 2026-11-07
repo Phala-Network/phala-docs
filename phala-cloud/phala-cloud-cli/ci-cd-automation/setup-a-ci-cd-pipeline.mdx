@@ -29,6 +29,10 @@ Regardless of which CI platform you use, store your Phala Cloud API key as a sec
 Rotate your API key immediately if it's ever exposed in logs or committed to a repository. Generate a new one from **Settings > API Keys** in the Phala Cloud dashboard.
 </Warning>
 
+## GitHub Actions with the deploy action
+
+If you only need to update a CVM from `phala.toml`, use the Phala deploy action. It installs the CLI, waits for the update, and returns the result as outputs. See [Deploy with the GitHub Action](/phala-cloud/phala-cloud-cli/ci-cd-automation/github-deploy-action).
+
 ## GitHub Actions with CLI
 
 This is the simplest approach. The workflow builds your Docker image, pushes it to a registry, and deploys with `phala deploy`.
