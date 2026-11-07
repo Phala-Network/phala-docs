@@ -25,7 +25,7 @@ Deploy new CVM or update existing one
 | `-r, --region <value>` | Preferred region (e.g., us-west, auto-selected if omitted) |
 | `-e, --env <value>` | Environment variable (KEY=VALUE) or env file path (repeatable) |
 | `--kms <value>` | KMS type: phala (default), ethereum/eth, or base |
-| `--wait` | Wait for deployment/update completion |
+| `--wait` | On update (--cvm-id): wait for the update to finish and fail if it failed. No effect on a new deployment |
 | `--ssh-pubkey <value>` | SSH public key path (default: ~/.ssh/id_rsa.pub) |
 | `--dev-os, --no-dev-os` | Use dev OS image (requires SSH key) |
 | `--public-logs, --no-public-logs` | Make CVM logs publicly accessible (default: true) |

@@ -83,10 +83,10 @@ Run `phala deploy` from the directory containing your `docker-compose.yml`. The 
 ```bash
 export PHALA_CLOUD_API_KEY="phak_your_key"
 
-phala deploy -n my-nginx -t tdx.small --wait
+phala deploy -n my-nginx -t tdx.small
 ```
 
-The `--wait` flag blocks until the CVM is fully running.
+The command returns once the CVM is created. The CVM keeps booting after that; run `phala cvms get my-nginx` or open the dashboard to see when it is running.
 </Step>
 </Steps>
 
