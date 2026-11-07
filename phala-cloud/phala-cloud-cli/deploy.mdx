@@ -162,7 +162,7 @@ phala deploy --cvm-id my-app --compose ./new-docker-compose.yml -e .env
 phala deploy --cvm-id app_abc123 --wait
 ```
 
-On an update, `--wait` waits until the CVM is back in the state it had before: running, or stopped if it was stopped. It then checks the result of the update and fails if the update failed. This check is skipped when the CLI signs in with a GitHub Actions OIDC token. For a CVM that uses the `bash` runner, `--compose` (`-c`) sends the file as the CVM's `bash_script`.
+On an update, `--wait` first waits for the update operation. If the update fails, the command stops at once with the operation's status and error message. Otherwise it then waits until the CVM is back in the state it had before: running, or stopped if it was stopped. For a CVM that uses the `bash` runner, `--compose` (`-c`) sends the file as the CVM's `bash_script`.
 
 * Update CVM from phala.toml
 
