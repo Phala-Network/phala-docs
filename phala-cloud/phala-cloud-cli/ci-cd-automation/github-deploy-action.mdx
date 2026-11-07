@@ -158,16 +158,19 @@ Use `1.2.1` or newer. Older versions do not wait correctly on stopped CVMs and d
 
 ## Keyless login with GitHub OIDC (Beta)
 
-Keyless login lets a workflow deploy without an API key. GitHub gives the job a short-lived token, and Phala Cloud accepts it from a repository you have marked as trusted.
+Keyless login lets a workflow deploy without an API key. GitHub gives the job a short-lived token, and Phala Cloud accepts it from a GitHub repository that you registered for the app.
 
 This feature is in Beta. It is enabled per workspace, so contact support to turn it on for yours.
 
 To use it:
 
 1. Ask support to enable it for your workspace.
-2. Register your GitHub repository as a trusted repository in the workspace. A workspace admin or owner does this.
-3. Give the workflow the `id-token: write` permission, and `contents: read` for checkout.
-4. Leave out `api-key`.
+2. Open your app in the dashboard and go to **GitHub**. This item appears only after support has enabled the feature.
+3. Under **GitHub repository**, enter the repository that may deploy this app, in `owner/repo` format, and select **Save**. Phala Cloud asks you to confirm with a fresh two-factor verification when you save. You cannot save it with an API key.
+4. Give the workflow the `id-token: write` permission, and `contents: read` for checkout.
+5. Leave out `api-key`.
+
+The page also has two optional fields. **Only this git ref** limits deploys to one ref, such as `refs/heads/main`. **Only this workflow** limits deploys to one workflow. Each app trusts one repository, and saving a new one replaces the old one. Select **Remove** to stop that repository from deploying the app.
 
 ```yaml
 name: Deploy to Phala Cloud
@@ -188,7 +191,7 @@ jobs:
       - uses: Phala-Network/phala-deploy-action@v3
 ```
 
-If the repository is trusted in more than one workspace, set the `workspace` input to the one you want. If you pass both an `api-key` and the permission, the CLI uses the API key.
+If the repository is registered for apps in more than one workspace, set the `workspace` input to the one you want. If you pass both an `api-key` and the permission, the CLI uses the API key.
 
 With keyless login the action reads the result from the deploy response only. The compose hash, OS image, `kms-type`, and `device-id` outputs are empty. `oidc-repository` and `oidc-commit-sha` are filled in only when the API returns them, so they can be empty too.
 
