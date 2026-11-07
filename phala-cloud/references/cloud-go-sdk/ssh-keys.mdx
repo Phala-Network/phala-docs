@@ -30,10 +30,10 @@ func (c *Client) ListSSHKeys(ctx context.Context) ([]SSHKey, error)
 ```go
 keys, err := client.ListSSHKeys(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 for _, key := range keys {
-	fmt.Printf("%s — %s (%s)\n", key.Name, key.ID, *key.KeyType)
+    fmt.Printf("%s — %s (%s)\n", key.Name, key.ID, *key.KeyType)
 }
 ```
 
@@ -58,13 +58,15 @@ func (c *Client) CreateSSHKey(ctx context.Context, req *CreateSSHKeyRequest) (*S
 
 **Returns:** `*SSHKey` — the created key with its assigned ID and fingerprint.
 
+Replace the sample public key with your own key before using it for access.
+
 ```go
 key, err := client.CreateSSHKey(ctx, &phala.CreateSSHKeyRequest{
-	Name:      "my-laptop",
-	PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample...",
+    Name:      "my-laptop",
+    PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Created key: %s (fingerprint: %s)\n", key.ID, *key.Fingerprint)
 ```
@@ -92,7 +94,7 @@ func (c *Client) DeleteSSHKey(ctx context.Context, keyID string) error
 ```go
 err := client.DeleteSSHKey(ctx, "key-abc123")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -119,7 +121,7 @@ func (c *Client) ImportGithubProfileSSHKeys(ctx context.Context, username string
 ```go
 imported, err := client.ImportGithubProfileSSHKeys(ctx, "octocat")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -144,6 +146,25 @@ func (c *Client) SyncGithubSSHKeys(ctx context.Context) (*SyncGithubResponse, er
 ```go
 synced, err := client.SyncGithubSSHKeys(ctx)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
+```
+
+## CVM SSH keys
+
+`GetCVMSSHKeys(ctx, cvmID)` reads `GET /cvms/{cvmId}/ssh-keys`. It returns the configured `Keys` and `RestartRequired`. This is the stored configuration; `GetCVMUserConfig` reads the running VM's configuration.
+
+`UpdateCVMSSHKeys(ctx, cvmID, req)` sends `PUT /cvms/{cvmId}/ssh-keys` and returns the same response type. `SSHKeyIDs` is the replacement set: include every selected key you want to retain. An explicit empty slice removes all selected keys unless `Usernames` adds members' resolved keys. Changes take effect at the next power-on, or immediately if `ApplyNow` restarts the CVM.
+
+This example uses the key created above. Add any other key IDs you want to retain.
+
+```go
+result, err := client.UpdateCVMSSHKeys(ctx, "my-app", &phala.UpdateCVMSSHKeysRequest{
+    SSHKeyIDs: []string{key.ID},
+    ApplyNow:  false,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result.RestartRequired)
 ```

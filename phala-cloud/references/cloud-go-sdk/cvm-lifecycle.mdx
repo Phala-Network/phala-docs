@@ -7,7 +7,7 @@ CVM lifecycle methods manage the full journey of a Confidential Virtual Machine,
 
 ## ProvisionCVM
 
-`POST /cvms/provision`
+`POST /cvms`
 
 Provisions a new CVM by reserving resources and generating a compose hash. This is the first step of the two-phase deployment flow. The returned `AppID` and `ComposeHash` are needed to commit the provision.
 
@@ -20,18 +20,27 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `Name` | `string` | Yes | Name for the CVM |
-| `InstanceType` | `string` | Yes | Instance type (e.g., `"tdx.small"`) |
-| `ComposeFile` | `*ComposeFile` | No | Docker Compose configuration |
+| `InstanceType` | `string` | No | Instance type; an empty value is omitted and the server selects a type |
+| `ComposeFile` | `*ComposeFile` | Yes | Compose configuration |
 | `VCPU` | `*int` | No | Number of vCPUs |
 | `Memory` | `*int` | No | Memory in MB |
 | `DiskSize` | `*int` | No | Disk size in GB |
-| `TeepodID` | `*int` | No | Target teepod ID |
+| `Node` | `*string` | No | Physical node name for deployment |
 | `Image` | `*string` | No | OS image name |
 | `Region` | `*string` | No | Target region |
-| `KMSType` | `*string` | No | KMS type (e.g., `"phala"`) |
+| `KMS` | `*string` | No | KMS type |
 | `Listed` | `*bool` | No | Whether the CVM is publicly listed |
-| `SecureTime` | `*bool` | No | Enable secure time |
-| `SSHAuthorizedKeys` | `[]string` | No | SSH public keys to authorize |
+| `SSHKeyIDs` | `[]string` | No | SSH key IDs to authorize |
+
+Additional typed fields include `KMSContractID`, `AppID`, `EnvKeys`, `Ports`, `GPUs`, `EncryptedEnv`, and `UserConfig`. `ComposeFile` also supports fields such as `Runner`, `BashScript`, `AllowedEnvs`, `Requirements`, and `PortPolicy`.
+
+`ProvisionCVMRequest.KMSType` and `ProvisionCVMRequest.SSHAuthorizedKeys` remain in the Go type, but the current backend ignores these top-level fields. Use `KMS` to select the KMS type and `SSHKeyIDs` to authorize registered SSH keys.
+
+For slice fields with `omitzero`, a nil slice is omitted and an explicitly empty slice is sent as `[]`.
+
+`ComposeFile.EncryptedEnv` has been removed. For creation, set `ProvisionCVMRequest.EncryptedEnv` instead. For changes to a CVM's encrypted environment, use `UpdateCVMEnvs`.
+
+`ComposeFile.InitScript` uses `ComposeInitScripts`, a string slice. It decodes historical single-string and array responses and encodes as an array. The server ignores `compose_file.init_script` during creation; use `ProvisionCVMRequest.InitScripts` to select platform-owned scripts.
 
 **Returns:** `*ProvisionCVMResponse` with `AppID`, `ComposeHash`, `AppEnvEncryptPubkey`, and other provisioning details.
 
@@ -39,14 +48,14 @@ func (c *Client) ProvisionCVM(ctx context.Context, req *ProvisionCVMRequest) (*P
 
 ```go
 provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
-	Name:         "my-app",
-	InstanceType: "tdx.small",
-	ComposeFile: &phala.ComposeFile{
-		DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
-	},
+    Name:         "my-app",
+    InstanceType: "tdx.small",
+    ComposeFile: &phala.ComposeFile{
+        DockerComposeFile: "services:\n  app:\n    image: nginx:latest\n    ports:\n      - \"80:80\"\n",
+    },
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("App ID: %s, Compose Hash: %s\n", provision.AppID, provision.ComposeHash)
 ```
@@ -57,7 +66,7 @@ fmt.Printf("App ID: %s, Compose Hash: %s\n", provision.AppID, provision.ComposeH
 
 `POST /cvms`
 
-Commits a provisioned CVM, triggering the actual deployment. You must pass the `AppID` and `ComposeHash` from the provision step.
+Commits a provisioned CVM, triggering deployment. Pass the provision response's `Token`, or supply its `AppID` and `ComposeHash`.
 
 ```go
 func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvisionRequest) (*CommitCVMProvisionResponse, error)
@@ -67,8 +76,9 @@ func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvision
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `AppID` | `string` | Yes | App ID from provision response |
-| `ComposeHash` | `string` | Yes | Compose hash from provision response |
+| `Token` | `*string` | No | Commit token from the provision response |
+| `AppID` | `string` | Without token | App ID from the provision response |
+| `ComposeHash` | `string` | Without token | Compose hash from the provision response |
 | `TransactionHash` | `*string` | No | On-chain transaction hash (for on-chain KMS) |
 | `EncryptedEnv` | `*string` | No | Encrypted environment variables |
 | `EnvKeys` | `[]string` | No | Environment variable key names |
@@ -80,23 +90,23 @@ func (c *Client) CommitCVMProvision(ctx context.Context, req *CommitCVMProvision
 ```go
 // Step 1: Provision
 provision, err := client.ProvisionCVM(ctx, &phala.ProvisionCVMRequest{
-	Name:         "my-app",
-	InstanceType: "tdx.small",
-	ComposeFile: &phala.ComposeFile{
-		DockerComposeFile: composeYAML,
-	},
+    Name:         "my-app",
+    InstanceType: "tdx.small",
+    ComposeFile: &phala.ComposeFile{
+        DockerComposeFile: composeYAML,
+    },
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 
 // Step 2: Commit
 cvm, err := client.CommitCVMProvision(ctx, &phala.CommitCVMProvisionRequest{
-	AppID:       provision.AppID,
-	ComposeHash: provision.ComposeHash,
+    AppID:       provision.AppID,
+    ComposeHash: provision.ComposeHash,
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("CVM deployed: %s (status: %s)\n", cvm.CvmID(), cvm.Status)
 ```
@@ -124,7 +134,7 @@ func (c *Client) StartCVM(ctx context.Context, cvmID string) (*CVMActionResponse
 ```go
 result, err := client.StartCVM(ctx, "my-app")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Status: %s\n", result.Status)
 ```
@@ -231,7 +241,7 @@ This action is irreversible. All data associated with the CVM will be permanentl
 ```go
 err := client.DeleteCVM(ctx, "my-app")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -258,14 +268,15 @@ func (c *Client) ReplicateCVM(ctx context.Context, cvmID string, opts *Replicate
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `NodeID` | `*int` | Target node ID for the replica |
+| `Node` | `*string` | Physical node name; omit to inherit the source placement |
+| `OSImage` | `string` | OS image override |
 
 ```go
 replica, err := client.ReplicateCVM(ctx, "my-app", &phala.ReplicateCVMOptions{
-	NodeID: phala.Int(42),
+    Node: phala.String("prod6"),
 })
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Printf("Replica status: %s\n", replica.Status)
 ```

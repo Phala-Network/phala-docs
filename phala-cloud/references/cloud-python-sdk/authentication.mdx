@@ -1,9 +1,9 @@
 ---
 title: Authentication
-description: Configure API key authentication for the Phala Cloud Python SDK.
+description: Configure API key, bearer, and workspace authentication for the Phala Cloud Python SDK.
 ---
 
-The Python SDK authenticates requests using an API key sent via the `X-API-Key` header. You can provide the key directly or through an environment variable.
+Authenticate with an API key or a bearer token. Configure credentials directly or through environment variables.
 
 ## API Key
 
@@ -37,18 +37,36 @@ client = create_client(api_key="phak_your_api_key")
 
 The explicit `api_key` parameter takes precedence over the environment variable.
 
+## Bearer token and workspace
+
+Set `bearer_token` to authenticate with a bearer token, including an OIDC token. Set `workspace` to select a workspace by slug. The SDK also reads `PHALA_OIDC_TOKEN` and `PHALA_CLOUD_WORKSPACE`.
+
+```python
+import os
+from phala_cloud import create_client
+
+client = create_client(
+    bearer_token=os.environ["PHALA_OIDC_TOKEN"],
+    workspace="my-workspace",
+)
+```
+
+A nonempty explicit value takes precedence over its environment variable. If both an API key and a bearer token are configured, the API key is used. Workspace names are stripped of surrounding whitespace.
+
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
 | `PHALA_CLOUD_API_KEY` | API key for authentication |
+| `PHALA_OIDC_TOKEN` | Bearer token for authentication |
+| `PHALA_CLOUD_WORKSPACE` | Workspace slug |
 | `PHALA_CLOUD_API_PREFIX` | Base URL override (defaults to `https://cloud-api.phala.com/api/v1`) |
 
-Both variables are read at client creation time. Changing them after the client is created has no effect.
+These variables are read at client creation time. Changing them after the client is created has no effect.
 
 ## Cookie-Based Auth
 
-For browser-like environments, the SDK supports cookie-based authentication instead of API keys. When enabled, the `X-API-Key` header is not sent, and authentication relies on cookies managed by the HTTP client.
+For browser-like environments, the SDK supports cookie-based authentication instead of API keys. When enabled, the SDK does not add an API key or bearer authorization header. Authentication relies on cookies managed by the HTTP client.
 
 ```python
 client = create_client(use_cookie_auth=True)
@@ -57,6 +75,12 @@ client = create_client(use_cookie_auth=True)
 <Note>
 Cookie-based auth is primarily for internal use. Most users should stick with API key authentication.
 </Note>
+
+## revoke_current_api_token
+
+`DELETE /tokens/self`
+
+Call `client.revoke_current_api_token()` to revoke the API token used for the request. It returns `None`. The token stops working immediately and cannot be restored. The async client supports `await client.revoke_current_api_token()`; a `safe_revoke_current_api_token` variant is also available.
 
 ## Custom Headers
 
@@ -111,14 +135,14 @@ from phala_cloud import create_client
 
 http = httpx.Client(
     verify="/path/to/ca-bundle.crt",
-    proxies="http://proxy.internal:8080",
+    proxy="http://proxy.internal:8080",
 )
 
 client = create_client(api_key="phak_your_api_key", http_client=http)
 ```
 
 <Warning>
-When you provide your own `http_client`, the SDK does not close it automatically. You are responsible for calling `http.close()` when done.
+The SDK applies its configured authentication, workspace, and version headers to requests made with the provided client. Configure that client with a base URL for relative API paths. The SDK does not close it automatically. You are responsible for calling `http.close()` when done.
 </Warning>
 
 ## Related

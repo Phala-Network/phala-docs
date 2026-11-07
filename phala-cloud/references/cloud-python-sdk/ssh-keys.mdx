@@ -46,18 +46,18 @@ Adds a new SSH public key to your account.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | `str` | Yes | Display name for the key |
-| `public_key` | `str` | Yes | SSH public key content (e.g., `ssh-ed25519 AAAA...`) |
+| `public_key` | `str` | Yes | SSH public key content |
 
 **Returns:** The created SSH key object.
 
-**Example:**
+**Example:** Replace the sample public key with your own key before using it for access.
 
 <CodeGroup>
 
 ```python Sync
 key = client.create_ssh_key({
     "name": "my-laptop",
-    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 print(key.id)
 ```
@@ -65,7 +65,7 @@ print(key.id)
 ```python Async
 key = await client.create_ssh_key({
     "name": "my-laptop",
-    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop",
+    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4dR/9d26lbwH5ViDEJgWZqaHI6/Mlr8QyTfE6w8ANk docs-example",
 })
 print(key.id)
 ```
@@ -164,6 +164,25 @@ print(result.model_dump())
 ```
 
 </CodeGroup>
+
+## CVM SSH keys
+
+`get_cvm_ssh_keys({"cvm_id": "my-app"})` reads `GET /cvms/{cvmId}/ssh-keys`. It returns a `CvmSshKeysResponse` with `keys` and `restart_required`. This is the stored configuration; use `get_cvm_user_config` for the running VM's configuration.
+
+`update_cvm_ssh_keys` sends `PUT /cvms/{cvmId}/ssh-keys` and replaces the configured key set. `ssh_key_ids` is required: include every selected key you want to retain. An empty list removes all selected keys unless `usernames` adds members' resolved keys. Changes take effect at the next power-on, or immediately if `apply_now` restarts the CVM.
+
+This example uses the key created above. Add any other key IDs you want to retain.
+
+```python
+result = client.update_cvm_ssh_keys({
+    "cvm_id": "my-app",
+    "ssh_key_ids": [key.id],
+    "apply_now": False,
+})
+print(result.restart_required)
+```
+
+The async client supports the same calls with `await`. Both methods also have `safe_` variants.
 
 ## Related
 

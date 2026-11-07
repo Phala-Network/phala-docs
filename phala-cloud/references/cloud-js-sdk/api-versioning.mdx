@@ -33,12 +33,14 @@ const client = createClient({
 });
 ```
 
-Use `.withVersion()` to create another client with the same authentication and a different API version:
+Use `.withVersion()` to create another client with the same authentication and a different API version. The new client retains built-in actions and custom extensions, bound to the new version:
 
 ```typescript
 const currentClient = createClient({ apiKey: "phak_your_api_key" });
 const legacyClient = currentClient.withVersion("2025-10-28");
 ```
+
+For custom extensions, the factory's client is typed with the `ApiVersion` union. After `withVersion()`, custom methods remain callable with their original parameters, but their return types are `unknown`. Check or narrow those values before using them. This avoids assuming the old version's response shape applies to the new version.
 
 ## Version-aware return types
 
@@ -58,6 +60,8 @@ const olderCvm = await olderClient.getCvmInfo({ id: "my-cvm" });
 ```
 
 Versions `2026-05-22` and `2026-06-23` share the same CVM and app response types. Version `2026-06-23` changes the KMS resource model from individual KMS nodes to KMS contracts.
+
+The client's `version` overrides any `X-Phala-Version` value in `config.headers`, regardless of header casing. An action can still explicitly pin its own request to a different version, as the KMS methods below do.
 
 ## Contract-centric KMS methods
 

@@ -28,9 +28,9 @@ client.get_cvm_info({"cvm_id": "my-app"})
 
 ## provision_cvm
 
-`POST /cvms/provision`
+`POST /cvms`
 
-Creates a CVM provision request. This is step one of the two-step provisioning flow. The response includes a `compose_hash` that you use in `commit_cvm_provision`.
+Creates a CVM provision request. This is step one of the two-step provisioning flow. Use the response's `token` in `commit_cvm_provision`.
 
 **Parameters:**
 
@@ -43,9 +43,9 @@ The request is a dictionary with the CVM configuration. The exact fields depend 
 | `vcpu` | `int` | No | Number of vCPUs |
 | `memory` | `int` | No | Memory in MB |
 | `disk_size` | `int` | No | Disk size in GB |
-| `teepod_id` | `int` | No | Target node ID |
+| `node` | `str` | No | Physical node name for deployment |
 
-**Returns:** Provision response with `compose_hash` and `app_id`.
+**Returns:** Provision response with `token`, `compose_hash`, and `app_id`.
 
 **Example:**
 
@@ -60,7 +60,7 @@ result = client.provision_cvm({
     "vcpu": 2,
     "memory": 2048,
     "disk_size": 20,
-    "teepod_id": 3,
+    "node": "prod6",
 })
 print(result.compose_hash)
 ```
@@ -74,7 +74,7 @@ result = await client.provision_cvm({
     "vcpu": 2,
     "memory": 2048,
     "disk_size": 20,
-    "teepod_id": 3,
+    "node": "prod6",
 })
 print(result.compose_hash)
 ```
@@ -87,7 +87,7 @@ print(result.compose_hash)
 
 `POST /cvms`
 
-Commits a provisioned CVM, creating the actual instance. This is step two of the provisioning flow. Pass the `compose_hash` from the provision step along with on-chain transaction details.
+Commits a provisioned CVM, creating the actual instance. Pass the token returned by `provision_cvm`. For the legacy flow, pass the provision response's `app_id` and `compose_hash` instead. On-chain KMS deployments may also need a transaction hash.
 
 This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again returns the existing CVM. A different `compose_hash` for the same `app_id` raises a `ResourceError` with error code `CVM_APP_ID_CONFLICT`.
 
@@ -95,9 +95,10 @@ This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `app_id` | `str` | Yes | App ID from provision step |
-| `compose_hash` | `str` | Yes | Hash from provision step |
-| `transaction_hash` | `str` | Yes | On-chain transaction hash |
+| `token` | `str` | Preferred | Token from the provision response |
+| `app_id` | `str` | Without token | App ID from the provision response |
+| `compose_hash` | `str` | Without token | Hash from the provision response |
+| `transaction_hash` | `str` | For on-chain KMS when needed | Transaction hash for on-chain verification |
 
 **Returns:** Committed CVM details.
 
@@ -107,17 +108,13 @@ This endpoint is idempotent: submitting the same `app_id` + `compose_hash` again
 
 ```python Sync
 cvm = client.commit_cvm_provision({
-    "app_id": "app-123",
-    "compose_hash": "0xabc...",
-    "transaction_hash": "0xdef...",
+    "token": result.token,
 })
 ```
 
 ```python Async
 cvm = await client.commit_cvm_provision({
-    "app_id": "app-123",
-    "compose_hash": "0xabc...",
-    "transaction_hash": "0xdef...",
+    "token": result.token,
 })
 ```
 
@@ -265,7 +262,8 @@ Creates a copy of an existing CVM. The replica shares the same compose configura
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `str` | Yes | Source CVM identifier |
-| `node_id` | `int` | No | Target node for the replica |
+| `node` | `str` | No | Physical node name; omit to inherit the source placement |
+| `os_image` | `str` | No | OS image override |
 
 **Returns:** Replicated CVM details.
 
@@ -274,11 +272,11 @@ Creates a copy of an existing CVM. The replica shares the same compose configura
 <CodeGroup>
 
 ```python Sync
-replica = client.replicate_cvm({"id": "my-app", "node_id": 5})
+replica = client.replicate_cvm({"id": "my-app", "node": "prod6"})
 ```
 
 ```python Async
-replica = await client.replicate_cvm({"id": "my-app", "node_id": 5})
+replica = await client.replicate_cvm({"id": "my-app", "node": "prod6"})
 ```
 
 </CodeGroup>
@@ -289,36 +287,50 @@ replica = await client.replicate_cvm({"id": "my-app", "node_id": 5})
 
 `GET /cvms/{cvmId}/state` (SSE)
 
-Polls the CVM state via Server-Sent Events until it reaches a target status. This is useful for waiting until a CVM finishes starting or stopping. Only available on the sync client.
+Watches CVM state via Server-Sent Events. Both sync and async clients support this method.
 
 **Parameters:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | `str` | Yes | CVM identifier |
-| `target` | `str` | Yes | Target state to wait for (e.g., `"Running"`) |
+| `target` | `str` | Yes | Target state to wait for (e.g., `"running"`) |
 | `interval` | `int` | No | Polling interval in seconds (default: `5`, range: 5-30) |
 | `timeout` | `int` | No | Server-side timeout in seconds (default: `300`, range: 10-600) |
-| `max_retries` | `int` | No | Maximum retry attempts |
+| `max_retries` | `int \| None` | No | Retries after an interrupted attempt; default `None` is unlimited, `0` disables retries |
 | `retry_delay` | `float` | No | Delay between retries in seconds (default: `5.0`) |
 
-**Returns:** CVM state object when the target state is reached.
+The SDK returns the `complete` event payload. A raw state status is not necessarily the derived status used by the server to determine completion, and a matching state alone does not complete the watch. A `complete` event whose `status` differs from `target` does not succeed; the SDK treats it as an interrupted attempt and reconnects within the retry budget.
 
-**Raises:** `TimeoutError` if max retries exceeded.
+The server may emit an `error` event and continue. On a timeout event, an EOF without completion, or a transient transport error, the SDK reconnects within the retry budget. Exhausted retries raise `RequestError`, retaining the latest server error and transport diagnostics when available. HTTP errors use SDK error types and are not retried.
+
+The stream read timeout is `timeout + interval + 5` seconds. Other HTTPX timeout settings remain in effect. Cancelling an async task closes the stream and propagates cancellation. `maxRetries` and `retryDelay` are also accepted as aliases.
 
 **Example:**
 
-```python
-# Start a CVM and wait for it to be running
-client.start_cvm({"id": "my-app"})
-state = client.watch_cvm_state({
+<CodeGroup>
+
+```python Sync
+result = client.watch_cvm_state({
     "id": "my-app",
-    "target": "Running",
+    "target": "running",
     "timeout": 120,
     "max_retries": 3,
 })
-print(state.status)  # "Running"
+print(result.status)
 ```
+
+```python Async
+result = await client.watch_cvm_state({
+    "id": "my-app",
+    "target": "running",
+    "timeout": 120,
+    "max_retries": 3,
+})
+print(result.status)
+```
+
+</CodeGroup>
 
 ## Related
 
