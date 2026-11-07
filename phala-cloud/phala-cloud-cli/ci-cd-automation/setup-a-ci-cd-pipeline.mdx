@@ -314,6 +314,6 @@ phala cvms get my-tee-app
 
 **Build failures:** Ensure your Dockerfile builds locally with `docker build .` before pushing to CI.
 
-**Deploy timeouts:** If `--wait` times out, the CVM may still be starting. Check the dashboard or run `phala cvms get` to see the current status. Increase the timeout with `--wait-timeout` if your app takes longer to boot.
+**Deploy timeouts:** If `--wait` times out, the CVM may still be starting. Check the dashboard or run `phala cvms get` to see the current status.
 
 **Image pull errors:** Verify the image tag in your compose file matches what was pushed to the registry. For private registries, set `DSTACK_DOCKER_USERNAME` and `DSTACK_DOCKER_PASSWORD` as [encrypted secrets](/phala-cloud/cvm/set-secure-environment-variables) on the CVM.
