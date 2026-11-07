@@ -1,6 +1,7 @@
 ---
 title: List Models
 description: List available Private AI models, modalities, context windows, and pricing metadata.
+api: "GET https://inference.phala.com/v1/models"
 ---
 
 ## Endpoints
@@ -27,11 +28,7 @@ curl "https://inference.phala.com/v1/models?zdr=true"
 ```
 
 <ParamField query="tee" type="string">
-  Set to `true` to return only models that are offered confidentially, meaning the model object carries `is_tee: true`.
-
-  This filter reports a model's own capability. It does not promise that a given request will reach an attested provider, which depends on the deployment serving it. To require attestation for a request, send `provider: {"aci_verified": true}`. See [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing).
-
-  `true` is the only accepted value. Any other value, including `false`, returns `400`. Omit the parameter to list the full catalog.
+  This host always filters to `is_tee: true` models. The host policy overrides this query parameter, including `tee=false` and `tee=1`; neither enables non-TEE models. Attested serving is also required for every inference request. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy).
 </ParamField>
 
 ```bash
@@ -73,7 +70,7 @@ curl https://inference.phala.com/v1/models
 | `pricing.prompt` | Input token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.completion` | Output token price per token; multiply by 1,000,000 for per-million-token pricing |
 | `pricing.input_cache_read` | Cached input price per token when the model exposes cache pricing |
-| `providers` | Serving routes available for the model. |
+| `providers` | Provider identifiers for active deployments that can serve the model; confidentiality is described by `is_tee`, not by this field alone. |
 | `input_modalities` | Supported input types, such as `text` or `image` |
 | `output_modalities` | Supported output types, such as `text`, `embeddings`, or `decisions` |
 | `supported_parameters` | Request parameters accepted by the model |

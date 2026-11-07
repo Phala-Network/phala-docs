@@ -3,53 +3,16 @@ title: Provider Verification
 description: Understand the evidence and channel bindings for each provider in Phala's live catalog.
 ---
 
-Every model served at `https://inference.phala.com/v1` uses the TEE-only policy. The Phala gateway requires upstream verification and an enforceable channel binding before forwarding your prompt. Evidence coverage varies by provider: a verified router, a model instance, and a provider broker prove different boundaries.
+import SharedContent from "/snippets/aci/providers.mdx";
+import { site } from "/snippets/site.jsx";
 
-The public [model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) lists serving providers in `providers`. The receipt identifies the session that actually served a response; inspect that session's `upstream_name`, `verifier_id`, `channel_binding`, `claims`, and `evidence`. A route label such as `phala-267` is distinct from the catalog provider `phala`.
+Phala serves confidential models only. Check the current [model catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) and the session cited by your receipt for the actual serving provider.
 
-## Provider evidence
-
-These are the providers in the live catalog. Availability changes; the catalog and each response's verified session remain authoritative.
-
-| Catalog provider | What the gateway verifier checks and binds | Evidence boundary |
-| --- | --- | --- |
-| `phala` | dstack TDX quote, nonce and signing-address/TLS-SPKI report-data binding, measured compose, and available GPU evidence; pins upstream TLS. | A Phala dstack model CVM. GPU claims depend on verified, nonce-bound evidence. |
-| `chutes` | Instance TDX evidence and verified instance encryption keys; binds forwarding to a verified ML-KEM E2EE key. | Model instance. Inspect the session for GPU evidence and claim status rather than assuming a CPU-to-GPU binding. |
-| `tinfoil` | The official verifier checks enclave evidence, release/code measurements, and router TLS SPKI. | The confidential model router. The gateway does not independently attest each model worker through this verifier. |
-| `near-ai` | Nonce-bound gateway TDX evidence and TLS SPKI; pins the verified gateway channel. | The NEAR AI gateway. Per-model backend verification is delegated to that gateway. |
-| `privatemode` | The official proxy is co-deployed in the gateway's measured compose. Its readiness follows initial Contrast verification and secret exchange; requests and successful responses use Privatemode OAE protection. | The measured proxy and its Contrast-attested secret path. The observed dynamic manifest is not bound to the active inference secret and is not proof of a particular serving manifest. |
-| `fortanix` | The `armet-ai` verifier checks nonce-bound TDX evidence, TLS SPKI, model-id/GPU-evidence report-data commitments, NRAS GPU verification, and an operator-pinned TD measurement profile. | The per-model Armet AI TD. Matching a configured measurement pin does not independently establish model-weight provenance. |
-| `0g-private-computer` | Native verifier checks provider-broker TDX evidence, a pinned boot chain, and report-data-bound encryption/signing keys; forwarding uses the verified E2EE key. | The provider broker TEE. `plaintext_destination_verified: false` means the evidence does not independently establish the plaintext inference destination. |
-
-The implementation is public in the [gateway provider verifiers](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/src/aci/verifier) and [provider evidence bridges](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/scripts/provider_verifier).
-
-## Binding methods
-
-| Binding | Meaning |
-| --- | --- |
-| `tls_spki_sha256` | Pins the provider-facing HTTPS connection to a verified TLS key. |
-| `e2ee_public_key_sha256` | Encrypts the provider-facing request to a verified key. |
-| `proxy_image_sha256` | Binds Privatemode forwarding to the co-deployed proxy's measured image (`proxy_image_digest`) and startup-checked shared credential digest (`credential_sha256`); plaintext is sent only to its configured internal origin. |
-
-Bindings and typed claims are in the **session**, referenced by the receipt's `upstream.verified.session_id`. The receipt event records `model_id`, `result`, `required`, and `session_id`; do not assume it embeds all verification details.
-
-## Claim coverage
-
-Claims have lowercase statuses `asserted`, `refuted`, or `unknown`, and a source that distinguishes hardware proof, verifier derivation, and provider/operator assertions.
-
-- `tee_attested` describes the verified TEE boundary above. Check its `source` as well as its `status`: Privatemode reports `verifier_derived`, based on the measured proxy and its Contrast-attested secret path, rather than `hardware_proven`.
-- `tcb_up_to_date` can be `refuted` for a stale TCB; successful verification does not silently turn it into an up-to-date claim.
-- `serving_software_known_good` depends on the verifier's measurement/provenance policy.
-- `gpu_attested` depends on provider evidence. A genuine GPU attestation alone does not establish its binding to the serving CPU TEE.
-- `model_weights_provenance` is not generally proven. Treat `unknown` as unproven.
-
-Zero data retention is a separate property. Send `provider: {"zdr": true}` when the provider must not keep prompt or completion content after serving. See [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
-
-Ordinary clients do not verify each response. Use the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy) for client-side verification.
+<SharedContent site={site} />
 
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/tcb-and-claims" />
+  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims" />
   <Card title="Receipts and Sessions" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions" />
 </CardGroup>

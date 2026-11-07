@@ -1,0 +1,228 @@
+export const AttestedRoutingExample1 = ({ site }) => <CodeBlock language="bash">{`curl ${site.baseUrl}/chat/completions \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "z-ai/glm-5.3",
+    "messages": [{"role": "user", "content": "Summarize this patient note."}],
+    "provider": {"aci_verified": true}
+  }'`}</CodeBlock>;
+
+export const AttestedRoutingExample2 = ({ site }) => <CodeBlock language="bash">{`curl -s "${site.baseUrl}/aci/sessions?model=z-ai/glm-5.3" \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  | jq -r '.sessions[] | "\\(.session_id)  \\(.upstream_name)  \\(.endpoint)"'`}</CodeBlock>;
+
+export const AttestedRoutingExample3 = ({ site }) => <CodeBlock language="bash">{`curl ${site.baseUrl}/chat/completions \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "z-ai/glm-5.3",
+    "messages": [{"role": "user", "content": "Summarize this patient note."}],
+    "provider": {
+      "aci_verified": true,
+      "aci_session_ids": ["c352e3e6f871bcb370d89bec98785c9311ddb062e31b33c556bd2ece0b7d0d86"]
+    }
+  }'`}</CodeBlock>;
+
+export const AttestedRoutingExample4 = ({ site }) => <CodeBlock language="bash">{`curl -s "${site.baseUrl}/models?tee=true" \\
+  | jq -r '.data[].id'`}</CodeBlock>;
+
+export const AttestedRoutingExample5 = ({ site }) => <CodeBlock language="bash">{`curl -s "${site.baseUrl}/embeddings/models?tee=true" \\
+  | jq -r '.data[].id'`}</CodeBlock>;
+
+export const AttestedRoutingExample6 = ({ site }) => <CodeBlock language="bash">{`curl -s "${site.baseUrl}/aci/receipts/$RECEIPT_ID" \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  | jq '.event_log[] | select(.type == "upstream.verified")'`}</CodeBlock>;
+
+Attested routing restricts a request to an upstream that the gateway verified before sending the
+prompt. Verification runs inside the TEE, produces an enforceable channel binding, and fails closed:
+if no eligible upstream verifies, the prompt is never forwarded.
+
+Use it when a prompt must not reach a provider whose execution environment you cannot check. The
+examples below use a confidential model; see
+[List the models you can use](#list-the-models-you-can-use) to find one.
+
+Two levels of constraint are available:
+
+| Constraint | What it selects |
+| --- | --- |
+| `provider: {"aci_verified": true}` | Any upstream that is currently verified and channel bound. |
+| `provider: {"aci_session_ids": [...]}` | One specific attested channel, by session id. |
+
+## Require an attested upstream
+
+Add the `provider` block to the request. The following JSON inference endpoints accept it:
+`/v1/chat/completions`, `/v1/messages`, `/v1/responses`, `/v1/embeddings`, and
+`/v1/completions`, `/v1/images/generations`, and `/v1/systemone`. Multipart
+`/v1/audio/transcriptions` carries the same constraints in `X-ACI-Provider`, as advertised by
+`service_capabilities.supported_multipart_constraint_endpoints`.
+
+<AttestedRoutingExample1 site={site} />
+
+
+When verification is required by the request or endpoint policy, a model that passes admission
+but has no eligible verified, attested upstream fails with `503 upstream_verification_failed`
+before the prompt is sent. Failover retries stay inside the attested set, so an unverified upstream
+never receives the prompt as a fallback.
+
+Admission can reject a request earlier: a TEE-only endpoint rejects an existing non-TEE model with
+`404`, and routing constraints such as `provider.zdr` can leave no eligible route (`404`). An unknown
+model returns `404 model_not_found`.
+
+On an endpoint that also serves non-TEE models, setting `"aci_verified": false` or omitting it adds
+no request-level attestation constraint. A TEE-only endpoint forces verification even when the
+client sends `false` or omits the field. This does not waive validation: combining `false` with
+session pins is still rejected as contradictory.
+
+<Note>
+Requests that send the removed `X-Upstream-Verification` header return `400` with type
+`invalid_request_error` and the message `X-Upstream-Verification is no longer supported; use
+provider.aci_verified`. Remove the header and use the request-body controls above.
+</Note>
+
+## Pin a request to one attested channel
+
+`aci_verified` accepts any upstream that is verified right now. To require one specific attested
+channel, pass its session id. This is useful when you have already inspected a session's evidence
+and want subsequent requests to reach that exact channel or fail.
+
+List the sessions that can serve your model. The unfiltered list covers every upstream the gateway
+has verified, so filter it: a session belonging to another upstream will never match your request.
+
+<AttestedRoutingExample2 site={site} />
+
+
+Each entry carries a `session_id` as 64 lowercase hex characters, the verifier that produced
+it, its channel binding, and an `expires_at` timestamp. `?upstream_name=` filters the same list by
+upstream. See <a href={site.paths.upstreams + "#attested-sessions"}>Attested sessions</a>.
+
+The most reliable id is the one that already served you. Every response's receipt names the session
+that served it, so a client can pin follow-up requests to the channel it just used.
+
+The example id is a snapshot from the public sessions list. Replace it with a current id for your
+model before sending the request. Pin a request to one or more of them:
+
+<AttestedRoutingExample3 site={site} />
+
+
+Listing several ids means any one of them may serve the request. If none of them matches a currently
+verified channel, the request fails with `412` and no prompt is sent:
+
+```json
+{
+  "error": {
+    "message": "none of the requested attested sessions is available for model z-ai/glm-5.3; pinned sessions may have been superseded by re-verification, so re-list /v1/aci/sessions and retry",
+    "type": "session_not_accepted",
+    "code": null,
+    "param": null
+  }
+}
+```
+
+A session id is tied to one verified channel and validity period. Re-verification can reuse an
+unexpired session when the verified material is equivalent. Changed material, or verification
+after the session expires, produces a new id. Read a current id shortly before you pin it, and
+expect a pinned id to stop matching. A pin that stops matching is a failure, never a
+silent fallback to a different channel.
+
+Do not retry a `412` with the same unavailable pins; inspect current sessions and approve a new set
+before changing the request.
+
+`aci_session_ids` implies `aci_verified`. Passing session ids together with `"aci_verified": false`
+is rejected as a contradiction rather than resolved in either direction.
+
+## List the models you can use
+
+<AttestedRoutingExample4 site={site} />
+
+
+Embedding models have their own catalog, which takes the same parameter:
+
+<AttestedRoutingExample5 site={site} />
+
+
+On an endpoint that also serves non-TEE models, `tee` accepts only `true`; any other value,
+including `false`, returns `400`. Omit the parameter for its full catalog. On a TEE-only endpoint,
+the filter is forced: any `tee` value, or omitting it, returns only TEE models.
+
+The independent `zdr` filter accepts only `true` on either endpoint type; omit it to leave retention
+unconstrained. `?zdr=true` composes with the endpoint’s TEE filter. TEE-only serving does not imply
+zero data retention.
+
+<Warning>
+`?tee=true` and `provider: {"aci_verified": true}` read different properties. The catalog filter
+reports a model's own `is_tee` capability flag. The routing constraint is enforced against the
+provider actually serving the request.
+
+A model listed under `?tee=true` can still return `503` for an attested request when none of its
+live deployments is on an attested provider. The catalog tells you which models are offered
+confidentially. Only the gateway decides what a given request may reach.
+</Warning>
+
+The requested model id, `claims.extra.canonical_model_id`, and measured `--served-model-name` may use
+different spellings; inspect the mapping under your policy rather than hard-coding a normalization rule.
+
+## Request validation
+
+The gateway parses the attestation fields itself and rejects anything it cannot read, rather than
+treating it as an absent constraint. Invalid entries below return `400` with type
+`invalid_request_error` and forward nothing; the table also shows valid controls.
+
+| Request | Result |
+| --- | --- |
+| `"provider": {"aci_verified": true}` | Constraint applied. |
+| `"provider": {"aci_verified": false}` | No extra constraint on a mixed endpoint; a TEE-only endpoint still requires verification. |
+| `"provider": {"aci_verified": "yes"}` | `400`, expected a boolean. |
+| `"provider": {"aci_session_ids": []}` | `400`, must not be empty. |
+| `"provider": {"aci_session_ids": [""]}` | `400`, expected 64-character lowercase hex strings. |
+| `"provider": {"aci_verified": false, "aci_session_ids": ["c352e3e6f871bcb370d89bec98785c9311ddb062e31b33c556bd2ece0b7d0d86"]}` | `400`, contradictory. |
+| `"provider": ["aci_verified"]` | `400`, the block must be an object. |
+
+`aci_verified` and `aci_session_ids` are read by the gateway and removed before the request reaches
+a provider. They compose with the other `provider` fields, such as
+<a href={site.paths.zdr}><code>zdr</code></a>.
+
+## What the constraint guarantees
+
+The check runs before any prompt bytes leave the gateway:
+
+1. The route is classified as an attested provider.
+2. Verification is required for that route and cannot be waived by a request header.
+3. Verification returns a verified result and an enforceable channel binding.
+4. The request is forwarded over the bound channel.
+
+Verification evidence is cached for a short interval and refreshed in the background, so a verified
+result may come from a recent check rather than one performed at that instant. The channel binding
+is enforced on every connection. If the upstream presents a key or certificate that does not match
+the binding, the gateway re-verifies and retries, then fails. A request is never served over a
+channel that does not match the evidence it was verified against.
+
+This constraint applies per request. There is no session to establish and reuse: every request is
+evaluated on its own, and each failover candidate is evaluated independently.
+
+## Verify that it held
+
+A completed attested request returns `x-receipt-id`. ACI-constrained streams, including all
+TEE-only endpoint streams, and E2EE streams are never early-committed. Fetch the receipt after
+completion and read its `upstream.verified` event:
+
+<AttestedRoutingExample6 site={site} />
+
+
+```json
+{
+  "type": "upstream.verified",
+  "model_id": "phala/gemma-4-26b-a4b-uncensored",
+  "result": "verified",
+  "required": true,
+  "session_id": "ecda679a01d29724ccb12f24e5007f536a50668b544d9c87d04c5ef8a1bddd3a"
+}
+```
+
+The example session id is a snapshot. In your receipt, `session_id` names the channel that served
+the request and is the id to pin for follow-up requests. Inspecting `"result": "verified"` and
+`"required": true` with `curl` and `jq` does not verify the receipt signature or the gateway's
+attestation. Verify those and the request and response hashes before accepting the receipt as proof
+that the constraint held. See <a href={site.paths.verify}>Verify a response</a>.
+
+The request you sent is bound into the same receipt through `request.received.body_hash`, so you can
+prove which constraint you asked for alongside the result you got.

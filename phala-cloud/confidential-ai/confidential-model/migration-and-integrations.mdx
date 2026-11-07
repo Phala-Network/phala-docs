@@ -14,6 +14,7 @@ After migration, responses can be verified with `x-receipt-id`, [Attestation Rep
 ## Migrate from OpenAI
 
 ```python
+import os
 from openai import OpenAI
 
 # Before
@@ -21,7 +22,7 @@ openai_client = OpenAI(api_key="sk-...")
 
 # After
 phala_client = OpenAI(
-    api_key="YOUR_PHALA_API_KEY",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 ```
@@ -31,11 +32,12 @@ Everything else stays familiar: chat completions, streaming, tool calling, visio
 ## Migrate from OpenRouter
 
 ```python
+import os
 from openai import OpenAI
 
 client = OpenAI(
     base_url="https://inference.phala.com/v1",
-    api_key="YOUR_PHALA_API_KEY",
+    api_key=os.environ["PHALA_AI_API_KEY"],
 )
 ```
 
@@ -46,10 +48,11 @@ Model ids use the provider/model format returned by `/v1/models`. Verify the act
 <CodeGroup>
 
 ```python Python
+import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="YOUR_PHALA_API_KEY",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -80,11 +83,12 @@ const response = await client.chat.completions.create({
 ## LangChain
 
 ```python
+import os
 from langchain_openai import ChatOpenAI
 
 chat = ChatOpenAI(
     model="z-ai/glm-5.3",
-    api_key="YOUR_PHALA_API_KEY",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -96,15 +100,16 @@ print(response.content)
 
 ```typescript
 import { generateText } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
-const phala = createOpenAI({
+const phala = createOpenAICompatible({
+  name: "phala",
   apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
 const { text } = await generateText({
-  model: phala("z-ai/glm-5.3"),
+  model: phala.chatModel("z-ai/glm-5.3"),
   prompt: "Explain attestation.",
 });
 ```
@@ -117,10 +122,10 @@ from langfuse.openai import OpenAI
 
 os.environ["LANGFUSE_PUBLIC_KEY"] = "pk-lf-..."
 os.environ["LANGFUSE_SECRET_KEY"] = "sk-lf-..."
-os.environ["LANGFUSE_HOST"] = "https://cloud.langfuse.com"
+os.environ["LANGFUSE_BASE_URL"] = "https://cloud.langfuse.com"
 
 client = OpenAI(
-    api_key="YOUR_PHALA_API_KEY",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 ```
@@ -171,6 +176,13 @@ Clients of the proxy use `phala-glm` as their model name; LiteLLM sends `z-ai/gl
 - [ ] Use a catalog model; every model on this endpoint runs in a TEE.
 - [ ] Capture `x-receipt-id` in raw HTTP responses when you need verification.
 - [ ] Verify one representative response before production rollout.
+
+## Integration guides
+
+- [OpenAI SDK](/phala-cloud/confidential-ai/confidential-model/integrations/openai-sdk): Responses, Chat Completions, embeddings, and verified Node/Bun transport.
+- [Agent frameworks](/phala-cloud/confidential-ai/confidential-model/integrations/agent-frameworks): CrewAI, PydanticAI, and OpenAI Agents SDK.
+- [Vercel AI SDK](/phala-cloud/confidential-ai/confidential-model/integrations/vercel-ai-sdk): the OpenAI-compatible provider and streaming routes.
+- [Langfuse](/phala-cloud/confidential-ai/confidential-model/integrations/langfuse): tracing boundaries, costs, and receipt verification.
 
 ## Related
 

@@ -1,0 +1,96 @@
+A <a href={site.paths.models}>confidential model</a> is served by an upstream provider whose
+enclave the gateway verifies before forwarding your prompt. Each provider produces an enforceable
+<a href={site.paths.upstreams + "#channel-binding"}>channel binding</a> and a set of
+<a href={site.paths.upstreams + "#claims"}>typed claims</a>. This page summarizes what each provider proves.
+
+The receipt's `upstream.verified.session_id` identifies the attested session that served a request.
+Fetch that session for the provider, channel binding, and verified claims. The platform adds
+confidential providers over time, so treat the cited session as the authoritative per-response
+record rather than this list.
+
+## Provider evidence
+
+Availability changes; the catalog and each response's verified session remain authoritative.
+
+| Catalog provider | What the gateway verifier checks and binds | Evidence boundary |
+| --- | --- | --- |
+| `phala` | dstack TDX quote, nonce and signing-address/TLS-SPKI report-data binding, measured compose, and available GPU evidence; pins upstream TLS. | A Phala dstack model CVM. GPU claims are supplemental nonce-matched checks; the generic GPU path does not authenticate JWT signatures or GPU identity. |
+| `chutes` | Instance TDX evidence and verified instance encryption keys; binds forwarding to a verified ML-KEM E2EE key. | Model instance. Supplemental GPU checks do not authenticate JWT signatures or GPU identity; inspect the session without assuming a CPU-to-GPU binding. |
+| `tinfoil` | The official verifier checks enclave evidence, release/code measurements, and router TLS SPKI. | The confidential model router. The gateway does not independently attest each model worker through this verifier. |
+| `near-ai` | Nonce-bound gateway TDX evidence and TLS SPKI; pins the verified gateway channel. | The NEAR AI gateway. Per-model backend verification is delegated to that gateway. |
+| `privatemode` | The official proxy is co-deployed in the gateway's measured compose. Its readiness follows initial Contrast verification and secret exchange; requests and successful responses use Privatemode OAE protection. | The measured proxy and its Contrast-attested secret path. The observed dynamic manifest is not bound to the active inference secret and is not proof of a particular serving manifest. |
+| `fortanix` | The `armet-ai` verifier checks nonce-bound TDX evidence, TLS SPKI, model-id/GPU-evidence report-data commitments, NRAS GPU verification, and an operator-pinned TD measurement profile. | The per-model Armet AI TD. Matching a configured measurement pin does not independently establish model-weight provenance. |
+| `0g-private-computer` | Native verifier checks provider-broker TDX evidence, a pinned boot chain, and report-data-bound encryption/signing keys; forwarding uses the verified E2EE key. | The provider broker TEE. `plaintext_destination_verified: false` means the evidence does not independently establish the plaintext inference destination. |
+
+The implementation is public in the [gateway provider verifiers](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/src/aci/verifier) and [provider evidence bridges](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/scripts/provider_verifier).
+
+## Providers and bindings
+
+| Provider | TEE | Channel binding | Zero data retention |
+| --- | --- | --- | --- |
+| Tinfoil | AMD SEV-SNP (or TDX) | `tls_spki_sha256` | Yes |
+| NEAR AI | Intel TDX; optional NVIDIA CC evidence (supplemental check; JWT signatures not verified) | `tls_spki_sha256` | Yes |
+| Chutes | Intel TDX + NVIDIA CC (supplemental check; JWT signatures not verified) | `e2ee_public_key_sha256` | Yes |
+| Phala | Intel TDX + NVIDIA CC (supplemental check; JWT signatures not verified) | `tls_spki_sha256` | Yes |
+| Privatemode | Contrast-attested secret path via a measured proxy | `proxy_image_sha256` | Not in the ZDR routing allowlist |
+| 0G | See session evidence | `e2ee_public_key_sha256` | Not in the ZDR routing allowlist |
+| Fortanix (ArmetAI) | Intel TDX + NVIDIA CC | `tls_spki_sha256` | Not in the ZDR routing allowlist |
+
+The GPU qualifiers follow the [Phala-direct](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/phala-direct/verification.md), [Chutes](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/chutes/verification.md), and [NEAR AI](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/near-ai/verification.md) verifier paths. They describe supplemental GPU checks, not authenticated GPU identity; NEAR AI preserves its optional result in `claims.extra.gateway_gpu_check` while leaving `gpu_attested` unknown.
+
+- A `tls_spki_sha256` binding pins the upstream HTTPS connection to the verified TLS key.
+- An `e2ee_public_key_sha256` binding encrypts the request body to the verified enclave key, so only
+  that enclave can decrypt it.
+- A `proxy_image_sha256` binding records `provider`, `proxy_image_digest`, and `credential_sha256`
+  for Privatemode's co-deployed proxy. The gateway checks the credential and forwards only to the
+  private proxy in its measured deployment; the proxy verifies and encrypts the provider hop.
+- Zero data retention means the provider does not keep prompt or completion content after serving a
+  request. It rests on the provider's contract or published policy, not on the attestation report.
+  The ZDR column describes the routing allowlist, which contains `phala`, `tinfoil`, `near-ai`,
+  and `chutes`. Absence from that list does not establish a provider’s retention policy. To enforce the
+  property per request, send `provider: {"zdr": true}`. See
+  <a href={site.paths.zdr}>Zero data retention</a>.
+
+The ZDR constraint applies independently on mixed and TEE-only endpoints; a verified TEE upstream
+is not automatically in the ZDR allowlist.
+
+## What each provider attests
+
+Claims are honest about their source. A claim is asserted only when that provider's verifier backs
+it; anything not established is `Unknown`. See
+<a href={site.paths.upstreams + "#claims"}>Claims</a> for the vocabulary.
+
+| Claim | Tinfoil | NEAR AI | Chutes | Phala | Privatemode | 0G | Fortanix (ArmetAI) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `tee_attested` | Hardware-proven | Hardware-proven | Hardware-proven | Hardware-proven | Verifier-derived | Hardware-proven | Hardware-proven |
+| `tcb_up_to_date` | Verifier-derived | Tri-state | Tri-state | Tri-state | Unknown | Tri-state | Tri-state |
+| `os_known_good` | Unknown | Unknown | Unknown | Verifier-derived | Unknown | Unknown | Unknown |
+| `serving_software_known_good` | Verifier-derived (Sigstore) | Unknown | Unknown | Unknown | Unknown | Unknown | Verifier-derived (operator pin) |
+| `gpu_attested` | Unknown | Unknown | Verifier-derived (supplemental) | Verifier-derived (supplemental) | Unknown | Unknown | Verifier-derived (NRAS-signed) |
+| `model_weights_provenance` | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown |
+
+Notes:
+
+- **`tee_attested` is hardware-proven** for Tinfoil, NEAR AI, Chutes, Phala, ArmetAI, and 0G: a genuine TEE
+  quote is verified and the request channel is bound to it. Privatemode's claim is verifier-derived
+  by `privatemode-proxy/co-deployed-contrast/v1`, based on its co-deployed proxy and channel binding.
+- **`tcb_up_to_date`** is tri-state when the verifier reports a TCB status: an up-to-date platform
+  asserts it, a stale platform refutes it, and an absent status is `Unknown`. Tinfoil's verifier
+  requires an up-to-date TCB but exposes no separate status, so its claim is verifier-derived.
+- **`os_known_good`** is verifier-derived for Phala when the attested OS image resolves to a known
+  production image. The other providers in this table leave it `Unknown`.
+- **`serving_software_known_good`** is asserted for Tinfoil by comparing its launch measurement
+  against published Sigstore golden values for the build. ArmetAI instead asserts it against an operator pin; the remaining providers leave it `Unknown`.
+- **`gpu_attested`** has provider-specific assurance. Phala and Chutes record accepted, nonce-matched supplemental NVIDIA checks; their generic GPU path decodes JWTs without verifying signatures and does not authenticate GPU identity or bind it to the serving CPU. ArmetAI requires a separate NRAS-signed check before emitting a verified result and binds the exact GPU evidence into CPU report data. The shared `verifier_derived` label does not make these checks equivalent.
+
+
+ArmetAI’s `armet-ai` verifier asserts serving software against a configured operator measurement pin and GPU evidence against nonce-bound NRAS reports. The pin does not independently prove reproducible software or model-weight provenance. Its TCB claim is tri-state and OS provenance remains unknown. See the [ArmetAI verification contract](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/docs/providers/armet-ai/verification.md#session-claims).
+
+
+
+## Router-backed providers
+
+Some providers (NEAR AI, Tinfoil) front many models behind one TEE gateway. The gateway verifies that
+gateway channel, so models can share an <a href={site.paths.upstreams + "#attested-sessions"}>attested session</a>
+for that channel; the served model is recorded on the receipt. Per-model coverage is delegated to the verified router; the gateway does not independently verify
+the router’s backend model enclaves.

@@ -1,0 +1,136 @@
+export const ReceiptsExample1 = ({ site }) => <CodeBlock language="bash">{`curl "${site.baseUrl}/aci/receipts/$RECEIPT_ID" \\
+  -H "Authorization: Bearer $${site.keyEnv}"`}</CodeBlock>;
+
+A receipt is the gateway's signed record of one request. It is an ordered event log that captures
+what the gateway received, which upstream it selected and verified, what it forwarded, and what it
+returned, with a hash at each step. The gateway signs the receipt with a key published in its
+<a href={site.paths.attestation}>attestation report</a>, so a verified receipt proves the response
+came from the attested workload and was not altered.
+
+Completed inference responses include the receipt id in `x-receipt-id`, except for early-committed,
+unconstrained, non-E2EE streams on a mixed endpoint; see [Streaming](#streaming). Fetch the receipt:
+
+<ReceiptsExample1 site={site} />
+
+
+`{id}` accepts the receipt id (`rcpt-…`) or the response `id` (chat id). See
+<a href={site.paths.apiReceipts}><code>GET /v1/aci/receipts/&#123;id&#125;</code></a> for the response shape. For a request made with an API key, use the same key: a missing bearer token
+returns `401`, and a different token returns `404`. Anonymous receipts may be publicly retrievable;
+an unknown receipt id returns `404`.
+
+## What a receipt commits to
+
+`GET /v1/aci/receipts/{id}` returns the receipt directly, signed by a key from the attested keyset:
+
+| Field | Meaning |
+| --- | --- |
+| `receipt_id`, `chat_id` | The receipt id and the response/chat id. |
+| `workload_keyset_digest` | Must match the attestation report you verified. |
+| `endpoint`, `method`, `served_at` | The route, HTTP method, and time served. |
+| `event_log` | The ordered transparency events below. |
+| `signature` | Signature over the receipt, by a `receipt_signing_keys` entry in the attested keyset. |
+
+The `event_log` carries the two hashes that matter most: `request.received.body_hash` (the request
+the gateway observed) and `response.returned.body_hash` (the response it returned). Comparing these to
+the bytes you sent and received proves the receipt covers your exact exchange.
+
+<Note>
+The legacy alias `GET /v1/signature/{id}` returns the same receipt wrapped in a compatibility envelope
+that adds a `text` field (`"<request body hash>:<response hash>"`), a top-level `signature`, and
+`signing_address`, for earlier API clients. The outer signature uses a separate legacy signer;
+it is not the embedded receipt's ACI signature. Verify the embedded receipt with the signing key
+from the canonical ACI keyset. New integrations should use `/v1/aci/receipts/{id}` directly.
+</Note>
+
+## The transparency event log
+
+The `event_log` records the request's path through the gateway. Each event carries a hash or a fact,
+never your prompt text.
+
+| Event | Author | What it records |
+| --- | --- | --- |
+| `request.received` | Frontend | Hash of the request body the gateway observed. |
+| `middleware.forwarded` | Frontend | Effective body hash after any middleware rewrite. |
+| `route.selected` | Backend | The target route id the backend accepted. |
+| `request.forwarded` | Backend | Hash of the provider-facing request body. |
+| `upstream.verified` | Backend | The upstream verification result and session reference (see below). |
+| `response.received` | Backend | Hash of the provider response before any post-processing. |
+| `response.returned` | Frontend | `body_hash` of the final response bytes. |
+
+The signed receipt includes `request.received.body_hash` and `response.returned.body_hash`, which
+lets a verifier bind the receipt to the exact bytes you sent and received.
+
+## The `upstream.verified` event
+
+This event records the upstream verification result and references the verified session.
+The provider boundary and its evidence are in that session:
+
+```json
+{
+  "type": "upstream.verified",
+  "model_id": "Qwen/Qwen3.6-35B-A3B-FP8",
+  "result": "verified",
+  "required": true,
+  "session_id": "5fbb0570097746289ee33ce69778bc917d9ec2db895788bc274a48c9771827fc"
+}
+```
+
+The session id is a snapshot from the public sessions list; use the id in your own receipt.
+
+- For a verified response, `result` is `verified` and `session_id` references the
+  <a href={site.paths.upstreams + "#attested-sessions"}>attested session</a> the channel was bound to.
+
+`required` records policy, not the verification result: on a mixed endpoint without an ACI
+constraint it is `false`, even when `result` is `verified`. On a TEE-only endpoint, every successful inference requires `result: "verified"`, `required: true`,
+and a `session_id`. On an endpoint that also serves non-TEE models, a non-attested routed response
+records `result: "failed"`, `required: false`, and no `session_id`. Requiring verified serving
+prevents that response rather than allowing an unverified fallback.
+
+Signed refusal receipts for `412` `session_not_accepted` and `503` `upstream_verification_failed` also
+arrive via `x-receipt-id`: they record `result: "failed"`, `required: true`, a `reason`, and no
+`session_id` or `request.forwarded` event; `response.returned` hashes the error body.
+
+## Why hashes, not bodies
+
+The gateway does not store your request or response. Receipts hold hashes, so they prove integrity
+without warehousing your data. A request rewrite appears as a difference between
+`request.received.body_hash` and `request.forwarded.body_hash`; a response rewrite appears as a
+difference between `response.received.body_hash` and `response.returned.body_hash`.
+
+## Verify the signature and session
+
+Receipt signatures cover the JCS form of the full receipt with `signature` removed. Resolve `key_id`
+in the verified keyset's `receipt_signing_keys`. Hash comparisons alone do not verify the signature
+or attestation. Use the <a href={site.paths.verify}>ACI TypeScript SDK</a> or
+<a href={site.paths.proxy}>Private AI Proxy</a>.
+
+## Attested sessions
+
+The <a href={site.paths.apiSessions}>session endpoint</a> returns the verified security context cited by
+`upstream.verified.session_id`: the upstream identity, binding, typed claims, validity window, and
+evidence. Its id is the bare 64-character lowercase SHA-256 digest of the complete session in JCS
+form, and is not a field in the full document. Fetch the full record before checking its content
+address; list entries omit `evidence.data`.
+
+The receipt records the gateway's assertion about the upstream. Independent upstream auditing also
+verifies the session's evidence and binding. Coverage varies by provider; apply your own claims policy.
+
+Receipts are kept in memory with a configurable TTL. Fetch them promptly and archive them if you
+need durable evidence.
+
+## Streaming
+
+For normal streams, `x-receipt-id` is sent before the body finishes, and the signed receipt is stored
+after the terminal body is observed. On an endpoint that also serves non-TEE models, an
+unconstrained, non-E2EE stream can instead be committed as
+HTTP `200` before the upstream answers. That response has no `x-receipt-id`; after a successful
+stream, fetch the receipt by the response `id`. ACI-constrained and E2EE streams are never
+early-committed; a TEE-only endpoint forces the ACI constraint for every inference request.
+
+In both cases, fetch the receipt after the stream ends: `response.returned.body_hash` covers the
+full streamed body. An upstream failure after early commit arrives as an in-band error and creates
+no receipt.
+
+Hash the raw SSE bytes, including every `data:` line, blank line, and final `[DONE]` frame, rather
+than the reassembled text. For E2EE, hash response ciphertext before decryption; the request uses
+restored compact JSON. See <a href={site.paths.e2ee + "#receipts-with-e2ee"}>Receipts with E2EE</a>.
