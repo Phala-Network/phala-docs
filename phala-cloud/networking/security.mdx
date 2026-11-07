@@ -26,7 +26,7 @@ graph LR
 
 Both the gateway and your CVM run inside Intel TDX Trusted Execution Environments. The infrastructure operator cannot access their memory or keys because the hardware prevents it. Before any connection is established, the gateway and your CVM verify each other through cryptographic attestation. This ensures you're always connecting to genuine TEE instances, not imposters.
 
-TLS certificate private keys are generated inside the TEE and never leave. The keys get sealed to specific hardware measurements, so only verified TEE instances can use them. DNS security records lock your domain to the TEE's certificate account, preventing unauthorized certificate issuance.
+TLS certificate private keys are generated and used inside the TEE. Custom-domain operators persist the ACME account and certificate state on the CVM's encrypted storage. Supported DNS providers can add CAA issuance constraints, and operators should verify the effective DNS policy.
 
 For network topology and routing details, see [Architecture](/phala-cloud/networking/architecture).
 
@@ -38,7 +38,7 @@ For network topology and routing details, see [Architecture](/phala-cloud/networ
 
 **Malicious infrastructure operator**: The gateway runs in its own TEE. Even with full infrastructure access, the operator cannot access the gateway's memory, keys, or decrypt your traffic. Both gateway and CVM verify each other before establishing connections.
 
-**Certificate compromise**: Certificate private keys are generated inside TEEs and cryptographically bound to hardware measurements. DNS security records prevent unauthorized certificate issuance. Even a compromised certificate authority cannot issue valid certificates without TEE control.
+**Certificate compromise**: Certificate private keys are generated inside TEEs. Attested evidence binds the served certificate and ACME metadata to a verified TDX quote. CAA and Certificate Transparency provide additional issuance controls and monitoring.
 
 **Certificate misissuance**: Public certificate transparency logs track all certificate issuance. Combined with DNS security records, this provides detection and prevention of unauthorized certificates.
 
@@ -87,28 +87,33 @@ This attestation requirement ensures you're always connecting to genuine TEE ins
 
 ## Zero-Trust HTTPS (zt-https)
 
-TLS certificate private keys are generated inside TEEs and never leave. The keys stay sealed to hardware measurements. Only verified TEE instances can use them. This means certificate private keys remain under TEE control at all times.
+TLS certificate private keys are generated and used inside TEEs. dstack-ingress
+stores its ACME account and private-key files under `/etc/letsencrypt` on the
+CVM's encrypted persistent storage. Verify the dstack KMS and storage policy,
+ingress code measurement, and evidence binding as part of the trust review.
 
 ### How TEEs Control Certificates
 
-Both Phala Cloud gateway domains (via gateway) and custom domains (via dstack-ingress) implement Zero-Trust HTTPS:
+Phala Cloud gateway domains and dstack-ingress custom domains each run their
+certificate lifecycle inside a TEE. For dstack-ingress:
 
-1. **TEE generates ECDSA keypair**: The private key is created inside TDX-encrypted memory and never leaves the TEE
-2. **Registers with Let's Encrypt**: The TEE establishes its own certificate account using the key
-3. **Seals credentials to hardware**: Keys are bound to specific TEE measurements, so only this exact TEE configuration can use them
-4. **Requests certificates**: Certificate operations happen entirely inside the TEE
+1. The ingress creates the ACME account and TLS key inside the CVM
+2. Let's Encrypt validates the configured DNS-01 or TLS-ALPN-01 challenge
+3. The account, certificate, and renewal state persist under `/etc/letsencrypt`
+4. Evidence generation binds the certificate manifest to TDX `report_data`
 
-The private keys never exist outside the TEE. They're stored on encrypted disk that only the TEE can decrypt, sealed to hardware measurements. Even with full host access, attackers can't extract or use these keys because the hardware cryptographically binds them to the TEE instance.
+Persist `/etc/letsencrypt` on encrypted CVM storage and verify the ingress image,
+compose hash, quote, and evidence binding as one trust chain.
 
 ### Certificate Architecture
 
-Zero-Trust HTTPS uses three mechanisms to prevent unauthorized certificate issuance:
+Zero-Trust HTTPS uses three complementary mechanisms:
 
-**CAA DNS Records**: Lock your domain to a specific ACME account
+**CAA DNS Records**: Constrain future issuance where the DNS provider supports the requested policy
 ```
 your-domain.com CAA 0 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/YOUR_TEE"
 ```
-This prevents anyone else from getting valid certificates, even with domain control. The certificate authority checks this DNS record before issuing certificates.
+Direct DNS-01 uses CAA only when `SET_CAA=true`. Cloudflare and Linode can publish the account-bound form shown above. Namecheap requires manual CAA management, while Route53 publishes a broader issuer policy at the hosted-zone apex. DNS administrators can change CAA, so monitor the effective response and Certificate Transparency logs.
 
 **Certificate Transparency Monitoring**: Every certificate issuance gets logged publicly. Monitor these logs to detect any unauthorized certificates immediately. Certificate Transparency logs are append-only and publicly auditable.
 
@@ -117,7 +122,10 @@ This prevents anyone else from getting valid certificates, even with domain cont
 - SHA256 hash linking the certificate to the ACME account
 - The actual certificate and account details
 
-This creates an auditable chain: the hardware signs the evidence, the evidence contains the certificate, and the certificate serves your traffic. Any tampering breaks the cryptographic chain.
+After cryptographic quote and TCB validation, compare the verified `report_data`
+with the SHA-256 digest of `sha256sum.txt`. Then verify the evidence certificate
+matches the certificate served to clients. These checks create an auditable
+binding from the TDX quote to the connection certificate.
 
 ### Preventing Timeline Attacks
 

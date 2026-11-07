@@ -260,29 +260,23 @@ cast call <DstackKms_ADDRESS> "kmsAllowedAggregatedMrs(bytes32)" <AGGREGATED_MR>
 
 ### ☐ TLS Certificate Binding
 
-**What it prevents:** Certificate impersonation attacks where attacker issues fraudulent certificates.
+**What it provides:** An attested binding between the published certificate manifest and a TDX quote.
 
-**How it works:** The TEE generates TLS certificates and publishes evidence files at `/evidences/`. The quote's `reportData` contains a hash of the evidence, cryptographically binding certificate to quote.
+**How it works:** The TEE generates TLS certificates and publishes evidence files at `/evidences/`. After validating the quote and TCB, compare the authenticated `reportData` with `sha256(sha256sum.txt)` followed by 32 zero bytes.
 
-**Why it's necessary:** Without binding, anyone (domain owner, CA, cloud provider) could issue valid certificates for your domain. Binding proves the TEE controls the certificate.
+**Why it's necessary:** The binding associates the certificate manifest and ACME metadata with one verified TDX quote. Review the ingress code measurement separately to establish which software handled the private key.
 
 **How to verify:** See [Domain Attestation](/phala-cloud/networking/domain-attestation)
 
-```javascript
-// Verify evidence hash in reportData
-const evidenceHash = crypto.createHash('sha256').update(evidenceFiles).digest();
-assert(quote.reportData.includes(evidenceHash));
-```
-
 ### ☐ CAA Records
 
-**What it prevents:** Unauthorized certificate issuance even if DNS is compromised.
+**What it provides:** A DNS-published policy for future certificate issuance.
 
-**How it works:** CAA DNS records restrict which Certificate Authorities can issue certificates for your domain.
+**How it works:** CAA records constrain participating Certificate Authorities, validation methods, and optionally an ACME account. dstack-ingress behavior varies by DNS provider and challenge mode.
 
-**Why it's necessary:** Without CAA records, any CA could issue certificates. CAA records add defense-in-depth against compromised CAs or DNS attacks.
+**Why it's useful:** CAA adds defense in depth while the intended record remains active. Certificate Transparency monitoring covers certificates that have already been issued.
 
-**How to verify:** See [Domain Attestation: CAA Records](/phala-cloud/networking/domain-attestation)
+**How to verify:** Query the effective CAA response and compare it with the provider-specific policy in [Domain Attestation](/phala-cloud/networking/domain-attestation).
 
 ```bash
 dig CAA yourdomain.com

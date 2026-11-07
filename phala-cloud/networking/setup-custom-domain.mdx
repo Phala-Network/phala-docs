@@ -7,7 +7,7 @@ This guide shows you how to use your own domain (like `api.mycompany.com`) inste
 
 ## Prerequisites
 
-- A domain with DNS hosted on Cloudflare (Linode and Namecheap also supported)
+- A domain with DNS hosted on Cloudflare, Linode, Namecheap, or Route53
 - Access to your DNS provider's API token
 - A deployed CVM application
 
@@ -37,6 +37,13 @@ This guide shows you how to use your own domain (like `api.mycompany.com`) inste
     2. Go to **Profile → Tools → API Access**
     3. Note your username and API key
   </Tab>
+
+  <Tab title="Route53">
+    1. Create an IAM role scoped to the hosted zone
+    2. Allow `route53:ChangeResourceRecordSets`, hosted-zone listing, record listing, and `route53:GetChange`
+    3. Create credentials that can assume that role
+    4. Note the access key, secret key, role ARN, and AWS region
+  </Tab>
 </Tabs>
 
 ## Step 2: Add dstack-ingress to Your Deployment
@@ -46,15 +53,15 @@ Update your `docker-compose.yml` to include the dstack-ingress container:
 ```yaml
 services:
   dstack-ingress:
-    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
+    image: ghcr.io/dstack-tee/dstack-ingress:2.6@sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0
     ports:
       - "443:443"
     environment:
+      - DNS_PROVIDER=cloudflare
       - DOMAIN=api.mycompany.com  # Your custom domain
       - TARGET_ENDPOINT=app:80  # Your app's internal endpoint
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
@@ -85,6 +92,12 @@ Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal 
 `dstack-ingress` is a HAProxy-based L4/TCP proxy. It terminates TLS and forwards the TCP stream to `TARGET_ENDPOINT`; it does not apply Nginx-style HTTP redirects, header rules, body limits, or buffering settings. Put HTTP-specific behavior in your application or in a separate HTTP proxy behind `TARGET_ENDPOINT` if needed.
 </Note>
 
+<Note>
+  `ACME_EMAIL` is optional. `CERTBOT_EMAIL` remains available as a historical
+  alias. Any configured contact address is published in
+  `/evidences/acme-account.json`, so use an address intended for public access.
+</Note>
+
 <Warning>
   `GATEWAY_DOMAIN` becomes your domain's CNAME target, and its first label must
   start with a letter or digit. Android rejects a leading underscore, so the
@@ -94,24 +107,35 @@ Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal 
 
 ## Step 3: Configure Environment Variables
 
-In the Phala Cloud dashboard, add these encrypted secrets:
+The Compose example above uses Cloudflare. For another provider, replace
+`DNS_PROVIDER=cloudflare` and remove `CLOUDFLARE_API_TOKEN`, then add the matching
+provider name and credentials below. Add these credentials as encrypted secrets
+in the Phala Cloud dashboard:
 
 <Tabs>
   <Tab title="Cloudflare">
+    - `DNS_PROVIDER`: `cloudflare`
     - `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
   </Tab>
 
   <Tab title="Linode">
+    - `DNS_PROVIDER`: `linode`
     - `LINODE_API_TOKEN`: Your API token from Step 1
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
   </Tab>
 
   <Tab title="Namecheap">
+    - `DNS_PROVIDER`: `namecheap`
     - `NAMECHEAP_USERNAME`: Your Namecheap username
     - `NAMECHEAP_API_KEY`: Your API key from Step 1
     - `NAMECHEAP_CLIENT_IP`: Your whitelisted IP address
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
+  </Tab>
+
+  <Tab title="Route53">
+    - `DNS_PROVIDER`: `route53`
+    - `AWS_ACCESS_KEY_ID`: Credentials that can assume the DNS role
+    - `AWS_SECRET_ACCESS_KEY`: Secret for those credentials
+    - `AWS_ROLE_ARN`: Role scoped to the hosted zone
+    - `AWS_REGION`: AWS region; defaults to `us-east-1`
   </Tab>
 </Tabs>
 
@@ -138,13 +162,12 @@ You can route multiple custom domains from one ingress container by using `DOMAI
 ```yaml
 services:
   ingress:
-    image: dstacktee/dstack-ingress:2.2@sha256:d05a7b343c37c1cca1bba8dbf7e8f3c6d2118158af2d41c455103796db4f67f0
+    image: ghcr.io/dstack-tee/dstack-ingress:2.6@sha256:c212abb7bedec4d7b54a82bcf9972e58e39a4757cc811faeb6017eee6c0673b0
     ports:
       - "443:443"
     environment:
       DNS_PROVIDER: cloudflare
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       GATEWAY_DOMAIN: gateway.${DSTACK_GATEWAY_DOMAIN}
       SET_CAA: true
       DOMAINS: |
@@ -186,27 +209,33 @@ The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
 
 ## Security Features
 
-When `SET_CAA=true` is enabled:
+With direct DNS-01 mode, `SET_CAA=true` asks the DNS provider integration to
+publish a Let's Encrypt CAA policy tied to the ingress ACME account. Verify the
+effective CAA response after deployment:
 
-- CAA records restrict certificate issuance to the TEE managed Let's Encrypt account
-- Only certificates requested from within your TEE can be issued
-- Certificate transparency logs can be monitored for unauthorized certificates
+- Cloudflare publishes the account-bound policy requested by dstack-ingress
+- Linode uses an address record for the gateway alias so CAA can coexist at the same name
+- Namecheap's API integration cannot create CAA records
+- Route53 publishes a broader issuer policy at the hosted-zone apex
+
+CAA reduces certificate-misissuance risk while the DNS policy remains intact.
+DNS administrators can change the policy, and previously issued certificates
+remain valid until they expire or are revoked. Monitor Certificate Transparency
+logs alongside CAA.
 
 <Warning>
-**Cloudflare Users**: Cloudflare automatically overrides CAA records at the apex domain (e.g., `example.com`). This prevents domain attestation from working correctly.
-
-**Solution options:**
-
-1. **Use a subdomain** (recommended): Deploy to `app.example.com` instead of `example.com`
-2. **Disable Cloudflare's CAA management**: See [Cloudflare CAA documentation](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/#caa-records-added-by-cloudflare)
-
-**To verify your CAA record is working:**
+**Cloudflare users**: Cloudflare Universal SSL can add partner-CA authorizations
+to an existing CAA RRset. These extra authorizations broaden the effective
+issuer policy while the dstack-ingress evidence binding remains independently
+verifiable. Review [Cloudflare's CAA behavior](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/#caa-records-added-by-cloudflare)
+and inspect every returned authorization:
 
 ```bash
 dig @1.1.1.1 +short CAA your-domain.com
 ```
 
-Should return the Let's Encrypt account URI with `validationmethods=dns-01;accounturi=...`
+Confirm the result contains the intended Let's Encrypt account restriction and
+evaluate every additional issuer against your policy.
 </Warning>
 
 ## Troubleshooting
@@ -216,9 +245,8 @@ Should return the Let's Encrypt account URI with `validationmethods=dns-01;accou
 Look for dstack-ingress container logs in the dashboard:
 
 ```text
-Successfully received certificate.
 Generated evidences successfully
-Next renewal check in 12 hours
+Next certificate check in 43200s
 ```
 
 ### Certbot Error: "too many certificates (5) already issued for this exact set of identifiers"
@@ -233,10 +261,11 @@ You may have forgotten to attach the data volume.
 
 **Connection refused**: Ensure `TARGET_ENDPOINT` points to the correct service:port.
 
-**CAA record conflicts**: Some providers (like Linode) don't allow CAA and CNAME on the same subdomain. The system will automatically use A records instead.
+**CAA record conflicts**: Linode uses an A record for the gateway alias so CAA can coexist at the same name. Namecheap users must manage CAA manually when they want an issuance policy.
 
 ## Next Steps
 
+- [Custom Domain and Ingress FAQ](/phala-cloud/networking/custom-domain-faq)
 - [Expose TCP services](/phala-cloud/networking/expose-tcp-service)
 - [Learn about domain attestation](/phala-cloud/networking/domain-attestation)
 - [Set up gRPC with custom domain](/phala-cloud/networking/setup-grpc-service)

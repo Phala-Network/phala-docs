@@ -1,0 +1,142 @@
+---
+title: Custom Domain and Ingress FAQ
+description: Answers to common questions about dstack-ingress, custom domains, DNS, TLS, and public endpoints
+---
+
+This FAQ collects common questions about exposing a CVM through a custom domain. Use the [custom domain setup guide](/phala-cloud/networking/setup-custom-domain) for the complete deployment procedure, and use [Troubleshooting](/phala-cloud/networking/troubleshooting) when an existing deployment does not respond.
+
+## Setup
+
+### How do I add a custom domain to my CVM
+
+Deploy `dstack-ingress` beside your application, configure a DNS provider and `TARGET_ENDPOINT`, then point your hostname to the gateway target shown by the setup. The ingress container obtains and renews the Let's Encrypt certificate, terminates custom-domain TLS inside the CVM, and forwards the resulting TCP stream to your application.
+
+Start with [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain). The guide includes the pinned dstack-ingress image, Compose mounts, provider-specific variables, DNS setup, and evidence verification.
+
+### Where do I add the DNS provider credentials
+
+Add them in the CVM's **Encrypted Secrets** section in the Phala Cloud dashboard. Common variables include:
+
+- `DOMAIN`
+- `CERTBOT_EMAIL` or `ACME_EMAIL`
+- `CLOUDFLARE_API_TOKEN`, `LINODE_API_TOKEN`, Namecheap credentials, or Route53 credentials, depending on `DNS_PROVIDER`
+
+Keep provider credentials in Encrypted Secrets and out of tickets, public Compose files, and source repositories. When updating an existing CVM, save the complete required secret set again so the deployment receives every required value. See [Set Secure Environment Variables](/phala-cloud/cvm/set-secure-environment-variables).
+
+### Which DNS records should I add
+
+The exact record names and values depend on the hostname, gateway domain, DNS mode, and provider. Follow the values generated for your deployment and verify the effective records with DNS queries. A record copied from another CVM or hostname can point to the wrong gateway or fail certificate validation.
+
+For a direct DNS-01 deployment, the provider integration creates the ACME challenge records. For TLS-ALPN-01, the operator manages the required DNS route and the gateway validates the challenge over TLS. See [Specifications](/phala-cloud/networking/specifications) for the supported modes and [Domain Attestation](/phala-cloud/networking/domain-attestation) for evidence checks.
+
+### Which DNS providers are supported
+
+Release 2.6 supports direct DNS-01 integrations for Cloudflare, Linode, Namecheap, and Route53. TLS-ALPN-01 supports operator-managed DNS without provider API credentials. Each provider uses its own variable names and permissions; follow the matching tab in the setup guide.
+
+### Why does the example use `gateway.<gateway-domain>` as the CNAME target
+
+The first label of `GATEWAY_DOMAIN` should start with a letter or digit. Use a target such as `gateway.${DSTACK_GATEWAY_DOMAIN}`. Older deployments may use a target beginning with `_`; Android hostname validation can reject that form even when other resolvers accept it.
+
+## TLS and protocols
+
+### Does dstack-ingress provide TLS passthrough
+
+The Phala gateway's `s` suffix controls gateway-level TLS passthrough. It sends the encrypted stream into the CVM. When that stream enters dstack-ingress, dstack-ingress terminates the custom-domain TLS connection and forwards decrypted TCP to `TARGET_ENDPOINT`.
+
+Application-managed TLS is a separate mode: the application terminates TLS, owns the certificate, and receives the gateway's encrypted stream through the `s` path. See [TLS Passthrough](/phala-cloud/networking/tls-passthrough) for the two termination models.
+
+### Can I expose PostgreSQL or another non-HTTP TCP service
+
+CVMs can expose TCP services through the gateway's TLS-wrapped TCP transport. The public connection uses TLS on port `443`; the gateway forwards the decrypted TCP stream to the service. Clients that expect plain TCP can use a local TLS-to-TCP bridge such as `socat` or the port-forwarding example.
+
+For application-managed TLS, use the `s` suffix and configure the service to handle TLS. For dstack-ingress, the ingress container owns the custom-domain certificate and the backend receives the decrypted stream. Direct plaintext TCP exposure on the public gateway is not the transport model.
+
+See [Expose TCP Services](/phala-cloud/networking/expose-tcp-service) and [TLS Passthrough](/phala-cloud/networking/tls-passthrough).
+
+### How do I expose gRPC through a custom domain
+
+Use the gRPC configuration in [Set Up a gRPC Service](/phala-cloud/networking/setup-grpc-service). The backend must speak HTTP/2, and the ingress or gateway path must preserve the required protocol settings. Test the endpoint with a gRPC-aware client such as `grpcurl`; a browser request is not a reliable gRPC test.
+
+## Certificates and evidence
+
+### The certificate was issued and DNS resolves. Why is the domain still unreachable
+
+Check the path from the public hostname to the backend in this order:
+
+1. Confirm the hostname resolves to the configured gateway target.
+2. Confirm the certificate SAN contains the hostname:
+
+   ```bash
+   openssl s_client -connect your-domain.example:443 \\
+     -servername your-domain.example </dev/null 2>/dev/null | \\
+     openssl x509 -noout -ext subjectAltName
+   ```
+
+3. Confirm `TARGET_ENDPOINT` uses a Compose service name and the correct internal port. Use `app:80` or `api:3000`; do not use `localhost` for another container.
+4. Confirm the backend listens on the container network interface and is healthy.
+5. Check the dstack-ingress and application logs.
+6. Test the evidence endpoint with HTTP/1.1:
+
+   ```bash
+   curl --http1.1 https://your-domain.example/evidences/
+   ```
+
+A valid certificate proves the ACME step completed. It does not prove that the backend service is listening or that the routing target is correct.
+
+### Where are the certificate and evidence files
+
+With the release 2.6 evidence layout, the endpoint can contain files such as:
+
+- `acme-account.json`
+- `cert-<domain>.pem`
+- `sha256sum.txt`
+- `quote.json`
+
+A multi-domain deployment can contain one certificate file for each domain. Download every certificate named by the manifest before running `sha256sum -c sha256sum.txt`. Follow [Domain Attestation](/phala-cloud/networking/domain-attestation) for quote verification and the `report_data` binding.
+
+### Why do I see several certificates or attestations after redeploying
+
+Each new CVM can have a new app ID and a separate certificate or attestation history. Compare the app ID, deployment time, certificate SAN, and current CVM state before deciding which entry represents the live deployment. Evidence files and Trust Center records should be interpreted together with the current deployment identity.
+
+The certificate manifest and CAA records provide useful verification signals. They do not independently prove exclusive private-key use, DNS administrator behavior, or quote authenticity. Verify the TDX quote and TCB with a trusted verifier before relying on the authenticated `report_data` binding.
+
+### Does CAA guarantee that only my CVM can obtain a certificate
+
+CAA reduces the risk of unintended certificate issuance when the effective DNS policy is intact. It does not prevent a DNS administrator from changing the records, and it does not invalidate certificates that were already issued.
+
+`SET_CAA` is disabled by default in release 2.6. When enabled, behavior is provider-specific: Namecheap cannot write CAA through the integration, and Route53 writes a broader issuer policy at the hosted-zone apex. Cloudflare may add partner-CA authorizations to the effective CAA response. Query the complete RRset after deployment and review Certificate Transparency records.
+
+```bash
+dig @1.1.1.1 +short CAA your-domain.example
+```
+
+## Renewals and deployment changes
+
+### How do I prevent rate-limit errors during redeployment
+
+Persist the `/etc/letsencrypt` directory across container replacement. It preserves the ACME account and certificate lineage, reducing unnecessary certificate requests. Persist `/evidences` as well so the certificate manifest and evidence remain aligned with the deployment.
+
+If issuance fails after a certificate or account reset, inspect existing CAA records and the Let's Encrypt rate-limit message before repeatedly redeploying. Reusing the persisted ACME state is usually the safer recovery path.
+
+### What should I include when asking for support
+
+Provide the following non-secret diagnostics:
+
+1. CVM or app ID
+2. Custom hostname and exact URL
+3. DNS provider and DNS mode
+4. The relevant DNS lookup output, including CNAME, TXT, or CAA records
+5. Complete dstack-ingress logs around certificate issuance or routing
+6. Backend container status and the internal service port
+7. `curl`, `openssl`, or `grpcurl` test output
+
+Remove API tokens, passwords, private keys, and other credentials before sharing logs or Compose files.
+
+## Related guides
+
+- [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain)
+- [Set Up a gRPC Service](/phala-cloud/networking/setup-grpc-service)
+- [Expose TCP Services](/phala-cloud/networking/expose-tcp-service)
+- [TLS Passthrough](/phala-cloud/networking/tls-passthrough)
+- [Domain Attestation](/phala-cloud/networking/domain-attestation)
+- [Troubleshooting](/phala-cloud/networking/troubleshooting)

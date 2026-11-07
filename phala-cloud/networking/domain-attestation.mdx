@@ -83,27 +83,23 @@ diff served-pubkey.pem evidence-pubkey.pem
 
 **Expected**: No output (files are identical).
 
-Now verify the TEE hardware signed the certificate public key:
+Cryptographically validate every quote before interpreting its `report_data`:
 
-```bash
-# Step 1: Prepare the public key for hashing
-cat acme-info.json | jq -r '.quoted_hist_keys[0].public_key' | xxd -r -p > pubkey.bin
-(echo -n "zt-cert:" && cat pubkey.bin) | sha512sum
-# Output: 68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8  -
+1. Submit each `account_quote` and `quoted_hist_keys[].quote` value to a trusted
+   DCAP verifier.
+2. Validate Intel collateral, TCB status, debug policy, and the expected gateway
+   application measurements.
+3. Compare the verifier-authenticated `report_data` with the account or public-key
+   binding defined by the audited gateway implementation.
+4. Match `active_cert` and the served certificate as shown above.
 
-# Step 2: Search for this hash in the TDX quote's report_data
-jq -r '.quoted_hist_keys[0].quote | fromjson | .report_data' acme-info.json | \
-  grep -o "68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8"
-# Output: 68f04e2b77f9ca8324d49ce916a5a7ebc6a715027d68fba4e7d3fb60f0f841a8
-```
-
-**What this means**: If you see the same hash in both outputs, Intel TDX hardware has cryptographically signed this public key. Copy the hash from step 1 and search for it in step 2 - they must match exactly.
-
-Please follow the [Attestation Verification tutorial](/phala-cloud/attestation/verifying-attestation) to further verify the remote attestation of the gateway. It ensures the implementation and the execution environment of the gateway is secure.
+A hash found in raw quote text is only a byte-presence check. Follow the
+[Attestation Verification tutorial](/phala-cloud/attestation/verification-guide)
+for cryptographic quote validation.
 
 #### Step 3: Check Domain Protection and Certificate History
 
-Verify only this TEE can issue certificates:
+Review the gateway's issuance policy and certificate history:
 
 ```bash
 # Check ALL certificates ever issued for the gateway domain
@@ -179,171 +175,147 @@ Custom domains use dstack-ingress running in your application's TEE to manage ce
 
 ### What You'll Verify
 
-Your TEE publishes cryptographic evidence at `https://your-domain.com/evidences/` that proves:
-1. The TLS certificate is controlled exclusively by this TEE
-2. Intel TDX hardware backs the attestation
-3. No one else can issue certificates for this domain
+The ingress publishes a manifest, certificate, ACME account metadata, and a TDX
+quote at `https://your-domain.com/evidences/`. Verification establishes four
+separate facts:
 
-Live example: [custom-domain-demo.phala.systems/evidences/](https://custom-domain-demo.phala.systems/evidences/)
+1. Intel's trust chain authenticates the TDX quote and its TCB status
+2. The verified quote's `report_data` binds the evidence manifest to that TEE
+3. The evidence certificate matches the certificate served to clients
+4. DNS CAA and Certificate Transparency records match your issuance policy
+
+Evidence binding alone does not prove private-key exclusivity. Complete the
+application measurement review to establish which code could access the key.
 
 ### Prerequisites
 
-Before starting, you'll need:
-- Your domain name (e.g., `your-domain.com`)
-- `curl`, `jq`, `openssl`, and `dig` commands installed
-- 3 minutes to complete all verifications
+You need your domain name plus `curl`, `jq`, `openssl`, `sha256sum`, and `dig`.
+You also need a trusted DCAP verifier that returns the authenticated
+`report_data` field. See [Attestation Verification](/phala-cloud/attestation/verification-guide).
 
-### Simple 3-Step Verification
+### Verification
 
-**Example**: We'll use `custom-domain-demo.phala.systems` - just replace with your domain.
-
-#### Step 1: Get the Evidence Files
-
-Your TEE publishes 4 files that prove it controls the certificate:
+#### Step 1: Authenticate the evidence manifest
 
 ```bash
-# Download the evidence files (4 files total)
-curl -sO https://your-domain.com/evidences/quote.json
-curl -sO https://your-domain.com/evidences/sha256sum.txt
-curl -sO https://your-domain.com/evidences/cert.pem
-curl -sO https://your-domain.com/evidences/acme-account.json
+DOMAIN=your-domain.com
+CERT_FILE="cert-${DOMAIN}.pem"
+BASE_URL="https://${DOMAIN}/evidences"
 
-# Verify the files haven't been tampered with
+curl --fail --http1.1 -sS -O "${BASE_URL}/quote.json"
+curl --fail --http1.1 -sS -O "${BASE_URL}/sha256sum.txt"
+```
+
+1. Extract the quote hex from `quote.json`.
+2. Cryptographically validate the quote signature, Intel collateral, TCB status,
+   and debug policy with a trusted DCAP verifier.
+3. Read `report_data` from the verifier's authenticated result.
+4. Compute `sha256sum sha256sum.txt`.
+5. Compare that 32-byte digest with the first 32 bytes of `report_data`; the
+   remaining 32 bytes must be zero.
+
+Searching the raw quote text for a hash is only a byte-presence check. The
+manifest becomes trustworthy after cryptographic quote and TCB validation.
+
+#### Step 2: Download and check every manifest file
+
+Release 2.6 names each certificate `cert-<domain>.pem`. Multi-domain deployments
+publish one certificate file per configured domain. Download every certificate
+named by the authenticated manifest before running the checksum check:
+
+```bash
+curl --fail --http1.1 -sS -O "${BASE_URL}/acme-account.json"
+
+awk '$2 ~ /^cert-/ {print $2}' sha256sum.txt | while IFS= read -r FILE; do
+  printf '%s\n' "${FILE}" | grep -Eq '^cert-[A-Za-z0-9.*-]+\.pem$' || exit 1
+  curl --fail --http1.1 -sS \
+    --output "${FILE}" "${BASE_URL}/${FILE}" || exit 1
+done
+
 sha256sum -c sha256sum.txt
 ```
 
-**Expected output**:
-```
-acme-account.json: OK
-cert.pem: OK
-```
-This means the files are authentic.
+The checksum command must report `OK` for `acme-account.json` and every
+`cert-*.pem` entry. A persisted evidence directory can retain certificates from
+previous domain configurations; review every manifest entry during an audit.
 
-#### Step 2: Verify the Certificate Matches
-
-Check that the evidence matches what's actually being served:
+#### Step 3: Match the served certificate
 
 ```bash
-# Compare the served certificate with the evidence certificate
-echo | openssl s_client -connect your-domain.com:443 2>/dev/null | \
+echo | openssl s_client \
+  -connect "${DOMAIN}:443" \
+  -servername "${DOMAIN}" 2>/dev/null | \
   openssl x509 -fingerprint -sha256 -noout
-openssl x509 -in cert.pem -fingerprint -sha256 -noout
+
+openssl x509 -in "${CERT_FILE}" -fingerprint -sha256 -noout
 ```
 
-**What to look for**: Both fingerprints should be identical. For example:
-```
-SHA256 Fingerprint=62:89:C4:19:E6:F6:B6:50:11:F9:7D:E1:CF:FD:EE:5A:CE:2C:A3:38:24:F0:DE:5F:9E:2C:01:A3:72:D3:8B:DE
-SHA256 Fingerprint=62:89:C4:19:E6:F6:B6:50:11:F9:7D:E1:CF:FD:EE:5A:CE:2C:A3:38:24:F0:DE:5F:9E:2C:01:A3:72:D3:8B:DE
-```
+The two SHA-256 fingerprints must match.
 
-Now verify the TEE hardware signed these files:
+#### Step 4: Review issuance policy and history
 
 ```bash
-# Step 1: Get the hash of sha256sum.txt
-sha256sum sha256sum.txt
-# Output: 7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988  sha256sum.txt
+# Certificate Transparency history
+curl -s "https://crt.sh/?q=${DOMAIN}&output=json" | \
+  jq -r '.[] | "\(.not_before) to \(.not_after): \(.issuer_name)"'
 
-# Step 2: Search for this complete hash in the TDX quote
-cat quote.json | jq -r '.quote' | grep -o "7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988"
-# Output: 7cd338a801531e88a5af8478aa185cfc51baf7501319446ce2f94dade56a0988
+# ACME account used by the ingress
+jq -r '.uri' acme-account.json
+
+# Effective CAA response
+dig +short CAA "${DOMAIN}"
 ```
 
-**What this means**: If you see the same 64-character hash in both outputs, Intel TDX hardware has cryptographically signed your evidence files. Copy the hash from step 1 and search for it in step 2 - they must match exactly.
+Review every still-valid certificate and reconcile unexpected issuance. CAA
+policy varies by DNS provider:
 
-#### Step 3: Check Domain Protection and Timeline
+- Cloudflare and Linode can publish the account-bound policy requested by ingress
+- Namecheap requires manual CAA management
+- Route53 publishes a broader issuer policy at the hosted-zone apex
+- `SET_CAA` defaults to `false` in direct DNS-01 mode
+- Full DNS delegation requires CAA in the delegated zone
 
-Make sure only this TEE can get certificates for your domain:
-
-```bash
-# Check ALL certificates ever issued for your domain
-curl -s "https://crt.sh/?q=your-domain.com&output=json" | \
-  jq -r '.[] | "\(.not_before) to \(.not_after): \(.issuer_name)"' | head -5
-
-# Get the TEE's ACME account number
-cat acme-account.json | jq -r '.uri'
-
-# Check if your domain is locked to this account
-dig +short CAA your-domain.com
-```
-
-**Example output**:
-```
-# Certificate history (note the dates!)
-2025-08-04T06:10:56 to 2025-11-02T06:10:55: C=US, O=Let's Encrypt, CN=E5  ← Current
-2025-08-04T06:00:18 to 2025-11-02T06:00:17: C=US, O=Let's Encrypt, CN=E5  ← TEE deployment
-
-# ACME account
-https://acme-v02.api.letsencrypt.org/acme/acct/2572685661
-
-# CAA record (contains the same account number)
-0 issue "letsencrypt.org;validationmethods=dns-01;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/2572685661"
-```
-
-**Critical timeline check**: If you see certificates issued BEFORE your TEE was deployed (before CAA was set), verify they're either:
-- Already expired (check the "to" date)
-- Issued by the same ACME account (meaning they were from a previous TEE deployment)
-
-If unexpired certificates exist from before CAA setup, they could potentially intercept traffic!
-
-### Understanding the Results
-
-When all verifications pass, you've proven:
-
-✅ **Exclusive TEE Control**: Only this specific TEE instance has the private key for your TLS certificate
-
-✅ **Hardware-Backed Security**: Intel TDX hardware cryptographically signed the evidence, proving it's a genuine TEE
-
-✅ **Domain Protection**: CAA DNS records prevent anyone else (even with domain access) from issuing certificates
-
-✅ **Complete Chain of Trust**: Every link from TDX hardware → evidence files → certificate → your connection is verified
+CAA constrains future issuance while the DNS policy remains intact. DNS
+administrators can alter the record, and existing certificates remain valid
+until expiration or revocation.
 
 ### Evidence Files Reference
 
-<Frame>
-    <img src="/images/evidence-files-directory.png" alt="Browser showing /evidences/ directory listing with four files: acme-account.json, cert.pem, quote.json, and sha256sum.txt with timestamps and file sizes" />
-</Frame>
+| File | Contents |
+|------|----------|
+| `quote.json` | TDX quote returned by the guest agent |
+| `sha256sum.txt` | SHA-256 manifest for the ACME metadata and `cert-*.pem` files |
+| `cert-<domain>.pem` | Current certificate for one configured domain |
+| `acme-account.json` | ACME directory, account URI, and optional public contact address |
 
-The four evidence files at `/evidences/` work together:
+`sha256sum.txt` excludes itself and `quote.json`. Its SHA-256 digest is placed in
+the first half of the quote's 64-byte `report_data` field.
 
-| File | Contains | Proves |
-|------|----------|--------|
-| `quote.json` | TDX attestation with embedded hash | Hardware generated the evidence |
-| `sha256sum.txt` | SHA256 of cert.pem + acme-account.json | Links certificate to ACME account |
-| `cert.pem` | Current TLS certificate | What's being served to clients |
-| `acme-account.json` | ACME account URI | Which account controls certificates |
+Evidence is regenerated after certificate issuance and actual renewal. Persist
+both `/etc/letsencrypt` and `/evidences` so a restart preserves the certificate
+state and its corresponding evidence.
 
 ### Troubleshooting
 
-**"Files not found at /evidences/"**: Ensure your domain uses custom domain setup with `SET_CAA=true`
+**Files missing at `/evidences/`**: Check that certificate issuance completed,
+`EVIDENCE_SERVER=true`, the `/evidences` volume is mounted, and the logs contain
+the evidence-generation step. `SET_CAA` does not control evidence generation.
 
-**"Certificate doesn't match"**: The TEE may have renewed the certificate. Re-download evidence files.
+**Certificate mismatch**: Renewal may have completed after the download.
+Download the full evidence set again and repeat the manifest and quote checks.
 
-**"Hash not in quote"**: Verify you're checking a production TEE deployment, not a test instance.
+**Quote verification failure**: Treat the evidence as untrusted. Check the guest
+agent response, DCAP collateral, TCB status, and the TDX platform requirement.
 
-**"CAA record missing"**: The domain owner needs to set CAA records pointing to the TEE's ACME account.
+**CAA mismatch**: Update or remove the active CAA RRset through the DNS provider.
+Changing `SET_CAA` only controls future writes by dstack-ingress.
 
-### Going Deeper: Application Trust
+### Complete Trust Review
 
-While you've verified the network connection is secure, the TLS private key is only as trustworthy as the code handling it. The key management software (dstack-ingress) runs inside the TEE and is open-source auditable code. To verify the exact code handling your keys matches what's deployed, check the compose-hash in the TEE's event log against the published source code. This ensures no malicious code can access or leak your private keys.
-
-Learn more: [Application Attestation Documentation](/phala-cloud/attestation/overview)
-
-### Complete Security Checklist
-
-<Note>
-**Network Security** (covered above):
-- ✅ Evidence files verify TEE control
-- ✅ TDX attestation proves hardware backing
-- ✅ CAA records prevent unauthorized certificates
-- ✅ Certificate timeline shows no pre-deployment threats
-
-**Advanced Verification** (for maximum security):
-- ⚠️ Application code trust - Verify compose-hash matches source code
-- ⚠️ Certificate timeline - Ensure no valid pre-CAA certificates exist
-- ⚠️ Continuous monitoring - Watch CT logs for unexpected certificates
-
-For detailed application verification: [Attestation Guide](/phala-cloud/attestation/overview)
-</Note>
+After the four checks above, verify the ingress compose hash, image digest, and
+source against the application's attested measurements. This establishes which
+code handled the certificate and private key. Continue with
+[Application Attestation](/phala-cloud/attestation/overview).
 
 ## Next Steps
 
