@@ -1,0 +1,166 @@
+---
+title: Deploy with the GitHub Action
+description: Update a CVM from GitHub Actions with the Phala deploy action, using phala.toml and an API key stored as a repository secret.
+---
+
+The [Phala deploy action](https://github.com/Phala-Network/phala-deploy-action) updates a CVM from your GitHub workflow. It installs the Phala CLI, runs `phala deploy --json --wait`, and reports the result as workflow outputs. You do not write any CLI commands yourself.
+
+Use it when you want the shortest path from a push to a deployed CVM. If you need to build images, run extra steps, or use another CI system, see [Set Up a CI/CD Pipeline](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline).
+
+## What do I need before I start?
+
+- A `phala.toml` file at the root of your repository. The action stops with an error if the file is missing. It tells the CLI which CVM to update. See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml).
+- A Docker Compose file in the repository. The CLI reads it the same way it does for `phala deploy`.
+- A Phala Cloud [API key](/phala-cloud/phala-cloud-api/overview).
+- An `actions/checkout` step before the action, so the files are on the runner.
+
+On self-hosted runners, use Actions Runner 2.327.1 or newer. GitHub-hosted `ubuntu-latest` runners already work.
+
+## How do I add the API key?
+
+Store the key as a repository secret. Do not put it in the workflow file.
+
+1. In your GitHub repository, open **Settings > Secrets and variables > Actions**.
+2. Select **New repository secret**.
+3. Name it `PHALA_API_KEY` and paste your Phala Cloud API key.
+
+If the key is ever exposed in logs or committed to a repository, create a new one in the Phala Cloud dashboard and replace the secret.
+
+## What does a minimal workflow look like?
+
+```yaml
+name: Deploy to Phala Cloud
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Phala-Network/phala-deploy-action@main
+        with:
+          api-key: ${{ secrets.PHALA_API_KEY }}
+```
+
+To deploy only when your configuration changes, add a `paths` filter under `push`:
+
+```yaml
+on:
+  push:
+    branches: [main]
+    paths:
+      - "phala.toml"
+      - "docker-compose.yml"
+```
+
+## What are the inputs?
+
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `api-key` | Yes | | Your Phala Cloud API key. Pass it from a repository secret. |
+| `envs` | No | | Environment variables for the CVM, one `KEY=VALUE` per line. |
+| `workspace` | No | | Workspace slug. Set it if your API key can reach more than one workspace and you want to pick one. |
+| `cli-version` | No | `1.2.1` | The Phala CLI version the action installs. |
+
+## What are the outputs?
+
+Read outputs from a step that has an `id`, for example `steps.deploy.outputs.status`.
+
+| Output | Description |
+|--------|-------------|
+| `status` | `success`, `failed`, or `pending_approval`. |
+| `result` | Full CVM information as JSON. |
+| `app-id` | App ID of the CVM. |
+| `vm-uuid` | VM UUID of the CVM. |
+| `cvm-name` | Name of the CVM. |
+| `dashboard-url` | Link to the CVM in the dashboard. |
+| `compose-hash` | SHA256 hash of the normalized app compose. |
+| `docker-compose-hash` | SHA256 hash of the raw `docker-compose.yml`. |
+| `pre-launch-script-hash` | SHA256 hash of the pre-launch script. |
+| `os-image` | OS image name. |
+| `os-image-version` | OS image version. |
+| `os-image-hash` | OS image hash. |
+| `kms-type` | Key management type: `phala`, `ethereum`, or `base`. |
+| `device-id` | Device ID of the node. |
+| `commit-token` | Token for approving an update that needs on-chain approval. Empty otherwise. |
+
+`status`, `app-id`, `vm-uuid`, `cvm-name`, and `dashboard-url` come straight from the deploy result. The hash, OS image, `kms-type`, and `device-id` outputs come from a second request for the CVM's details, which the action makes with your API key. If that request fails, the deploy still counts as successful, the action prints a warning, and those outputs are empty.
+
+## When does the job succeed or fail?
+
+When the deployment is an update, the job waits for the real result. It does not stop after the update request is accepted.
+
+- **Update finishes:** the job succeeds with `status=success`.
+- **Update fails or is cancelled:** the job fails with `status=failed`, and the deploy output is printed in the job log.
+- **Wait takes too long:** the CLI waits up to 5 minutes for an update. After that the job fails, but the update may still be running. Check the CVM in the dashboard before you re-run the workflow.
+- **Stopped CVM:** the job waits for the CVM to return to the state it was in before the update. A stopped CVM stays stopped.
+
+A first deployment behaves differently. If `phala.toml` does not point at an existing CVM, the action creates a new one. The job returns as soon as the CVM is created, and the CVM keeps booting afterwards. Open the `dashboard-url` output to follow it until it is running.
+
+Updating a CVM that is in `error` status is not supported yet. A fix is planned for the next CLI release. Until then, do not rely on the action to update a CVM in that state.
+
+## What happens when nothing changed?
+
+If the configuration, compose file, and environment variables match what is already deployed, the job succeeds right away. The CVM is not restarted.
+
+## What if the CVM uses on-chain KMS?
+
+An update to a CVM that uses on-chain KMS must be approved on-chain before it takes effect. The job does not fail in this case. It ends with `status=pending_approval`, prints the compose hash as a warning, and sets `compose-hash` and `commit-token`. Approve the update in the dashboard. Do not treat this status as a finished deployment.
+
+```yaml
+      - uses: Phala-Network/phala-deploy-action@main
+        id: deploy
+        with:
+          api-key: ${{ secrets.PHALA_API_KEY }}
+
+      - name: Remind the team to approve
+        if: steps.deploy.outputs.status == 'pending_approval'
+        run: echo "Approve compose hash ${{ steps.deploy.outputs.compose-hash }} in the dashboard."
+```
+
+## How do I pass environment variables and secrets?
+
+Use the `envs` input. Put one `KEY=VALUE` on each line, and take every value from a GitHub secret.
+
+```yaml
+      - uses: Phala-Network/phala-deploy-action@main
+        with:
+          api-key: ${{ secrets.PHALA_API_KEY }}
+          envs: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+```
+
+The action writes these lines to a `.env` file on the runner and passes it to the deploy. The CLI encrypts the values before it sends them, so they reach your CVM as [encrypted secrets](/phala-cloud/cvm/set-secure-environment-variables). Use a repository secret for each value. Never type a secret directly into the workflow file.
+
+## Which CLI version should I use?
+
+Leave `cli-version` unset. The action installs the version it was tested with, which is `1.2.1`. Because the action pins the version, a new CLI release does not change your deployments until you change the input.
+
+To use a different release, set the input to an exact version:
+
+```yaml
+      - uses: Phala-Network/phala-deploy-action@main
+        with:
+          api-key: ${{ secrets.PHALA_API_KEY }}
+          cli-version: "1.2.1"
+```
+
+Use `1.2.1` or newer. Older versions do not wait correctly on stopped CVMs.
+
+## Can I deploy without an API key?
+
+Keyless login is available for selected workspaces. Contact support if you want it enabled for yours.
+
+## Troubleshooting
+
+**The job says `phala.toml not found`.** Add `phala.toml` to the repository root, and make sure `actions/checkout` runs before the action.
+
+**The job says no authentication method is available.** Pass `api-key` and check that the secret name matches the one you created.
+
+**The job fails after about 5 minutes.** The update may still be running. Open the CVM in the dashboard and check its status before you run the workflow again.
+
+**An output is empty.** Hash, OS image, `kms-type`, and `device-id` outputs are filled in only when the action could fetch the CVM's details. Look for a warning in the job log.
