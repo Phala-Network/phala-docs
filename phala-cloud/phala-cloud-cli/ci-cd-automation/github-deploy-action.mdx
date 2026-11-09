@@ -1,15 +1,15 @@
 ---
 title: Deploy with the GitHub Action
-description: Deploy or update a CVM from GitHub Actions with the Phala deploy action, using phala.toml and an API key stored as a repository secret.
+description: Update a CVM from GitHub Actions with the Phala deploy action, using phala.toml and an API key stored as a repository secret.
 ---
 
-The [Phala deploy action](https://github.com/Phala-Network/phala-deploy-action) creates or updates a CVM from your GitHub workflow. It installs the Phala CLI, runs `phala deploy --json --wait`, and reports the result as workflow outputs. You do not write any CLI commands yourself.
+The [Phala deploy action](https://github.com/Phala-Network/phala-deploy-action) updates a CVM from your GitHub workflow. It installs the Phala CLI, runs `phala deploy --json --wait`, and reports the result as workflow outputs. You do not write any CLI commands yourself.
 
 Use it when you want the shortest path from a push to a deployed CVM. If you need to build images, run extra steps, or use another CI system, see [Set Up a CI/CD Pipeline](/phala-cloud/phala-cloud-cli/ci-cd-automation/setup-a-ci-cd-pipeline).
 
 ## What do I need before I start?
 
-- A `phala.toml` file at the root of your repository. The action stops with an error if the file is missing. It tells the CLI which CVM to deploy. See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml).
+- A `phala.toml` file at the root of your repository. The action stops with an error if the file is missing. It tells the CLI which CVM to update, so it must name an existing CVM (see [below](#which-cvm-does-the-action-update)). See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml).
 - A Docker Compose file in the repository. The CLI reads it the same way it does for `phala deploy`.
 - A Phala Cloud [API key](/phala-cloud/phala-cloud-api/overview).
 - An `actions/checkout` step before the action, so the files are on the runner.
@@ -96,13 +96,23 @@ Read outputs from a step that has an `id`, for example `steps.deploy.outputs.sta
 
 The job waits for the real result. It does not stop after the request is accepted.
 
-- **New CVM:** the job waits until the CVM is running, then succeeds with `status=success`. If the CVM does not start, the job fails with the reason. The CVM still exists, so check it in the dashboard.
+- **New CVM (no CVM named in `phala.toml`):** the job creates a new CVM and waits until it is running, then succeeds with `status=success`. If the CVM does not start, the job fails with the reason. The CVM still exists, so check it in the dashboard.
 - **Update finishes:** the job succeeds with `status=success`.
 - **Update fails or is cancelled:** the job fails with `status=failed`, and the deploy output is printed in the job log.
 - **Wait takes too long:** the CLI waits up to 5 minutes. After that the job fails, but the CVM may still be starting or updating. Check the CVM in the dashboard before you re-run the workflow.
 - **CVM that is not running before an update:** the job waits for the CVM to be stopped, not running. A stopped CVM stays stopped, and so does a CVM in `error` status.
 
-To follow a new CVM yourself, open it in the dashboard.
+## Which CVM does the action update?
+
+The action is built to update a CVM that already exists. It finds the CVM from `phala.toml`. If `phala.toml` does not name a CVM, the CLI creates a new CVM, and it does so on every workflow run.
+
+Create the CVM first, for example with `phala deploy -n <name> -c docker-compose.yml`. Then put its name in `phala.toml`:
+
+```toml
+name = "my-tee-app"
+```
+
+You can also use `app_id`, `uuid`, or `instance_id` in place of `name`. See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml). The action then updates that CVM on each push.
 
 ## What happens when nothing changed?
 

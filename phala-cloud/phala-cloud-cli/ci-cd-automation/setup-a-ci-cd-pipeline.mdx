@@ -87,7 +87,7 @@ services:
       - "80:80"
 ```
 
-`--cvm-id` names the CVM to update, so each push updates `my-tee-app` in place and `--wait` waits for the update to finish. The CLI does not look up an existing CVM by `--name`: `phala deploy -n my-tee-app` always creates a new CVM. With `--wait`, a new CVM waits until it is running, but it is still a new CVM, not an update. Create the CVM once before the first pipeline run, for example with `phala deploy -n my-tee-app -c docker-compose.yml`.
+`--cvm-id` names the CVM to update, so each push updates `my-tee-app` in place and `--wait` waits for the update to finish. The CLI does not look up an existing CVM by `--name`: `phala deploy -n my-tee-app` always creates a new CVM, on every run. With `--wait`, a new CVM waits until it is running, but it is still a new CVM, not an update. Create the CVM once before the first pipeline run, for example with `phala deploy -n my-tee-app -c docker-compose.yml`.
 
 ## GitHub Actions with JS SDK
 
