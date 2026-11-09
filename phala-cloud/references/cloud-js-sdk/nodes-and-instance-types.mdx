@@ -26,7 +26,7 @@ Returns available TEE nodes with capacity information and KMS details.
 const available = await client.getAvailableNodes();
 console.log(`Tier: ${available.tier}`);
 available.nodes.forEach(node => {
-  console.log(`Node ${node.id}: ${node.region}`);
+  console.log(`Node ${node.node}: ${node.region_identifier}`);
 });
 ```
 
