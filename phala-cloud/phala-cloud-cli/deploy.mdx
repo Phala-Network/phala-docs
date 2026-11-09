@@ -54,7 +54,7 @@ Deploy new CVM or update existing one
 | `--no-pre-launch-script` | Deploy without any pre-launch script. This also skips the automatic local SSH key, unless you pass `--dev-os` or `--ssh-pubkey`. |
 | `--runner <value>` | App runner: docker-compose (default), nerdctl-compose, or bash. With bash, --compose is the script to run. nerdctl-compose and bash need the compose_advanced feature. Create only. |
 | `--app-compose <value>` | Path to a whole app-compose JSON file, sent instead of --compose and the compose flags. Needs the compose_advanced feature. Create only. |
-| `--init-script <value>` | Platform init script to run on every boot: docker_cleanup or env_merge (repeatable). On update, replaces the current set. |
+| `--init-script <value>` | Platform init script to run on every boot: docker_cleanup (repeatable). On update, replaces the current set. |
 | `--clear-init-scripts` | Remove every platform init script from an existing CVM. Cannot be combined with --init-script. Update only. |
 | `--launch-token <value>` | Launch token (at least 32 bytes) the CVM must boot with. Create only. |
 | `--generate-launch-token` | Gate the CVM with a launch token Phala Cloud generates for a new app (shown once), or with the app's existing token. Create only. |

@@ -26,7 +26,7 @@ Turning a script on or off changes the CVM's compose, so the CVM restarts. See [
 | Argument | Description |
 | -------- | ----------- |
 | `<cvm_id>?` | CVM identifier (UUID, app_id, instance_id, or name) |
-| `<slug>?` | Platform init script (`docker_cleanup`, `env_merge`) |
+| `<slug>?` | Platform init script (`docker_cleanup`) |
 | `<state>?` | `on` or `off` |
 
 Pass both `<slug>` and `<state>`, or neither.
@@ -35,7 +35,6 @@ Pass both `<slug>` and `<state>`, or neither.
 
 | Option | Description |
 | ------ | ----------- |
-| `-y, --yes` | Replace custom init scripts. Without it, the command stops if the CVM has custom init scripts. |
 | `--confirm-data-wipe` | Confirm turning on `docker_cleanup`, which erases container stores on every boot |
 
 ### Advanced Options
@@ -64,7 +63,7 @@ Pass both `<slug>` and `<state>`, or neither.
 
 ### Output
 
-Without a script name, the command prints one row per script with the columns `SLUG`, `SELECTED`, `SELECTABLE`, and `REASON`. `SELECTED` says whether the CVM runs the script. `SELECTABLE` says whether you can turn it on, and `REASON` says why not. A last line tells you whether the CVM also runs custom init scripts.
+Without a script name, the command prints one row per script with the columns `SLUG`, `SELECTED`, `SELECTABLE`, and `REASON`. `SELECTED` says whether the CVM runs the script. `SELECTABLE` says whether you can turn it on for this CVM, and `REASON` says why not.
 
 If the script is already in the state you asked for, the command says so and changes nothing.
 
@@ -82,8 +81,8 @@ phala cvms init-scripts app_123
 phala cvms init-scripts app_123 docker_cleanup on --confirm-data-wipe
 ```
 
-* Turn env_merge off
+* Turn docker_cleanup off
 
 ```bash
-phala cvms init-scripts app_123 env_merge off
+phala cvms init-scripts app_123 docker_cleanup off
 ```

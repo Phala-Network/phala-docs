@@ -317,7 +317,7 @@ A batch update method that can modify multiple CVM fields in a single request. T
 | `public_sysinfo` | `bool` | No | Whether system info is public |
 | `public_tcbinfo` | `bool` | No | Whether TCB info is public |
 | `compose` | `ComposePatch` | No | Other compose settings as a merge patch, for example `{"swap_size": "2G", "requirements": {"health_check": True}}` |
-| `init_scripts` | `list[str]` | No | Platform init scripts the CVM runs (`"docker_cleanup"`, `"env_merge"`), replacing the current set. `[]` removes them all. |
+| `init_scripts` | `list[str]` | No | Platform init scripts the CVM runs (`"docker_cleanup"`), replacing the current set. `[]` removes them all. |
 | `confirm_data_wipe` | `bool` | No | Confirms turning on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot |
 | `encrypted_env` | `str` | No | Encrypted environment variables |
 | `user_config` | `str` | No | User configuration string |
