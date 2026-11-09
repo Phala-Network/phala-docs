@@ -87,7 +87,7 @@ services:
       - "80:80"
 ```
 
-`--cvm-id` names the CVM to update, so each push updates `my-tee-app` in place and `--wait` waits for the update to finish. The CLI does not look up an existing CVM by `--name`: `phala deploy -n my-tee-app` always creates a new CVM, and `--wait` has no effect on it. Create the CVM once before the first pipeline run, for example with `phala deploy -n my-tee-app -c docker-compose.yml`.
+`--cvm-id` names the CVM to update, so each push updates `my-tee-app` in place and `--wait` waits for the update to finish. The CLI does not look up an existing CVM by `--name`: `phala deploy -n my-tee-app` always creates a new CVM. With `--wait`, a new CVM waits until it is running, but it is still a new CVM, not an update. Create the CVM once before the first pipeline run, for example with `phala deploy -n my-tee-app -c docker-compose.yml`.
 
 ## GitHub Actions with JS SDK
 
@@ -318,6 +318,6 @@ phala cvms get my-tee-app
 
 **Build failures:** Ensure your Dockerfile builds locally with `docker build .` before pushing to CI.
 
-**Deploy timeouts:** If `--wait` times out, the update may still be running. Check the dashboard or run `phala cvms get my-tee-app` to see the current status.
+**Deploy timeouts:** `--wait` waits up to 5 minutes. If it times out, the update or the new CVM may still be starting. Check the dashboard or run `phala cvms get my-tee-app` to see the current status.
 
 **Image pull errors:** Verify the image tag in your compose file matches what was pushed to the registry. For private registries, set `DSTACK_DOCKER_USERNAME` and `DSTACK_DOCKER_PASSWORD` as [encrypted secrets](/phala-cloud/cvm/set-secure-environment-variables) on the CVM.
