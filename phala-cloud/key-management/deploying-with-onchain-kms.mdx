@@ -261,7 +261,7 @@ The flags you will reach for most often on top of the basic `--kms base -c docke
 | Flag | Purpose |
 | --- | --- |
 | `-e <file-or-var>` | Encrypt env vars for the CVM. Accepts a `.env` path or inline `KEY=VALUE`, repeatable. |
-| `--wait` | Wait for an update (`--cvm-id`) to finish. It has no effect on a new deployment: the command returns once the backend commits the provision, and the CVM keeps booting. Check it with `phala cvms get <name>` or the dashboard. |
+| `--wait` | Wait for the deployment to finish. On a new deployment, the command registers the app on-chain, commits the provision, and then waits until the CVM is running. If the CVM does not start, the command fails with the boot error and the CVM ID. On an update (`--cvm-id`), it waits for the update to finish. |
 | `--instance-type tdx.medium` | Pick a specific size instead of letting the scheduler decide. Use when you care about exact vCPU / memory / disk. |
 | `--no-public-logs`, `--no-public-sysinfo` | Opt out of public log and system-info endpoints at deploy time. Private by default for audit-sensitive workloads. |
 | `--rpc-url <url>` | Override the default public RPC. Strongly recommended for production — pass an Alchemy, QuickNode, or equivalent endpoint. |

@@ -293,6 +293,7 @@
                           "/phala-cloud/phala-cloud-cli/cvms/delete",
                           "/phala-cloud/phala-cloud-cli/cvms/device-allowlist",
                           "/phala-cloud/phala-cloud-cli/cvms/get",
+                          "/phala-cloud/phala-cloud-cli/cvms/init-scripts",
                           "/phala-cloud/phala-cloud-cli/cvms/list",
                           "/phala-cloud/phala-cloud-cli/cvms/list-nodes",
                           "/phala-cloud/phala-cloud-cli/cvms/logs",

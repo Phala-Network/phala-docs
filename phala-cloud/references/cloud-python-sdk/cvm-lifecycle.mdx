@@ -44,7 +44,7 @@ The request is a dictionary with the CVM configuration. The exact fields depend 
 | `memory` | `int` | No | Memory in MB |
 | `disk_size` | `int` | No | Disk size in GB |
 | `node` | `str` | No | Physical node name for deployment |
-| `init_scripts` | `list[str]` | No | Platform init scripts the CVM runs on every boot: `docker_cleanup` (needs dstack OS 0.6.x, `ext4` storage and the `docker-compose` runner) and `env_merge` (dstack OS 0.6.0 or newer, available on request). The list is the whole set; Phala Cloud runs them in a fixed order, `docker_cleanup` first. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). The `{"env_merge": True}` form and `enabled_init_scripts_docker_cleanup` are deprecated. |
+| `init_scripts` | `list[str]` | No | Platform init scripts the CVM runs on every boot: `docker_cleanup` (needs dstack OS 0.6.x, `ext4` storage and the `docker-compose` runner). The list is the whole set. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). `enabled_init_scripts_docker_cleanup` is deprecated. |
 | `launch_token` | `str` | No | Launch token, at least 32 bytes, that the CVM must have on every boot. See [Launch Token](/phala-cloud/cvm/launch-token). |
 | `generate_launch_token` | `bool` | No | Have Phala Cloud generate the launch token for a new app, or use the app's existing token. A new token is returned once, as `launch_token` in the commit response. |
 | `annotations` | `dict[str, str]` | No | Host-side settings for tools on the node, not measured. Needs a feature flag (`ERR-03-049` without it) and dstack VMM 0.6.1 or newer on the node (`ERR-03-050`). See [Annotations](/phala-cloud/cvm/advanced-settings#annotations). |

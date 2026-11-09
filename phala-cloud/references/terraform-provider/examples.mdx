@@ -247,7 +247,7 @@ data "phala_nodes" "west" {
 resource "phala_app" "pinned" {
   name    = "pinned-app"
   size    = "tdx.medium"
-  node_id = data.phala_nodes.west.nodes[0].node_id
+  node    = data.phala_nodes.west.nodes[0].node
 
   docker_compose = <<-YAML
     services:

@@ -94,7 +94,11 @@ Replicate a CVM to a specific node:
 phala cvms replicate <cvm-id> --node prod6
 ```
 
-`--node` accepts a physical node name, for example `prod6`, `prod7`, or `use2`.
+`--node` accepts a physical node name, for example `prod6`, `prod7`, or `use2`. Run `phala nodes` to see the node names your workspace can use.
+
+<Note>
+`--node-id` and `--teepod-id` no longer exist. Use `--node` with the node name instead.
+</Note>
 
 Omit `--node` to let the backend schedule the replica on any node with capacity and a compatible image:
 

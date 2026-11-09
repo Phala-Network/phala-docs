@@ -176,15 +176,15 @@ Each entry in `images` contains:
 
 ## phala_nodes
 
-Lists available worker nodes (teepods) for CVM placement. Use this when you need to pin a deployment to a specific node with `node_id` on `phala_app`.
+Lists available worker nodes for CVM placement. Use this when you need to pin a deployment to a specific node with `node` on `phala_app`.
 
 ```hcl
 data "phala_nodes" "west" {
   region = "us-west"
 }
 
-output "node_ids" {
-  value = data.phala_nodes.west.nodes[*].node_id
+output "node_names" {
+  value = data.phala_nodes.west.nodes[*].node
 }
 ```
 
@@ -201,7 +201,8 @@ Each entry in `nodes` contains:
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `node_id` | Number | Node ID (use this as the `node_id` value in `phala_app`). |
+| `node` | String | Physical node name (use this as the `node` value in `phala_app`). |
+| `node_id` | Number | Numeric node ID. Not a placement input. |
 | `name` | String | Node display name. |
 | `region` | String | Node region. |
 | `device_id` | String | Hardware device identifier. |

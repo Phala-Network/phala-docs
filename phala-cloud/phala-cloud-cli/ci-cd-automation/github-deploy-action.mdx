@@ -9,7 +9,7 @@ Use it when you want the shortest path from a push to a deployed CVM. If you nee
 
 ## What do I need before I start?
 
-- A `phala.toml` file at the root of your repository. The action stops with an error if the file is missing. It tells the CLI which CVM to update. See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml).
+- A `phala.toml` file at the root of your repository. The action stops with an error if the file is missing. It tells the CLI which CVM to update, so it must name an existing CVM (see [below](#which-cvm-does-the-action-update)). See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml).
 - A Docker Compose file in the repository. The CLI reads it the same way it does for `phala deploy`.
 - A Phala Cloud [API key](/phala-cloud/phala-cloud-api/overview).
 - An `actions/checkout` step before the action, so the files are on the runner.
@@ -63,7 +63,7 @@ on:
 | `api-key` | Yes, unless you use keyless login | | Your Phala Cloud API key. Pass it from a repository secret. |
 | `envs` | No | | Environment variables for the CVM, one `KEY=VALUE` per line. |
 | `workspace` | No | | Slug of the workspace to deploy into. |
-| `cli-version` | No | `1.2.2` | The Phala CLI version the action installs. |
+| `cli-version` | No | `1.2.3` | The Phala CLI version the action installs. |
 | `oidc-audience` (Beta) | No | `https://cloud.phala.com` | Audience of the GitHub OIDC token. Change it only if support tells you to. See [Keyless login](#keyless-login-with-github-oidc-beta). |
 
 ## What are the outputs?
@@ -94,18 +94,25 @@ Read outputs from a step that has an `id`, for example `steps.deploy.outputs.sta
 
 ## When does the job succeed or fail?
 
-When the deployment is an update, the job waits for the real result. It does not stop after the update request is accepted.
+The job waits for the real result. It does not stop after the request is accepted.
 
+- **New CVM (no CVM named in `phala.toml`):** the job creates a new CVM and waits until it is running, then succeeds with `status=success`. If the CVM does not start, the job fails with the reason. The CVM still exists, so check it in the dashboard.
 - **Update finishes:** the job succeeds with `status=success`.
 - **Update fails or is cancelled:** the job fails with `status=failed`, and the deploy output is printed in the job log.
-- **Wait takes too long:** the CLI waits up to 5 minutes for an update. After that the job fails, but the update may still be running. Check the CVM in the dashboard before you re-run the workflow.
-- **Stopped CVM:** the job waits for the CVM to return to the state it was in before the update. A stopped CVM stays stopped.
+- **Wait takes too long:** the CLI waits up to 5 minutes. After that the job fails, but the CVM may still be starting or updating. Check the CVM in the dashboard before you re-run the workflow.
+- **CVM that is not running before an update:** the job waits for the CVM to be stopped, not running. A stopped CVM stays stopped, and so does a CVM in `error` status.
 
-The action is built to update a CVM that already exists. Create the CVM first, for example with `phala deploy -n <name> -c docker-compose.yml`, and put its name in `phala.toml`. Then let the action update it on each push.
+## Which CVM does the action update?
 
-A new CVM keeps booting after the command that creates it returns, so do not expect a first deployment to wait until the CVM is running. Open the CVM in the dashboard to follow it.
+The action is built to update a CVM that already exists. It finds the CVM from `phala.toml`. If `phala.toml` does not name a CVM, the CLI creates a new CVM, and it does so on every workflow run.
 
-Updating a CVM that is in `error` status is not supported yet. A fix is planned for the next CLI release. Until then, do not rely on the action to update a CVM in that state.
+Create the CVM first, for example with `phala deploy -n <name> -c docker-compose.yml`. Then put its name in `phala.toml`:
+
+```toml
+name = "my-tee-app"
+```
+
+You can also use `app_id`, `uuid`, or `instance_id` in place of `name`. See [phala.toml Configuration](/phala-cloud/phala-cloud-cli/phala-toml). The action then updates that CVM on each push.
 
 ## What happens when nothing changed?
 
@@ -143,7 +150,7 @@ The action writes these lines to a `.env` file on the runner and passes it to th
 
 ## Which CLI version should I use?
 
-Leave `cli-version` unset. The action installs the version it was tested with, which is `1.2.2`. Because the action pins the version, a new CLI release does not change your deployments until you change the input.
+Leave `cli-version` unset. The action installs the version it was tested with, which is `1.2.3`. Because the action pins the version, a new CLI release does not change your deployments until you change the input.
 
 To use a different release, set the input to an exact version:
 
@@ -151,7 +158,7 @@ To use a different release, set the input to an exact version:
       - uses: Phala-Network/phala-deploy-action@v3
         with:
           api-key: ${{ secrets.PHALA_API_KEY }}
-          cli-version: "1.2.2"
+          cli-version: "1.2.3"
 ```
 
 Use `1.2.1` or newer. Older versions do not wait correctly on stopped CVMs and do not check the update result with keyless login.

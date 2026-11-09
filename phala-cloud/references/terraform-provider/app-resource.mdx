@@ -54,10 +54,14 @@ resource "phala_app" "web" {
 |-----------|------|-------------|
 | `region` | String | Preferred region slug (e.g. `US-WEST-1`). **Force-new.** Discover values with `data.phala_regions`. |
 | `image` | String | OS image slug. Updatable in-place. Use exact slugs from `data.phala_images`. |
-| `node_id` | Number | Pin placement to a specific worker node. **Force-new.** Discover nodes with `data.phala_nodes`. |
+| `node` | String | Pin placement to a physical node by name, for example `usw5`. Omit it for automatic placement. Omitting it later keeps the current placement. **Force-new.** Discover names with `data.phala_nodes`. Needs provider 0.3.0-beta.5 or newer. |
 | `kms` | String | KMS type for provisioning: `phala` (default), `ethereum`, or `base`. **Force-new.** |
 | `custom_app_id` | String | Custom app ID for deterministic identity flow (PHALA KMS). **Force-new.** |
 | `nonce` | Number | Nonce paired with `custom_app_id` for deterministic identity. **Force-new.** |
+
+<Note>
+`node_id` is replaced by `node`. Change `node_id` in your configuration to the node name shown by `data.phala_nodes`, then run a normal plan with refresh on. A matching name does not replace the resource. If no current CVM reports the old node, the plan stops without changing placement.
+</Note>
 | `listed` | Boolean | Whether the app is publicly listed. **Force-new.** |
 
 ### Infrastructure
@@ -85,7 +89,7 @@ These attributes control compose-level runtime behavior. Changing any of them tr
 ### Compose Settings, Init Scripts, Annotations and Launch Token
 
 <Note>
-These attributes are in the provider's unreleased changes (after 0.3.0-beta.4). No released provider version has them yet.
+These attributes need provider 0.3.0-beta.5 or newer.
 </Note>
 
 The provider sends every compose change of one apply as a single [`PATCH /cvms/{id}`](/phala-cloud/update/update-cvm-configuration) merge patch. Only changed keys are sent, and compose keys the provider does not manage stay as they are. The provider keeps these settings as configured in state and does not read them back from Phala Cloud.
@@ -98,7 +102,7 @@ The provider sends every compose change of one apply as a single [`PATCH /cvms/{
 | `snapshotter` | String | `overlayfs` or `stargz`. Only with `runner = "nerdctl-compose"`. |
 | `event_log_version` | Number | Event log format, `1` or `2`. Every verifier that checks the app must support the version you pick. |
 | `requirements` | Object | Guest requirements: `health_check`, `health_status_file`, `platforms`, `tdx_measure_acpi_tables`, `ephemeral_data_disk` and `gpu_policy`. Only the keys you set are written. `gpu_policy` needs a feature flag and is **force-new**. |
-| `init_scripts` | Set of String | Platform init scripts every CVM of the app runs on boot: `docker_cleanup` and `env_merge` (feature-flagged). See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). |
+| `init_scripts` | Set of String | Platform init scripts every CVM of the app runs on boot: `docker_cleanup`. See [Init scripts](/phala-cloud/cvm/advanced-settings#init-scripts). |
 | `confirm_data_wipe` | Boolean | Confirms an update that turns on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot. Not needed on create. |
 | `runner` | String | `docker-compose` (default), `nerdctl-compose` or `bash`. The other runners need a feature flag. **Force-new.** |
 | `bash_script` | String | Script the `bash` runner runs; set `docker_compose = ""` with it. **Force-new.** |
@@ -194,8 +198,8 @@ Changing any of these attributes destroys the existing resource and creates a ne
 - `kms`
 - `custom_app_id`
 - `nonce`
-- `node_id`
-- `runner`, `bash_script` and `requirements.gpu_policy` (unreleased, see [above](#compose-settings-init-scripts-annotations-and-launch-token))
+- `node`
+- `runner`, `bash_script` and `requirements.gpu_policy`
 
 ### In-Place Updates
 
@@ -209,7 +213,7 @@ These attributes can be updated without replacement:
 - `replicas`
 - `env` / `encrypted_env`
 - Compose runtime settings (`public_logs`, `public_sysinfo`, `public_tcbinfo`, `gateway_enabled`, `secure_time`)
-- Unreleased: the compose settings, `init_scripts`, `annotations` and `launch_token` described [above](#compose-settings-init-scripts-annotations-and-launch-token)
+- The compose settings, `init_scripts`, `annotations` and `launch_token` described [above](#compose-settings-init-scripts-annotations-and-launch-token)
 
 ### Replica Scaling
 

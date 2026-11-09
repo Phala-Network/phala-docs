@@ -256,7 +256,7 @@ For CVMs with on-chain KMS (ETHEREUM/BASE), a change to the compose needs a seco
 | `public_sysinfo` | `boolean` | No | Make system info public |
 | `public_tcbinfo` | `boolean` | No | Make TCB info public |
 | `compose` | `ComposePatch` | No | Other compose settings as a merge patch, for example `{ swap_size: "2G", requirements: { health_check: true } }` |
-| `init_scripts` | `("docker_cleanup" \| "env_merge")[]` | No | Platform init scripts the CVM runs, replacing the current set. `[]` removes them all. |
+| `init_scripts` | `"docker_cleanup"[]` | No | Platform init scripts the CVM runs, replacing the current set. `[]` removes them all. |
 | `confirm_data_wipe` | `boolean` | No | Confirms turning on `docker_cleanup` or `requirements.ephemeral_data_disk`, which erase data on every boot |
 | `encrypted_env` | `string` | No | Hex-encoded encrypted env vars |
 | `user_config` | `string` | No | User configuration string |

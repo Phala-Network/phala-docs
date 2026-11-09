@@ -7,24 +7,23 @@ These settings are set through the API, on the create request (`POST /cvms`) or 
 
 ## Init scripts
 
-Init scripts are small scripts Phala Cloud provides. The CVM runs them on every boot, before your containers start. You pick them by name:
+Init scripts are small scripts Phala Cloud provides. The CVM runs them on every boot, before your containers start. You pick them by name. Today there is one:
 
 | Name | What it does | Needs |
 | --- | --- | --- |
 | `docker_cleanup` | Erases every local container store on each boot: images, volumes and all containerd namespaces. Each boot pulls images again and starts with empty Docker volumes. | dstack OS 0.6.x, `ext4` storage, the `docker-compose` runner |
-| `env_merge` | On each boot, merges the encrypted environment variables you sent into the ones the CVM stored before, limited to `allowed_envs`. | dstack OS 0.6.0 or newer. Available on request. |
-
-The scripts always run in this order: `docker_cleanup`, then `env_merge`.
 
 ### How do I choose init scripts?
 
 Send the full list. It replaces the scripts the CVM runs now, and `[]` removes them all:
 
 ```json
-{ "init_scripts": ["docker_cleanup", "env_merge"] }
+{ "init_scripts": ["docker_cleanup"] }
 ```
 
-Use the same field on create and on `PATCH /cvms/{cvm_id}`. The create request still accepts the older forms `init_scripts: {"env_merge": true}` and `enabled_init_scripts_docker_cleanup`.
+With the CLI, use `phala deploy --init-script docker_cleanup` on create, or `phala cvms init-scripts <cvm-id> <name> on|off` to turn one script on or off on an existing CVM. See [`cvms init-scripts`](/phala-cloud/phala-cloud-cli/cvms/init-scripts).
+
+Use the same field on create and on `PATCH /cvms/{cvm_id}`. The create request still accepts the older form `enabled_init_scripts_docker_cleanup`.
 
 Storage is fixed when you create a CVM, and the default is `zfs`. To use `docker_cleanup`, create the CVM with `ext4` storage.
 
