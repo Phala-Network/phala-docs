@@ -25,7 +25,7 @@ Deploy new CVM or update existing one
 | `-r, --region <value>` | Preferred region (e.g., us-west, auto-selected if omitted) |
 | `-e, --env <value>` | Environment variable (KEY=VALUE) or env file path (repeatable) |
 | `--kms <value>` | KMS type: phala (default), ethereum/eth, or base |
-| `--wait` | On update (--cvm-id): wait for the update to finish and fail if it failed. No effect on a new deployment |
+| `--wait` | Wait for the deployment to finish and fail if it failed. New CVM: wait until it is running. Update (--cvm-id): wait until the CVM is running again, or stays stopped if it was not running before the update |
 | `--ssh-pubkey <value>` | SSH public key path (default: ~/.ssh/id_rsa.pub) |
 | `--dev-os, --no-dev-os` | Use dev OS image (requires SSH key) |
 | `--public-logs, --no-public-logs` | Make CVM logs publicly accessible (default: true) |
@@ -51,6 +51,7 @@ Deploy new CVM or update existing one
 | `--custom-app-id <value>` | Custom App ID (requires --nonce for PHALA KMS) |
 | `--nonce <value>` | Nonce for deterministic app_id (requires --custom-app-id, PHALA KMS only) |
 | `--pre-launch-script <value>` | Path to pre-launch script |
+| `--no-pre-launch-script` | Deploy without any pre-launch script. This also skips the automatic local SSH key, unless you pass `--dev-os` or `--ssh-pubkey`. |
 | `--runner <value>` | App runner: docker-compose (default), nerdctl-compose, or bash. With bash, --compose is the script to run. nerdctl-compose and bash need the compose_advanced feature. Create only. |
 | `--app-compose <value>` | Path to a whole app-compose JSON file, sent instead of --compose and the compose flags. Needs the compose_advanced feature. Create only. |
 | `--init-script <value>` | Platform init script to run on every boot: docker_cleanup or env_merge (repeatable). On update, replaces the current set. |
@@ -156,13 +157,21 @@ phala deploy --cvm-id app_abc123
 phala deploy --cvm-id my-app --compose ./new-docker-compose.yml -e .env
 ```
 
+* Deploy a new CVM and wait until it is running
+
+```bash
+phala deploy --wait
+```
+
+On a new CVM, `--wait` waits up to 5 minutes for the CVM to run. If it does not start, the command fails with the boot error and the CVM ID. The CVM exists even then, so check it with `phala cvms get <cvm-id>`.
+
 * Update CVM and wait for completion
 
 ```bash
 phala deploy --cvm-id app_abc123 --wait
 ```
 
-On an update, `--wait` first waits for the update operation. If the update fails, the command stops at once with the operation's status and error message. Otherwise it then waits until the CVM is back in the state it had before: running, or stopped if it was stopped. For a CVM that uses the `bash` runner, `--compose` (`-c`) sends the file as the CVM's `bash_script`.
+On an update, `--wait` first waits for the update operation. If the update fails, the command stops at once with the operation's status and error message. Otherwise it then waits for the CVM to settle. If the CVM was running before the update, it waits until the CVM is running again. In any other state before the update (stopped, error, and so on), it waits until the CVM is stopped. For a CVM that uses the `bash` runner, `--compose` (`-c`) sends the file as the CVM's `bash_script`.
 
 * Update CVM from phala.toml
 

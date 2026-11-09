@@ -24,6 +24,8 @@ Send the full list. It replaces the scripts the CVM runs now, and `[]` removes t
 { "init_scripts": ["docker_cleanup", "env_merge"] }
 ```
 
+With the CLI, use `phala deploy --init-script docker_cleanup` on create, or `phala cvms init-scripts <cvm-id> <name> on|off` to turn one script on or off on an existing CVM. See [`cvms init-scripts`](/phala-cloud/phala-cloud-cli/cvms/init-scripts).
+
 Use the same field on create and on `PATCH /cvms/{cvm_id}`. The create request still accepts the older forms `init_scripts: {"env_merge": true}` and `enabled_init_scripts_docker_cleanup`.
 
 Storage is fixed when you create a CVM, and the default is `zfs`. To use `docker_cleanup`, create the CVM with `ext4` storage.
