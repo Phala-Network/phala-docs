@@ -33,6 +33,45 @@ const cvm = await client.getCvmInfo({ id: "my-app" });
 console.log(cvm.name, cvm.status);
 ```
 
+The detail response includes complete presigned URLs for serial, stdout, and stderr logs. Each URL is valid for 300 seconds to open a connection. Expiry is checked only when the connection opens.
+
+An established stream can continue for up to 3,600 seconds (one hour). In follow mode, reconnect whenever the stream reaches EOF, including after idle timeouts or a clean end. The request to `getCvmInfo` uses your authenticated API client. Anyone with a valid URL can open it directly without signing in, so treat these URLs like passwords.
+
+For container logs, the `2026-01-21` detail response provides `logs.container_log_base` without a query string and an optional, nullable `logs.auth_query`. Append a valid container name and display options to the base, then add the authentication query.
+
+Both fields are non-null only when `public_logs` is `true` and `vm_uuid` is present. Clients should tolerate `auth_query` being omitted or `null`.
+
+```typescript
+import { createClient } from "@phala/cloud";
+
+const client = createClient({
+  apiKey: "phak_your_api_key",
+  version: "2026-01-21",
+});
+const cvm = await client.getCvmInfo({ id: "my-app" });
+const { container_log_base, auth_query } = cvm.logs;
+const containerName = "api"; // Container names match the pattern below.
+const validName = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(containerName)
+  && !containerName.includes("..");
+
+if (container_log_base && auth_query && validName) {
+  const url = `${container_log_base}/${containerName}?format=text&timestamps=true&tail=500&ansi=true&follow=true&${auth_query}`;
+}
+```
+
+Container names must match `[A-Za-z0-9][A-Za-z0-9_.-]{0,127}` and must not contain `..`. Use the name directly in the path; do not URL-encode it, because encoded path characters such as `%` are rejected.
+
+If a reconnect returns `ERR-17-003`, the URL has expired. Call `getCvmInfo` again to get fresh URLs, then retry. You do not need to sign in again to open a currently valid URL.
+
+### Reconnect to a log stream
+
+Reconnect after every EOF in follow mode. An EOF can follow an idle timeout (about 100 seconds at Cloudflare or 600 seconds at the guest agent), the 3,600-second stream limit, or a clean end.
+
+- For container logs, request timestamps and reconnect with `since` set to the last timestamp received. Drop duplicate lines at the reconnect boundary.
+- For node logs (serial, stdout, or stderr), reconnect with `tail=0` to continue without replaying earlier lines.
+
+The gateway does not add keepalive records. Preserve empty lines because they may be real log entries. Node streams can include VMM heartbeat lines; in follow mode, drop only node lines whose entire contents exactly match `[vmm heartbeat]` or `[teepod heartbeat]`. Keep container log lines with those same contents.
+
 ---
 
 ## getCvmList

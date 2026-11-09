@@ -27,13 +27,13 @@ The log drawer switches to the selected container's output. If a container does 
   <img src="/images/cloud-container-log.png" alt="CVM log drawer with demo-api selected under Docker Containers and its application output streaming" />
 </Frame>
 
-## Open and copy a public log URL
+## Open and copy a log URL
 
 1. Select a container under **Docker Containers**.
 2. Open the log toolbar menu, then click **Open in New Window**.
 3. Copy the URL from the new window's browser address bar.
 
-**Open in New Window** is available only when the selected container has a public log endpoint. Anyone with the copied URL can open it without signing in to Phala Cloud.
+**Open in New Window** is available only when the selected container has a log endpoint. The URL is signed for your account and expires 300 seconds after it is issued. Anyone who has the URL can open it without signing in until it expires, so treat it like a password. The expiry is checked only when a stream opens; an open stream runs for up to one hour.
 
 ## Control public access
 
@@ -41,7 +41,7 @@ The **Public Logs** setting controls Phala Cloud's managed Docker log endpoints.
 
 | Setting | Behavior |
 | --- | --- |
-| Enabled | The dashboard provides a log URL for each available container. Anyone with a URL can view that container's logs without a Phala Cloud session. |
+| Enabled | The dashboard provides a short-lived signed log URL for each available container to members of the workspace. There is no anonymous access: a URL works only while its signature is valid. |
 | Disabled | The dashboard does not provide Docker log URLs. Use an in-CVM log viewer or forward logs to a private external service instead. |
 
 To change the setting for an existing CVM:
