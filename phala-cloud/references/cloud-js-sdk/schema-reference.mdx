@@ -94,13 +94,36 @@ Compact CVM info returned in list endpoints.
 
 ### CvmInfoDetailV20260121
 
-Extended CVM info with compose file (returned by single-CVM endpoints).
+Extended CVM info returned by single-CVM endpoints. The `logs` object contains the log URLs described below.
 
 ```typescript
 CvmInfoV20260121 & {
   compose_file?: Record<string, any> | string | null;
+  logs?: CvmLogUrlsV20260121;
 }
 ```
+
+### CvmLogUrlsV20260121
+
+The `serial`, `stdout`, and `stderr` fields are complete presigned URLs for the corresponding CVM logs. Each URL is valid for 300 seconds to open a connection. Expiry is checked only when the connection opens.
+
+An established stream can continue for up to 3,600 seconds (one hour) before it ends. In follow mode, reconnect whenever the stream reaches EOF. If a reconnect returns `ERR-17-003`, fetch fresh URLs with an authenticated CVM detail request.
+
+See [CVM Query](/phala-cloud/references/cloud-js-sdk/cvm-query) for reconnect cursors and heartbeat handling. A URL is a bearer capability, so anyone with a valid URL can open it directly without signing in. An authenticated API request is required to retrieve CVM details and these URLs.
+
+```typescript
+{
+  serial?: string | null; // Complete presigned URL for serial logs
+  stdout?: string | null; // Complete presigned URL for CVM stdout
+  stderr?: string | null; // Complete presigned URL for CVM stderr
+  container_log_base?: string | null; // Container URL base with no query string
+  auth_query?: string | null; // Optional authentication query string
+}
+```
+
+To build a container log URL, append the container name and display options to `container_log_base`, then add `auth_query`. Both container fields are non-null only when `public_logs` is `true` and the CVM has a `vm_uuid`. Clients should accept `auth_query` being omitted or `null` for forward compatibility.
+
+In the legacy `2025-10-28` response, `syslog_endpoint` is a complete presigned serial log URL, not a URL base.
 
 ### PaginatedCvmInfosV20260121
 
