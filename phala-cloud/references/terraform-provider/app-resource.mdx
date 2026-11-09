@@ -89,7 +89,7 @@ These attributes control compose-level runtime behavior. Changing any of them tr
 ### Compose Settings, Init Scripts, Annotations and Launch Token
 
 <Note>
-These attributes are in the provider's unreleased changes (after 0.3.0-beta.4). No released provider version has them yet.
+These attributes need provider 0.3.0-beta.5 or newer.
 </Note>
 
 The provider sends every compose change of one apply as a single [`PATCH /cvms/{id}`](/phala-cloud/update/update-cvm-configuration) merge patch. Only changed keys are sent, and compose keys the provider does not manage stay as they are. The provider keeps these settings as configured in state and does not read them back from Phala Cloud.
@@ -199,7 +199,7 @@ Changing any of these attributes destroys the existing resource and creates a ne
 - `custom_app_id`
 - `nonce`
 - `node`
-- `runner`, `bash_script` and `requirements.gpu_policy` (unreleased, see [above](#compose-settings-init-scripts-annotations-and-launch-token))
+- `runner`, `bash_script` and `requirements.gpu_policy`
 
 ### In-Place Updates
 
@@ -213,7 +213,7 @@ These attributes can be updated without replacement:
 - `replicas`
 - `env` / `encrypted_env`
 - Compose runtime settings (`public_logs`, `public_sysinfo`, `public_tcbinfo`, `gateway_enabled`, `secure_time`)
-- Unreleased: the compose settings, `init_scripts`, `annotations` and `launch_token` described [above](#compose-settings-init-scripts-annotations-and-launch-token)
+- The compose settings, `init_scripts`, `annotations` and `launch_token` described [above](#compose-settings-init-scripts-annotations-and-launch-token)
 
 ### Replica Scaling
 
