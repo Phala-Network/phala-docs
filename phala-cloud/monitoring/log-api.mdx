@@ -1,0 +1,217 @@
+---
+description: Fetch CVM serial, node, and container logs over HTTP from scripts and monitoring tools.
+title: Fetch Logs over HTTP
+---
+
+Use this page to read CVM logs from your own scripts, monitoring tools, or clients written in any language. You request a signed log URL from the Phala Cloud API, then read the log stream from that URL with a plain HTTP GET.
+
+For the dashboard log viewer, see [Serial Logs](/phala-cloud/monitoring/serials-logs) and [Docker container logs](/phala-cloud/monitoring/public-logs). The `phala logs` command is described in the [CLI reference](/phala-cloud/phala-cloud-cli/logs).
+
+## Get a log URL
+
+Call `GET /api/v1/cvms/{id}` on `https://cloud-api.phala.com` with your API key in the `X-API-Key` header. The response contains a `logs` object:
+
+| Field | Description |
+| --- | --- |
+| `logs.serial` | Complete URL for the CVM serial console (boot, kernel). |
+| `logs.stdout` | Complete URL for the CVM stdout channel. |
+| `logs.stderr` | Complete URL for the CVM stderr channel. |
+| `logs.container_log_base` | Base URL for container logs. |
+| `logs.auth_query` | Query string that authorizes container log requests. |
+
+A node log URL has this form (`serial`, `stdout`, or `stderr` in the last path segment):
+
+```text
+https://cloud-logs.phala.com/logs/{vm_uuid}/node/{serial|stdout|stderr}?uid=<uid>&exp=<exp>&kid=<kid>&sig=<sig>
+```
+
+A container log URL is built from the base and the container name:
+
+```text
+{logs.container_log_base}/{container_name}?{logs.auth_query}
+```
+
+You can also read a ready-made container URL from `log_endpoint` on each container in the response of `GET /api/v1/cvms/{id}/composition`.
+
+In API version `2025-10-28`, the serial URL is returned as `syslog_endpoint`. Later versions return it as `logs.serial`.
+
+All of these fields are `null` when the requesting user cannot read the CVM's logs.
+
+The container fields (`logs.container_log_base`, `logs.auth_query`, and the container `log_endpoint`) are also `null` unless the CVM has [Public Logs](/phala-cloud/monitoring/public-logs) enabled. Container requests are rejected with `ERR-17-006` when it is disabled. Node logs (`serial`, `stdout`, `stderr`) are not affected by this setting.
+
+### How URLs are signed
+
+Phala Cloud signs each URL for the user who requested it. The signature covers the whole CVM, so one signature works for the serial, stdout, stderr, and container URLs. Your client never signs anything.
+
+- Do not change the `uid`, `exp`, `kid`, or `sig` parameters. Add your own query parameters after them.
+- Anonymous access is not supported. You must be a member of the CVM's workspace to get a URL.
+- Treat a URL like a credential until it expires. Anyone who has it can read the logs.
+
+## Expiry and rotation
+
+| Limit | Value |
+| --- | --- |
+| Signature lifetime | 5 minutes. It is checked only when the connection opens. |
+| Open stream | Not cut when the signature expires. A single stream lasts at most 1 hour. |
+| Idle client | A client that stops reading for 60 seconds is disconnected. |
+
+Because of these limits:
+
+- Fetch a fresh URL from the CVM API right before each connection.
+- Never cache or store URLs.
+- If a request returns `401` (`ERR-17-002` or `ERR-17-003`), the signature is missing, invalid, or expired. Fetch a new URL and retry.
+
+## Query parameters
+
+The same parameters apply to every log kind unless noted. Unknown or repeated parameters are rejected with `400`. Boolean parameters accept only `true` or `false`.
+
+| Parameter | Applies to | Description |
+| --- | --- | --- |
+| `tail` | All | Number of most recent lines: `0` to `10000`, or `all`. |
+| `follow` | All | `true` keeps the connection open and streams new lines. |
+| `since` | Container logs | Start time. RFC 3339 timestamp, Unix seconds, or relative (`<n>s`, `<n>m`, `<n>h`, `<n>d`). |
+| `until` | Container logs | End time. Same formats as `since`. |
+| `timestamps` | Container logs | Prefix each line with its timestamp. |
+| `ansi` | All | `true` keeps ANSI color codes. Only valid with `format=text`. |
+| `format` | All | `text` (default), or `ndjson` (container logs only). |
+
+Append parameters with `&` after the signature parameters. For a container URL, `auth_query` is already in the query string, so join with `&` as well.
+
+## Read logs
+
+### Fetch recent lines
+
+```bash
+URL=$(curl -s "https://cloud-api.phala.com/api/v1/cvms/<cvm-id>" \
+  -H "X-API-Key: $PHALA_CLOUD_API_KEY" | jq -r '.logs.serial')
+
+curl -s "$URL&tail=100"
+```
+
+For a container (`api` in this example):
+
+```bash
+RESP=$(curl -s "https://cloud-api.phala.com/api/v1/cvms/<cvm-id>" \
+  -H "X-API-Key: $PHALA_CLOUD_API_KEY")
+BASE=$(echo "$RESP" | jq -r '.logs.container_log_base')
+AUTH=$(echo "$RESP" | jq -r '.logs.auth_query')
+
+curl -s "$BASE/api?$AUTH&tail=100&timestamps=true"
+```
+
+### Polling
+
+Poll on a timer. On each tick, fetch a fresh URL and request the last `N` lines without `follow`. Use `since` for container logs, or compare against the last line you saw, to avoid processing the same lines twice.
+
+### Following
+
+Request the URL with `follow=true` and read the response as it arrives. The stream can end for any reason: a normal close, the 1-hour limit, or a network error. When it ends:
+
+1. Fetch a fresh URL from the CVM API.
+2. Reconnect without repeating lines you already read:
+   - Node logs (`serial`, `stdout`, `stderr`): reconnect with `tail=0`.
+   - Container logs: request with `timestamps=true`, and reconnect with `since` set to the timestamp of the last line you received. Drop lines at that boundary second that you already saw.
+3. After several consecutive failures, give up and report the error. The `phala` CLI stops after 5. A successful `200` response resets the failure count.
+
+Node log streams can contain heartbeat lines whose entire content is `[vmm heartbeat]` or `[teepod heartbeat]`. Drop those lines from node logs only; keep container lines with the same text, and keep empty lines, which can be real log entries. No other keepalive records are added to the stream.
+
+### Example: follow a serial log in Python
+
+```python
+import os
+import time
+
+import httpx
+
+API = "https://cloud-api.phala.com/api/v1"
+HEADERS = {"X-API-Key": os.environ["PHALA_CLOUD_API_KEY"]}
+CVM_ID = "<cvm-id>"
+MAX_FAILURES = 5
+
+
+def fresh_serial_url(client: httpx.Client) -> str:
+    resp = client.get(f"{API}/cvms/{CVM_ID}", headers=HEADERS)
+    resp.raise_for_status()
+    url = resp.json()["logs"]["serial"]
+    if url is None:
+        raise RuntimeError("No permission to read logs for this CVM")
+    return url
+
+
+def follow_serial() -> None:
+    failures = 0
+    tail = "100"  # First connection shows recent lines; reconnects use 0.
+    with httpx.Client(timeout=httpx.Timeout(10.0, read=None)) as client:
+        while failures < MAX_FAILURES:
+            try:
+                url = fresh_serial_url(client)
+                with client.stream("GET", f"{url}&follow=true&tail={tail}") as resp:
+                    resp.raise_for_status()
+                    failures = 0
+                    tail = "0"
+                    for line in resp.iter_lines():
+                        if line not in ("[vmm heartbeat]", "[teepod heartbeat]"):
+                            print(line, flush=True)
+            except httpx.HTTPError:
+                failures += 1
+            time.sleep(1)
+    raise RuntimeError(f"Giving up after {MAX_FAILURES} consecutive failures")
+
+
+follow_serial()
+```
+
+The loop fetches a new URL on every connection, so an expired signature (`401`) is handled by the next iteration.
+
+## Errors
+
+Error responses have a JSON body:
+
+```json
+{
+  "error_code": "ERR-17-001",
+  "message": "<description>",
+  "details": [],
+  "suggestions": [],
+  "links": [],
+  "request_id": null
+}
+```
+
+Match on `error_code`. The `message` text is for people and may change.
+
+| Status | Code | Meaning |
+| --- | --- | --- |
+| `400` | `ERR-17-001` | Invalid log request |
+| `401` | `ERR-17-002` | Missing or invalid log access signature |
+| `401` | `ERR-17-003` | Log access signature expired |
+| `404` | `ERR-17-004` | CVM not found or access denied |
+| `409` | `ERR-17-005` | CVM is not running (container logs only; `details` has the current CVM `status`) |
+| `409` | `ERR-17-006` | Container logs are disabled (public logs are off) |
+| `404` | `ERR-17-007` | Container not found |
+| `502` | `ERR-17-008` | Node VMM unreachable or returned a bad response |
+| `502` | `ERR-17-009` | Guest agent or gateway unreachable |
+| `504` | `ERR-17-010` | Log upstream timed out |
+| `429` | `ERR-17-011` | Too many concurrent log streams |
+| `503` | `ERR-17-012` | Node or gateway routing data is unavailable |
+| `404` | `ERR-17-013` | VM no longer exists on the node |
+
+How to react:
+
+- `401` (`ERR-17-002`, `ERR-17-003`): fetch a fresh URL from the CVM API and retry.
+- `429` and `5xx`: back off, fetch a fresh URL, and retry.
+- `400`, `404`, `409`: do not retry blindly. Fix the request or the CVM state first. With `ERR-17-005`, node logs (`serial`, `stdout`, `stderr`) remain readable.
+
+When you contact support, include the `error_code`, the time of the request, and the CVM ID.
+
+## Migrate from old URLs and parameters
+
+Older dstack-style log URLs accepted different parameters. Requests that still send them now fail with `400`.
+
+| Old | New |
+| --- | --- |
+| `lines=N` | `tail=N` |
+| `ch=serial` | Use the `/node/serial` URL from `logs.serial`. |
+| `text`, `bare` | Remove. Plain text is the default. |
+| `ansi` (bare flag) | `ansi=true` |
+| `follow` (bare flag) | `follow=true` |
