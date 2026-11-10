@@ -101,9 +101,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-03-008` | `ReplicaSourceInstanceNotAccessibleError` | The source CVM instance was not found in this workspace or access is denied<br/>*Raised when the replica source CVM instance is not visible in the current workspace.* |
 | `ERR-03-009` | `ReplicaComposeHashRequiredError` | This app has multiple live CVM instances. Please specify compose_hash to choose which revision to replicate.<br/>*Raised when replicate needs an explicit compose_hash due to multiple live instances.* |
 | `ERR-03-010` | `MultipleCvmsForIdentifierError` | Multiple CVMs match this identifier in the workspace<br/>*Raised when an identifier (e.g. app_id) matches multiple CVMs in a workspace.* |
-| `ERR-03-011` | `CvmPhysicalDeleteNotScheduledError` | The CVM is not scheduled for physical deletion<br/>*Raised when immediate physical deletion is requested without a schedule.* |
-| `ERR-03-012` | `CvmRecoveryError` | The CVM cannot be recovered in its current state<br/>*Base error for an admin recovery of a retained CVM.* |
-| `ERR-03-013` | `CvmRecoveryVmmUnavailableError` | The Teepod could not verify the retained CVM<br/>*The Teepod could not prove that the retained VM still exists.* |
 | `ERR-03-014` | `ReplicaImageChangeNotAllowedError` | The target OS image is not compatible with the source CVM<br/>*Raised when a replica target image is incompatible with its source image.* |
 | `ERR-03-015` | `CvmOSImageChangeInProgressError` | Another operation is already in progress for this CVM<br/>*Raised when a CVM already has a live operation.* |
 | `ERR-03-016` | `FirewallRuleSyncFailedError` | Port mappings were saved, but the node firewall still has a rule that should have been created or removed.<br/>*Node firewall still has a CVM rule after a mapping create or removal.* |
@@ -148,7 +145,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-03-056` | `ReservedAppIdError` | This app_id is reserved and cannot be deployed<br/>*The app_id is a gateway app id: no code may be created, replicated or redeployed under it.* |
 | `ERR-03-057` | `VmInfoUnavailableError` | This CVM is not reachable via its node right now. Retry in a moment, or contact support if it persists.<br/>*Raised when VMM/teepod cannot return VmInfo for a CVM.* |
 | `ERR-03-058` | `InitScriptSourceConflictError` | Send either init_script or init_scripts, not both.<br/>*A request sends both a raw init_script and init_scripts slugs.* |
-| `ERR-03-059` | `InitScriptAdminOnlyError` | Only Phala Cloud admins can replace a CVM's raw init scripts.<br/>*Replacing raw init_script is reserved for system admins.* |
 
 
 ## Module 04: Workspace
@@ -166,7 +162,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-04-008` | `WebhookCapacityError` | This workspace already has 10 webhooks. Delete one before adding another.<br/>*The workspace has reached its webhook limit.* |
 | `ERR-04-009` | `WebhookCreationIneligibleError` | Add a payment method or create a CVM before adding a webhook.<br/>*Webhook creation requires a payment method or a non-deleted CVM.* |
 | `ERR-04-010` | `WebhookPaymentCheckUnavailableError` | We could not check your payment methods. Try again later.<br/>*A failed payment-method check must not grant webhook creation.* |
-| `ERR-04-011` | `WebhookAdminDisabledError` | An administrator disabled this webhook. Contact support to enable or change it.<br/>*Only an administrator may restore an admin-disabled webhook.* |
 
 
 ## Module 05: Credentials
@@ -193,9 +188,7 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-06-008` | `AccessRoleDeniedError` | Your workspace role does not grant this permission<br/>*The user's workspace role does not grant the required permission.* |
 | `ERR-06-009` | `AccessTokenCeilingDeniedError` | This API key is not allowed to use this permission<br/>*The API key is not allowed to exercise the required permission.* |
 | `ERR-06-010` | `AccessUserRouteApiKeyDeniedError` | API keys cannot access this user route<br/>*API keys cannot access session-only user routes.* |
-| `ERR-06-011` | `AccessAdminRequiredError` | Only admins can access this endpoint<br/>*A non-admin user attempted to access an admin route.* |
 | `ERR-06-012` | `AccessSlugWorkspaceApiKeyDeniedError` | API keys cannot access slug-resolved workspace routes<br/>*API keys cannot access slug-resolved workspace routes.* |
-| `ERR-06-013` | `AccessAdminTwoFactorRequiredError` | Admin access requires two-factor authentication<br/>*An admin-role user without 2FA attempted to access an admin route.* |
 
 
 ## Module 09: Billing

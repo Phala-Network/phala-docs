@@ -12,6 +12,8 @@ OUTPUT_FILE="$REPO_ROOT/phala-cloud/references/error-codes.mdx"
 # Modules used only by internal endpoints; keep them out of the public page.
 # 07 Admin, 08 Core/Runtime/DevOps, 13 Changelog Publication, 15 Catalog Pricing
 EXCLUDED_MODULES="07 08 13 15"
+# Single codes from public modules that are only returned to admins.
+EXCLUDED_CODES="ERR-03-011 ERR-03-012 ERR-03-013 ERR-03-059 ERR-04-011 ERR-06-011 ERR-06-013"
 
 if [ ! -f "$SOURCE_FILE" ]; then
     echo "Error: Source file not found at $SOURCE_FILE"
@@ -37,6 +39,7 @@ FRONTMATTER
     # 3. Remove teehouse module path references (internal implementation details)
     # 4. Remove -000 errors (base class exceptions, not user-facing)
     # 5. Remove modules that are not part of the public API (EXCLUDED_MODULES)
+    # 6. Remove single admin-only codes (EXCLUDED_CODES)
     # Using awk for portability (BSD sed on macOS does not support the
     # multi-command range form used previously).
     awk -v excluded="$EXCLUDED_MODULES" '
@@ -53,7 +56,15 @@ FRONTMATTER
                                 { print }
     ' "$SOURCE_FILE" \
         | sed 's/ (`teehouse[^`]*`)//g' \
-        | grep -v 'ERR-[0-9][0-9]-000'
+        | grep -v 'ERR-[0-9][0-9]-000' \
+        | awk -v excluded="$EXCLUDED_CODES" '
+            BEGIN {
+                n = split(excluded, codes, " ")
+                for (i = 1; i <= n; i++) skip_code["`" codes[i] "`"] = 1
+            }
+            /^\| `ERR-/ { split($0, cols, " "); if (cols[2] in skip_code) next }
+            { print }
+        '
 
 } > "$OUTPUT_FILE"
 
