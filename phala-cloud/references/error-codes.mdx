@@ -18,15 +18,11 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 - **Module 04** - Workspace
 - **Module 05** - Credentials
 - **Module 06** - Auth
-- **Module 07** - Admin
-- **Module 08** - Core, Runtime, and DevOps
 - **Module 09** - Billing
 - **Module 10** - GPU Rental
 - **Module 11** - Centralized KMS
 - **Module 12** - KMS
-- **Module 13** - Changelog Publication
 - **Module 14** - Confidential AI
-- **Module 15** - Catalog Pricing
 - **Module 16** - Trust Center
 - **Module 17** - Log Access
 
@@ -202,41 +198,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-06-013` | `AccessAdminTwoFactorRequiredError` | Admin access requires two-factor authentication<br/>*An admin-role user without 2FA attempted to access an admin route.* |
 
 
-## Module 07: Admin
-
-
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-07-001` | `AdminListFilterError` | (dynamic: Invalid admin list filter: ...)<br/>*Raised when an admin list endpoint receives a filter or sort value* |
-| `ERR-07-002` | `WorkspaceOwnerDisabledError` | Workspace owner is disabled<br/>*Raised when an admin invoice operation targets a workspace whose owner user* |
-| `ERR-07-003` | `FeatureFlagToggleNotFoundError` | (dynamic: Feature flag toggle not found: ...)<br/>*Raised when an admin deletes a persisted feature-flag toggle that does* |
-| `ERR-07-004` | `AdminContentSearchValidationError` | (dynamic: Invalid CVM content search filter: ...)<br/>*Raised when an admin CVM content query violates its request contract.* |
-| `ERR-07-005` | `AdminContentSearchUnavailableError` | CVM content search unavailable<br/>*Raised when ClickHouse cannot serve an active content search.* |
-| `ERR-07-006` | `AdminWorkspaceNotFoundError` | Workspace not found<br/>*Raised when an admin endpoint targets a workspace ID that does not exist.* |
-| `ERR-07-007` | `PurgedWorkspaceWalletError` | This workspace is purged; its signing wallet cannot be recreated.<br/>*Raised when an admin asks to provision a signing wallet for a purged workspace.* |
-| `ERR-07-008` | `PreLaunchScriptReviewNotFoundError` | Pre-launch script review not found<br/>*Raised when an admin deletes a missing pre-launch script review.* |
-| `ERR-07-009` | `AdminInvalidIdentifierError` | (dynamic: Invalid ...)<br/>*Raised when an admin request body carries identifiers the server cannot* |
-| `ERR-07-010` | `AdminUsersNotFoundError` | Users not found<br/>*Raised when an admin endpoint targets user IDs that do not exist.* |
-| `ERR-07-011` | `RedpillConnectionKeyDisableFailedError` | Could not disable this connection's Confidential AI keys at the provider; the connection was not deleted. Retry once the provider is reachable.<br/>*Raised when admin connection delete cannot disable the connection's* |
-| `ERR-07-012` | `RedpillConnectionTeamReassignmentBlockedError` | This connection has Confidential AI key ownership rows; its workspace cannot be reassigned<br/>*Raised when an admin tries to change `redpill_connections.team_id`* |
-| `ERR-07-013` | `RedpillConnectionDeleteLockedError` | This connection's Confidential AI key lifecycle is locked by another in-progress operation. Retry shortly.<br/>*Raised when admin connection delete cannot acquire the team's Redpill* |
-| `ERR-07-014` | `NodeNetworkAdminTokenError` | Node network admin token was rejected or is not configured<br/>*Teescope rejected or is missing the per-node network admin Bearer token.* |
-| `ERR-07-016` | `NodeNetworkUnreachableError` | Node network agent is unreachable<br/>*Teescope agent could not be reached or returned 5xx.* |
-| `ERR-07-017` | `EmailDomainRuleNotFoundError` | Email domain rule not found<br/>*Raised when an admin endpoint targets an email domain rule that does not exist.* |
-| `ERR-07-018` | `EmailDomainRuleExistsError` | An email domain rule already exists for this domain<br/>*Raised when creating an email domain rule for a domain that already has one.* |
-| `ERR-07-019` | `FeatureFlagUnknownError` | (dynamic: Unknown feature flag: ...)<br/>*Raised when an admin tries to grant a flag name that is not in the registry.* |
-| `ERR-07-020` | `FeatureFlagScopeNotAllowedError` | (dynamic: Feature flag ...)<br/>*Raised when an admin grants a flag at a scope the registry does not allow.* |
-
-
-## Module 08: Core, Runtime, and DevOps
-
-
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-08-001` | `InvalidHashedIdError` | (dynamic: Expected ...)<br/>*A path identifier does not match one of its registered HashId types.* |
-| `ERR-08-002` | `AutoTopupPaymentIntentNotSucceededError` | Auto-topup payment did not complete<br/>*A background auto-topup PaymentIntent completed without succeeding.* |
-
-
 ## Module 09: Billing
 
 
@@ -282,18 +243,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-12-003` | `KmsReplicaHealthError` | The KMS replica did not pass its health check<br/>*Raised when a KMS replica cannot be verified before enabling.* |
 
 
-## Module 13: Changelog Publication
-
-
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-13-001` | `ChangelogEntryNotFoundError` | Changelog entry not found<br/>*Raised when a version row does not exist.* |
-| `ERR-13-002` | `ChangelogEntryImmutableError` | Published changelog entries cannot be edited<br/>*Raised when a published version is patched; publish a new version instead.* |
-| `ERR-13-003` | `ChangelogImageInvalidError` | Invalid changelog image<br/>*Raised when an uploaded changelog image fails validation.* |
-| `ERR-13-004` | `ChangelogSlugInvalidError` | Invalid changelog slug<br/>*Raised when a slug is empty or otherwise not usable as a public path segment.* |
-| `ERR-13-005` | `ChangelogVersionProtectedError` | Changelog version cannot be changed<br/>*Raised when unpublishing a non-live version or deleting a published row.* |
-
-
 ## Module 14: Confidential AI
 
 
@@ -304,18 +253,6 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 | `ERR-14-004` | `RedpillUsageMappingMissingError` | usage mapping missing<br/>*Raised when direct usage reads cannot resolve a connection to a Redpill user.* |
 | `ERR-14-005` | `RedpillUsageRangeInvalidError` | Invalid usage time range<br/>*Raised when a public usage time bound is not a valid datetime.* |
 | `ERR-14-006` | `RedpillConnectLockTimeoutError` | Private AI is already being connected for this workspace. Try again in a moment.<br/>*Raised when another request holds the workspace's Private AI connect lock.* |
-
-
-## Module 15: Catalog Pricing
-
-
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-15-001` | `PriceChangeValidationError` | The price change cannot be scheduled.<br/>*A proposed rate or effective time cannot be scheduled.* |
-| `ERR-15-002` | `PendingPriceChangeError` | This price already has a pending change. Cancel it before scheduling another.<br/>*A target already has a pending rate change.* |
-| `ERR-15-003` | `PriceTargetNotFoundError` | The requested catalog price was not found.<br/>*The persisted catalog target does not exist.* |
-| `ERR-15-004` | `AppliedPriceChangeError` | This price change has already been applied. Schedule a new change instead.<br/>*An applied rate cannot be cancelled through the pending-change operation.* |
-| `ERR-15-005` | `PriceChangeNotFoundError` | The requested price change was not found.<br/>*The requested audit row does not exist.* |
 
 
 ## Module 16: Trust Center
