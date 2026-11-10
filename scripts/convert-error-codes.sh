@@ -40,6 +40,7 @@ FRONTMATTER
     # 4. Remove -000 errors (base class exceptions, not user-facing)
     # 5. Remove modules that are not part of the public API (EXCLUDED_MODULES)
     # 6. Remove single admin-only codes (EXCLUDED_CODES)
+    # 7. Drop the Exception Class column and docstrings (internal names)
     # Using awk for portability (BSD sed on macOS does not support the
     # multi-command range form used previously).
     awk -v excluded="$EXCLUDED_MODULES" '
@@ -63,6 +64,17 @@ FRONTMATTER
                 for (i = 1; i <= n; i++) skip_code["`" codes[i] "`"] = 1
             }
             /^\| `ERR-/ { split($0, cols, " "); if (cols[2] in skip_code) next }
+            { print }
+        ' \
+        | awk -F'|' '
+            # Keep only the code and the user-facing message.
+            /^\|/ && NF == 5 {
+                message = $4
+                # Drop the developer docstring appended after the message.
+                sub(/<br\/>\*.*\* *$/, " ", message)
+                print "|" $2 "|" message "|"
+                next
+            }
             { print }
         '
 

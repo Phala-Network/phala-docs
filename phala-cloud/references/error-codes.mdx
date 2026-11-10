@@ -31,252 +31,252 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 ## Module 01: CVM API / Preflight
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-01-001` | `NodeNotFoundError` | The requested node is not available<br/>*Raised when specified node is not found* |
-| `ERR-01-002` | `ComposeFileRequiredError` | The request contains invalid parameters<br/>*Raised when compose_file is required but not provided* |
-| `ERR-01-003` | `InvalidComposeFileError` | The Docker Compose file contains errors<br/>*Raised when Docker Compose file is invalid* |
-| `ERR-01-004` | `DuplicateCvmNameError` | (dynamic: A CVM with name '...)<br/>*Raised when a CVM name already exists in the workspace (HTTP 409)* |
-| `ERR-01-005` | `HashRegistrationRequired` | Compose hash registration required on-chain<br/>*Raised by an onchain KMS compose update when the new compose hash is not yet on DstackApp.allowedComposeHashes; the response carries commit_token, commit_url, and the on-chain action needed to complete the prepare-approve-commit flow (HTTP 465)* |
-| `ERR-01-006` | `HashInvalidOrExpired` | The provided compose hash is invalid or has expired<br/>*Raised at commit time when the commit token is unknown, has expired (14-day TTL), has been superseded by a newer prepare for the same CVM, or the compose hash bound to the token no longer matches the compose file currently saved for this CVM — re-run prepare to recover (HTTP 466)* |
-| `ERR-01-007` | `TxVerificationFailed` | Transaction verification failed<br/>*Raised at commit time when the supplied transaction_hash cannot be verified against the expected addComposeHash state change — the receipt is missing, the transaction reverted, or it did not target the expected DstackApp contract (HTTP 467)* |
-| `ERR-01-008` | `HashNotAllowed` | The compose hash is not allowed by the on-chain contract<br/>*Raised at commit time when DstackApp.allowedComposeHashes(bytes32) returns false for the target hash — typically because the Phase 2 approval transaction has not actually landed on the expected contract, or landed on the wrong contract (HTTP 468)* |
-| `ERR-01-009` | `TeepodVmCreationFailedError` | VM creation failed on the target node<br/>*Raised when the target node's VMM fails to create the VM (HTTP 400).* |
-| `ERR-01-010` | `PreLaunchScriptRejectedError` | The deployment violates the terms of use<br/>*Raised when an operator has rejected the exact script hash.* |
-| `ERR-01-011` | `PlacementIdNotSupportedError` | node_id and teepod_id are not supported for node selection<br/>*Public requests must select a physical node by name.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-01-001` | The requested node is not available |
+| `ERR-01-002` | The request contains invalid parameters |
+| `ERR-01-003` | The Docker Compose file contains errors |
+| `ERR-01-004` | (dynamic: A CVM with name '...) |
+| `ERR-01-005` | Compose hash registration required on-chain |
+| `ERR-01-006` | The provided compose hash is invalid or has expired |
+| `ERR-01-007` | Transaction verification failed |
+| `ERR-01-008` | The compose hash is not allowed by the on-chain contract |
+| `ERR-01-009` | VM creation failed on the target node |
+| `ERR-01-010` | The deployment violates the terms of use |
+| `ERR-01-011` | node_id and teepod_id are not supported for node selection |
 
 
 ## Module 02: Inventory
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-02-001` | `InstanceTypeNotFoundError` | The requested instance type does not exist<br/>*Raised when a requested instance type is not found.* |
-| `ERR-02-002` | `ResourceNotAvailableError` | No available resources match your requirements<br/>*Raised when no suitable resources are found* |
-| `ERR-02-003` | `InsufficientVcpuError` | The selected node does not have enough CPU capacity<br/>*Raised when teepod has insufficient vCPU resources.* |
-| `ERR-02-004` | `InsufficientMemoryError` | The selected node does not have enough memory<br/>*Raised when teepod has insufficient memory resources.* |
-| `ERR-02-005` | `InsufficientSlotsError` | The selected node has reached its maximum capacity<br/>*Raised when teepod has no available CVM slots.* |
-| `ERR-02-006` | `GpuAllocationError` | The selected node does not have enough GPU resources<br/>*Raised when GPU allocation fails* |
-| `ERR-02-007` | `InsufficientGpuError` | The selected node does not have enough GPU resources<br/>*Raised when teepod has insufficient GPU resources.* |
-| `ERR-02-008` | `InvalidRequestError` | The request contains invalid parameters<br/>*Raised when request parameters are invalid* |
-| `ERR-02-009` | `IncompatibleConfigurationError` | The configuration parameters are not compatible with each other<br/>*Raised when resource configuration is not compatible* |
-| `ERR-02-010` | `ImageNotFoundError` | The requested operating system image is not available<br/>*Raised when a requested OS image is not found.* |
-| `ERR-02-011` | `KmsNotFoundError` | The requested security configuration is not available on this node<br/>*Raised when no matching KMS is found on teepod.* |
-| `ERR-02-012` | `TeepodNotAccessibleError` | The requested node is not available<br/>*Raised when user doesn't have permission to access a teepod.* |
-| `ERR-02-013` | `OsImageNotCompatibleError` | The requested operating system image is not available<br/>*Raised when no compatible OS image is found.* |
-| `ERR-02-014` | `NodeCapacityNotConfiguredError` | The requested node is not available<br/>*Raised when node capacity is not properly configured.* |
-| `ERR-02-015` | `QuotaExceededError` | Your account has reached its resource quota<br/>*Raised when team resource quota would be exceeded.* |
-| `ERR-02-016` | `GpuDeviceInUseError` | GPUs are available but currently occupied at device level<br/>*Raised when GPUs are available in database but occupied at device level.* |
-| `ERR-02-017` | `NoEnabledGatewayError` | No enabled gateway is available for the selected node<br/>*Raised when resources and KMS match, but no enabled gateway matches the target node.* |
-| `ERR-02-018` | `NodeHasMultipleDeviceIdsError` | This node has multiple device IDs; specify which one to use<br/>*Node has multiple enabled device_ids; caller must specify which one.* |
-| `ERR-02-019` | `NodeHasNoDeviceIdError` | This node has no device ID configured<br/>*Node has no enabled device_id entries.* |
-| `ERR-02-020` | `KmsAppIdAllocationError` | Failed to allocate an app ID from the centralized KMS<br/>*Raised when the centralized KMS fails to allocate an app ID (nonce).* |
-| `ERR-02-021` | `KmsContractNotFoundError` | The requested KMS was not found<br/>*Raised when a KMS contract identifier resolves to nothing.* |
-| `ERR-02-022` | `KmsNodeNotFoundError` | The requested KMS node was not found<br/>*Raised when a KMS node identifier resolves to nothing.* |
-| `ERR-02-023` | `KmsNodeUnavailableError` | The KMS node did not respond<br/>*Raised when a KMS node is reachable in the registry but its RPC fails.* |
-| `ERR-02-024` | `GpuProductRequirementError` | Invalid GPU product requirement<br/>*Invalid GPU product requirement in an instance type configuration.* |
-| `ERR-02-025` | `GpuRequirementNotConfiguredError` | GPU instance type has no configured GPU product requirement<br/>*A GPU instance type has no explicit GPU product requirement.* |
-| `ERR-02-026` | `GpuProductMismatchError` | (dynamic: This CVM's active GPU allocation does not match th...)<br/>*An active GPU allocation holds hardware of the wrong product.* |
-| `ERR-02-027` | `GpuResizeRequirementChangedError` | (dynamic: A GPU CVM cannot be resized into an instance type ...)<br/>*A resize targets an instance type with a different GPU product or count.* |
-| `ERR-02-028` | `GpuRequirementInUseError` | (dynamic: Instance type '...)<br/>*A catalog edit would invalidate running CVMs' active GPU allocations.* |
-| `ERR-02-029` | `GpuGroupSelectionUnavailableError` | (dynamic: This instance type requires ...)<br/>*A Blackwell multi-GPU requirement targets a node without GPU-layout support.* |
-| `ERR-02-030` | `KmsDisabledError` | The requested KMS is disabled<br/>*Raised when a request names a KMS replica that is disabled.* |
-| `ERR-02-031` | `KmsContractDisabledError` | The requested KMS contract is disabled<br/>*Raised when a new deployment targets a KMS contract that is disabled.* |
-| `ERR-02-032` | `InstanceTypeNetworkConfigError` | (dynamic message)<br/>*Invalid default network mode or queue count on an instance type.* |
-| `ERR-02-033` | `CreateTimePortsUnsupportedError` | Port mappings cannot be set at creation for an instance type that uses bridge networking.<br/>*A launch asks for create-time ports on an instance type with a bridge network.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-02-001` | The requested instance type does not exist |
+| `ERR-02-002` | No available resources match your requirements |
+| `ERR-02-003` | The selected node does not have enough CPU capacity |
+| `ERR-02-004` | The selected node does not have enough memory |
+| `ERR-02-005` | The selected node has reached its maximum capacity |
+| `ERR-02-006` | The selected node does not have enough GPU resources |
+| `ERR-02-007` | The selected node does not have enough GPU resources |
+| `ERR-02-008` | The request contains invalid parameters |
+| `ERR-02-009` | The configuration parameters are not compatible with each other |
+| `ERR-02-010` | The requested operating system image is not available |
+| `ERR-02-011` | The requested security configuration is not available on this node |
+| `ERR-02-012` | The requested node is not available |
+| `ERR-02-013` | The requested operating system image is not available |
+| `ERR-02-014` | The requested node is not available |
+| `ERR-02-015` | Your account has reached its resource quota |
+| `ERR-02-016` | GPUs are available but currently occupied at device level |
+| `ERR-02-017` | No enabled gateway is available for the selected node |
+| `ERR-02-018` | This node has multiple device IDs; specify which one to use |
+| `ERR-02-019` | This node has no device ID configured |
+| `ERR-02-020` | Failed to allocate an app ID from the centralized KMS |
+| `ERR-02-021` | The requested KMS was not found |
+| `ERR-02-022` | The requested KMS node was not found |
+| `ERR-02-023` | The KMS node did not respond |
+| `ERR-02-024` | Invalid GPU product requirement |
+| `ERR-02-025` | GPU instance type has no configured GPU product requirement |
+| `ERR-02-026` | (dynamic: This CVM's active GPU allocation does not match th...) |
+| `ERR-02-027` | (dynamic: A GPU CVM cannot be resized into an instance type ...) |
+| `ERR-02-028` | (dynamic: Instance type '...) |
+| `ERR-02-029` | (dynamic: This instance type requires ...) |
+| `ERR-02-030` | The requested KMS is disabled |
+| `ERR-02-031` | The requested KMS contract is disabled |
+| `ERR-02-032` | (dynamic message) |
+| `ERR-02-033` | Port mappings cannot be set at creation for an instance type that uses bridge networking. |
 
 
 ## Module 03: CVM Operations
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-03-001` | `CvmNotFoundError` | No CVM found with the specified name in this workspace<br/>*Raised when a CVM is not found by the given identifier.* |
-| `ERR-03-002` | `MultipleCvmsWithSameNameError` | Multiple CVMs have the same name in this workspace<br/>*Raised when multiple CVMs share the same name in a workspace.* |
-| `ERR-03-003` | `CvmNotInWorkspaceError` | No CVM found in this workspace<br/>*Raised when CVM exists but not in the expected workspace.* |
-| `ERR-03-004` | `CvmNotInWorkspaceError` | The requested CVM was not found<br/>*Raised when CVM exists but not in the expected workspace.* |
-| `ERR-03-005` | `CvmAccessDeniedError` | The requested CVM was not found<br/>*Raised when user lacks permission for CVM operation.* |
-| `ERR-03-006` | `ReplicaImageNotAvailableError` | The source CVM's OS image is not available on the target node<br/>*Raised when the source CVM's OS image is not available on the target node.* |
-| `ERR-03-007` | `CvmAppIdConflictError` | This app_id already has an active CVM with a different configuration. Provision again to get a new app_id, or use the existing CVM.<br/>*Raised when app_id is already used by a different configuration in the same workspace.* |
-| `ERR-03-008` | `ReplicaSourceInstanceNotAccessibleError` | The source CVM instance was not found in this workspace or access is denied<br/>*Raised when the replica source CVM instance is not visible in the current workspace.* |
-| `ERR-03-009` | `ReplicaComposeHashRequiredError` | This app has multiple live CVM instances. Please specify compose_hash to choose which revision to replicate.<br/>*Raised when replicate needs an explicit compose_hash due to multiple live instances.* |
-| `ERR-03-010` | `MultipleCvmsForIdentifierError` | Multiple CVMs match this identifier in the workspace<br/>*Raised when an identifier (e.g. app_id) matches multiple CVMs in a workspace.* |
-| `ERR-03-014` | `ReplicaImageChangeNotAllowedError` | The target OS image is not compatible with the source CVM<br/>*Raised when a replica target image is incompatible with its source image.* |
-| `ERR-03-015` | `CvmOSImageChangeInProgressError` | Another operation is already in progress for this CVM<br/>*Raised when a CVM already has a live operation.* |
-| `ERR-03-016` | `FirewallRuleSyncFailedError` | Port mappings were saved, but the node firewall still has a rule that should have been created or removed.<br/>*Node firewall still has a CVM rule after a mapping create or removal.* |
-| `ERR-03-017` | `CvmEnvKeysMismatchError` | The revision expects different environment variable names. Provide a re-encrypted encrypted_env value or set allow_env_mismatch to true to continue.<br/>*The revision's declared env keys differ from the last env write.* |
-| `ERR-03-018` | `ComposeCompatibilityError` | This machine cannot start with the selected OS image, node version, and key provider pin. Choose a compatible combination and try again.<br/>*Selected settings cannot start the machine on the guest or VMM (HTTP 422).* |
-| `ERR-03-019` | `CurrentComposeRevisionNotFoundError` | The current compose revision for this CVM could not be found<br/>*The persisted current compose revision could not be found.* |
-| `ERR-03-020` | `CurrentComposeRevisionIntegrityError` | The current compose revision failed integrity validation<br/>*The persisted current compose revision failed identity or byte validation.* |
-| `ERR-03-022` | `CvmGpuLayoutRefusedError` | We could not set up the GPU for this CVM. The problem is on our side, so changing your compose file will not fix it.<br/>*The node GPU layout manager refused to apply this CVM's GPU assignment.* |
-| `ERR-03-023` | `CvmVmmStopMissingKillTxError` | We could not stop this CVM. The host did not finish the stop. The problem is on our side.<br/>*VMM refused or failed a stop because the process kill transaction is missing.* |
-| `ERR-03-024` | `CvmKmsRequestFailedError` | This CVM could not get its keys from KMS while it was booting, so it did not start. The problem is on our side, so changing your compose file will not fix it.<br/>*The guest could not reach KMS to fetch an app key or sign a certificate.* |
-| `ERR-03-025` | `CvmGatewayRegistrationFailedError` | This CVM booted, but it could not register with the Phala Cloud gateway, so the start failed. The problem is on our side, so changing your compose file will not fix it.<br/>*dstack-gateway / tproxy registration failed.* |
-| `ERR-03-026` | `CvmDockerRegistryAuthError` | The container registry rejected the login when this CVM tried to pull an image from your compose file.<br/>*The guest could not log in to a container registry.* |
-| `ERR-03-027` | `CvmKmsComposeHashDeniedError` | KMS did not let this CVM boot. Its compose hash is not on your app's allow list.<br/>*KMS refused boot because the compose hash is not on the app allow list.* |
-| `ERR-03-028` | `CvmInvalidEnvInputError` | This CVM did not boot because one of its environment variables was rejected. A name or a value is empty, too long, or not valid.<br/>*The guest rejected an environment variable name or value.* |
-| `ERR-03-029` | `InitScriptNotAllowedError` | (dynamic: The ...)<br/>*A selected init script lacks an account or workspace grant.* |
-| `ERR-03-030` | `GuestAgentAccessRelaxNotAllowedError` | Guest agent access for this app is restricted to Phala Cloud. Relaxing the restriction requires Phala Cloud support.<br/>*The app's guest agent is restricted to Phala Cloud and a request asked to open it.* |
-| `ERR-03-031` | `LegacyComposeVersionUnsupportedError` | Manifest version 3 is not supported by this legacy endpoint. Use app-compose.json instead.<br/>*The legacy compose endpoint cannot represent a v3 manifest.* |
-| `ERR-03-032` | `CvmInfrastructureIncompleteError` | This CVM's configuration on our side is incomplete, so we cannot reach it right now. Please contact support.<br/>*Raised when a CVM row cannot be turned into a usable ``CvmHandle``.* |
-| `ERR-03-033` | `CvmOperationNotResumableError` | The CVM has no resumable in-progress operation<br/>*The CVM has no in-progress operation that resume-operation can re-dispatch.* |
-| `ERR-03-034` | `CvmOperationTaskAliveError` | The operation's task is still running<br/>*The in-progress operation's task is still running, so it must not be re-dispatched.* |
-| `ERR-03-035` | `CvmOperationChangedError` | The operation changed while it was being resumed<br/>*The in-progress operation was replaced or finished while it was being resumed.* |
-| `ERR-03-036` | `CvmDeletionProtectedError` | This CVM is protected from deletion<br/>*Deletion is blocked by an operator protection lock.* |
-| `ERR-03-037` | `CvmShutdownProtectedError` | This CVM is protected from shutdown<br/>*Shutdown is blocked by an operator protection lock.* |
-| `ERR-03-038` | `CvmHostDecommissioningError` | This CVM cannot start while its host is being decommissioned.<br/>*The host is being decommissioned and cannot start the CVM.* |
-| `ERR-03-039` | `CvmRemovalInProgressError` | This CVM is being deleted.<br/>*Another operation cannot replace an in-progress CVM removal.* |
-| `ERR-03-040` | `ComposeFieldImmutableError` | (dynamic:  cannot be changed on an existing CVM....)<br/>*A compose update changes a field that is fixed when the CVM is created.* |
-| `ERR-03-041` | `ComposeFieldNotAllowedOnCreateError` | tproxy_enabled cannot be set when creating a CVM. Use gateway_enabled instead.<br/>*A create request sets tproxy_enabled, the legacy alias of gateway_enabled.* |
-| `ERR-03-042` | `ComposeGpuPolicyNotAllowedError` | requirements.gpu_policy is not enabled for this account or workspace.<br/>*requirements.gpu_policy is set or changed without the compose_gpu_policy grant.* |
-| `ERR-03-043` | `LaunchTokenHashMismatchError` | requirements.launch_token_hash does not match this app's launch token.<br/>*requirements.launch_token_hash does not match the app's launch token.* |
-| `ERR-03-044` | `LaunchTokenConflictError` | This app already has a different launch token.<br/>*A create sends a launch token other than the one the app already has.* |
-| `ERR-03-045` | `ComposeAdvancedNotAllowedError` | (dynamic:  is not enabled for this account or workspace....)<br/>*A create uses a non-default runner or raw compose input without compose_advanced.* |
-| `ERR-03-046` | `ComposeRunnerNotSupportedError` | (dynamic: Runner ...)<br/>*The compose names a runner the dstack guest does not run.* |
-| `ERR-03-047` | `ComposeFieldRequiredError` | (dynamic: The ...)<br/>*The compose's runner needs a field the caller did not send.* |
-| `ERR-03-048` | `ComposeDataWipeNotConfirmedError` | (dynamic: Turning on ...)<br/>*An update turns on a setting that wipes data on every boot without confirming it.* |
-| `ERR-03-049` | `CvmAnnotationsNotEnabledError` | CVM annotations are not enabled for this account or workspace.<br/>*The cvm_annotations feature flag is off for the workspace and the caller.* |
-| `ERR-03-050` | `CvmAnnotationsVmmUnsupportedError` | (dynamic: The node runs dstack VMM ...)<br/>*The node's dstack VMM predates per-VM annotations (added in 0.6.1).* |
-| `ERR-03-051` | `CvmAnnotationsVmmRequestFailedError` | (dynamic: The node could not read or update the CVM annotati...)<br/>*The node's VMM did not return or did not accept the CVM's annotations.* |
-| `ERR-03-052` | `CvmDraftNotFoundError` | This CVM has no staged changes.<br/>*The CVM has no draft to show, apply or discard.* |
-| `ERR-03-053` | `CvmDraftOutdatedError` | The CVM changed after these changes were staged.<br/>*The CVM's compose changed after its draft was opened; nothing was applied.* |
-| `ERR-03-054` | `CvmDraftChangedError` | The staged changes were changed by another request. Load them and try again.<br/>*Another request changed the draft while this one ran, or after its apply was prepared.* |
-| `ERR-03-055` | `LaunchTokenStillRequiredError` | CVMs of this app still require the launch token, so it cannot be cleared.<br/>*The app token cannot be cleared: CVMs of the app still boot with launch_token_hash.* |
-| `ERR-03-056` | `ReservedAppIdError` | This app_id is reserved and cannot be deployed<br/>*The app_id is a gateway app id: no code may be created, replicated or redeployed under it.* |
-| `ERR-03-057` | `VmInfoUnavailableError` | This CVM is not reachable via its node right now. Retry in a moment, or contact support if it persists.<br/>*Raised when VMM/teepod cannot return VmInfo for a CVM.* |
-| `ERR-03-058` | `InitScriptSourceConflictError` | Send either init_script or init_scripts, not both.<br/>*A request sends both a raw init_script and init_scripts slugs.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-03-001` | No CVM found with the specified name in this workspace |
+| `ERR-03-002` | Multiple CVMs have the same name in this workspace |
+| `ERR-03-003` | No CVM found in this workspace |
+| `ERR-03-004` | The requested CVM was not found |
+| `ERR-03-005` | The requested CVM was not found |
+| `ERR-03-006` | The source CVM's OS image is not available on the target node |
+| `ERR-03-007` | This app_id already has an active CVM with a different configuration. Provision again to get a new app_id, or use the existing CVM. |
+| `ERR-03-008` | The source CVM instance was not found in this workspace or access is denied |
+| `ERR-03-009` | This app has multiple live CVM instances. Please specify compose_hash to choose which revision to replicate. |
+| `ERR-03-010` | Multiple CVMs match this identifier in the workspace |
+| `ERR-03-014` | The target OS image is not compatible with the source CVM |
+| `ERR-03-015` | Another operation is already in progress for this CVM |
+| `ERR-03-016` | Port mappings were saved, but the node firewall still has a rule that should have been created or removed. |
+| `ERR-03-017` | The revision expects different environment variable names. Provide a re-encrypted encrypted_env value or set allow_env_mismatch to true to continue. |
+| `ERR-03-018` | This machine cannot start with the selected OS image, node version, and key provider pin. Choose a compatible combination and try again. |
+| `ERR-03-019` | The current compose revision for this CVM could not be found |
+| `ERR-03-020` | The current compose revision failed integrity validation |
+| `ERR-03-022` | We could not set up the GPU for this CVM. The problem is on our side, so changing your compose file will not fix it. |
+| `ERR-03-023` | We could not stop this CVM. The host did not finish the stop. The problem is on our side. |
+| `ERR-03-024` | This CVM could not get its keys from KMS while it was booting, so it did not start. The problem is on our side, so changing your compose file will not fix it. |
+| `ERR-03-025` | This CVM booted, but it could not register with the Phala Cloud gateway, so the start failed. The problem is on our side, so changing your compose file will not fix it. |
+| `ERR-03-026` | The container registry rejected the login when this CVM tried to pull an image from your compose file. |
+| `ERR-03-027` | KMS did not let this CVM boot. Its compose hash is not on your app's allow list. |
+| `ERR-03-028` | This CVM did not boot because one of its environment variables was rejected. A name or a value is empty, too long, or not valid. |
+| `ERR-03-029` | (dynamic: The ...) |
+| `ERR-03-030` | Guest agent access for this app is restricted to Phala Cloud. Relaxing the restriction requires Phala Cloud support. |
+| `ERR-03-031` | Manifest version 3 is not supported by this legacy endpoint. Use app-compose.json instead. |
+| `ERR-03-032` | This CVM's configuration on our side is incomplete, so we cannot reach it right now. Please contact support. |
+| `ERR-03-033` | The CVM has no resumable in-progress operation |
+| `ERR-03-034` | The operation's task is still running |
+| `ERR-03-035` | The operation changed while it was being resumed |
+| `ERR-03-036` | This CVM is protected from deletion |
+| `ERR-03-037` | This CVM is protected from shutdown |
+| `ERR-03-038` | This CVM cannot start while its host is being decommissioned. |
+| `ERR-03-039` | This CVM is being deleted. |
+| `ERR-03-040` | (dynamic:  cannot be changed on an existing CVM....) |
+| `ERR-03-041` | tproxy_enabled cannot be set when creating a CVM. Use gateway_enabled instead. |
+| `ERR-03-042` | requirements.gpu_policy is not enabled for this account or workspace. |
+| `ERR-03-043` | requirements.launch_token_hash does not match this app's launch token. |
+| `ERR-03-044` | This app already has a different launch token. |
+| `ERR-03-045` | (dynamic:  is not enabled for this account or workspace....) |
+| `ERR-03-046` | (dynamic: Runner ...) |
+| `ERR-03-047` | (dynamic: The ...) |
+| `ERR-03-048` | (dynamic: Turning on ...) |
+| `ERR-03-049` | CVM annotations are not enabled for this account or workspace. |
+| `ERR-03-050` | (dynamic: The node runs dstack VMM ...) |
+| `ERR-03-051` | (dynamic: The node could not read or update the CVM annotati...) |
+| `ERR-03-052` | This CVM has no staged changes. |
+| `ERR-03-053` | The CVM changed after these changes were staged. |
+| `ERR-03-054` | The staged changes were changed by another request. Load them and try again. |
+| `ERR-03-055` | CVMs of this app still require the launch token, so it cannot be cleared. |
+| `ERR-03-056` | This app_id is reserved and cannot be deployed |
+| `ERR-03-057` | This CVM is not reachable via its node right now. Retry in a moment, or contact support if it persists. |
+| `ERR-03-058` | Send either init_script or init_scripts, not both. |
 
 
 ## Module 04: Workspace
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-04-001` | `InsufficientBalanceError` | Top up your Balance before launching a CVM.<br/>*Raised when account balance is too low* |
-| `ERR-04-002` | `MaxCvmLimitError` | Your account has reached the maximum number of instances<br/>*Raised when VM count limit is reached* |
-| `ERR-04-003` | `ResourceLimitExceededError` | The requested resources exceed your account limits<br/>*Raised when resource limits are exceeded* |
-| `ERR-04-004` | `BillingSuspendedError` | Workspace billing is suspended. Please settle your outstanding balance before proceeding.<br/>*Raised when workspace billing is suspended and user attempts a mutating operation.* |
-| `ERR-04-005` | `BillingAbandonedError` | This workspace has been closed. Contact support if you wish to recover it.<br/>*Raised when workspace has been closed (post-30-day retention).* |
-| `ERR-04-006` | `WorkspaceCreationBlockedByUnpaidWorkspaceError` | You have an unpaid workspace. Settle the balance before creating a new workspace.<br/>*Raised when a user has an abandoned workspace.* |
-| `ERR-04-007` | `WebhookUrlConflictError` | A webhook with this URL already exists in this workspace.<br/>*The workspace already has a webhook for this URL.* |
-| `ERR-04-008` | `WebhookCapacityError` | This workspace already has 10 webhooks. Delete one before adding another.<br/>*The workspace has reached its webhook limit.* |
-| `ERR-04-009` | `WebhookCreationIneligibleError` | Add a payment method or create a CVM before adding a webhook.<br/>*Webhook creation requires a payment method or a non-deleted CVM.* |
-| `ERR-04-010` | `WebhookPaymentCheckUnavailableError` | We could not check your payment methods. Try again later.<br/>*A failed payment-method check must not grant webhook creation.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-04-001` | Top up your Balance before launching a CVM. |
+| `ERR-04-002` | Your account has reached the maximum number of instances |
+| `ERR-04-003` | The requested resources exceed your account limits |
+| `ERR-04-004` | Workspace billing is suspended. Please settle your outstanding balance before proceeding. |
+| `ERR-04-005` | This workspace has been closed. Contact support if you wish to recover it. |
+| `ERR-04-006` | You have an unpaid workspace. Settle the balance before creating a new workspace. |
+| `ERR-04-007` | A webhook with this URL already exists in this workspace. |
+| `ERR-04-008` | This workspace already has 10 webhooks. Delete one before adding another. |
+| `ERR-04-009` | Add a payment method or create a CVM before adding a webhook. |
+| `ERR-04-010` | We could not check your payment methods. Try again later. |
 
 
 ## Module 05: Credentials
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-05-001` | `TokenLimitExceededError` | (dynamic: You have reached the maximum of ...)<br/>*Raised when workspace token limit is exceeded* |
-| `ERR-05-002` | `TokenRateLimitError` | (dynamic: Rate limit exceeded: maximum ...)<br/>*Raised when token creation rate limit is exceeded* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-05-001` | (dynamic: You have reached the maximum of ...) |
+| `ERR-05-002` | (dynamic: Rate limit exceeded: maximum ...) |
 
 
 ## Module 06: Auth
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-06-001` | `OAuthEmailInvalidError` | Your email address did not pass our security verification.<br/>*Raised when OAuth registration email fails anti-fraud validation.* |
-| `ERR-06-002` | `OAuthAccountDisabledError` | Account is disabled.<br/>*Raised when an existing OAuth account is linked to a disabled user.* |
-| `ERR-06-003` | `OAuthEmailBlockedError` | Account deleted and in cooling-off period. Contact support for assistance.<br/>*Raised when OAuth email is in the deleted-account cooling-off block list.* |
-| `ERR-06-004` | `AccountBlockedError` | Account is disabled<br/>*User account is disabled/blocked* |
-| `ERR-06-005` | `AccountInCoolingOffError` | Account deleted and in cooling-off period. Contact support for assistance.<br/>*Raised when a registration attempt is blocked by the deleted-account cooling-off list.* |
-| `ERR-06-006` | `AuthzPermissionDeniedError` | You do not have permission to perform this action.<br/>*The requester cannot perform this action.* |
-| `ERR-06-007` | `AccessError` | Access denied<br/>*Base class for route-level access denials.* |
-| `ERR-06-008` | `AccessRoleDeniedError` | Your workspace role does not grant this permission<br/>*The user's workspace role does not grant the required permission.* |
-| `ERR-06-009` | `AccessTokenCeilingDeniedError` | This API key is not allowed to use this permission<br/>*The API key is not allowed to exercise the required permission.* |
-| `ERR-06-010` | `AccessUserRouteApiKeyDeniedError` | API keys cannot access this user route<br/>*API keys cannot access session-only user routes.* |
-| `ERR-06-012` | `AccessSlugWorkspaceApiKeyDeniedError` | API keys cannot access slug-resolved workspace routes<br/>*API keys cannot access slug-resolved workspace routes.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-06-001` | Your email address did not pass our security verification. |
+| `ERR-06-002` | Account is disabled. |
+| `ERR-06-003` | Account deleted and in cooling-off period. Contact support for assistance. |
+| `ERR-06-004` | Account is disabled |
+| `ERR-06-005` | Account deleted and in cooling-off period. Contact support for assistance. |
+| `ERR-06-006` | You do not have permission to perform this action. |
+| `ERR-06-007` | Access denied |
+| `ERR-06-008` | Your workspace role does not grant this permission |
+| `ERR-06-009` | This API key is not allowed to use this permission |
+| `ERR-06-010` | API keys cannot access this user route |
+| `ERR-06-012` | API keys cannot access slug-resolved workspace routes |
 
 
 ## Module 09: Billing
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-09-001` | `RedpillDirectBillingConflictError` | Post-paid billing and direct billing for Private AI cannot be enabled for the same workspace<br/>*Post-paid billing and a Redpill direct-billing connection are mutually exclusive.* |
-| `ERR-09-009` | `WorkspaceStripeCustomerConflictError` | Payments are paused for this workspace because its billing profile needs a manual fix on our side<br/>*Team and Credit persist different Stripe Customers for one workspace.* |
-| `ERR-09-010` | `WorkspaceStripeCustomerNotFoundError` | Workspace not found<br/>*Workspace or credit account referenced by Stripe Customer ensure is missing.* |
-| `ERR-09-011` | `PaymentAbuseDeniedError` | Too many payment attempts.<br/>*New payment creation denied by a manual hold, the AND rule, or the risk-block rule.* |
-| `ERR-09-012` | `PaymentAbuseUnavailableError` | Payments are temporarily unavailable. Try again shortly.<br/>*Payment-abuse counters could not be evaluated safely.* |
-| `ERR-09-013` | `PaymentRiskBlockedError` | This payment was declined. Try another card.<br/>*Stripe Radar or issuer fraud block on a direct saved-card charge.* |
-| `ERR-09-014` | `OneBalanceMonthlyPrivateAiLineError` | Monthly invoice contains Private AI lines; One Balance cannot allocate this invoice as CVM-only<br/>*A One Balance monthly invoice cannot carry Private AI lines.* |
-| `ERR-09-015` | `OneBalanceSwitchedDuringInvoiceGenerationError` | One Balance was enabled while the monthly invoice was being generated<br/>*One Balance was enabled while a monthly invoice draft was being built.* |
-| `ERR-09-017` | `AppNotFoundError` | App not found<br/>*No live app with this id exists in the caller's scope.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-09-001` | Post-paid billing and direct billing for Private AI cannot be enabled for the same workspace |
+| `ERR-09-009` | Payments are paused for this workspace because its billing profile needs a manual fix on our side |
+| `ERR-09-010` | Workspace not found |
+| `ERR-09-011` | Too many payment attempts. |
+| `ERR-09-012` | Payments are temporarily unavailable. Try again shortly. |
+| `ERR-09-013` | This payment was declined. Try another card. |
+| `ERR-09-014` | Monthly invoice contains Private AI lines; One Balance cannot allocate this invoice as CVM-only |
+| `ERR-09-015` | One Balance was enabled while the monthly invoice was being generated |
+| `ERR-09-017` | App not found |
 
 
 ## Module 10: GPU Rental
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-10-020` | `GpuRentalInactiveStartError` | The GPU rental order is not active<br/>*A CVM cannot start after its GPU rental has ended.* |
-| `ERR-10-021` | `GpuRentalAllocationChangedError` | The GPU rental's machines changed during the request.<br/>*The rental's machine allocations changed during the request.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-10-020` | The GPU rental order is not active |
+| `ERR-10-021` | The GPU rental's machines changed during the request. |
 
 
 ## Module 11: Centralized KMS
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-11-001` | `TeamWalletNotFoundError` | This workspace has no signing wallet yet, so the next app ID cannot be predicted.<br/>*Raised when a read-only KMS operation needs a wallet the workspace lacks.* |
-| `ERR-11-002` | `AppIdPredictionFailedError` | Could not predict the next app ID. Please try again.<br/>*Raised when app ID prediction fails for any reason other than a missing wallet.* |
-| `ERR-11-003` | `TeamWalletEncryptionUnavailableError` | Wallet provisioning is unavailable. Please try again later.<br/>*Raised when no key is configured to encrypt a new wallet's private key.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-11-001` | This workspace has no signing wallet yet, so the next app ID cannot be predicted. |
+| `ERR-11-002` | Could not predict the next app ID. Please try again. |
+| `ERR-11-003` | Wallet provisioning is unavailable. Please try again later. |
 
 
 ## Module 12: KMS
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-12-001` | `KmsAppIdInvalidError` | The app ID is not a valid KMS app identifier<br/>*Raised when an app ID is not a valid KMS app identifier.* |
-| `ERR-12-002` | `EnvEncryptPubkeyUnavailableError` | The KMS did not return the environment encryption public key<br/>*Raised when no KMS endpoint could return the env encrypt pubkey for an app.* |
-| `ERR-12-003` | `KmsReplicaHealthError` | The KMS replica did not pass its health check<br/>*Raised when a KMS replica cannot be verified before enabling.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-12-001` | The app ID is not a valid KMS app identifier |
+| `ERR-12-002` | The KMS did not return the environment encryption public key |
+| `ERR-12-003` | The KMS replica did not pass its health check |
 
 
 ## Module 14: Confidential AI
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-14-001` | `RedpillApiKeyNotFoundError` | Private AI API key not found<br/>*Raised for a Redpill API key id the caller may not see or act on.* |
-| `ERR-14-002` | `RedpillApiKeyCreateFailedError` | Could not create the Private AI API key<br/>*Raised when creating a Redpill API key fails.* |
-| `ERR-14-004` | `RedpillUsageMappingMissingError` | usage mapping missing<br/>*Raised when direct usage reads cannot resolve a connection to a Redpill user.* |
-| `ERR-14-005` | `RedpillUsageRangeInvalidError` | Invalid usage time range<br/>*Raised when a public usage time bound is not a valid datetime.* |
-| `ERR-14-006` | `RedpillConnectLockTimeoutError` | Private AI is already being connected for this workspace. Try again in a moment.<br/>*Raised when another request holds the workspace's Private AI connect lock.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-14-001` | Private AI API key not found |
+| `ERR-14-002` | Could not create the Private AI API key |
+| `ERR-14-004` | usage mapping missing |
+| `ERR-14-005` | Invalid usage time range |
+| `ERR-14-006` | Private AI is already being connected for this workspace. Try again in a moment. |
 
 
 ## Module 16: Trust Center
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-16-001` | `GuestAgentCvmNotFoundError` | The app or instance was not found.<br/>*The app, or the requested CVM of the app, does not exist or is deleted.* |
-| `ERR-16-002` | `GuestAgentCvmNotRunningError` | The CVM is not running.<br/>*The selected CVM is not running, so its guest agent cannot answer.* |
-| `ERR-16-003` | `GuestAgentTimeoutError` | The guest agent timed out.<br/>*The guest agent did not answer within the RPC timeout.* |
-| `ERR-16-004` | `GuestAgentUnreachableError` | The guest agent is unreachable.<br/>*The guest agent request failed or returned an unusable response.* |
+| Error Code | Message |
+|------------|---------|
+| `ERR-16-001` | The app or instance was not found. |
+| `ERR-16-002` | The CVM is not running. |
+| `ERR-16-003` | The guest agent timed out. |
+| `ERR-16-004` | The guest agent is unreachable. |
 
 
 ## Module 17: Log Access
 
 
-| Error Code | Exception Class | Message |
-|------------|----------------|---------|
-| `ERR-17-001` | `InvalidLogRequestError` | Invalid log request |
-| `ERR-17-002` | `InvalidLogSignatureError` | Missing or invalid log access signature |
-| `ERR-17-003` | `ExpiredLogSignatureError` | Log access signature expired |
-| `ERR-17-004` | `LogCvmNotFoundError` | CVM not found or access denied |
-| `ERR-17-005` | `LogCvmNotRunningError` | CVM is not running |
-| `ERR-17-006` | `ContainerLogsDisabledError` | Container logs are disabled |
-| `ERR-17-007` | `LogContainerNotFoundError` | Container not found |
-| `ERR-17-008` | `LogNodeUnreachableError` | Node VMM unreachable or returned a bad response |
-| `ERR-17-009` | `LogGuestUnreachableError` | Guest agent or gateway unreachable |
-| `ERR-17-010` | `LogUpstreamTimeoutError` | Log upstream timed out |
-| `ERR-17-011` | `TooManyLogStreamsError` | Too many concurrent log streams |
-| `ERR-17-012` | `LogRoutingUnavailableError` | Node or gateway routing data is unavailable |
-| `ERR-17-013` | `LogVmMissingOnNodeError` | VM no longer exists on the node |
+| Error Code | Message |
+|------------|---------|
+| `ERR-17-001` | Invalid log request |
+| `ERR-17-002` | Missing or invalid log access signature |
+| `ERR-17-003` | Log access signature expired |
+| `ERR-17-004` | CVM not found or access denied |
+| `ERR-17-005` | CVM is not running |
+| `ERR-17-006` | Container logs are disabled |
+| `ERR-17-007` | Container not found |
+| `ERR-17-008` | Node VMM unreachable or returned a bad response |
+| `ERR-17-009` | Guest agent or gateway unreachable |
+| `ERR-17-010` | Log upstream timed out |
+| `ERR-17-011` | Too many concurrent log streams |
+| `ERR-17-012` | Node or gateway routing data is unavailable |
+| `ERR-17-013` | VM no longer exists on the node |
 
 
 ---
@@ -285,9 +285,9 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 
 Retired codes are never reused.
 
-| Error Code | Former Exception Class | Retired |
-|---|---|---|
-| `ERR-03-021` | `ComposePolicyWritesDisabledError` | 2026-10-22 |
+| Error Code | Retired |
+|---|---|
+| `ERR-03-021` | 2026-10-22 |
 
 ---
 
