@@ -91,6 +91,17 @@ client = create_client(
 | `headers` | `dict[str, str]` | `None` | Additional request headers |
 | `http_client` | `httpx.Client` / `httpx.AsyncClient` | `None` | Bring your own httpx client |
 
+### User-Agent
+
+By default the SDK sends `User-Agent: phala-cloud-sdk-python/<version> python/<v> httpx/<v>`, for example `phala-cloud-sdk-python/0.4.0 python/3.13.1 httpx/0.28.1`. To use your own value, pass a `User-Agent` entry in `headers`. A header you supply overrides the default.
+
+```python
+client = create_client(
+    api_key="phak_your_api_key",
+    headers={"User-Agent": "my-automation/2.0"},
+)
+```
+
 ### API Versions
 
 The SDK supports four API versions. The version affects response shapes for endpoints such as `get_current_user()` and `get_cvm_list()`.
@@ -111,7 +122,7 @@ legacy_client = client.with_version("2025-10-28")
 
 ## Sync vs. Async
 
-Every method on the sync `PhalaCloud` client has an identical counterpart on `AsyncPhalaCloud`. The async version simply requires `await`.
+Almost every method on the sync `PhalaCloud` client has an identical counterpart on `AsyncPhalaCloud`. The async version simply requires `await`. The exceptions are `fetch_cvm_logs` and `follow_cvm_logs`, which are available on the sync client only (see [CVM Logs](#cvm-logs)).
 
 <CodeGroup>
 
@@ -185,6 +196,8 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `get_cvm_pre_launch_script(request)` | Get pre-launch script |
 | `get_cvm_user_config(request)` | Get user config |
 | `get_cvm_status_batch(request)` | Get typed status and resource usage for multiple CVMs |
+| `fetch_cvm_logs(cvm_id, source, ...)` | Fetch serial, node, or container logs (sync client only) |
+| `follow_cvm_logs(cvm_id, source, ...)` | Stream logs as an iterator (sync client only) |
 
 ### CVM Lifecycle
 
@@ -268,6 +281,124 @@ Read more in [Error Handling](/phala-cloud/references/cloud-python-sdk/error-han
 | `get_available_nodes()` | List available TEE nodes |
 | `list_all_instance_type_families()` | List all instance type families |
 | `list_family_instance_types(request)` | List instance types in a family |
+
+## CVM Logs
+
+Available in `phala-cloud` 0.4.0 and later.
+
+`PhalaCloud.fetch_cvm_logs` and `PhalaCloud.follow_cvm_logs` read serial, node, and container logs. `AsyncPhalaCloud` does not have these methods yet.
+
+```python
+from phala_cloud import LogAccessError, create_client
+
+client = create_client(api_key="phak_your_api_key")
+
+# Last 100 lines of the serial console
+serial = client.fetch_cvm_logs(
+    "my-app",
+    {"type": "node", "channel": "serial"},
+    tail=100,
+)
+print(serial)
+
+# Follow the "api" container; stop by leaving the loop
+try:
+    for entry in client.follow_cvm_logs(
+        "my-app",
+        {"type": "container", "name": "api"},
+        tail=50,
+    ):
+        print(entry["message"], end="")
+except LogAccessError as error:
+    print(error.code, error.suggestions)
+```
+
+```python
+def fetch_cvm_logs(
+    self,
+    cvm_id: str,
+    source: CvmLogSource,
+    *,
+    tail: int | str | None = None,
+    since: str | int | None = None,
+    until: str | int | None = None,
+    timestamps: bool = False,
+    ansi: bool = False,
+    format: CvmLogFormat = "text",
+    log_http: httpx.Client | None = None,
+) -> str | list[CvmLogEntry]: ...
+
+def follow_cvm_logs(
+    self,
+    cvm_id: str,
+    source: CvmLogSource,
+    *,
+    tail: int | str | None = None,
+    since: str | int | None = None,
+    until: str | int | None = None,
+    timestamps: bool = False,
+    ansi: bool = False,
+    log_http: httpx.Client | None = None,
+) -> Iterator[str | CvmLogEntry]: ...
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `cvm_id` | `str` | None | CVM identifier (name, UUID, or App ID) |
+| `source` | `CvmLogSource` | None | Which logs to read (see below) |
+| `tail` | `int \| str \| None` | `None` | Number of most recent lines, or `"all"`. When `None`, the server default applies. |
+| `since` | `str \| int \| None` | `None` | Start time: RFC 3339 timestamp, Unix seconds, or relative duration such as `"10m"` (`s`, `m`, `h`, `d`). |
+| `until` | `str \| int \| None` | `None` | End time. Same formats as `since`. |
+| `timestamps` | `bool` | `False` | Prefix each container line with its timestamp. |
+| `ansi` | `bool` | `False` | Keep ANSI color codes. |
+| `format` | `"text" \| "ndjson"` | `"text"` | `fetch_cvm_logs` only. With `"ndjson"`, a container source returns a list of entries. |
+| `log_http` | `httpx.Client \| None` | `None` | Your own `httpx.Client` for the log requests. When omitted, the SDK creates one and closes it when the call finishes. |
+
+**`CvmLogSource`** is a dictionary:
+
+| Shape | Description |
+|-------|-------------|
+| `{"type": "node", "channel": "serial" \| "stdout" \| "stderr"}` | A CVM-level channel |
+| `{"type": "container", "name": str, "matchContainerIdPrefix": bool}` | A container. Both `name` and `matchContainerIdPrefix` are optional. `name` is a container name or ID prefix; if you omit it, the SDK uses the first container that has a log endpoint. `matchContainerIdPrefix` defaults to `True`. |
+
+`since`, `until`, and `timestamps` apply to container logs only. Passing them with a node source raises `ValueError`.
+
+**Return types:**
+
+| Call | Source | Result |
+|------|--------|--------|
+| `fetch_cvm_logs` | Node | `str` |
+| `fetch_cvm_logs` | Container | `str`, or `list[CvmLogEntry]` when `format="ndjson"` |
+| `follow_cvm_logs` | Node | Iterator of `str` lines, each ending in a newline |
+| `follow_cvm_logs` | Container | Iterator of `CvmLogEntry` |
+
+`CvmLogEntry` is a dictionary: `{"channel": "stdout" | "stderr", "message": str}`. The types are importable from `phala_cloud.logs`.
+
+To stop a follow, leave the loop or close the generator. The SDK then closes the log connection.
+
+**Behavior:**
+
+- Every connection uses a fresh signed URL.
+- Follow mode reconnects after any stream end and gives up after 5 consecutive failures.
+- Node heartbeat lines are dropped.
+- Container follow resumes from the last timestamp without repeating lines.
+- The helpers request CVM info with API version `2026-01-21` internally, so they work with clients configured for older versions.
+
+For the HTTP details behind these methods, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
+
+**Errors:**
+
+Log gateway errors are raised as `LogAccessError`, a subclass of `ResourceError`. Match on `code` rather than the message.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `code` | `str \| None` | Log error code such as `ERR-17-005` |
+| `http_status` | `int \| None` | HTTP status of the failed request |
+| `suggestions` | `list[str] \| None` | Suggested fixes from the API |
+
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the method raises `ValueError` before sending any log request. Node channels are not affected. A missing container also raises `ValueError`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 ## Utility Functions
 

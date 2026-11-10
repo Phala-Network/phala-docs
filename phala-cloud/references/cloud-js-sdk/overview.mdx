@@ -70,6 +70,17 @@ const client = createClient({
 | `headers` | `Record<string, string>` | — | Additional request headers |
 | `onResponseError` | `function` | — | Custom response error handler |
 
+### User-Agent
+
+In Node.js, Bun, Deno, and Cloudflare Workers, the client sends `User-Agent: phala-cloud-sdk-js/<version> <runtime>/<v>`, where the runtime token is `node/<v>`, `bun/<v>`, `deno/<v>`, or `workerd`. In browsers it sends no `User-Agent`. To use your own value, pass a `User-Agent` entry in `headers`. A header you supply overrides the default.
+
+```typescript
+const client = createClient({
+  apiKey: "phak_your_api_key",
+  headers: { "User-Agent": "my-automation/2.0" },
+});
+```
+
 ### Tree-Shaking with `createBaseClient`
 
 For smaller bundles, use `createBaseClient` with individual action imports:
@@ -127,6 +138,8 @@ Actions marked with **V** return different response types depending on the clien
 | `getCvmStatusBatch(request)` | Get status of multiple CVMs |
 | `getCvmUserConfig(request)` | Get user-level CVM config |
 | `checkCvmIsAllowed(request)` | Check on-chain deployment allowance |
+
+To read CVM logs, use the standalone `fetchCvmLogs` and `followCvmLogs` functions. See [CVM Query](/phala-cloud/references/cloud-js-sdk/cvm-query#read-cvm-logs).
 
 ### CVM Lifecycle
 

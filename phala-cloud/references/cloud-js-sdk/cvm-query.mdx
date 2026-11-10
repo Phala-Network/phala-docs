@@ -33,42 +33,140 @@ const cvm = await client.getCvmInfo({ id: "my-app" });
 console.log(cvm.name, cvm.status);
 ```
 
-The detail response includes complete presigned URLs for serial, stdout, and stderr logs. Phala Cloud signs them for the requesting user. Each signature is valid for 5 minutes and is checked only when the connection opens. Fetch a fresh URL before every connection and never cache them. Anonymous access is not supported: you must be a member of the CVM's workspace.
+The detail response includes a `logs` object with complete presigned URLs for the serial, stdout, and stderr channels, plus the pieces needed to build container log URLs. All `logs` fields are `null` when the requester cannot read logs. You do not need to use these URLs yourself: the log helpers below read them for you.
 
-For container logs, the `2026-01-21` detail response provides `logs.container_log_base` without a query string and `logs.auth_query`. A container URL is `{container_log_base}/{container_name}?{auth_query}`, followed by any display options. All log fields are `null` when the requester cannot read logs. The container fields are also `null` unless the CVM has Public Logs enabled; container requests are rejected with `ERR-17-006` when it is disabled. Node logs (`serial`, `stdout`, `stderr`) are not affected by this setting.
+### Read CVM logs
+
+Available in `@phala/cloud` 0.6.0 and later.
+
+`fetchCvmLogs` and `followCvmLogs` read logs from a CVM. They are standalone functions exported from `@phala/cloud`, not methods on the client, so pass the client as the first argument.
 
 ```typescript
-import { createClient } from "@phala/cloud";
+import { createClient, fetchCvmLogs, followCvmLogs } from "@phala/cloud";
 
-const client = createClient({
-  apiKey: "phak_your_api_key",
-  version: "2026-01-21",
-});
-const cvm = await client.getCvmInfo({ id: "my-app" });
-const { container_log_base, auth_query } = cvm.logs;
-const containerName = "api"; // Container names match the pattern below.
-const validName = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(containerName)
-  && !containerName.includes("..");
+const client = createClient({ apiKey: "phak_your_api_key" });
 
-if (container_log_base && auth_query && validName) {
-  const url = `${container_log_base}/${containerName}?${auth_query}&tail=500&timestamps=true`;
+// Last 100 lines of the serial console
+const serial = await fetchCvmLogs(
+  client,
+  "my-app",
+  { type: "node", channel: "serial" },
+  { tail: 100 },
+);
+console.log(serial);
+
+// Follow the "api" container until the signal is aborted
+const controller = new AbortController();
+for await (const entry of followCvmLogs(
+  client,
+  "my-app",
+  { type: "container", name: "api" },
+  { tail: 50, signal: controller.signal },
+)) {
+  console.log(entry);
 }
 ```
 
-Container names must match `[A-Za-z0-9][A-Za-z0-9_.-]{0,127}` and must not contain `..`. Use the name directly in the path; do not URL-encode it, because encoded path characters such as `%` are rejected.
+```typescript
+function fetchCvmLogs(
+  client: Client,
+  id: CvmIdInput | string,
+  source: CvmLogSource,
+  options?: CvmLogsOptions,
+): Promise<string | CvmLogEntry[]>
 
-A `401` response (`ERR-17-002` or `ERR-17-003`) means the signature is missing, invalid, or expired. Call `getCvmInfo` again to get fresh URLs, then retry.
+function followCvmLogs(
+  client: Client,
+  id: CvmIdInput | string,
+  source: CvmLogSource,
+  options?: CvmLogsOptions,
+): AsyncGenerator<string | CvmLogEntry>
+```
 
-### Reconnect to a log stream
+**Parameters:**
 
-Reconnect after every end of stream in follow mode, fetching fresh URLs with `getCvmInfo` first. A stream can end after an idle timeout, the 1-hour stream limit, or a clean end.
+| Name | Type | Description |
+|------|------|-------------|
+| `client` | `Client` | A client from `createClient` or `createBaseClient` |
+| `id` | `CvmIdInput \| string` | CVM identifier (name, UUID, or App ID) |
+| `source` | `CvmLogSource` | Which logs to read (see below) |
+| `options` | `CvmLogsOptions` | Optional display and time-window settings |
 
-- For container logs, request timestamps and reconnect with `since` set to the last timestamp received. Drop duplicate lines at the reconnect boundary.
-- For node logs (serial, stdout, or stderr), reconnect with `tail=0` to continue without replaying earlier lines.
+**`CvmLogSource`:**
 
-Node streams can include heartbeat lines; drop only node lines whose entire contents exactly match `[vmm heartbeat]` or `[teepod heartbeat]`. Keep container log lines with those same contents, and keep empty lines because they may be real log entries.
+| Shape | Description |
+|-------|-------------|
+| `{ type: "node", channel: "serial" \| "stdout" \| "stderr" }` | A CVM-level channel: serial console, stdout, or stderr |
+| `{ type: "container", name?: string, matchContainerIdPrefix?: boolean }` | A container. `name` is a container name or ID prefix. If you omit it, the SDK uses the first container that has a log endpoint. `matchContainerIdPrefix` defaults to `true`; set it to `false` to match names only. |
 
-For query parameters, reconnect behavior, error responses, and examples that use plain HTTP, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
+**`CvmLogsOptions`:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tail` | `number \| "all"` | Number of most recent lines, or `"all"`. When omitted, the server default applies. |
+| `since` | `string \| number` | Start time: RFC 3339 timestamp, Unix seconds, or relative duration such as `"10m"` (`s`, `m`, `h`, `d`). |
+| `until` | `string \| number` | End time. Same formats as `since`. |
+| `timestamps` | `boolean` | Prefix each container line with its timestamp. |
+| `ansi` | `boolean` | Keep ANSI color codes. Valid only with `format: "text"`. |
+| `format` | `"text" \| "ndjson"` | Output format for `fetchCvmLogs` on containers. Default is text. |
+| `signal` | `AbortSignal` | Cancels the request, or ends a follow. |
+
+`since`, `until`, `timestamps`, and `format: "ndjson"` apply to container logs only. Passing them with a node source throws an `Error`.
+
+**Return types:**
+
+| Call | Source | Result |
+|------|--------|--------|
+| `fetchCvmLogs` | Node | `string` |
+| `fetchCvmLogs` | Container | `string`, or `CvmLogEntry[]` when `format` is `"ndjson"` |
+| `followCvmLogs` | Node | Yields `string` lines, each ending in a newline |
+| `followCvmLogs` | Container | Yields `CvmLogEntry` objects |
+
+`CvmLogEntry` is `{ channel: "stdout" | "stderr"; message: string }`.
+
+To stop a follow, abort the `AbortSignal` you passed in `options.signal`. The generator then ends without throwing.
+
+**Behavior:**
+
+- Every connection uses a fresh signed URL.
+- Follow mode reconnects after any stream end and gives up after 5 consecutive failures.
+- Node heartbeat lines are dropped.
+- Container follow resumes from the last timestamp without repeating lines.
+- The helpers request CVM info with API version `2026-01-21` internally, so they work with clients configured for older versions.
+
+For the HTTP details behind these helpers, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
+
+**Errors:**
+
+Log gateway errors are thrown as `LogAccessError`, which extends `ResourceError`. Match on `code` rather than the message.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `code` | `string \| undefined` | Log error code such as `ERR-17-005` |
+| `httpStatus` | `number \| undefined` | HTTP status of the failed request |
+| `suggestions` | `string[]` | Suggested fixes from the API |
+
+```typescript
+import { LogAccessError, fetchCvmLogs } from "@phala/cloud";
+
+try {
+  await fetchCvmLogs(client, "my-app", { type: "container", name: "api" });
+} catch (error) {
+  if (error instanceof LogAccessError && error.code === "ERR-17-005") {
+    console.error("The CVM is not running; container logs are unavailable.");
+  } else {
+    throw error;
+  }
+}
+```
+
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the helper throws a plain `Error` before sending any log request. Node channels are not affected. A missing container also throws a plain `Error`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+
+**Lower-level exports:** `@phala/cloud` also exports `fetchCvmChannelLogs`, `streamCvmChannelLogs`, `fetchContainerLogs`, `fetchContainerLogsEntries`, `streamContainerLogs`, `streamContainerLogsEntries`, `getCvmLogEndpoint`, and `resolveLogTimeWindow`. Prefer `fetchCvmLogs` and `followCvmLogs` unless you need one of these for a specific case.
+
+### Without the helper
+
+If you are not using the JS SDK, or need full control, you can read the URLs from `getCvmInfo` and make the HTTP requests yourself. Use API version `2026-01-21` or later so the response includes `logs`. You then handle URL expiry, reconnects, and heartbeat lines in your own code. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api) for the URL format, query parameters, and reconnect rules.
 
 ---
 

@@ -79,8 +79,19 @@ Every option is a function passed to `NewClient`. They follow Go's functional op
 | `WithTimeout(d)` | no timeout | HTTP client timeout as `time.Duration` |
 | `WithMaxRetries(n)` | `30` | Maximum retries for retryable errors (409/429/503) |
 | `WithHTTPClient(hc)` | `&http.Client{}` | Custom `*http.Client` for full control |
-| `WithUserAgent(ua)` | `phala-cloud-sdk-go/0.3.0` | Custom User-Agent header |
+| `WithUserAgent(ua)` | `DefaultUserAgent()` | Replace the User-Agent header |
 | `WithHeader(key, val)` | — | Add a custom header to all requests |
+
+### User-Agent
+
+By default the client sends `User-Agent: phala-cloud-sdk-go/<version> go/<v>`, for example `phala-cloud-sdk-go/0.5.0 go/1.24.2`. `phala.DefaultUserAgent()` returns this string. `WithUserAgent` replaces it entirely, so a value you supply overrides the default. To keep the SDK token and add your own, prepend to the default:
+
+```go
+client, err := phala.NewClient(
+	phala.WithAPIKey("phak_your_api_key"),
+	phala.WithUserAgent("my-automation/2.0 "+phala.DefaultUserAgent()),
+)
+```
 
 ## Environment Variables
 
@@ -171,6 +182,9 @@ This means you never need to worry about converting between ID formats yourself.
 | `GetCVMAttestation(ctx, id)` | Get TEE attestation |
 | `GetCVMUserConfig(ctx, id)` | Get user configuration |
 | `WatchCVMState(ctx, id, opts)` | Watch state changes via SSE |
+| `FetchCVMLogs(ctx, id, source, opts)` | Fetch a log snapshot as text |
+| `FetchCVMLogEntries(ctx, id, source, opts)` | Fetch container logs as entries |
+| `FollowCVMLogs(ctx, id, source, opts)` | Stream logs until the context ends |
 | `GetCVMStatusBatch(ctx, ids)` | Get typed status and resource usage for multiple CVMs |
 
 ### Apps
@@ -255,6 +269,91 @@ fmt.Println(event.Event, string(event.Data))
 ```
 
 See [Webhooks](/phala-cloud/references/webhooks) for full payload format and delivery behavior.
+
+## CVM Logs
+
+Available in Go SDK v0.5.0 and later.
+
+`FetchCVMLogs`, `FetchCVMLogEntries`, and `FollowCVMLogs` read serial, node, and container logs.
+
+```go
+// Last 100 lines of the serial console
+text, err := client.FetchCVMLogs(ctx, "my-app",
+	phala.LogSource{Type: "node", Channel: phala.CVMLogSerial},
+	&phala.LogsOptions{Tail: 100},
+)
+
+// Follow the "api" container until ctx is cancelled
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+
+lines, errs := client.FollowCVMLogs(ctx, "my-app",
+	phala.LogSource{Type: "container", Name: "api"},
+	&phala.LogsOptions{Tail: 50},
+)
+for line := range lines {
+	fmt.Print(line)
+}
+if err := <-errs; err != nil {
+	var apiErr *phala.APIError
+	if errors.As(err, &apiErr) {
+		fmt.Println(apiErr.ErrorCode, apiErr.Suggestions)
+	}
+}
+```
+
+```go
+func (c *Client) FetchCVMLogs(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) (string, error)
+func (c *Client) FetchCVMLogEntries(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) ([]LogEntry, error)
+func (c *Client) FollowCVMLogs(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) (<-chan string, <-chan error)
+```
+
+`opts` may be `nil`.
+
+| Method | Result |
+|--------|--------|
+| `FetchCVMLogs` | A `string`. For a container source, the SDK joins the entries into text. |
+| `FetchCVMLogEntries` | `[]LogEntry` for a container source |
+| `FollowCVMLogs` | A channel of log text and a channel of errors. Cancel with the `ctx` you pass in. |
+
+`FollowCVMLogs` closes both channels when the follow ends. A cancelled context ends the follow without sending an error. Any other failure is sent once on the error channel. Read the log channel until it closes, then read the error channel.
+
+**`LogSource`:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Type` | `string` | `"node"` or `"container"`. Set it explicitly: any value other than `"container"` is treated as a node source. |
+| `Channel` | `CVMLogChannel` | Node channel: `CVMLogSerial`, `CVMLogStdout`, or `CVMLogStderr` |
+| `Name` | `string` | Container name or ID prefix. If empty, the SDK uses the first container that has a log endpoint. |
+
+**`LogsOptions`:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Tail` | `any` | Number of most recent lines as an `int`, or the string `"all"`. When `nil`, the server default applies. |
+| `Since` | `any` | Start time as Unix seconds (`int`, `int64`, or a numeric string), an RFC 3339 string, or a relative duration such as `"10m"` (`s`, `m`, `h`, `d`). Container logs only. |
+| `Until` | `any` | End time. Same formats as `Since`. Container logs only. |
+| `Timestamps` | `bool` | Keep the timestamp prefix on container lines. |
+| `ANSI` | `bool` | Keep ANSI color codes. |
+| `Format` | `string` | `"text"` or `"ndjson"`. The log methods do not read it: use `FetchCVMLogEntries` for entries. |
+
+`LogEntry` has two fields: `Channel` (`"stdout"` or `"stderr"`) and `Message`.
+
+**Behavior:**
+
+- Every connection uses a fresh signed URL.
+- Follow mode reconnects after any stream end and gives up after 5 consecutive failures.
+- Node heartbeat lines are dropped.
+- Container follow resumes from the last timestamp without repeating lines.
+- The helpers request CVM info with API version `2026-01-21` internally, so they work with clients configured for older versions.
+
+For the HTTP details behind these methods, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
+
+**Errors:**
+
+Log gateway errors are returned as `*APIError`. Check `ErrorCode` for a log error code such as `ERR-17-005`, and use `errors.As` to reach it. `Suggestions` holds suggested fixes from the API.
+
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the method returns a plain error before sending any log request. Node channels are not affected. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 ## Related
 
