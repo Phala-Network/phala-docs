@@ -18,6 +18,7 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 - **Module 04** - Workspace
 - **Module 05** - Credentials
 - **Module 06** - Authentication (OAuth redirect errors — not returned as JSON API responses)
+- **Module 17** - Log Access
 
 ---
 
@@ -112,3 +113,24 @@ Error codes follow the format `ERR-{MODULE}-{CODE}` where:
 
 ---
 
+## Module 17: Log Access
+
+
+| Error Code | Exception Class | Message |
+|------------|----------------|---------|
+| `ERR-17-001` | `InvalidLogRequestError` | Invalid log request |
+| `ERR-17-002` | `InvalidLogSignatureError` | Missing or invalid log access signature |
+| `ERR-17-003` | `ExpiredLogSignatureError` | Log access signature expired |
+| `ERR-17-004` | `LogCvmNotFoundError` | CVM not found or access denied |
+| `ERR-17-005` | `LogCvmNotRunningError` | CVM is not running |
+| `ERR-17-006` | `ContainerLogsDisabledError` | Container logs are disabled |
+| `ERR-17-007` | `LogContainerNotFoundError` | Container not found |
+| `ERR-17-008` | `LogNodeUnreachableError` | Node VMM unreachable or returned a bad response |
+| `ERR-17-009` | `LogGuestUnreachableError` | Guest agent or gateway unreachable |
+| `ERR-17-010` | `LogUpstreamTimeoutError` | Log upstream timed out |
+| `ERR-17-011` | `TooManyLogStreamsError` | Too many concurrent log streams |
+| `ERR-17-012` | `LogRoutingUnavailableError` | Node or gateway routing data is unavailable |
+| `ERR-17-013` | `LogVmMissingOnNodeError` | VM no longer exists on the node |
+
+
+---

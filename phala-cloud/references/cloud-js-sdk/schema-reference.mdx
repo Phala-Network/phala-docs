@@ -105,11 +105,9 @@ CvmInfoV20260121 & {
 
 ### CvmLogUrlsV20260121
 
-The `serial`, `stdout`, and `stderr` fields are complete presigned URLs for the corresponding CVM logs. Each URL is valid for 300 seconds to open a connection. Expiry is checked only when the connection opens.
+The `serial`, `stdout`, and `stderr` fields are complete presigned URLs for the corresponding CVM logs. Phala Cloud signs them for the requesting user. Each signature is valid for 5 minutes and is checked only when the connection opens. A stream lasts at most 1 hour.
 
-An established stream can continue for up to 3,600 seconds (one hour) before it ends. In follow mode, reconnect whenever the stream reaches EOF. If a reconnect returns `ERR-17-003`, fetch fresh URLs with an authenticated CVM detail request.
-
-See [CVM Query](/phala-cloud/references/cloud-js-sdk/cvm-query) for reconnect cursors and heartbeat handling. A URL is a bearer capability, so anyone with a valid URL can open it directly without signing in. An authenticated API request is required to retrieve CVM details and these URLs.
+If a request returns `401` (`ERR-17-002` or `ERR-17-003`), fetch fresh URLs with a CVM detail request and retry. Do not modify the signature parameters. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api) for query parameters, reconnect behavior, and errors.
 
 ```typescript
 {
@@ -117,11 +115,11 @@ See [CVM Query](/phala-cloud/references/cloud-js-sdk/cvm-query) for reconnect cu
   stdout?: string | null; // Complete presigned URL for CVM stdout
   stderr?: string | null; // Complete presigned URL for CVM stderr
   container_log_base?: string | null; // Container URL base with no query string
-  auth_query?: string | null; // Optional authentication query string
+  auth_query?: string | null; // Query string that authorizes container log requests
 }
 ```
 
-To build a container log URL, append the container name and display options to `container_log_base`, then add `auth_query`. Both container fields are non-null only when `public_logs` is `true` and the CVM has a `vm_uuid`. Clients should accept `auth_query` being omitted or `null` for forward compatibility.
+A container log URL is `{container_log_base}/{container_name}?{auth_query}`. All log fields are `null` when the requester cannot read logs. The container fields are also `null` when `public_logs` is `false` (container requests are rejected with `ERR-17-006`) or the CVM has no `vm_uuid`. Node logs are not affected by `public_logs`. Clients should accept `auth_query` being omitted or `null`.
 
 In the legacy `2025-10-28` response, `syslog_endpoint` is a complete presigned serial log URL, not a URL base.
 
