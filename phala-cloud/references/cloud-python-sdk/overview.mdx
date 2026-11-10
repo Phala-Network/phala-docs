@@ -338,6 +338,7 @@ def follow_cvm_logs(
     until: str | int | None = None,
     timestamps: bool = False,
     ansi: bool = False,
+    format: CvmLogFormat = "text",
     log_http: httpx.Client | None = None,
 ) -> Iterator[str | CvmLogEntry]: ...
 ```
@@ -353,7 +354,7 @@ def follow_cvm_logs(
 | `until` | `str \| int \| None` | `None` | End time. Same formats as `since`. |
 | `timestamps` | `bool` | `False` | Prefix each container line with its timestamp. |
 | `ansi` | `bool` | `False` | Keep ANSI color codes. |
-| `format` | `"text" \| "ndjson"` | `"text"` | `fetch_cvm_logs` only. With `"ndjson"`, a container source returns a list of entries. |
+| `format` | `"text" \| "ndjson"` | `"text"` | With `fetch_cvm_logs`, `"ndjson"` makes a container source return a list of entries. `follow_cvm_logs` accepts it from 0.4.1 and always yields entries for containers. `"ndjson"` with a node source raises an error. |
 | `log_http` | `httpx.Client \| None` | `None` | Your own `httpx.Client` for the log requests. When omitted, the SDK creates one and closes it when the call finishes. |
 
 **`CvmLogSource`** is a dictionary:
@@ -398,7 +399,7 @@ Log gateway errors are raised as `LogAccessError`, a subclass of `ResourceError`
 | `http_status` | `int \| None` | HTTP status of the failed request |
 | `suggestions` | `list[str] \| None` | Suggested fixes from the API |
 
-Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the method raises `ValueError` before sending any log request. Node channels are not affected. A missing container also raises `ValueError`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the method raises `LogAccessError` with code `ERR-17-006` ("Container logs are disabled") before sending any log request; this needs `phala-cloud` 0.4.1 or later (0.4.0 raised `ValueError`). Node channels are not affected. A missing container also raises `ValueError`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 ## Utility Functions
 

@@ -160,7 +160,7 @@ try {
 }
 ```
 
-Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the helper throws a plain `Error` before sending any log request. Node channels are not affected. A missing container also throws a plain `Error`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the helper throws `LogAccessError` with code `ERR-17-006` ("Container logs are disabled") before sending any log request; this needs `@phala/cloud` 0.6.1 or later (0.6.0 threw a plain `Error`). Node channels are not affected. A missing container also throws a plain `Error`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 **Lower-level exports:** `@phala/cloud` also exports `fetchCvmChannelLogs`, `streamCvmChannelLogs`, `fetchContainerLogs`, `fetchContainerLogsEntries`, `streamContainerLogs`, `streamContainerLogsEntries`, `getCvmLogEndpoint`, and `resolveLogTimeWindow`. Prefer `fetchCvmLogs` and `followCvmLogs` unless you need one of these for a specific case.
 

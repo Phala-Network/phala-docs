@@ -331,11 +331,11 @@ func (c *Client) FollowCVMLogs(ctx context.Context, cvmID string, source LogSour
 | Field | Type | Description |
 |-------|------|-------------|
 | `Tail` | `any` | Number of most recent lines as an `int`, or the string `"all"`. When `nil`, the server default applies. |
-| `Since` | `any` | Start time as Unix seconds (`int`, `int64`, or a numeric string), an RFC 3339 string, or a relative duration such as `"10m"` (`s`, `m`, `h`, `d`). Container logs only. |
-| `Until` | `any` | End time. Same formats as `Since`. Container logs only. |
-| `Timestamps` | `bool` | Keep the timestamp prefix on container lines. |
+| `Since` | `any` | Start time as Unix seconds (`int`, `int64`, or a numeric string), an RFC 3339 string, or a relative duration such as `"10m"` (`s`, `m`, `h`, `d`). Container logs only; from v0.5.1 a node source with `Since` returns an error. |
+| `Until` | `any` | End time. Same formats as `Since`. Container logs only; from v0.5.1 a node source with `Until` returns an error. |
+| `Timestamps` | `bool` | Keep the timestamp prefix on container lines. Container logs only; from v0.5.1 a node source with `Timestamps` returns an error. |
 | `ANSI` | `bool` | Keep ANSI color codes. |
-| `Format` | `string` | `"text"` or `"ndjson"`. The log methods do not read it: use `FetchCVMLogEntries` for entries. |
+| `Format` | `string` | `"text"` or `"ndjson"`. From v0.5.1, `FetchCVMLogEntries` reads it (default `"ndjson"`; other values return an error) and a node source with `"ndjson"` returns an error. `FetchCVMLogs` always returns text. |
 
 `LogEntry` has two fields: `Channel` (`"stdout"` or `"stderr"`) and `Message`.
 
@@ -353,7 +353,7 @@ For the HTTP details behind these methods, see [Fetch Logs over HTTP](/phala-clo
 
 Log gateway errors are returned as `*APIError`. Check `ErrorCode` for a log error code such as `ERR-17-005`, and use `errors.As` to reach it. `Suggestions` holds suggested fixes from the API.
 
-Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the CVM has no container log endpoints and the method returns a plain error before sending any log request. Node channels are not affected. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the method returns an `*APIError` with `ErrorCode` `ERR-17-006` ("Container logs are disabled") before sending any log request; this needs Go SDK v0.5.1 or later (v0.5.0 returned a plain error). Node channels are not affected. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 ## Related
 
