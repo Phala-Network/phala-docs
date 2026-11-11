@@ -118,7 +118,7 @@ client, err := phala.NewClient(
 
 ## User Agent
 
-The SDK sends a `User-Agent` header in the form `phala-cloud-sdk-go/<version> go/<v>` by default. `phala.DefaultUserAgent()` returns this value. `WithUserAgent` replaces it entirely, so a value you supply overrides the default. Use it to identify your application in server logs.
+The SDK sends a `User-Agent` header in the form `phala-cloud-sdk-go/<version> go/<v>` by default. `phala.DefaultUserAgent()` returns this value. `WithUserAgent` replaces it entirely, so a value you supply overrides the default. Use it to identify your application in server logs. The log methods (`FetchCVMLogs`, `FetchCVMLogEntries`, `FollowCVMLogs`, `FollowCVMLogEntries`) use the same settings for all their requests, including the request that reads the log stream. They reuse your HTTP client and its transport and send your `User-Agent`. A one-shot fetch keeps the client's timeout. A follow clears only the timeout, so a long stream is not cut; cancel it with the `ctx` you pass in.
 
 ```go
 client, err := phala.NewClient(

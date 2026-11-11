@@ -9,7 +9,7 @@ For the dashboard log viewer, see [Serial Logs](/phala-cloud/monitoring/serials-
 
 ## Get a log URL
 
-Call `GET /api/v1/cvms/{id}` on `https://cloud-api.phala.com` with your API key in the `X-API-Key` header. The response contains a `logs` object:
+Call `GET /api/v1/cvms/{id}` on `https://cloud-api.phala.com` with your API key in the `X-API-Key` header and `X-Phala-Version: 2026-01-21`. The response contains a `logs` object:
 
 | Field | Description |
 | --- | --- |
@@ -35,7 +35,7 @@ You can also read a ready-made container URL from `log_endpoint` on each contain
 
 In API version `2025-10-28`, the serial URL is returned as `syslog_endpoint`. Later versions return it as `logs.serial`.
 
-All of these fields are `null` when the requesting user cannot read the CVM's logs.
+If the requesting user cannot access the CVM, the request returns `404`. The `logs` fields are `null` when signed log URLs are not available for that CVM, for example when it has no VM yet.
 
 The container fields (`logs.container_log_base`, `logs.auth_query`, and the container `log_endpoint`) are also `null` unless the CVM has [Public Logs](/phala-cloud/monitoring/public-logs) enabled. Container requests are rejected with `ERR-17-006` when it is disabled. Node logs (`serial`, `stdout`, `stderr`) are not affected by this setting.
 
@@ -59,7 +59,7 @@ Because of these limits:
 
 - Fetch a fresh URL from the CVM API right before each connection.
 - Never cache or store URLs.
-- If a request returns `401` (`ERR-17-002` or `ERR-17-003`), the signature is missing, invalid, or expired. Fetch a new URL and retry.
+- If a request returns `401` (`ERR-17-002` or `ERR-17-003`), the signature is missing, invalid, or expired. Fetch a new URL and retry (see [Retry rules](#retry-rules)).
 
 ## Query parameters
 
@@ -67,9 +67,9 @@ The same parameters apply to every log kind unless noted. Unknown or repeated pa
 
 | Parameter | Applies to | Description |
 | --- | --- | --- |
-| `tail` | All | Number of most recent lines: `0` to `10000`, or `all`. |
+| `tail` | All | Number of most recent lines: `0` to `10000`, or `all`. Default `1000` on every request. |
 | `follow` | All | `true` keeps the connection open and streams new lines. |
-| `since` | Container logs | Start time. RFC 3339 timestamp, Unix seconds, or relative (`<n>s`, `<n>m`, `<n>h`, `<n>d`). |
+| `since` | Container logs | Start time. Unix seconds, relative (`<n>s`, `<n>m`, `<n>h`, `<n>d`), or an RFC 3339 UTC timestamp ending in `Z`. See [Query encoding](#query-encoding). |
 | `until` | Container logs | End time. Same formats as `since`. |
 | `timestamps` | Container logs | Prefix each line with its timestamp. |
 | `ansi` | All | `true` keeps ANSI color codes. Only valid with `format=text`. |
@@ -77,13 +77,64 @@ The same parameters apply to every log kind unless noted. Unknown or repeated pa
 
 Append parameters with `&` after the signature parameters. For a container URL, `auth_query` is already in the query string, so join with `&` as well.
 
+### Query encoding
+
+The gateway rejects any request target that contains a `%`, so do not percent-encode query values. Append each parameter to the signed URL as raw text with `&`, for example `&since=1731226542&tail=all`. Do not pass the URL or its parameters through a generic query encoder.
+
+Write `since` and `until` as Unix seconds or as relative values (`<n>s`, `<n>m`, `<n>h`, `<n>d`). An RFC 3339 UTC timestamp ending in `Z` is also accepted if you write it literally, such as `2026-11-10T08:15:42Z`. Do not use `+` or other characters that would need encoding.
+
+## Response format
+
+### Text
+
+The default. The body is plain text, one log line per line. With `timestamps=true`, each container line starts with an RFC 3339 timestamp with nanoseconds, then one space, then the text:
+
+```text
+2026-11-10T08:15:42.123456789Z server started on port 8080
+```
+
+### NDJSON
+
+With `format=ndjson` (container logs only), each line of the body is a JSON object:
+
+```json
+{"channel": "stdout", "message": "server started on port 8080\n"}
+```
+
+- `channel` is `stdout`, `stderr`, `console` (containers started with a TTY), or `stdin`. Clients must accept all four.
+- `message` ends with a newline in most cases. A record can have an empty `message`. Pass it on as an empty string and do not add a newline.
+- With `timestamps=true`, the timestamp is part of `message`, in the same `<timestamp><space><text>` form as the text format.
+
+### Heartbeat lines
+
+Node log streams (`serial`, `stdout`, `stderr`) can contain lines whose entire content is `[vmm heartbeat]` or `[teepod heartbeat]`. Drop those lines from node logs only. Keep container lines with the same text, and keep empty lines, which can be real log entries. No other keepalive records are added to the stream.
+
+### Errors inside a stream
+
+A stream that opened with `200` can still report a failure in its body. Check every line for these records.
+
+| Where | Record | What it means |
+| --- | --- | --- |
+| Gateway, text | `[error] ERR-17-0xx <message>`, for example `[error] ERR-17-008 Node VMM unreachable or returned a bad response` or `[error] ERR-17-009 Guest agent or gateway unreachable` | The connection to the CVM broke after the stream opened. Reconnect. |
+| Gateway, NDJSON | `{"error_code":"ERR-17-0xx","message":"<message>"}`, for example `{"error_code":"ERR-17-008","message":"Node VMM unreachable or returned a bad response"}` or `{"error_code":"ERR-17-009","message":"Guest agent or gateway unreachable"}` | Same as above. Reconnect. |
+| CVM, text or NDJSON | `{"error": "<message>"}` | The agent inside the CVM could not read the container's logs, for example because the container uses a Docker logging driver that does not support reading. This is a final answer for that container. Do not reconnect; report the message. |
+
+The `{"error": ...}` record has no `channel` or `message` field and is not always followed by a newline, so it can be glued to the next record on the same line. The record can also be the whole body of a non-follow request.
+
+- In NDJSON, a record with a string `error` and no `channel` or `message` is a guest error anywhere in the stream. Read the stream with a streaming JSON decoder, not by splitting on newlines.
+- In text format, treat `{"error": ...}` as a guest error only at the very start of the response body, before you have delivered any output. It may be glued to the text that follows. Later in the stream, a line of that shape can be ordinary application output, so it cannot be told apart. Use `format=ndjson` for container logs if you need reliable error detection.
+- Node log streams (`serial`, `stdout`, `stderr`) carry arbitrary process output. Only the gateway `[error] ERR-17-0xx` lines are errors there.
+
+Match on the error code, never on the message text, which may change. Treat an error code from the gateway the same way as the same code in an HTTP error response (see [Errors](#errors)). What to do for each case is in [Retry rules](#retry-rules).
+
 ## Read logs
 
 ### Fetch recent lines
 
 ```bash
 URL=$(curl -s "https://cloud-api.phala.com/api/v1/cvms/<cvm-id>" \
-  -H "X-API-Key: $PHALA_CLOUD_API_KEY" | jq -r '.logs.serial')
+  -H "X-API-Key: $PHALA_CLOUD_API_KEY" \
+  -H "X-Phala-Version: 2026-01-21" | jq -r '.logs.serial')
 
 curl -s "$URL&tail=100"
 ```
@@ -92,7 +143,8 @@ For a container (`api` in this example):
 
 ```bash
 RESP=$(curl -s "https://cloud-api.phala.com/api/v1/cvms/<cvm-id>" \
-  -H "X-API-Key: $PHALA_CLOUD_API_KEY")
+  -H "X-API-Key: $PHALA_CLOUD_API_KEY" \
+  -H "X-Phala-Version: 2026-01-21")
 BASE=$(echo "$RESP" | jq -r '.logs.container_log_base')
 AUTH=$(echo "$RESP" | jq -r '.logs.auth_query')
 
@@ -101,67 +153,190 @@ curl -s "$BASE/api?$AUTH&tail=100&timestamps=true"
 
 ### Polling
 
-Poll on a timer. On each tick, fetch a fresh URL and request the last `N` lines without `follow`. Use `since` for container logs, or compare against the last line you saw, to avoid processing the same lines twice.
+Poll on a timer. On each tick, fetch a fresh URL and request the last `N` lines without `follow`. Use `since` (Unix seconds) for container logs, or compare against the last line you saw, to avoid processing the same lines twice.
 
 ### Following
 
-Request the URL with `follow=true` and read the response as it arrives. The stream can end for any reason: a normal close, the 1-hour limit, or a network error. When it ends:
+Request the URL with `follow=true` and read the response as it arrives. A stream can end for any reason: a normal close, the 1-hour limit, a network error, or an error record in the body. Every time it ends, fetch a fresh URL from the CVM API (one lookup per connection) and reconnect as follows.
 
-1. Fetch a fresh URL from the CVM API.
-2. Reconnect without repeating lines you already read:
-   - Node logs (`serial`, `stdout`, `stderr`): reconnect with `tail=0`.
-   - Container logs: request with `timestamps=true`, and reconnect with `since` set to the timestamp of the last line you received. Drop lines at that boundary second that you already saw.
-3. After several consecutive failures, give up and report the error. The `phala` CLI stops after 5. A successful `200` response resets the failure count.
+**Node logs (`serial`, `stdout`, `stderr`).** Send `tail` on the first request only. Reconnect with `tail=0`. Node log lines have no timestamps, so lines written while you were disconnected are not replayed.
 
-Node log streams can contain heartbeat lines whose entire content is `[vmm heartbeat]` or `[teepod heartbeat]`. Drop those lines from node logs only; keep container lines with the same text, and keep empty lines, which can be real log entries. No other keepalive records are added to the stream.
+**Container logs.** Always request `timestamps=true`, even if your users do not want timestamps. You need them to resume.
+
+1. Send `tail` (and `since`, if the user gave one) until the first `200` is accepted. Every later request sends `tail=all` plus `since`, as described below.
+2. Keep the Unix second of the latest timestamp you received, and count how many records you received in that second, grouped by channel and full message. Also record the time the first HTTP `200` was accepted, floored to the second.
+3. Reconnect with `tail=all` and `since` set to that second. If no timestamped record has arrived yet, there is no cursor: use the caller's own `since` if they set one, otherwise the time the first `200` was accepted, floored to the second. Without `since`, `tail=all` would replay the whole history, for example for a caller who asked for `tail=0` on a quiet container. You must send `tail`: without it the gateway returns only the last 1000 lines, and lines written during a long disconnect would be lost.
+4. The server sends every record from that second again. For each record in the boundary second, skip it if you still have a matching count; otherwise deliver it. Deliver records from later seconds as they come.
+5. Strip the timestamp prefix before showing a line, unless the user asked for timestamps. Records without a timestamp pass through unchanged.
+
+For container logs, check whether Public Logs is on before the first log request and again on every reconnect (each connection looks up the CVM info anyway): the CVM response (API version `2026-01-21` or later) has `public_logs` set to `false` when it is off. Then you fail at once with `ERR-17-006` instead of waiting for the gateway to reject the request.
+
+#### Retry rules
+
+| Situation | What to do |
+| --- | --- |
+| `401` with `ERR-17-003` (signature expired) | Fetch a fresh URL and retry at once. This has its own limit of 3 refetches in a row. The count resets after a connection that delivered records or ended cleanly. It is separate from the failure count. |
+| `401` with `ERR-17-002` (signature missing or invalid) | Fetch a fresh URL and retry. This counts as a failure. |
+| `429` with `ERR-17-011` | Back off and retry. |
+| Any other `4xx` (including `ERR-17-001`, `ERR-17-004`, `ERR-17-005`, `ERR-17-006`, `ERR-17-007`, `ERR-17-013`) | Stop. Retrying does not help. |
+| `5xx`, a network or read error, or a gateway in-stream line (`[error] ERR-17-008 <message>` or `[error] ERR-17-009 <message>` in text, `{"error_code":"ERR-17-008","message":"<message>"}` or `ERR-17-009` in NDJSON) | Back off and retry. |
+| Guest `{"error": ...}` record | Stop and report the message. |
+| Node log stream ended cleanly | Reconnect with `tail=0`. Never stop. If it delivered no records and ended within 10 s of the `200` response, back off first (250 ms, doubling up to 5 s, counting consecutive such ends). Otherwise reconnect at once. The 1-hour stream limit ends streams too, and the node sends heartbeats while it is idle. |
+| Container log stream ended cleanly | Reconnect. If it delivered no new records and ended within 10 s of the `200` response, back off (same delay steps) and count it; after 5 such ends in a row, stop and report that the container has likely stopped. A connection that sat idle longer than 10 s before ending cleanly resets the count: reconnect immediately. If you set `until` and its time was reached, finish normally without an error. |
+
+Recommended client behavior:
+
+- Back off exponentially: start at 250 ms, double each time, up to 5 s. Reset the delay after a connection that delivered records.
+- Decide by where the error came from. A gateway error read from the body of a `200` response (`[error] ERR-17-...` in text, `{"error_code":...}` in NDJSON) is a failure to retry. A guest `{"error": ...}` record stops the follow. An HTTP error is decided by its status alone: `5xx` and `429` are failures, `401` with `ERR-17-003` or `ERR-17-002` fetches a new URL, and any other `4xx` stops.
+- Count `ERR-17-003` refetches separately from failures: allow 3 in a row, and reset that count after a connection that delivered records or ended cleanly. A `401` with `ERR-17-002` also fetches a new URL, but it counts as one of the 5 failures.
+- Count a connection as recovered only when it delivered at least one record. A `200` whose body immediately fails counts as a failure, not a recovery.
+- Give up after 5 consecutive failures.
+- Keep at least 1 s between the starts of consecutive connections, whatever the outcome, so a stream that ends at once cannot cause a tight reconnect loop.
+- Treat a clean end with no new output as neither a failure nor a recovery. Count it only if the connection ended within 10 s of the `200` response, and back off 250 ms, doubling up to 5 s, before reconnecting. For container logs, stop after 5 such ends in a row: a container that exited ends its stream this way. Node logs never stop on a clean end; they keep backing off and reconnecting.
+- A long idle connection that ends cleanly is normal: the agent closes an idle stream after 600 s. Reset the clean-end count and reconnect immediately (the 1 s minimum between connection starts still applies).
+- Reset the clean-end count on any failure or any delivered record, so it means consecutive clean ends.
+- When a connection delivered records and then failed, reset the failure count when the first record arrived, then count this failure as 1 and wait 250 ms. Failures always back off.
+- Container reconnects always send `tail=all` with `since`. If no timestamped record has arrived yet, `since` is the caller's own `since` if set, otherwise the time the first `200` was accepted, floored to the second.
+- Send the caller's initial `tail` until a log response with HTTP `200` has been accepted. A failed URL lookup or a failed log request does not count as the first connection.
 
 ### Example: follow a serial log in Python
 
+This example follows the retry rules above for node logs. It classifies each response by status and by `error_code` in the JSON body.
+
 ```python
 import os
+import re
 import time
+from collections.abc import Iterator
 
 import httpx
 
 API = "https://cloud-api.phala.com/api/v1"
-HEADERS = {"X-API-Key": os.environ["PHALA_CLOUD_API_KEY"]}
+HEADERS = {
+    "X-API-Key": os.environ["PHALA_CLOUD_API_KEY"],
+    "X-Phala-Version": "2026-01-21",
+}
 CVM_ID = "<cvm-id>"
 MAX_FAILURES = 5
+MAX_EXPIRED = 3  # ERR-17-003 refetches in a row.
+QUIET_SECONDS = 10.0  # A clean end with no records before this is a quick empty end.
+MIN_CONNECT_INTERVAL = 1.0  # Seconds between connection starts.
+HEARTBEATS = {"[vmm heartbeat]", "[teepod heartbeat]"}
+STREAM_ERROR = re.compile(r"^\[error\] ERR-17-0\d\d ")
 
 
-def fresh_serial_url(client: httpx.Client) -> str:
-    resp = client.get(f"{API}/cvms/{CVM_ID}", headers=HEADERS)
-    resp.raise_for_status()
-    url = resp.json()["logs"]["serial"]
-    if url is None:
-        raise RuntimeError("No permission to read logs for this CVM")
-    return url
+class Retry(Exception):
+    def __init__(self, reason: object, expired: bool = False) -> None:
+        super().__init__(reason)
+        self.expired = expired  # True for ERR-17-003: refetch, not a failure.
+
+
+class Stop(Exception):
+    pass
+
+
+def check(resp: httpx.Response) -> None:
+    if resp.status_code == 200:
+        return
+    try:
+        code = resp.json().get("error_code")
+    except ValueError:
+        code = None
+    if resp.status_code == 401 and code == "ERR-17-003":
+        raise Retry(code, expired=True)  # Next attempt fetches a fresh URL.
+    if resp.status_code == 401 and code == "ERR-17-002":
+        raise Retry(code)  # Fresh URL, but this counts as a failure.
+    if resp.status_code == 429 or resp.status_code >= 500:
+        raise Retry(code or resp.status_code)
+    raise Stop(f"HTTP {resp.status_code} {code}")  # 400, 404, 409, ...
+
+
+def read_lines(client: httpx.Client, tail: str, conn: dict[str, float]) -> Iterator[str]:
+    try:
+        resp = client.get(f"{API}/cvms/{CVM_ID}", headers=HEADERS)
+        check(resp)
+        url = resp.json()["logs"]["serial"]
+        if url is None:
+            raise Stop("Signed log URLs are not available for this CVM yet")
+        with client.stream("GET", f"{url}&follow=true&tail={tail}") as resp:
+            if resp.status_code != 200:
+                resp.read()
+                check(resp)
+            conn["opened_at"] = time.monotonic()  # A 200 was accepted.
+            for line in resp.iter_lines():
+                if line in HEARTBEATS:
+                    continue
+                if STREAM_ERROR.match(line):
+                    raise Retry(line)  # Gateway error inside a 200 stream.
+                yield line
+    except httpx.TransportError as exc:  # Network and read errors.
+        raise Retry(str(exc)) from exc
+
+
+def backoff(count: int) -> None:
+    time.sleep(min(0.25 * 2 ** (min(count, 6) - 1), 5.0))
 
 
 def follow_serial() -> None:
-    failures = 0
-    tail = "100"  # First connection shows recent lines; reconnects use 0.
+    failures = 0  # Consecutive failed connections.
+    expired = 0  # Consecutive ERR-17-003 refetches.
+    empty_ends = 0  # Consecutive quick clean ends with no records.
+    tail = "100"  # Caller's tail, used until a 200 is accepted; then 0.
+    last_start = 0.0
     with httpx.Client(timeout=httpx.Timeout(10.0, read=None)) as client:
-        while failures < MAX_FAILURES:
+        while True:
+            time.sleep(max(0.0, last_start + MIN_CONNECT_INTERVAL - time.monotonic()))
+            last_start = time.monotonic()
+            conn: dict[str, float] = {}
+            delivered = 0
             try:
-                url = fresh_serial_url(client)
-                with client.stream("GET", f"{url}&follow=true&tail={tail}") as resp:
-                    resp.raise_for_status()
-                    failures = 0
+                for line in read_lines(client, tail, conn):
+                    if delivered == 0:
+                        failures = 0  # Recovered.
+                        expired = 0
+                        empty_ends = 0
+                    delivered += 1
+                    print(line, flush=True)
+            except Retry as exc:
+                print(f"retrying: {exc}")
+                if "opened_at" in conn:
                     tail = "0"
-                    for line in resp.iter_lines():
-                        if line not in ("[vmm heartbeat]", "[teepod heartbeat]"):
-                            print(line, flush=True)
-            except httpx.HTTPError:
+                empty_ends = 0
+                if exc.expired:
+                    expired += 1
+                    if expired > MAX_EXPIRED:
+                        raise RuntimeError("Signature kept expiring") from exc
+                    continue  # Refetch the URL at once.
                 failures += 1
-            time.sleep(1)
-    raise RuntimeError(f"Giving up after {MAX_FAILURES} consecutive failures")
+                if failures >= MAX_FAILURES:
+                    raise RuntimeError(f"Giving up after {failures} failures") from exc
+                backoff(failures)  # Failures always back off.
+                continue
+            # Clean end: the stream closed without an error.
+            tail = "0"
+            expired = 0
+            if delivered == 0 and time.monotonic() - conn["opened_at"] < QUIET_SECONDS:
+                empty_ends += 1  # Node logs never stop on this; they only back off.
+                backoff(empty_ends)
+            else:
+                empty_ends = 0
 
 
-follow_serial()
+try:
+    follow_serial()
+except Stop as exc:
+    raise SystemExit(str(exc))
 ```
 
-The loop fetches a new URL on every connection, so an expired signature (`401`) is handled by the next iteration.
+This example is simpler than the SDKs. It covers node logs only. It has no container logic, no `until`, and no cancellation.
+
+For container logs, change the request and the bookkeeping, not the retry rules:
+
+- Request `timestamps=true`. On reconnect, send `tail=all` and `since` set to the last timestamp second (before any record has arrived: the caller's own `since`, or else the time the first `200` was accepted, floored to the second), and drop the records you already delivered in that second (see [Following](#following)).
+- Do not drop heartbeat lines.
+- Add the container-only stop rule: count clean ends with no output that came within 10 s of the `200` response, and stop after 5 in a row (see [Retry rules](#retry-rules)). Reset that count on any failure or delivered record.
+- Stop on a `{"error": ...}` record. Use `format=ndjson` so it is reliably a line of its own; in text format it can be glued to earlier output.
+- If you set `until` and its time is reached, finish normally when the stream ends cleanly.
 
 ## Errors
 
@@ -190,19 +365,19 @@ Match on `error_code`. The `message` text is for people and may change.
 | `409` | `ERR-17-006` | Container logs are disabled (public logs are off) |
 | `404` | `ERR-17-007` | Container not found |
 | `502` | `ERR-17-008` | Node VMM unreachable or returned a bad response |
-| `502` | `ERR-17-009` | Guest agent or gateway unreachable |
+| `502` | `ERR-17-009` | Guest agent or gateway unreachable, or the guest agent could not read the container's logs |
 | `504` | `ERR-17-010` | Log upstream timed out |
 | `429` | `ERR-17-011` | Too many concurrent log streams |
 | `503` | `ERR-17-012` | Node or gateway routing data is unavailable |
 | `404` | `ERR-17-013` | VM no longer exists on the node |
 
-How to react:
-
-- `401` (`ERR-17-002`, `ERR-17-003`): fetch a fresh URL from the CVM API and retry.
-- `429` and `5xx`: back off, fetch a fresh URL, and retry.
-- `400`, `404`, `409`: do not retry blindly. Fix the request or the CVM state first. With `ERR-17-005`, node logs (`serial`, `stdout`, `stderr`) remain readable.
+How to react: follow the [Retry rules](#retry-rules). With `ERR-17-005`, node logs (`serial`, `stdout`, `stderr`) remain readable.
 
 When you contact support, include the `error_code`, the time of the request, and the CVM ID.
+
+## Known limitations
+
+When the node's log file cannot be opened or read, the node log endpoint currently answers HTTP `200` and writes a plain text error line, for example a line starting with `<failed to read line:`, instead of an `ERR-17` error. Clients see it as ordinary node output. Keep at least 1 s between the starts of consecutive connections (see [Retry rules](#retry-rules)) so such a stream cannot cause a tight reconnect loop.
 
 ## Migrate from old URLs and parameters
 

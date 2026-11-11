@@ -41,8 +41,8 @@ The **Public Logs** setting controls Phala Cloud's managed Docker log endpoints.
 
 | Setting | Behavior |
 | --- | --- |
-| Enabled | The dashboard provides a short-lived signed log URL for each available container to members of the workspace. There is no anonymous access: a URL works only while its signature is valid. |
-| Disabled | The dashboard does not provide Docker log URLs. Use an in-CVM log viewer or forward logs to a private external service instead. |
+| Enabled | The dashboard provides a short-lived signed log URL for each available container to members of the workspace. You must be a workspace member to get a URL. The URL itself is a short-lived credential: anyone who holds it can open a stream until it expires (it must be used to open within 5 minutes). |
+| Disabled | The dashboard does not provide Docker log URLs. Container log requests from the API, the SDKs, and the `phala` CLI fail with error `ERR-17-006`, both when fetching and when following. VM logs (serial, qemu output, qemu stderr) are not affected. Use an in-CVM log viewer or forward logs to a private external service instead. |
 
 To change the setting for an existing CVM:
 
