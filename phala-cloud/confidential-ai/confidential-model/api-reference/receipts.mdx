@@ -1,108 +1,16 @@
 ---
 title: "Receipt"
 description: "The signed receipt for a response, with the full transparency event log."
-api: "GET /aci/receipts/{id}"
+api: "GET https://inference.phala.com/v1/aci/receipts/{id}"
 ---
 
-Returns the signed receipt for a response: a transparency event log that binds the request and
-response hashes to the attested gateway, signed by a key from the attested
-[keyset](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation). This is the canonical per-response proof. Look up a receipt by
-the `x-receipt-id` header on the inference response, or by the response `id`. For how to read the
-event log, see [Receipts](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions).
+import SharedContent from "/snippets/aci/api-receipts.mdx";
+import { site } from "/snippets/site.jsx";
 
-```http
-GET /v1/aci/receipts/{id}
-```
+`https://inference.phala.com/v1` is a TEE-only endpoint, so its inference streams are never
+early-committed; a completed stream returns `x-receipt-id`.
 
-## Request
-
-<ParamField path="id" type="string" required>
-  A receipt id (`rcpt-…`) or the response `id` (chat id). The receipt id is returned in the
-  `x-receipt-id` response header on `/v1/chat/completions`.
-</ParamField>
-
-## Response
-
-`200 OK`, `application/json`. The bare canonical receipt. Use the same API key that made the inference request; a different key returns `404`, and a missing key returns `401` for a credential-bound receipt:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `api_version` | string | ACI version token, for example `aci/1`. |
-| `receipt_id` | string | The receipt id (`rcpt-…`). |
-| `chat_id` | string or null | The response/chat id, when the upstream returns one. |
-| `workload_keyset_digest` | string | Must match the attestation report. |
-| `model` | string or null | Model requested by the client. |
-| `endpoint` | string | The route served, for example `/v1/chat/completions`. |
-| `method` | string | HTTP method. |
-| `served_at` | number | Unix seconds. |
-| `event_log` | array | Ordered transparency events (below). |
-| `key_id` | string | Selects a receipt-signing key from the attested keyset. |
-| `signature` | string | Signature over the receipt, by a key in the attested keyset. |
-
-### `event_log` entries
-
-| `type` | Key fields |
-| --- | --- |
-| `request.received` | `body_hash` |
-| `middleware.forwarded` | `body_hash` |
-| `route.selected` | `target_route_id` |
-| `request.forwarded` | `body_hash` |
-| `upstream.verified` | `model_id`, `result`, `required`, `session_id` |
-| `response.received` | `body_hash` |
-| `response.returned` | `body_hash` |
-
-### Example (truncated)
-
-```json
-{
-  "api_version": "aci/1",
-  "receipt_id": "rcpt-e0eefe63b3673e2a5984951f",
-  "chat_id": "d3ad808b20a444c29e798db35f112033",
-  "workload_keyset_digest": "sha256:3eff0836…",
-  "model": "z-ai/glm-5.3",
-  "endpoint": "/v1/chat/completions",
-  "method": "POST",
-  "served_at": 1781588857,
-  "event_log": [
-    { "type": "request.received", "body_hash": "sha256:111d08a5…" },
-    { "type": "route.selected", "target_route_id": "<selected-route>" },
-    { "type": "upstream.verified", "model_id": "z-ai/glm-5.3",
-      "result": "verified", "required": true, "session_id": "3681736b…" },
-    { "type": "response.returned", "body_hash": "sha256:07703fb4…" }
-  ],
-  "key_id": "dstack-kms-receipt-ed25519-v1",
-  "signature": "…"
-}
-```
-
-## Verifying the receipt
-
-1. Confirm `workload_keyset_digest` matches a verified
-   [attestation report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation).
-2. Resolve `key_id` in the attested `receipt_signing_keys` and verify `signature` over the JCS (RFC 8785) form of the receipt with only `signature` removed. The baseline is a hex-encoded Ed25519 signature.
-3. Confirm `request.received.body_hash` matches the request you sent and `response.returned.body_hash`
-   matches the response you received.
-4. On this TEE-only endpoint, upstream verification is required (`required: true`). A failed check refuses forwarding instead of returning unverified inference. Read `upstream.verified`: `result = verified` and `required = true` indicate a confidential model
-   served from a verified, channel-bound upstream. Follow `session_id` to the
-   [attested session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions).
-
-See [Verify a response](/phala-cloud/confidential-ai/verify/verify-signature) for the full walkthrough.
-
-## Legacy alias
-
-`GET /v1/signature/{id}` returns the same receipt wrapped in a legacy envelope, for clients written
-against earlier API versions. `{id}` is a receipt id or a response id.
-
-| Field | Description |
-| --- | --- |
-| `api_version` | ACI version token, for example `aci/1`. |
-| `signing_algo` | Signature algorithm, for example `ecdsa`. |
-| `signing_address` | Address that signed `text`. |
-| `text` | `"<request body hash>:<response hash>"`, the signed message. |
-| `signature` | Signature over `text`. |
-| `receipt` | The full receipt object, identical to this endpoint's response. |
-
-New integrations should use `/v1/aci/receipts/{id}`.
+<SharedContent site={site} />
 
 ## Related
 

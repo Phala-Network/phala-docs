@@ -229,7 +229,8 @@
                   "/phala-cloud/confidential-ai/gpu-tee-deployment-guide",
                   "/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify",
                   "/phala-cloud/confidential-ai/confidential-gpu/troubleshooting",
-                  "/phala-cloud/confidential-ai/benchmark"
+                  "/phala-cloud/confidential-ai/benchmark",
+                  "/phala-cloud/confidential-ai/confidential-gpu/faqs"
                 ]
               },
               {
@@ -763,13 +764,18 @@
             "group": "Private AI",
             "pages": [
               "/phala-cloud/confidential-ai/overview",
+              "/phala-cloud/confidential-ai/confidential-model/how-it-works",
               {
                 "group": "Getting Started",
                 "pages": [
                   "/phala-cloud/confidential-ai/confidential-model/confidential-ai-api",
                   "/phala-cloud/confidential-ai/confidential-model/playground",
                   "/phala-cloud/confidential-ai/confidential-model/migration-and-integrations",
-                  "/phala-cloud/confidential-ai/confidential-model/anthropic-sdk"
+                  "/phala-cloud/confidential-ai/confidential-model/anthropic-sdk",
+                  "/phala-cloud/confidential-ai/confidential-model/integrations/openai-sdk",
+                  "/phala-cloud/confidential-ai/confidential-model/integrations/agent-frameworks",
+                  "/phala-cloud/confidential-ai/confidential-model/integrations/vercel-ai-sdk",
+                  "/phala-cloud/confidential-ai/confidential-model/integrations/langfuse"
                 ]
               },
               {
@@ -790,6 +796,7 @@
               {
                 "group": "API Reference",
                 "pages": [
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/overview",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/responses",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/messages",
@@ -801,9 +808,7 @@
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
                   "/phala-cloud/confidential-ai/confidential-model/api-reference/sessions",
-                  "/phala-cloud/confidential-ai/confidential-model/api-reference/signature",
-                  "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings",
-                  "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
+                  "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings"
                 ]
               },
               {
@@ -816,6 +821,7 @@
                   "/phala-cloud/confidential-ai/confidential-model/prompt-caching",
                   "/phala-cloud/confidential-ai/confidential-model/streaming",
                   "/phala-cloud/confidential-ai/confidential-model/attested-routing",
+                  "/phala-cloud/confidential-ai/confidential-model/endpoint-policy",
                   "/phala-cloud/confidential-ai/confidential-model/zero-data-retention",
                   "/phala-cloud/confidential-ai/confidential-model/error-handling"
                 ]
@@ -827,17 +833,17 @@
                   "/phala-cloud/confidential-ai/verify/typescript-sdk",
                   "/phala-cloud/confidential-ai/verify/verify-attestation",
                   "/phala-cloud/confidential-ai/verify/verify-signature",
-                  "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
-                  "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims"
+                  "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions"
                 ]
               },
               {
                 "group": "Security Model",
                 "pages": [
                   "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
-                  "/phala-cloud/confidential-ai/confidential-model/channel-binding",
+                  "/phala-cloud/confidential-ai/confidential-model/verified-upstreams",
                   "/phala-cloud/confidential-ai/confidential-model/providers",
                   "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
+                  "/phala-cloud/confidential-ai/confidential-model/e2ee-guide",
                   "/phala-cloud/confidential-ai/confidential-model/compliance-and-open-source"
                 ]
               },
@@ -958,6 +964,22 @@
     ]
   },
   "redirects": [
+    {
+      "source": "/phala-cloud/confidential-ai/confidential-model/channel-binding",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/verified-upstreams"
+    },
+    {
+      "source": "/phala-cloud/confidential-ai/confidential-model/tcb-and-claims",
+      "destination": "/phala-cloud/confidential-ai/confidential-model/verified-upstreams"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
+      "source": "/phala-cloud/confidential-ai/confidential-model/api-reference/signature"
+    },
+    {
+      "destination": "/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings",
+      "source": "/phala-cloud/confidential-ai/confidential-model/api-reference/embedding-models"
+    },
     {
       "destination": "/phala-cloud/key-management/deploying-with-onchain-kms",
       "source": "/phala-cloud/references/cloud-js-sdk/on-chain-kms-guide"

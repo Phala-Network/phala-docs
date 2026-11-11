@@ -1,0 +1,20 @@
+---
+title: How Private AI works
+description: The two proof layers and request flow behind Phala's TEE-only inference API.
+---
+
+import SharedContent from "/snippets/aci/how-it-works.mdx";
+import { site } from "/snippets/site.jsx";
+
+Every model on `https://inference.phala.com/v1` requires verified upstream serving. Ordinary SDK calls use TLS; use a verification client to establish the gateway identity and pin the channel.
+
+<SharedContent site={site} />
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Verify a response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/typescript-sdk" />
+  <Card title="Verified upstreams" icon="link" href="/phala-cloud/confidential-ai/confidential-model/verified-upstreams" />
+  <Card title="Receipts and sessions" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions" />
+  <Card title="Attestation report" icon="microchip" href="/phala-cloud/confidential-ai/verify/verify-attestation" />
+</CardGroup>

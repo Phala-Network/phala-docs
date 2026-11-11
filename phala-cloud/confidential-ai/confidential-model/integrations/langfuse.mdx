@@ -1,0 +1,85 @@
+---
+title: Langfuse
+description: "Trace Phala API calls with Langfuse and an explicit data boundary."
+---
+
+Langfuse can trace Phala calls through its OpenAI SDK wrapper. It records latency, usage, errors,
+and, by default, model inputs and outputs.
+
+<Warning>
+  Langfuse is a separate observability destination. Traced prompts and responses leave Phala's
+  trust boundary and are subject to your Langfuse deployment, retention, and access controls.
+</Warning>
+
+## Configure tracing
+
+Install the current Python SDKs and set both services' credentials:
+
+```bash
+pip install -U langfuse openai
+
+export PHALA_AI_API_KEY="YOUR_API_KEY"
+export LANGFUSE_PUBLIC_KEY="pk-lf-..."
+export LANGFUSE_SECRET_KEY="sk-lf-..."
+export LANGFUSE_BASE_URL="https://cloud.langfuse.com"
+```
+
+Use your own `LANGFUSE_BASE_URL` for a self-hosted deployment.
+
+## Trace a request
+
+Import `OpenAI` from `langfuse.openai`, then configure Phala as the API endpoint:
+
+```python
+import os
+
+from langfuse import get_client
+from langfuse.openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["PHALA_AI_API_KEY"],
+    base_url="https://inference.phala.com/v1",
+)
+
+response = client.chat.completions.create(
+    model="z-ai/glm-5.3",
+    messages=[{"role": "user", "content": "Reply with: connected"}],
+    name="phala_connection_check",
+)
+print(response.choices[0].message.content)
+
+# Flush explicitly in short-lived jobs and scripts.
+get_client().flush()
+```
+
+The wrapper accepts the same streaming and async calls as the OpenAI SDK. Add trace names,
+session identifiers, and low-sensitivity metadata only when they are useful for debugging or
+aggregation.
+
+## Decide what to export
+
+Before enabling tracing in production:
+
+1. Classify prompts, responses, tool arguments, retrieved documents, and metadata.
+2. Configure Langfuse masking before those values leave the application, or omit content entirely.
+3. Set retention and access controls for the Langfuse project.
+4. Use a self-hosted Langfuse deployment when its data must remain inside your own boundary.
+
+Masking changes telemetry only; it does not change the request sent to Phala. If another
+OpenTelemetry exporter is active, configure its redaction separately.
+
+## Costs and receipts
+
+Langfuse cost estimates depend on a matching model definition. Phala model IDs or prices may need
+a custom definition under **Project Settings > Models**. Treat the Phala dashboard as the billing
+source of truth.
+
+Langfuse does not verify Phala's signed receipts. Fetch and verify a receipt separately when the
+serving path is part of your security decision.
+
+## Related
+
+- [Langfuse OpenAI integration](https://langfuse.com/docs/integrations/openai)
+- [Langfuse masking](https://langfuse.com/docs/observability/features/masking)
+- [Langfuse cost tracking](https://langfuse.com/docs/observability/features/token-and-cost-tracking)
+- [Phala receipts](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions)
