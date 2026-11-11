@@ -32,12 +32,13 @@ Fetch logs from a CVM
 | `--serial` | CVM serial console (boot, kernel, docker-compose) |
 | `--cvm-stdout` | CVM stdout channel |
 | `--cvm-stderr` | CVM stderr channel |
-| `--stderr` | Include container stderr (container mode only) |
-| `-n, --tail <value>` | Number of lines from end |
+| `--stderr` | Show only stderr (container mode only) |
+| `--stdout` | Show only stdout, console, and stdin (container mode only) |
+| `-n, --tail <lines>` | Number of lines from the end (0 to 10000), or all |
 | `-f, --follow` | Stream in real-time |
 | `-t, --timestamps` | Show timestamps |
-| `--since SINCE` | Start time (RFC3339 or relative, e.g. 42m) |
-| `--until UNTIL` | End time (RFC3339 or relative) |
+| `--since SINCE` | Start time (RFC3339, Unix seconds, or relative, e.g. 42m) |
+| `--until UNTIL` | End time (RFC3339, Unix seconds, or relative) |
 
 #### Global Options
 
@@ -55,16 +56,22 @@ Fetch logs from a CVM
 
 #### Examples
 
-* Container stdout
+* All container channels
 
 ```bash
 phala logs my-service
 ```
 
-* Container stderr
+* Container stderr only
 
 ```bash
 phala logs my-service --stderr
+```
+
+* Container stdout, console, and stdin only
+
+```bash
+phala logs my-service --stdout
 ```
 
 * Follow container logs
@@ -97,9 +104,24 @@ phala logs --cvm-stderr
 phala logs my-service -n 100
 ```
 
+* All available lines
+
+```bash
+phala logs my-service -n all
+```
+
 * Specify CVM
 
 ```bash
 phala logs my-service --cvm-id app_abc123
 ```
 
+#### Notes
+
+* By default a container shows all channels: stdout, console, and stdin go to standard output, and stderr goes to standard error. `--stdout` and `--stderr` limit the output to one side. They cannot be used together, and they cannot be used with `--serial`, `--cvm-stdout`, or `--cvm-stderr`.
+* The container name can be the exact name or a unique prefix of the container ID.
+* `-n, --tail` takes an integer from 0 to 10000, or `all`.
+* `--since`, `--until`, and `--timestamps` work for container logs only. They are rejected with `--serial`, `--cvm-stdout`, and `--cvm-stderr`.
+* Errors from the log service print their code once, for example `Error [ERR-17-009]: Docker responded ...`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the code list.
+* With `-f`, a container that has exited makes the stream end with no new output. The command counts such an end toward the stop only if the connection lasted less than 10 s. After 5 such ends in a row, it stops with `log stream keeps ending without new output; the container may have stopped`. A longer idle connection that ends reconnects without counting.
+* `phala logs` needs CLI 1.2.6 or later for the behavior above.

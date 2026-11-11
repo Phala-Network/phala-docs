@@ -272,9 +272,9 @@ See [Webhooks](/phala-cloud/references/webhooks) for full payload format and del
 
 ## CVM Logs
 
-Available in Go SDK v0.5.0 and later.
+Available in Go SDK v0.5.0 and later. The behavior described here is complete in v0.5.4, so use v0.5.4 or later.
 
-`FetchCVMLogs`, `FetchCVMLogEntries`, and `FollowCVMLogs` read serial, node, and container logs.
+`FetchCVMLogs` and `FollowCVMLogs` read serial, node, and container logs as text. `FetchCVMLogEntries` and `FollowCVMLogEntries` read container logs as entries with a channel and a message.
 
 ```go
 // Last 100 lines of the serial console
@@ -300,12 +300,37 @@ if err := <-errs; err != nil {
 		fmt.Println(apiErr.ErrorCode, apiErr.Suggestions)
 	}
 }
+
+// Fetch the last 100 container records as entries
+entries, err := client.FetchCVMLogEntries(ctx, "my-app",
+	phala.LogSource{Type: "container", Name: "api"},
+	&phala.LogsOptions{Tail: 100},
+)
+if err != nil {
+	log.Fatal(err)
+}
+for _, entry := range entries {
+	fmt.Printf("[%s] %s", entry.Channel, entry.Message)
+}
+
+// Follow the container as entries
+records, errs := client.FollowCVMLogEntries(ctx, "my-app",
+	phala.LogSource{Type: "container", Name: "api"},
+	&phala.LogsOptions{Tail: 50},
+)
+for entry := range records {
+	fmt.Printf("[%s] %s", entry.Channel, entry.Message)
+}
+if err := <-errs; err != nil {
+	log.Fatal(err)
+}
 ```
 
 ```go
 func (c *Client) FetchCVMLogs(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) (string, error)
 func (c *Client) FetchCVMLogEntries(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) ([]LogEntry, error)
 func (c *Client) FollowCVMLogs(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) (<-chan string, <-chan error)
+func (c *Client) FollowCVMLogEntries(ctx context.Context, cvmID string, source LogSource, opts *LogsOptions) (<-chan LogEntry, <-chan error)
 ```
 
 `opts` may be `nil`.
@@ -313,10 +338,11 @@ func (c *Client) FollowCVMLogs(ctx context.Context, cvmID string, source LogSour
 | Method | Result |
 |--------|--------|
 | `FetchCVMLogs` | A `string`. For a container source, the SDK joins the entries into text. |
-| `FetchCVMLogEntries` | `[]LogEntry` for a container source |
+| `FetchCVMLogEntries` | `[]LogEntry`. Container sources only; a node source returns an error. |
 | `FollowCVMLogs` | A channel of log text and a channel of errors. Cancel with the `ctx` you pass in. |
+| `FollowCVMLogEntries` | A channel of `LogEntry` and a channel of errors. Container sources only; a node source sends an error. Cancel with the `ctx` you pass in. |
 
-`FollowCVMLogs` closes both channels when the follow ends. A cancelled context ends the follow without sending an error. Any other failure is sent once on the error channel. Read the log channel until it closes, then read the error channel.
+`FollowCVMLogs` and `FollowCVMLogEntries` close both channels when the follow ends. A cancelled context ends the follow without sending an error. Cancelling `ctx` also interrupts waits between reconnects. `FetchCVMLogs` and `FetchCVMLogEntries` stop when `ctx` is cancelled, including during their lookups. Any other failure is sent once on the error channel. Read the log channel until it closes, then read the error channel.
 
 **`LogSource`:**
 
@@ -324,36 +350,59 @@ func (c *Client) FollowCVMLogs(ctx context.Context, cvmID string, source LogSour
 |-------|------|-------------|
 | `Type` | `string` | `"node"` or `"container"`. Set it explicitly: any value other than `"container"` is treated as a node source. |
 | `Channel` | `CVMLogChannel` | Node channel: `CVMLogSerial`, `CVMLogStdout`, or `CVMLogStderr` |
-| `Name` | `string` | Container name or ID prefix. If empty, the SDK uses the first container that has a log endpoint. |
+| `Name` | `string` | Container name or unique container ID prefix. If empty, the SDK uses the first container in the CVM composition. See [Container names](#container-names). |
 
 **`LogsOptions`:**
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `Tail` | `any` | Number of most recent lines as an `int`, or the string `"all"`. When `nil`, the server default applies. |
-| `Since` | `any` | Start time as Unix seconds (`int`, `int64`, or a numeric string), an RFC 3339 string, or a relative duration such as `"10m"` (`s`, `m`, `h`, `d`). Container logs only; from v0.5.1 a node source with `Since` returns an error. |
-| `Until` | `any` | End time. Same formats as `Since`. Container logs only; from v0.5.1 a node source with `Until` returns an error. |
-| `Timestamps` | `bool` | Keep the timestamp prefix on container lines. Container logs only; from v0.5.1 a node source with `Timestamps` returns an error. |
-| `ANSI` | `bool` | Keep ANSI color codes. |
-| `Format` | `string` | `"text"` or `"ndjson"`. From v0.5.1, `FetchCVMLogEntries` reads it (default `"ndjson"`; other values return an error) and a node source with `"ndjson"` returns an error. `FetchCVMLogs` always returns text. |
+| `Since` | `any` | Start time as Unix seconds (`int`, `int64`, or a numeric string), an RFC 3339 string, or a relative duration such as `"10m"` (`s`, `m`, `h`, `d`). Container logs only. A node source with `Since` returns an error. |
+| `Until` | `any` | End time. Same formats as `Since`. Container logs only. A node source with `Until` returns an error. |
+| `Timestamps` | `bool` | Keep the timestamp prefix on container lines. Container logs only. A node source with `Timestamps` returns an error. |
+| `ANSI` | `bool` | Keep ANSI escape sequences in the output. The default removes them from every line and entry, including NDJSON messages. This is an output option, so it never causes an error. |
+| `Format` | `string` | `"text"` or `"ndjson"`. `FetchCVMLogEntries` reads it (default `"ndjson"`; other values return an error). A node source with `"ndjson"` returns an error. `FetchCVMLogs` and `FollowCVMLogs` return text. For containers, they read NDJSON and join the messages unless `Format` is `"text"`, which uses the plain-text transport. `FollowCVMLogEntries` also reads `Format`: other values than `"ndjson"` return an error. |
 
-`LogEntry` has two fields: `Channel` (`"stdout"` or `"stderr"`) and `Message`.
+`LogEntry` has two fields: `Channel` (`"stdout"`, `"stderr"`, `"console"`, or `"stdin"`) and `Message`. `console` appears for containers started with a TTY. `Message` is exactly what the container wrote, usually ending in a newline. An empty message stays an empty string.
+
+**Container names:**
+
+The SDK resolves the container name once at the start of a follow, with one composition call. It tries these steps in order:
+
+1. An exact match on a container name.
+2. A unique match on the start of a container ID.
+3. If `Name` is empty, the first container in the composition.
+
+If the prefix matches more than one container, the call returns an `*APIError` with `ErrorCode` `ERR-17-001` and the message `Ambiguous container prefix '<name>': web, worker`, which lists the candidates. If nothing matches, it returns `ERR-17-007`. If the composition has no containers and returns an `error` string, for example because the CVM is stopped, the call returns an `*APIError` with that message.
+
+A name must be 1 to 128 characters, start with a letter or digit, and then use only letters, digits, `_`, `.`, and `-`. It must not contain `..`. Other names, such as `/app`, are rejected with `ERR-17-001` before any request is sent.
 
 **Behavior:**
 
-- Every connection uses a fresh signed URL.
-- Follow mode reconnects after any stream end and gives up after 5 consecutive failures.
-- Node heartbeat lines are dropped.
-- Container follow resumes from the last timestamp without repeating lines.
+- Every connection uses a fresh signed URL, with one CVM info lookup per connection.
+- Follow reconnects after a stream ends or fails. Failures back off from 250 ms, doubling up to 5 s, and follow gives up after 5 consecutive failures. Starts of two connections are at least 1 s apart.
+- HTTP errors are handled by status. `5xx` and `429` are failures. `401` with `ERR-17-003` fetches a new URL and retries, up to 3 times in a row. The count resets after a connection that delivered records or ended cleanly. `401` with `ERR-17-002` fetches a new URL and counts as a failure. Any other `4xx` stops follow.
+- A gateway error line inside a `200` stream, or a network error, counts as a failure. A connection that delivered at least one record resets the failure count before its own failure is counted.
+- Container follow always requests timestamps internally, in both the NDJSON and the text transport. It sends the caller's `Tail` until the first connection is accepted. Every later request sends `tail=all` plus `since`, and skips lines it already delivered at the boundary second, so a reconnect does not repeat output. Before any timestamped record arrives, it uses your `Since` if you set one, otherwise the second the first connection was accepted. Timestamps are removed from the output unless you set `Timestamps`.
+- Container follow: if a stream ends cleanly with no new output within 10 s, it backs off and counts the end. After 5 such ends in a row, follow stops with `log stream keeps ending without new output; the container may have stopped`. A clean end after records, or after an idle connection of 10 s or more, reconnects at once and resets the count.
+- Node follow never stops on a clean end. After the first connection it requests `tail=0`.
+- If you set `Until`, follow finishes normally, without an error, when the stream reaches that time.
+- A missing container is not retried.
+- Node follow and fetch drop `[vmm heartbeat]` and `[teepod heartbeat]` lines.
+- A text-format record that looks like `{"error": ...}` is treated as a guest error only at the very start of the body. Use NDJSON (the default for entries) for reliable detection.
 - The helpers request CVM info with API version `2026-01-21` internally, so they work with clients configured for older versions.
 
 For the HTTP details behind these methods, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
 
 **Errors:**
 
-Log gateway errors are returned as `*APIError`. Check `ErrorCode` for a log error code such as `ERR-17-005`, and use `errors.As` to reach it. `Suggestions` holds suggested fixes from the API.
+Log gateway errors are returned as `*APIError`. Check `ErrorCode` for a log error code such as `ERR-17-005`, and use `errors.As` to reach it. `Message` holds the human-readable text only, without the code. `Suggestions`, `Details`, `Links`, and `RequestID` come from the API error envelope. `StatusCode` is the HTTP status and is set only for errors returned as an HTTP response. It is `0` for client-side errors (bad container name, bad time, unsupported option) and for errors read from the body of a stream, such as a guest agent error or the stalled-stream error. Those print as their message alone, without `phala api error (status N)`.
 
-Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the method returns an `*APIError` with `ErrorCode` `ERR-17-006` ("Container logs are disabled") before sending any log request; this needs Go SDK v0.5.1 or later (v0.5.0 returned a plain error). Node channels are not affected. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, container fetch and follow return an `*APIError` with `ErrorCode` `ERR-17-006` ("Container logs are disabled") before sending any log request. Follow checks this before its first log request and again on every reconnect, because each connection looks up the CVM info. Node channels are not affected.
+
+If the agent inside the CVM cannot read a container's logs, for example because the container uses a Docker logging driver that does not support reading, the method returns an `*APIError` with `ErrorCode` `ERR-17-009` and the agent's message. This applies to text and NDJSON, in fetch and in follow. Follow stops on it. A server-returned HTTP `502` with `ERR-17-009` is different: follow reconnects.
+
+See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 ## Related
 

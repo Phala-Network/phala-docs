@@ -33,16 +33,21 @@ const cvm = await client.getCvmInfo({ id: "my-app" });
 console.log(cvm.name, cvm.status);
 ```
 
-The detail response includes a `logs` object with complete presigned URLs for the serial, stdout, and stderr channels, plus the pieces needed to build container log URLs. All `logs` fields are `null` when the requester cannot read logs. You do not need to use these URLs yourself: the log helpers below read them for you.
+The detail response includes a `logs` object with complete presigned URLs for the serial, stdout, and stderr channels, plus the pieces needed to build container log URLs. If the requester cannot access the CVM, the request fails with HTTP `404`. The `logs` fields are `null` when signed log URLs are not available for that CVM yet, for example when it has no VM. You do not need to use these URLs yourself: the log helpers below read them for you.
 
 ### Read CVM logs
 
-Available in `@phala/cloud` 0.6.0 and later.
+Available in `@phala/cloud` 0.6.0 and later. The behavior described here is complete in 0.6.4, so use 0.6.4 or later.
 
 `fetchCvmLogs` and `followCvmLogs` read logs from a CVM. They are standalone functions exported from `@phala/cloud`, not methods on the client, so pass the client as the first argument.
 
 ```typescript
-import { createClient, fetchCvmLogs, followCvmLogs } from "@phala/cloud";
+import {
+  createClient,
+  fetchCvmLogs,
+  followCvmLogs,
+  type CvmLogEntry,
+} from "@phala/cloud";
 
 const client = createClient({ apiKey: "phak_your_api_key" });
 
@@ -55,7 +60,18 @@ const serial = await fetchCvmLogs(
 );
 console.log(serial);
 
-// Follow the "api" container until the signal is aborted
+// Fetch container records as entries
+const entries = await fetchCvmLogs(
+  client,
+  "my-app",
+  { type: "container", name: "api" },
+  { tail: 100, format: "ndjson" },
+);
+for (const entry of entries as CvmLogEntry[]) {
+  console.log(entry.channel, entry.message);
+}
+
+// Follow the "api" container as entries until the signal is aborted
 const controller = new AbortController();
 for await (const entry of followCvmLogs(
   client,
@@ -63,7 +79,18 @@ for await (const entry of followCvmLogs(
   { type: "container", name: "api" },
   { tail: 50, signal: controller.signal },
 )) {
-  console.log(entry);
+  const { channel, message } = entry as CvmLogEntry;
+  process.stdout.write(`[${channel}] ${message}`);
+}
+
+// Follow the same container as text lines
+for await (const line of followCvmLogs(
+  client,
+  "my-app",
+  { type: "container", name: "api" },
+  { format: "text", signal: controller.signal },
+)) {
+  process.stdout.write(line as string);
 }
 ```
 
@@ -97,7 +124,7 @@ function followCvmLogs(
 | Shape | Description |
 |-------|-------------|
 | `{ type: "node", channel: "serial" \| "stdout" \| "stderr" }` | A CVM-level channel: serial console, stdout, or stderr |
-| `{ type: "container", name?: string, matchContainerIdPrefix?: boolean }` | A container. `name` is a container name or ID prefix. If you omit it, the SDK uses the first container that has a log endpoint. `matchContainerIdPrefix` defaults to `true`; set it to `false` to match names only. |
+| `{ type: "container", name?: string, matchContainerIdPrefix?: boolean }` | A container. `name` is a container name or ID prefix. If you omit it, the SDK uses the first container in the CVM composition. `matchContainerIdPrefix` defaults to `true`; set it to `false` to match names only. See [Container names](#container-names). |
 
 **`CvmLogsOptions`:**
 
@@ -107,11 +134,11 @@ function followCvmLogs(
 | `since` | `string \| number` | Start time: RFC 3339 timestamp, Unix seconds, or relative duration such as `"10m"` (`s`, `m`, `h`, `d`). |
 | `until` | `string \| number` | End time. Same formats as `since`. |
 | `timestamps` | `boolean` | Prefix each container line with its timestamp. |
-| `ansi` | `boolean` | Keep ANSI color codes. Valid only with `format: "text"`. |
-| `format` | `"text" \| "ndjson"` | Output format for `fetchCvmLogs` on containers. Default is text. |
+| `ansi` | `boolean` | Keep ANSI escape sequences in the output. The default is `false`, which removes them from every line and entry, including NDJSON messages. This is an output option, so it never causes an error. |
+| `format` | `"text" \| "ndjson"` | For containers, `fetchCvmLogs` returns a string unless this is `"ndjson"`, which returns entries. `followCvmLogs` yields entries unless this is `"text"`, which yields strings. |
 | `signal` | `AbortSignal` | Cancels the request, or ends a follow. |
 
-`since`, `until`, `timestamps`, and `format: "ndjson"` apply to container logs only. Passing them with a node source throws an `Error`.
+`since`, `until`, `timestamps`, and `format: "ndjson"` apply to container logs only. Passing them with a node source throws a `LogAccessError` with code `ERR-17-001` before any request is sent.
 
 **Return types:**
 
@@ -119,19 +146,41 @@ function followCvmLogs(
 |------|--------|--------|
 | `fetchCvmLogs` | Node | `string` |
 | `fetchCvmLogs` | Container | `string`, or `CvmLogEntry[]` when `format` is `"ndjson"` |
-| `followCvmLogs` | Node | Yields `string` lines, each ending in a newline |
-| `followCvmLogs` | Container | Yields `CvmLogEntry` objects |
+| `followCvmLogs` | Node | Yields `string` lines, each delivered with its original newline (or lack of one), after heartbeat lines are dropped and ANSI escapes are stripped (unless `ansi` is `true`) |
+| `followCvmLogs` | Container | Yields `CvmLogEntry` objects, or `string` lines when `format` is `"text"` |
 
-`CvmLogEntry` is `{ channel: "stdout" | "stderr"; message: string }`.
+`CvmLogEntry` is `{ channel: "stdout" | "stderr" | "console" | "stdin"; message: string }`. `console` appears for containers started with a TTY. `message` is exactly what the container wrote, usually ending in a newline. An empty message stays an empty string.
 
-To stop a follow, abort the `AbortSignal` you passed in `options.signal`. The generator then ends without throwing.
+#### Container names
+
+The SDK resolves the container name once at the start of a follow, with one composition call. It tries these steps in order:
+
+1. An exact match on a container name.
+2. A unique match on the start of a container ID, unless `matchContainerIdPrefix` is `false`.
+3. If you gave no name, the first container in the composition.
+
+If the prefix matches more than one container, the SDK throws a `LogAccessError` with code `ERR-17-001` and the message `Ambiguous container prefix '<name>': web, worker`, which lists the candidates. If nothing matches, it throws a `LogAccessError` with code `ERR-17-007`. If the composition has no containers and returns an `error` string, for example because the CVM is stopped, the SDK throws a `LogAccessError` with that message.
+
+A name you pass must be 1 to 128 characters, start with a letter or digit, and then use only letters, digits, `_`, `.`, and `-`. It must not contain `..`. Other names, such as `/app`, are rejected with `ERR-17-001` before any request is sent. The SDK does not strip a leading `/` from a name you pass.
+
+#### Cancellation
+
+Pass an `AbortSignal` in `options.signal`. Aborting it during a follow ends the follow without throwing, and so does leaving the `for await` loop or calling `return()` on the generator. Waits between reconnects are interrupted at once. The signal also applies to a one-shot `fetchCvmLogs`, including its lookups. A signal that is already aborted before a follow starts makes the iteration throw an `AbortError` without sending any request. A fetch that is aborted rejects with an `AbortError`.
+
 
 **Behavior:**
 
-- Every connection uses a fresh signed URL.
-- Follow mode reconnects after any stream end and gives up after 5 consecutive failures.
-- Node heartbeat lines are dropped.
-- Container follow resumes from the last timestamp without repeating lines.
+- Every connection uses a fresh signed URL, with one CVM info lookup per connection.
+- Follow reconnects after a stream ends or fails. Failures back off from 250 ms, doubling up to 5 s, and follow gives up after 5 consecutive failures. Starts of two connections are at least 1 s apart.
+- HTTP errors are handled by status. `5xx` and `429` are failures. `401` with `ERR-17-003` fetches a new URL and retries, up to 3 times in a row. The count resets after a connection that delivered records or ended cleanly. `401` with `ERR-17-002` fetches a new URL and counts as a failure. Any other `4xx` stops follow.
+- A gateway error line inside a `200` stream, or a network error, counts as a failure. A connection that delivered at least one record resets the failure count before its own failure is counted.
+- Container follow always requests timestamps internally. It sends the caller's `tail` until the first connection is accepted. Every later request sends `tail=all` plus `since`, and skips lines it already delivered at the boundary second, so a reconnect does not repeat output. Before any timestamped record arrives, it uses your `since` if you set one, otherwise the second the first connection was accepted. Timestamps are removed from the output unless you set `timestamps: true`.
+- Container follow: if a stream ends cleanly with no new output within 10 s, it backs off and counts the end. After 5 such ends in a row, follow stops with `log stream keeps ending without new output; the container may have stopped`. A clean end after records, or after an idle connection of 10 s or more, reconnects at once and resets the count.
+- Node follow never stops on a clean end. After the first connection it requests `tail=0`.
+- If you set `until`, follow finishes normally, without an error, when the stream reaches that time.
+- A missing container is not retried.
+- Node follow and fetch drop `[vmm heartbeat]` and `[teepod heartbeat]` lines.
+- A text-format record that looks like `{"error": ...}` is treated as a guest error only at the very start of the body. Use NDJSON (the default for entries) for reliable detection.
 - The helpers request CVM info with API version `2026-01-21` internally, so they work with clients configured for older versions.
 
 For the HTTP details behind these helpers, see [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api).
@@ -142,9 +191,11 @@ Log gateway errors are thrown as `LogAccessError`, which extends `ResourceError`
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `code` | `string \| undefined` | Log error code such as `ERR-17-005` |
-| `httpStatus` | `number \| undefined` | HTTP status of the failed request |
+| `code` | `string \| undefined` | Log error code such as `ERR-17-005`. The code is not repeated in `message`, which holds the human-readable text only. |
+| `httpStatus` | `number \| undefined` | HTTP status, set only for errors returned as an HTTP response. `undefined` for client-side errors (bad container name, bad time, unsupported option) and for errors read from the body of a stream. |
 | `suggestions` | `string[]` | Suggested fixes from the API |
+
+`LogAccessError` also carries `errorCode`, `structuredDetails`, `links`, and `requestId` from the API error envelope.
 
 ```typescript
 import { LogAccessError, fetchCvmLogs } from "@phala/cloud";
@@ -160,7 +211,9 @@ try {
 }
 ```
 
-Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, the helper throws `LogAccessError` with code `ERR-17-006` ("Container logs are disabled") before sending any log request; this needs `@phala/cloud` 0.6.1 or later (0.6.0 threw a plain `Error`). Node channels are not affected. A missing container also throws a plain `Error`. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
+Container logs require [Public Logs](/phala-cloud/monitoring/public-logs) to be enabled on the CVM. When it is off, container fetch and follow throw `LogAccessError` with code `ERR-17-006` ("Container logs are disabled") before sending any log request. Follow checks this before its first log request and again on every reconnect, because each connection looks up the CVM info. Node channels are not affected. A missing container throws a `LogAccessError` with code `ERR-17-007` (see [Container names](#container-names)).
+
+If the agent inside the CVM cannot read a container's logs, for example because the container uses a Docker logging driver that does not support reading, the helper throws `LogAccessError` with code `ERR-17-009` and the agent's message. This applies to text and NDJSON, in fetch and in follow. Follow stops on it. A server-returned HTTP `502` with `ERR-17-009` is different: follow reconnects. See [Fetch Logs over HTTP](/phala-cloud/monitoring/log-api#errors) for the full error code list.
 
 **Lower-level exports:** `@phala/cloud` also exports `fetchCvmChannelLogs`, `streamCvmChannelLogs`, `fetchContainerLogs`, `fetchContainerLogsEntries`, `streamContainerLogs`, `streamContainerLogsEntries`, `getCvmLogEndpoint`, and `resolveLogTimeWindow`. Prefer `fetchCvmLogs` and `followCvmLogs` unless you need one of these for a specific case.
 
