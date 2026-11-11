@@ -115,8 +115,8 @@ A stream that opened with `200` can still report a failure in its body. Check ev
 
 | Where | Record | What it means |
 | --- | --- | --- |
-| Gateway, text | `[error] ERR-17-0xx <message>`, for example `[error] ERR-17-008 upstream stream failed` or `[error] ERR-17-009 upstream stream failed` | The connection to the CVM broke after the stream opened. Reconnect. |
-| Gateway, NDJSON | `{"error_code":"ERR-17-0xx","message":"<message>"}`, for example `{"error_code":"ERR-17-008","message":"upstream stream failed"}` or `{"error_code":"ERR-17-009","message":"upstream stream failed"}` | Same as above. Reconnect. |
+| Gateway, text | `[error] ERR-17-0xx <message>`, for example `[error] ERR-17-008 Node VMM unreachable or returned a bad response` or `[error] ERR-17-009 Guest agent or gateway unreachable` | The connection to the CVM broke after the stream opened. Reconnect. |
+| Gateway, NDJSON | `{"error_code":"ERR-17-0xx","message":"<message>"}`, for example `{"error_code":"ERR-17-008","message":"Node VMM unreachable or returned a bad response"}` or `{"error_code":"ERR-17-009","message":"Guest agent or gateway unreachable"}` | Same as above. Reconnect. |
 | CVM, text or NDJSON | `{"error": "<message>"}` | The agent inside the CVM could not read the container's logs, for example because the container uses a Docker logging driver that does not support reading. This is a final answer for that container. Do not reconnect; report the message. |
 
 The `{"error": ...}` record has no `channel` or `message` field and is not always followed by a newline, so it can be glued to the next record on the same line. The record can also be the whole body of a non-follow request.
