@@ -208,7 +208,7 @@ For programmatic attestation verification in your application, see [Verify Attes
 
 ## Add a custom domain
 
-Expose your model API on your own domain by adding dstack-ingress to your Docker Compose. This handles DNS and TLS certificates automatically.
+Expose your model API on your own domain. You can add it from the **Domains** page of your app, or add dstack-ingress to your Docker Compose by hand as shown below. It handles TLS certificates automatically.
 
 ```yaml
 services:
@@ -221,7 +221,6 @@ services:
       - TARGET_ENDPOINT=vllm:8000
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
@@ -238,7 +237,7 @@ volumes:
   evidences:
 ```
 
-See [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain) for the full guide including DNS provider configuration and troubleshooting.
+See [Set Up a Custom Domain](/phala-cloud/networking/setup-custom-domain) for the dashboard flow, DNS records, and troubleshooting.
 
 ## Next steps
 
