@@ -9,6 +9,10 @@ Every app already has a Phala Cloud address for each published port. The dstack 
 
 You do both from the **Domains** page. Open the dashboard, select your app, then select **Domains**.
 
+<Frame caption="The Domains page with a platform address and a configured custom domain">
+  <img src="/images/custom-domain-overview.jpg" alt="Domains page listing a platform address for port 80 and app.example.com with green DNS configured, HTTPS set up and Routing active pills, plus the Add domain field and the Guest agent row" />
+</Frame>
+
 ## Prerequisites
 
 - A deployed app on Phala Cloud
@@ -52,6 +56,10 @@ The CNAME sends visitors to the dstack gateway. The TXT record tells the gateway
 
 <Tabs>
   <Tab title="Cloudflare">
+    <Frame caption="DNS records dialog, Cloudflare tab">
+      <img src="/images/custom-domain-dns-cloudflare.png" alt="DNS records dialog for api.example.com on the Cloudflare tab, listing a CNAME and a TXT record with an Open Cloudflare DNS button" />
+    </Frame>
+
     1. Select **Open Cloudflare DNS**.
     2. Select **Add record** for each row. Copy the type, name and value from the dialog. You can paste the full name, because Cloudflare removes your domain from the end.
     3. For the CNAME record, turn the proxy off so **Proxy status** reads **DNS only**.
@@ -63,6 +71,10 @@ The CNAME sends visitors to the dstack gateway. The TXT record tells the gateway
   </Tab>
 
   <Tab title="Other DNS providers">
+    <Frame caption="DNS records dialog, Other DNS providers tab">
+      <img src="/images/custom-domain-dns-other.png" alt="DNS records dialog for api.example.com on the Other DNS providers tab, listing a CNAME and a TXT record" />
+    </Frame>
+
     1. Sign in where your domain's DNS is hosted. This is often the company you bought the domain from.
     2. Add a record for each row. If your provider adds your domain to the end of the name, paste the name without it.
     3. If your provider offers a proxy or CDN for the CNAME record, turn it off.
