@@ -38,9 +38,9 @@ The gateway makes intelligent routing decisions based on URL patterns and health
 The URL structure tells the gateway how to handle your traffic:
 
 ```
-deadbeef111111111111111111111111-8080.dstack-prod5.phala.network   → TLS termination → HTTP to container
-deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network  → TLS passthrough → Raw TLS to container
-deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network → HTTP/2 enabled → gRPC to container
+deadbeef111111111111111111111111-8080.<gateway-name>.phala.network   → TLS termination → HTTP to container
+deadbeef111111111111111111111111-5432s.<gateway-name>.phala.network  → TLS passthrough → Raw TLS to container
+deadbeef111111111111111111111111-50051g.<gateway-name>.phala.network → HTTP/2 enabled → gRPC to container
 ```
 
 The suffix changes behavior. No suffix means standard HTTP/HTTPS with TLS termination. Add `s` for TLS passthrough when you need end-to-end encryption. Add `g` to enable HTTP/2 with ALPN negotiation for gRPC. For TLS passthrough use cases and security considerations, see [TLS Passthrough](/phala-cloud/networking/tls-passthrough).
@@ -173,8 +173,8 @@ services:
   gateway:
     ports: ["443:443"]
     environment:
-      BACKEND_1: https://deadbeef111111111111111111111111-8080.dstack-prod5.phala.network
-      BACKEND_2: https://def456-8080.dstack-prod5.phala.network
+      BACKEND_1: https://deadbeef111111111111111111111111-8080.<gateway-name>.phala.network
+      BACKEND_2: https://def456-8080.<gateway-name>.phala.network
 ```
 
 Benefits: Single entry point, centralized auth, routing logic in your control.

@@ -15,10 +15,10 @@ Every container you deploy gets:
 
 Your application URL looks like this:
 ```
-https://<app-id>-<port>.dstack-prod5.phala.network
+https://<app-id>-<port>.<gateway-name>.phala.network
 ```
 
-Deploy on port 8080? Your URL is `https://appid-8080.dstack-prod5.phala.network`. Deploy on port 3000? It's `https://appid-3000.dstack-prod5.phala.network`. Simple.
+Deploy on port 8080? Your URL is `https://appid-8080.<gateway-name>.phala.network`. Deploy on port 3000? It's `https://appid-3000.<gateway-name>.phala.network`. Simple.
 
 ## Zero Configuration Required
 
@@ -44,7 +44,7 @@ Phala Cloud handles more than just web services:
 
 **Databases**: Expose PostgreSQL or MySQL with automatic TLS encryption. Your database connections are secure by default.
 
-**gRPC Services**: Full HTTP/2 support. Access gRPC endpoints by appending `g` to your URL (e.g., `appid-8080g.dstack-prod5.phala.network`).
+**gRPC Services**: Full HTTP/2 support. Access gRPC endpoints by appending `g` to your URL (e.g., `appid-8080g.<gateway-name>.phala.network`).
 
 **TCP Services**: Any TCP protocol works - Redis, custom game servers, message queues. All get automatic TLS wrapping.
 
