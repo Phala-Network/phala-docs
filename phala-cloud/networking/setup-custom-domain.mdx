@@ -1,28 +1,134 @@
 ---
 title: Set Up a Custom Domain
-description: Use your own domain with automatic SSL certificates
+description: Use your own domain with HTTPS certificates that only your app can hold
 ---
 
-This guide shows you how to use your own domain (like `api.mycompany.com`) instead of the default Phala Cloud domain.
+This guide shows you how to serve your app from your own domain, such as `api.mycompany.com`, instead of the default Phala Cloud address.
+
+Every app already has a Phala Cloud address for each published port. The dstack gateway serves it, and the HTTPS key is held inside a TEE. A custom domain works the same way, with one difference. Your own app gets the certificate from Let's Encrypt, inside its TEE, so the key never leaves it. This is why the setup has two parts: DNS records that point your domain to the app, and a small service in your app that gets and renews the certificate.
+
+You do both from the **Domains** page. Open the dashboard, select your app, then select **Domains**.
+
+<Frame caption="The Domains page with a platform address and a configured custom domain">
+  <img src="/images/custom-domain-overview.jpg" alt="Domains page listing a platform address for port 80 and app.example.com with green DNS configured, HTTPS set up and Routing active pills, plus the Add domain field and the Guest agent row" />
+</Frame>
 
 ## Prerequisites
 
-- A domain with DNS hosted on Cloudflare (Linode and Namecheap also supported)
-- Access to your DNS provider's API token
-- A deployed CVM application
+- A deployed app on Phala Cloud
+- A domain whose DNS you can edit
+- For the dashboard flow, an API token from your DNS provider. Cloudflare has a ready-made token link. Other providers can use the [docker-compose method](#set-up-with-docker-compose)
 
-## Step 1: Create DNS API Token
+## Add a custom domain
+
+1. Open **Domains** for your app.
+2. Type your domain, for example `api.example.com`. The port defaults to `443`. Change it only if your app serves HTTPS on another port.
+3. Select **Add domain**.
+
+The domain appears in the list with three status pills.
+
+| Pill | Red | Green |
+| --- | --- | --- |
+| DNS | DNS records need attention | DNS configured |
+| HTTPS | HTTPS not set up | HTTPS set up |
+| Routing | Shows a hint that routing is not active yet | Routing active |
+
+A new domain usually starts with red DNS and HTTPS pills.
+
+<Frame caption="A new domain with DNS and HTTPS both still to do">
+  <img src="/images/custom-domain-needs-attention.png" alt="Domains page with api.example.com showing red pills for DNS records need attention and HTTPS not set up, plus a Check again button" />
+</Frame>
+
+Select **Check again** on a row to check its DNS again. The domain name is a link to `https://<your domain>`.
+
+## Create the DNS records
+
+Select the red **DNS records need attention** pill. A dialog lists the records for that domain, with a **Cloudflare** tab and an **Other DNS providers** tab.
+
+There are exactly two records:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| CNAME | `<your domain>` | `gateway.<gateway base domain>` |
+| TXT | `_dstack-app-address.<your domain>` | `<app_id>:<port>` |
+
+The CNAME sends visitors to the dstack gateway. The TXT record tells the gateway which app and port the domain belongs to. The dialog fills in the real values and has a copy button for each one.
+
+<Tabs>
+  <Tab title="Cloudflare">
+    <Frame caption="DNS records dialog, Cloudflare tab">
+      <img src="/images/custom-domain-dns-cloudflare.png" alt="DNS records dialog for api.example.com on the Cloudflare tab, listing a CNAME and a TXT record with an Open Cloudflare DNS button" />
+    </Frame>
+
+    1. Select **Open Cloudflare DNS**.
+    2. Select **Add record** for each row. Copy the type, name and value from the dialog. You can paste the full name, because Cloudflare removes your domain from the end.
+    3. For the CNAME record, turn the proxy off so **Proxy status** reads **DNS only**.
+    4. Select **Save**, go back to the dashboard and select **Check again**.
+
+    The proxy must be off because your app serves its own HTTPS certificate. Visitors have to reach the app directly, not through Cloudflare.
+
+    If you plan to use **Set up HTTPS** in the next section, you can skip this. It creates these records in Cloudflare for you.
+  </Tab>
+
+  <Tab title="Other DNS providers">
+    <Frame caption="DNS records dialog, Other DNS providers tab">
+      <img src="/images/custom-domain-dns-other.png" alt="DNS records dialog for api.example.com on the Other DNS providers tab, listing a CNAME and a TXT record" />
+    </Frame>
+
+    1. Sign in where your domain's DNS is hosted. This is often the company you bought the domain from.
+    2. Add a record for each row. If your provider adds your domain to the end of the name, paste the name without it.
+    3. If your provider offers a proxy or CDN for the CNAME record, turn it off.
+    4. Save, go back to the dashboard and select **Check again**.
+  </Tab>
+</Tabs>
+
+DNS checks are fastest when the records exist before you add the domain or select **Check again**. DNS changes can take a few minutes to show up. Wait, then select **Check again**.
+
+## Set up HTTPS
+
+Select the red **HTTPS not set up** pill. A form opens on the row.
+
+<Frame caption="The Set up HTTPS form">
+  <img src="/images/custom-domain-setup-https.png" alt="Set up HTTPS form with a DNS provider list, a Create Cloudflare API token button, an API token field, an optional certificate email field and a Preview merge button" />
+</Frame>
+
+1. Choose your **DNS provider**.
+2. Select **Create Cloudflare API token**. It opens Cloudflare with DNS edit and zone read access already selected. Under **Zone Resources**, limit the token to your zone, create it, and paste it into **API token**.
+3. Optional: enter a **Certificate email**. Let's Encrypt uses it for certificate notices. Leave it empty if you do not want them.
+4. Select **Preview merge**.
+
+The page adds a pinned dstack-ingress service to your app's compose file and shows you the result before anything changes. Read it, then deploy. The token is stored encrypted on your instances, and it cannot be shown again after you save it.
+
+dstack-ingress runs inside your app's TEE. It gets a Let's Encrypt certificate there, so the private key never leaves the TEE. It can also set CAA records so that only your TEE can get certificates for the domain. See [Security features](#security-features). dstack-ingress is open source; its code and full configuration reference are in [dstack-examples](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress).
+
+The first deployment usually takes 3 to 5 minutes.
+
+## Check that it works
+
+Go back to **Domains** and select **Check again**. When the row shows **DNS configured**, **HTTPS set up** and **Routing active**, open `https://<your domain>`. Your browser should show a valid Let's Encrypt certificate.
+
+To check that the certificate key is held by a TEE, follow [Domain attestation](/phala-cloud/networking/domain-attestation).
+
+## Platform addresses and the guest agent
+
+The first rows on the Domains page are the platform domains. There is one per published port. Use the **APP** and **INSTANCE** switch to see app-level addresses or the address of each instance.
+
+A separate row controls the guest agent on port 8090. See [Guest agent access](/phala-cloud/networking/guest-agent-access).
+
+## Set up with docker-compose
+
+Use this method if you want to write the dstack-ingress service yourself, or your DNS provider is not in the dashboard form. It does the same job as **Set up HTTPS**. You edit the compose file and set the secrets by hand. The [dstack-ingress README](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress) lists every environment variable and more examples.
+
+### Step 1: Create a DNS API token
 
 <Tabs>
   <Tab title="Cloudflare">
     1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
-    2. Select your domain
-    3. Go to **Get Your API Token**
-    4. Click **Create Token**
-    5. Use the **Edit zone DNS** template
-    6. Select your domain in **Zone Resources**
-    7. Click **Continue to summary** and create the token
-    8. Copy the token for later use
+    2. Open **My Profile** → **API Tokens** and select **Create Token**
+    3. Start from the **Edit zone DNS** template
+    4. Make sure the token has **Zone → DNS → Edit** and **Zone → Zone → Read**
+    5. Under **Zone Resources**, select only your domain's zone
+    6. Select **Continue to summary**, create the token and copy it
   </Tab>
 
   <Tab title="Linode">
@@ -39,7 +145,7 @@ This guide shows you how to use your own domain (like `api.mycompany.com`) inste
   </Tab>
 </Tabs>
 
-## Step 2: Add dstack-ingress to Your Deployment
+### Step 2: Add dstack-ingress to your deployment
 
 Update your `docker-compose.yml` to include the dstack-ingress container:
 
@@ -54,7 +160,6 @@ services:
       - TARGET_ENDPOINT=app:80  # Your app's internal endpoint
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GATEWAY_DOMAIN=gateway.${DSTACK_GATEWAY_DOMAIN}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - SET_CAA=true
     volumes:
       - /var/run/dstack.sock:/var/run/dstack.sock
@@ -92,30 +197,27 @@ Set `DOMAIN` to your custom domain and `TARGET_ENDPOINT` to your app's internal 
   change it to `gateway.${DSTACK_GATEWAY_DOMAIN}` if your deployment still has it.
 </Warning>
 
-## Step 3: Configure Environment Variables
+### Step 3: Configure environment variables
 
-In the Phala Cloud dashboard, add these encrypted secrets:
+In the Phala Cloud dashboard, add these encrypted secrets. You can also add `CERTBOT_EMAIL` and reference it in the compose file as `CERTBOT_EMAIL=${CERTBOT_EMAIL}`. It is optional. Let's Encrypt uses it for certificate notices.
 
 <Tabs>
   <Tab title="Cloudflare">
     - `CLOUDFLARE_API_TOKEN`: Your API token from Step 1
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
   </Tab>
 
   <Tab title="Linode">
     - `LINODE_API_TOKEN`: Your API token from Step 1
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
   </Tab>
 
   <Tab title="Namecheap">
     - `NAMECHEAP_USERNAME`: Your Namecheap username
     - `NAMECHEAP_API_KEY`: Your API key from Step 1
     - `NAMECHEAP_CLIENT_IP`: Your whitelisted IP address
-    - `CERTBOT_EMAIL`: Your email for Let's Encrypt notifications
   </Tab>
 </Tabs>
 
-## Step 4: Deploy
+### Step 4: Deploy
 
 Deploy your updated docker-compose.yml through the dashboard. The first deployment typically takes 3–5 minutes as it:
 
@@ -123,7 +225,7 @@ Deploy your updated docker-compose.yml through the dashboard. The first deployme
 2. Requests SSL certificate from Let's Encrypt
 3. Starts the HAProxy TCP proxy
 
-## Step 5: Verify
+### Step 5: Verify
 
 After deployment, you can:
 
@@ -144,7 +246,6 @@ services:
     environment:
       DNS_PROVIDER: cloudflare
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       GATEWAY_DOMAIN: gateway.${DSTACK_GATEWAY_DOMAIN}
       SET_CAA: true
       DOMAINS: |
@@ -177,7 +278,7 @@ volumes:
 
 ## Why We Pin Infrastructure Images
 
-The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
+The dstack-ingress image uses a SHA256 hash instead of a tag. You can audit the code behind it in [dstack-examples](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress). Pinning ensures:
 
 - **Auditability**: Anyone can verify the exact infrastructure code handling domains
 - **Immutability**: The ingress behavior never changes unexpectedly
@@ -211,6 +312,22 @@ Should return the Let's Encrypt account URI with `validationmethods=dns-01;accou
 
 ## Troubleshooting
 
+### DNS records need attention right after I added the domain
+
+DNS changes can take a few minutes to show up, and the check may run before they do. Wait a few minutes, then select **Check again**. If the pill stays red, open it and compare each record with the dialog. Common causes:
+
+- The name or value was pasted with a typo, or with your domain added twice.
+- The CNAME proxy is still on. Turn it off so Cloudflare reads **DNS only**.
+- The TXT record is missing. The domain needs both records.
+
+### Routing is not active yet
+
+The row shows a hint instead of **Routing active** until the gateway sees both DNS records and your app is serving the domain. Check that DNS reads **DNS configured**, then check that HTTPS reads **HTTPS set up**. If you just deployed, wait a few minutes and select **Check again**.
+
+### The Set up HTTPS preview fails or the certificate is not issued
+
+Check that the API token has DNS edit and zone read access, and that **Zone Resources** includes the zone for your domain. Create a new token with **Create Cloudflare API token** if you are not sure.
+
 ### Check Logs
 
 Look for dstack-ingress container logs in the dashboard:
@@ -229,7 +346,7 @@ You may have forgotten to attach the data volume.
 
 **DNS not propagating**: Wait 2-5 minutes for DNS changes to propagate globally.
 
-**Certificate request failed**: Verify your API token has permission to edit DNS records.
+**Certificate request failed**: Verify your API token has permission to edit DNS records and read the zone.
 
 **Connection refused**: Ensure `TARGET_ENDPOINT` points to the correct service:port.
 
@@ -237,6 +354,8 @@ You may have forgotten to attach the data volume.
 
 ## Next Steps
 
+- [Control access to the guest agent on port 8090](/phala-cloud/networking/guest-agent-access)
 - [Expose TCP services](/phala-cloud/networking/expose-tcp-service)
 - [Learn about domain attestation](/phala-cloud/networking/domain-attestation)
 - [Set up gRPC with custom domain](/phala-cloud/networking/setup-grpc-service)
+- [dstack-ingress source and configuration reference](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress)

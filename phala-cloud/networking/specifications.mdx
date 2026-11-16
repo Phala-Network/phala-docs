@@ -7,12 +7,12 @@ description: Quick lookup for URL patterns, environment variables, and configura
 
 | Pattern | Protocol | Example |
 |---------|----------|---------|
-| `{app-id}.{cluster}.phala.network` | HTTP/HTTPS to port 80 (default) | `abc123.dstack-prod5.phala.network` |
-| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `deadbeef111111111111111111111111-8080.dstack-prod5.phala.network` |
-| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `deadbeef111111111111111111111111-50051g.dstack-prod5.phala.network` |
-| `{app-id}s.{cluster}.phala.network` | TLS passthrough to port 443 (default) | `abc123s.dstack-prod5.phala.network` |
-| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `deadbeef111111111111111111111111-5432s.dstack-prod5.phala.network` |
-| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `deadbeef111111111111111111111111-22.dstack-prod5.phala.network` |
+| `{app-id}.{cluster}.phala.network` | HTTP/HTTPS to port 80 (default) | `abc123.<gateway-name>.phala.network` |
+| `{app-id}-{port}.{cluster}.phala.network` | HTTP/HTTPS (TLS termination) | `deadbeef111111111111111111111111-8080.<gateway-name>.phala.network` |
+| `{app-id}-{port}g.{cluster}.phala.network` | gRPC/HTTP2 | `deadbeef111111111111111111111111-50051g.<gateway-name>.phala.network` |
+| `{app-id}s.{cluster}.phala.network` | TLS passthrough to port 443 (default) | `abc123s.<gateway-name>.phala.network` |
+| `{app-id}-{port}s.{cluster}.phala.network` | TLS passthrough | `deadbeef111111111111111111111111-5432s.<gateway-name>.phala.network` |
+| `{app-id}-22.{cluster}.phala.network` | SSH tunnel | `deadbeef111111111111111111111111-22.<gateway-name>.phala.network` |
 
 **Default Port Behaviors:**
 
@@ -51,7 +51,7 @@ The variables you can change to config networking features.
 | `TARGET_ENDPOINT` | Conditional | string | Backend address for single-domain mode, such as `app:80`; protocol prefixes like `http://` and `grpc://` are accepted and stripped |
 | `ROUTING_MAP` | Conditional | string | Multi-domain routing entries, one `domain=service:port` entry per line |
 | `GATEWAY_DOMAIN` | Yes | string | `gateway.${DSTACK_GATEWAY_DOMAIN}` |
-| `CERTBOT_EMAIL` | Yes | string | Let's Encrypt email |
+| `CERTBOT_EMAIL` | No | string | Let's Encrypt email for certificate notices |
 | `SET_CAA` | No | boolean | Enable CAA records (default: false) |
 | `DNS_PROVIDER` | No | string | `cloudflare|linode|namecheap` (auto-detected) |
 | `ALPN` | No | string | TLS ALPN protocols, such as `h2` for gRPC custom domains |

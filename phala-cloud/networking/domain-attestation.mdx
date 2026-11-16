@@ -33,7 +33,7 @@ The gateway TEE publishes cryptographic evidence at `https://GATEWAY-DOMAIN/.dst
 
 ### 3-Step Verification
 
-**Example**: We'll use `gateway.dstack-pha-prod7.phala.network` - replace with your gateway domain.
+**Example**: We'll use `gateway.<gateway-name>.phala.network` - replace with your gateway domain.
 
 #### Step 1: Get Gateway Evidence
 
@@ -41,10 +41,10 @@ The gateway publishes evidence through three endpoints:
 
 ```bash
 # Get ACME certificate information
-curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/acme-info" | jq > acme-info.json
+curl -s "https://gateway.<gateway-name>.phala.network/.dstack/acme-info" | jq > acme-info.json
 
 # Get gateway application information
-curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/app-info" | jq > app-info.json
+curl -s "https://gateway.<gateway-name>.phala.network/.dstack/app-info" | jq > app-info.json
 ```
 
 **Expected output from acme-info.json**:
@@ -58,7 +58,7 @@ curl -s "https://gateway.dstack-pha-prod7.phala.network/.dstack/app-info" | jq >
     {"public_key": "<base64>", "quote": { tdx-quote-with-eventlogs } }
   ],
   "active_cert": "-----BEGIN CERTIFICATE-----\n...",
-  "base_domain": "dstack-pha-prod7.phala.network"
+  "base_domain": "<gateway-name>.phala.network"
 }
 ```
 
@@ -70,7 +70,7 @@ Check that the served certificate matches the TEE-quoted keys:
 
 ```bash
 # Get the public key from the served certificate
-openssl s_client -connect gateway.dstack-pha-prod7.phala.network:443 </dev/null 2>/dev/null | \
+openssl s_client -connect gateway.<gateway-name>.phala.network:443 </dev/null 2>/dev/null | \
   openssl x509 -pubkey -noout > served-pubkey.pem
 
 # Get the public key from the evidence certificate
@@ -107,7 +107,7 @@ Verify only this TEE can issue certificates:
 
 ```bash
 # Check ALL certificates ever issued for the gateway domain
-curl -s "https://crt.sh/?q=%.dstack-pha-prod7.phala.network&output=json" | \
+curl -s "https://crt.sh/?q=%.<gateway-name>.phala.network&output=json" | \
   jq -r '.[] | "\(.not_before) to \(.not_after): \(.issuer_name)"' | head -10
 
 # Get the TEE's ACME account
@@ -115,7 +115,7 @@ cat acme-info.json | jq -r '.account_uri'
 # Output: https://acme-v02.api.letsencrypt.org/acme/acct/2584877296
 
 # Check DNS CAA records for the base domain
-dig +short CAA dstack-pha-prod7.phala.network
+dig +short CAA <gateway-name>.phala.network
 ```
 
 **Example output**:
@@ -154,11 +154,11 @@ The `acme-info` response structure:
 | `hist_keys` | Array | All certificate public keys (current + historical) |
 | `quoted_hist_keys` | Array | Public keys with TDX quotes proving TEE generated them |
 | `active_cert` | String | Currently active certificate (PEM format) |
-| `base_domain` | String | Base domain for gateway (e.g., dstack-pha-prod7.phala.network) |
+| `base_domain` | String | Base domain for gateway (e.g., `<gateway-name>.phala.network`) |
 
 ### Troubleshooting
 
-**"Connection refused to /.dstack/ endpoints"**: These endpoints are only accessible via the gateway subdomain: `gateway.dstack-pha-prod7.phala.network`
+**"Connection refused to /.dstack/ endpoints"**: These endpoints are only accessible via the gateway subdomain: `gateway.<gateway-name>.phala.network`
 
 **"Certificate doesn't match quoted keys"**: The gateway may have recently renewed certificates. Re-fetch the evidence with a fresh `acme-info` request.
 
@@ -350,7 +350,7 @@ For detailed application verification: [Attestation Guide](/phala-cloud/attestat
 ### Monitoring
 
 Set up alerts on [crt.sh](https://crt.sh) to detect unexpected certificate issuance:
-- Gateway domains: `%.dstack-pha-prod7.phala.network`
+- Gateway domains: `%.<gateway-name>.phala.network`
 - Custom domains: `your-domain.com`
 
 ### Development

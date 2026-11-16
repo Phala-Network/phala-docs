@@ -43,7 +43,7 @@ volumes:
 After deployment, connect to your database:
 ```bash
 # Direct TLS connection (if client supports it)
-psql "postgresql://dbuser:password@<app-id>-5432.dstack-prod5.phala.network:443/myapp?sslmode=require"
+psql "postgresql://dbuser:password@<app-id>-5432.<gateway-name>.phala.network:443/myapp?sslmode=require"
 ```
 
 ## Example: Custom TCP Service
@@ -69,14 +69,14 @@ Many existing clients don't support connecting to TLS-wrapped TCP services. Use 
 ```bash socat (Linux/macOS)
 # Forward local port 5432 to PostgreSQL
 socat TCP-LISTEN:5432,bind=127.0.0.1,fork,reuseaddr \
-      OPENSSL:<app-id>-5432.dstack-prod5.phala.network:443
+      OPENSSL:<app-id>-5432.<gateway-name>.phala.network:443
 
 # Now connect normally
 psql -h 127.0.0.1 -p 5432 -U dbuser myapp
 
 # Forward local port 9000 to custom service
 socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr \
-      OPENSSL:<app-id>-9000.dstack-prod5.phala.network:443
+      OPENSSL:<app-id>-9000.<gateway-name>.phala.network:443
 
 # Connect with any TCP client
 telnet 127.0.0.1 9000
@@ -87,7 +87,7 @@ telnet 127.0.0.1 9000
 # https://github.com/Dstack-TEE/dstack-examples/blob/main/tcp-port-forwarding/port_forwarder.py
 
 # Forward local port 5432 to PostgreSQL
-python3 port_forwarder.py 5432 <app-id>-5432.dstack-prod5.phala.network
+python3 port_forwarder.py 5432 <app-id>-5432.<gateway-name>.phala.network
 
 # Connect normally
 psql -h 127.0.0.1 -p 5432 -U dbuser myapp
