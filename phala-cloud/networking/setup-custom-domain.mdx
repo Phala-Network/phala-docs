@@ -99,7 +99,7 @@ Select the red **HTTPS not set up** pill. A form opens on the row.
 
 The page adds a pinned dstack-ingress service to your app's compose file and shows you the result before anything changes. Read it, then deploy. The token is stored encrypted on your instances, and it cannot be shown again after you save it.
 
-dstack-ingress runs inside your app's TEE. It gets a Let's Encrypt certificate there, so the private key never leaves the TEE. It can also set CAA records so that only your TEE can get certificates for the domain. See [Security features](#security-features).
+dstack-ingress runs inside your app's TEE. It gets a Let's Encrypt certificate there, so the private key never leaves the TEE. It can also set CAA records so that only your TEE can get certificates for the domain. See [Security features](#security-features). dstack-ingress is open source; its code and full configuration reference are in [dstack-examples](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress).
 
 The first deployment usually takes 3 to 5 minutes.
 
@@ -117,7 +117,7 @@ A separate row controls the guest agent on port 8090. See [Guest agent access](/
 
 ## Set up with docker-compose
 
-Use this method if you want to write the dstack-ingress service yourself, or your DNS provider is not in the dashboard form. It does the same job as **Set up HTTPS**. You edit the compose file and set the secrets by hand.
+Use this method if you want to write the dstack-ingress service yourself, or your DNS provider is not in the dashboard form. It does the same job as **Set up HTTPS**. You edit the compose file and set the secrets by hand. The [dstack-ingress README](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress) lists every environment variable and more examples.
 
 ### Step 1: Create a DNS API token
 
@@ -278,7 +278,7 @@ volumes:
 
 ## Why We Pin Infrastructure Images
 
-The dstack-ingress image uses a SHA256 hash instead of a tag to ensure:
+The dstack-ingress image uses a SHA256 hash instead of a tag. You can audit the code behind it in [dstack-examples](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress). Pinning ensures:
 
 - **Auditability**: Anyone can verify the exact infrastructure code handling domains
 - **Immutability**: The ingress behavior never changes unexpectedly
@@ -358,3 +358,4 @@ You may have forgotten to attach the data volume.
 - [Expose TCP services](/phala-cloud/networking/expose-tcp-service)
 - [Learn about domain attestation](/phala-cloud/networking/domain-attestation)
 - [Set up gRPC with custom domain](/phala-cloud/networking/setup-grpc-service)
+- [dstack-ingress source and configuration reference](https://github.com/Dstack-TEE/dstack-examples/tree/main/custom-domain/dstack-ingress)
