@@ -1,0 +1,122 @@
+---
+title: "November 2026 KMS Migration: Recover Old Keys"
+description: Recover keys derived before the November 2026 platform-wide KMS and CVM update
+---
+
+On **November 20, 2026**, Phala Cloud started a platform-wide KMS and CVM update in response to the November incidents. The window ran from 00:25 UTC on November 20 to 00:25 UTC on November 21. See the [maintenance notice](https://status.phala.network/maintenance/1130832) for the schedule and affected services.
+
+## What changed
+
+- The KMS root key was rotated. Every key derived from the old root changed.
+- 0.5.x CVMs were updated to dstack 0.5.15.
+- Data disks and sealed environments were re-encrypted automatically at boot.
+- Application keys from `getKey()` were **not** migrated. Your app has to fetch them.
+
+The new KMS keeps the old root as **epoch 0**. Keys your app derived before the migration are still recoverable there, even though `getKey()` now returns keys from the new root.
+
+## When you need this
+
+Use the recovery tool if all of these are true:
+
+- Your app called `getKey()` before the migration.
+- You still need the old key: a wallet, an encrypted record, a signing key, or a database key.
+- You have not re-encrypted or moved that data to the new key.
+
+## When you don't
+
+You can skip this page if any of these apply:
+
+- Your app never called `getKey()`. TLS certificates from `getTlsKey()` are issued fresh and are not affected.
+- Your app derives a key at runtime and does not persist anything tied to it.
+- You already re-encrypted your data or moved your assets to the new key.
+- You only need the **data disk** or **sealed environment**. Those are re-encrypted automatically at boot and do not need this tool.
+
+## How recovery works
+
+The recovery tool asks the KMS for the epoch-0 app root and re-applies the same derivation your app used, so you get the exact old key back. It runs as a sidecar inside your CVM, and your app calls it over HTTP.
+
+## Recover a 0.5.x key
+
+Most apps use the 0.5.x API: `getKey(path, purpose?, algorithm?)`.
+
+### 1. Add the sidecar
+
+Add this to your `docker-compose.yml`:
+
+```yaml
+services:
+  key-recovery:
+    image: ghcr.io/dstack-tee/dstack-key-recovery:0.6.5@sha256:26803eb7eb34f69f367d7ebc0b4abc31f35caad5e58213de77a91dddcd2d0b6b
+    restart: unless-stopped
+    command: ["serve", "--addr", "0.0.0.0:8099", "--no-socket"]
+    security_opt: ["seccomp=unconfined"]
+    environment:
+      DSTACK_CCEL_FILE: /ccel.bin
+    volumes:
+      - /dstack/.host-shared:/dstack/.host-shared:ro
+      - /run/log/dstack:/run/log/dstack:ro
+      - /sys/firmware/acpi/tables/data/CCEL:/ccel.bin:ro
+      - /etc/tdx-attest.conf:/etc/tdx-attest.conf:ro
+    devices:
+      - /dev/tdx_guest:/dev/tdx_guest
+      - /dev/vsock:/dev/vsock
+
+  app:
+    image: your-app
+    depends_on:
+      - key-recovery
+    environment:
+      KEY_RECOVERY_URL: http://key-recovery:8099
+```
+
+<Note>
+The sidecar needs the quote device, the boot event log and the host vsock service. The full passthrough table is in the [tool README](https://github.com/Dstack-TEE/dstack/blob/next/dstack/tools/key-recovery/README.md).
+</Note>
+
+### 2. Call it from your app
+
+```bash
+curl "$KEY_RECOVERY_URL/key?name=my-app/encryption/v1"
+```
+
+```json
+{
+  "api": "v0",
+  "key": "87063e62…",
+  "public_key": "03b4b5f9…",
+  "signature_chain": ["cbd6ca60…", "179f5096…"],
+  "root_epoch": 0,
+  "app_epoch": 0
+}
+```
+
+`name` is the same `path` you passed to `getKey()`.
+
+### 3. Check the result
+
+Compare `key` with the old key you recorded before the migration. If you did not record it, check that the key still derives the address or decrypts the data you expect.
+
+## 0.6.x apps
+
+On 0.6.x the API is `getKey(domain, algorithm)`. The tool reads the guest version and uses the v1 derivation automatically, so the same call works:
+
+```bash
+curl "$KEY_RECOVERY_URL/key?name=my-app/encryption/v1&algorithm=secp256k1"
+```
+
+To force a surface, use `/v0/key?path=…&purpose=…` or `/v1/key?domain=…&algorithm=…`.
+
+## Verify the image
+
+```bash
+DIGEST=sha256:26803eb7eb34f69f367d7ebc0b4abc31f35caad5e58213de77a91dddcd2d0b6b
+
+cosign verify ghcr.io/dstack-tee/dstack-key-recovery@$DIGEST \
+  --certificate-identity-regexp \
+    'https://github.com/Dstack-TEE/dstack/.github/workflows/key-recovery-release.yml@refs/tags/key-recovery-v0.6.5' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+## Details
+
+The tool also has a CLI, an `info` command and the full passthrough reference: [dstack-key-recovery README](https://github.com/Dstack-TEE/dstack/blob/next/dstack/tools/key-recovery/README.md).
