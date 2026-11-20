@@ -201,7 +201,8 @@
                   "/phala-cloud/getting-started/deploy-first-cvm",
                   "/phala-cloud/getting-started/explore-templates/overview",
                   "/phala-cloud/getting-started/attestation",
-                  "/phala-cloud/references/migration-from-dstack-v03"
+                  "/phala-cloud/references/migration-from-dstack-v03",
+                  "/phala-cloud/references/migration-to-new-kms"
                 ]
               },
               {
