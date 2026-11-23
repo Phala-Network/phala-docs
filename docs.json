@@ -216,6 +216,7 @@
                   "/phala-cloud/cvm/replicating-cvms",
                   "/phala-cloud/cvm/launch-token",
                   "/phala-cloud/cvm/advanced-settings",
+                  "/phala-cloud/cvm/ephemeral-data-disk",
                   "/phala-cloud/cvm/deployment-cheat-sheet",
                   "/phala-cloud/cvm/image/overview",
                   "/phala-cloud/storage/access-database",

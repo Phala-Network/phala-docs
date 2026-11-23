@@ -87,7 +87,7 @@ You can send these keys in `compose`:
 | `requirements.health_check`, `requirements.health_status_file` | Health check the guest runs |
 | `requirements.platforms` | Attestation platforms the app accepts |
 | `requirements.tdx_measure_acpi_tables` | Whether TDX measures the ACPI tables |
-| `requirements.ephemeral_data_disk` | Start every boot with an empty data disk. See [Ephemeral data disk](/phala-cloud/cvm/advanced-settings#ephemeral-data-disk) |
+| `requirements.ephemeral_data_disk` | Start every boot with an empty data disk. See [Ephemeral Data Disk](/phala-cloud/cvm/ephemeral-data-disk) |
 | `requirements.launch_token_hash` | Launch token check. See [Launch Token](/phala-cloud/cvm/launch-token) |
 
 The top-level fields such as `docker_compose_file`, `pre_launch_script`, `allowed_envs` and `public_logs` also change the compose. Send them at the top level, not inside `compose`.

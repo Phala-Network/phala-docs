@@ -13,6 +13,8 @@ Init scripts are small scripts Phala Cloud provides. The CVM runs them on every 
 | --- | --- | --- |
 | `docker_cleanup` | Erases every local container store on each boot: images, volumes and all containerd namespaces. Each boot pulls images again and starts with empty Docker volumes. | dstack OS 0.6.x, `ext4` storage, the `docker-compose` runner |
 
+`docker_cleanup` is the older way to start each boot clean. On dstack OS 0.6.3 or newer, use an [ephemeral data disk](/phala-cloud/cvm/ephemeral-data-disk) instead. It erases the whole data disk and works with `zfs` storage too.
+
 ### How do I choose init scripts?
 
 Send the full list. It replaces the scripts the CVM runs now, and `[]` removes them all:
@@ -39,20 +41,9 @@ To see what a CVM runs and what you could pick, call `GET /cvms/{cvm_id}/init-sc
 
 ## Ephemeral data disk
 
-With `requirements.ephemeral_data_disk` set to `true`, the CVM starts every boot with an empty data disk. The guest formats the disk before any app code runs, so nothing from earlier boots is left. Use it for workloads that must not keep data between boots.
+With `requirements.ephemeral_data_disk` set to `true`, the CVM starts every boot with an empty data disk. It needs dstack OS 0.6.3 or newer, and dstack OS 0.5.x does not support it. Turning it on for an existing CVM needs `"confirm_data_wipe": true`.
 
-It needs dstack OS 0.6.3 or newer.
-
-To turn it on at create, put it in `compose_file.requirements`. To turn it on for an existing CVM, confirm the wipe:
-
-```json
-{
-  "compose": { "requirements": { "ephemeral_data_disk": true } },
-  "confirm_data_wipe": true
-}
-```
-
-Without `confirm_data_wipe`, the update fails with `ERR-03-048`. Turning it off needs no confirmation.
+[Ephemeral Data Disk](/phala-cloud/cvm/ephemeral-data-disk) explains what is erased, what stays, and how to turn it on and off.
 
 ## Annotations
 
