@@ -334,8 +334,37 @@ a.nav-tabs-item[data-active="true"] {
   font-weight: 500 !important;
 }
 
+/* TOC rows. Each link is its own box: padding on all four sides so the
+   active and hover backgrounds do not touch the text, and a 2px gap so
+   neighbouring backgrounds do not touch each other. The heading gets the
+   same inset, so its icon lines up with the labels below it. */
+#table-of-contents > :first-child:not(ul) {
+  padding-left: 10px !important;
+}
+
+#table-of-contents ul.toc {
+  margin-top: 8px !important;
+}
+
+.toc-item > ul {
+  margin-top: 2px;
+}
+
+.toc-item > a {
+  padding: 5px 10px !important;
+  line-height: 1.4 !important;
+}
+
+.toc-item + .toc-item {
+  margin-top: 2px;
+}
+
 .toc-item[data-depth="1"] {
-  padding-left: 1rem;
+  padding-left: 14px;
+}
+
+.toc-item[data-depth="2"] {
+  padding-left: 28px;
 }
 
 .dark .toc-item > a,
@@ -360,6 +389,49 @@ a.nav-tabs-item[data-active="true"] {
 .dark .eyebrow.text-primary,
 [data-theme="dark"] .eyebrow {
   color: var(--primary-300) !important; /* bright lime stays on dark bg */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Page header — the title and the frontmatter description form a summary
+   block. The description is a lede: larger and quieter than body text. A
+   dotted hairline closes the block, so the description does not read as
+   the first paragraph.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#header {
+  padding-bottom: 24px;
+  border-bottom: 1px dotted var(--base-300);
+}
+
+#page-title {
+  text-wrap: balance;
+}
+
+/* Title to lede: 16px, from the title's own bottom margin. */
+#header > .prose {
+  margin-top: 0 !important;
+}
+
+#header > .prose p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--base-600);
+  text-wrap: pretty;
+}
+
+/* A page that opens with a heading keeps the same gap under the line as one that opens with text. */
+#header + #content > :is(h2, h3):first-child {
+  margin-top: 0 !important;
+}
+
+.dark #header,
+[data-theme="dark"] #header {
+  border-bottom-color: var(--base-700);
+}
+
+.dark #header > .prose p,
+[data-theme="dark"] #header > .prose p {
+  color: var(--base-400);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -462,6 +534,24 @@ p,
 li {
   font-size: 15px;
   line-height: 1.65;
+}
+
+/* Body text. Mintlify renders a paragraph as <span data-as="p">, so the rule
+   above never reached paragraphs and lists were a size smaller than the text
+   around them. One size and leading for both; tables keep their own. */
+#content :is(p, [data-as="p"], li):not(:is(td, th) *) {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* Measure. Running text stops near 75 characters a line. Tables, code and
+   images keep the full column. */
+#content > :is(p, [data-as="p"], ul, ol) {
+  max-width: 64ch;
+}
+
+#header > .prose p {
+  max-width: 56ch;
 }
 
 /* Inline code — hairline border, mono, slightly tinted */
