@@ -9,14 +9,15 @@ Private AI API supports streaming, enabling you to receive responses in a stream
 
 ### Example of Streaming
 
-Replace `<API_KEY>` with your actual API key in the examples below.
+Set `PHALA_AI_API_KEY` in your environment before running the examples.
 
 <CodeGroup>
 ```python Python
+import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="<API_KEY>",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -40,7 +41,7 @@ for chunk in stream:
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "<API_KEY>",
+  apiKey: process.env.PHALA_AI_API_KEY,
   baseURL: "https://inference.phala.com/v1",
 });
 
@@ -67,4 +68,25 @@ HelloHello
 
 ### Supported Models
 
-All models support streaming.
+Check the selected model’s capabilities in [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models). Decision models use `/v1/systemone` and do not stream.
+
+## Raw SSE
+
+```bash
+curl --no-buffer https://inference.phala.com/v1/chat/completions \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"z-ai/glm-5.3","messages":[{"role":"user","content":"Say hello"}],"stream":true}'
+```
+
+The response body contains SSE frames, for example:
+
+```text
+data: {"id":"chatcmpl-123","choices":[{"delta":{"content":"Hello"}}]}
+
+data: {"id":"chatcmpl-123","choices":[{"delta":{"content":" world"}}]}
+
+data: [DONE]
+```
+
+For receipt verification, preserve the exact SSE body bytes and wait until the stream completes. See [Streaming receipts](/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions#streaming).

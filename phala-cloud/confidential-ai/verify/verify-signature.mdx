@@ -3,52 +3,11 @@ description: Verify a Phala response with a pinned client transport, signed rece
 title: Verify a Response
 ---
 
-`https://inference.phala.com/v1` requires confidential routing through Phala's attested gateway. Ordinary HTTP clients do not verify its attestation, pin its TLS key, or verify each response receipt. `curl` and `jq` can inspect the artifacts; client-side verification requires the [TypeScript ACI verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
+import SharedContent from "/snippets/aci/verify-response.mdx";
+import { site } from "/snippets/site.jsx";
 
-## Choose a verification client
+`https://inference.phala.com/v1` is Phala's TEE-only endpoint. Every request requires verified upstream serving. Ordinary SDK calls and cURL do not verify the attestation or pin the channel; use the verification client below or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
 
-| Client | Verification |
-| --- | --- |
-| Node.js or Bun application | Call `connectAci()` before traffic, use `aci.fetch`, and call `verifyReceipt()` after consuming the response. See the [TypeScript example](/phala-cloud/confidential-ai/verify/typescript-sdk). |
-| Coding agent through Private AI Proxy | The proxy verifies attestation and pins the channel before traffic, then audits receipts after delivery. See [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy). |
-| Ordinary OpenAI/Anthropic SDK or cURL | Base-URL configuration alone does not perform client-side verification. |
+<SharedContent site={site} />
 
-Agent tools, MCP servers, browser automation, and telemetry remain separate trust boundaries.
-
-## What the verifier checks
-
-1. Verify a fresh nonce-bound gateway quote, recompute the JCS keyset digest, check `not_after`, and replay the measured compose evidence. See [Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
-2. Before sending model traffic, use hostname-validated TLS pinned to a key in the attested keyset.
-3. Fetch the receipt named by `x-receipt-id` using the same credential that made the request. Require `workload_keyset_digest` to match the verified keyset. Resolve `key_id` in `receipt_signing_keys` and verify the Ed25519 signature over the JCS receipt with `signature` removed.
-4. Match `request.received.body_hash` and `response.returned.body_hash` to the exact request and response bytes. For SSE, the response hash includes the complete in-order stream framing. E2EE request hashes follow the transport extension's restored-plaintext rules.
-5. Require a successful `upstream.verified` event with `result: "verified"`, `required: true`, and a `session_id`. Fetch the full session, recompute its bare SHA-256 JCS content address, verify its evidence and binding, and apply your claim policy. The receipt's serving time must fall within that session's validity interval.
-
-A receipt event by itself is an assertion by the attested gateway. Verifying the cited session's evidence provides the independent upstream audit; coverage varies by provider.
-
-## Inspect existing artifacts
-
-The following commands only display documents for a request you already made. They do not produce a verification verdict.
-
-```bash
-# Set RECEIPT_ID to the x-receipt-id header from your inference response.
-curl --fail-with-body -sS "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY" -o receipt.json
-
-jq '{receipt_id, workload_keyset_digest, key_id, endpoint,
-     upstream: [.event_log[] | select(.type == "upstream.verified")]}' receipt.json
-
-# Stop if the receipt does not cite a successful upstream session.
-SESSION_ID=$(jq -er '.event_log[] | select(.type == "upstream.verified" and .result == "verified") | .session_id | select(type == "string" and test("^[0-9a-f]{64}$"))' receipt.json) && \
-  curl --fail-with-body -sS "https://inference.phala.com/v1/aci/sessions/$SESSION_ID" \
-    | jq '{upstream_name, endpoint, channel_binding, claims}'
-```
-
-The session uses `upstream_name` (for example `chutes` or `phala-267`). The list endpoint accepts `?upstream_name=` and `?model=`; it omits `evidence.data`, so fetch the full record for a content-address check.
-
-## Release policy and limits
-
-A passing audit binds the exact exchange to a genuine attested gateway, pinned TLS channel, signed receipt, and verified upstream session. It establishes a reviewed release only when you enforce an independently obtained compose allowlist. Workload-declared `source_provenance` is not a trust root. See the [SDK release policy](/phala-cloud/confidential-ai/verify/typescript-sdk#release-policy).
-
-## Legacy signature endpoint
-
-`GET /v1/signature/{id}` wraps the same canonical receipt for older clients. New integrations should verify `/v1/aci/receipts/{id}` directly.
+For runtime API details and local receipt history, see the [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk).

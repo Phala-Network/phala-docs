@@ -1,0 +1,169 @@
+---
+title: "Overview"
+description: "Base URL, authentication, and the full list of API endpoints."
+---
+
+The API is OpenAI-compatible. Point an OpenAI client at `https://inference.phala.com/v1`,
+or an Anthropic client at `https://inference.phala.com` (its SDK appends `/v1/messages`), and send
+your key as a bearer token.
+
+## Base URL
+
+```
+https://inference.phala.com/v1
+```
+
+This host rejects non-TEE models with `404` and requires verified upstream serving. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy).
+
+## Authentication
+
+Send an API key as a bearer token for inference and private artifacts:
+
+```bash
+Authorization: Bearer $PHALA_AI_API_KEY
+```
+
+Create keys in the [dashboard](https://cloud.phala.com/dashboard). Read the key from an environment
+variable or a secret manager, call the API from a backend rather than from browser or mobile code,
+and revoke a key in the dashboard if it is exposed. The model catalog and gateway attestation are
+public.
+
+## Endpoints
+
+### Inference
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| [`/v1/chat/completions`](/phala-cloud/confidential-ai/confidential-model/api-reference/chat-completions) | POST | Create a chat completion. |
+| [`/v1/responses`](/phala-cloud/confidential-ai/confidential-model/api-reference/responses) | POST | Create a response (Responses API format). |
+| [`/v1/messages`](/phala-cloud/confidential-ai/confidential-model/api-reference/messages) | POST | Create a message (Anthropic Messages format). |
+| [`/v1/embeddings`](/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings) | POST | Create text embeddings. |
+| [`/v1/images/generations`](/phala-cloud/confidential-ai/confidential-model/api-reference/images) | POST | Generate images (buffered, base64). |
+| [`/v1/audio/transcriptions`](/phala-cloud/confidential-ai/confidential-model/api-reference/audio) | POST | Transcribe audio (multipart upload). |
+| [`/v1/systemone`](/phala-cloud/confidential-ai/confidential-model/api-reference/systemone) | POST | Answer typed questions with decision models. |
+| [`/v1/embeddings/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/embeddings#list-embedding-models) | GET | List embedding models. |
+| [`/v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models) | GET | List models with providers, context windows, and pricing. |
+
+Each model has an `is_tee` boolean: `is_tee: true` means it can be served confidentially. The
+receipt's `upstream.verified` event confirms a specific response was. See
+[Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
+
+### Verification
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| [`/v1/aci/attestation`](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) | GET | Fresh TEE attestation report, bound to a caller-supplied `nonce`. |
+| [`/v1/aci/receipts/{id}`](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) | GET | Signed receipt for a response, by receipt id or chat id. |
+| [`/v1/aci/sessions/{id}`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions) | GET | Attested-session record referenced by a receipt. |
+| [`/v1/aci/sessions`](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions) | GET | List current attested sessions (`?upstream_name=&model=`). |
+
+To verify a response: fetch the attestation report with a fresh `nonce`, read the `x-receipt-id`
+header on your response, fetch its signed receipt, then check the receipt signature under the attested
+keyset and compare the request and response hashes. See [Verify a response](/phala-cloud/confidential-ai/verify/typescript-sdk).
+
+### Legacy
+
+Legacy endpoints kept for backward compatibility with earlier API clients. New integrations should use the canonical
+endpoints above.
+
+| Endpoint | Method | Canonical replacement |
+| --- | --- | --- |
+| [`/v1/completions`](/phala-cloud/confidential-ai/confidential-model/api-reference/completions) | POST | `/v1/chat/completions` |
+| [`/v1/signature/{id}`](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#legacy-alias) | GET | `/v1/aci/receipts/{id}` |
+| [`/v1/attestation/report`](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation#legacy-alias) | GET | `/v1/aci/attestation` |
+
+The Phala endpoint always requires verified upstream serving. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy).
+
+## Request format
+
+POST requests use JSON:
+
+```bash
+curl https://inference.phala.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -d '{
+    "model": "z-ai/glm-5.3",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
+```
+
+## Response format
+
+```json
+{
+  "id": "chatcmpl-123",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "z-ai/glm-5.3",
+  "choices": [{
+    "index": 0,
+    "message": { "role": "assistant", "content": "Hello! How can I help you?" },
+    "finish_reason": "stop"
+  }],
+  "usage": { "prompt_tokens": 9, "completion_tokens": 12, "total_tokens": 21 }
+}
+```
+
+## Response headers
+
+Inference responses include verification headers:
+
+| Header | Description |
+| --- | --- |
+| `x-receipt-id` | Id of the signed [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) for the response. |
+| `x-aci-keyset-digest` | Digest of the workload's published keyset. |
+| `x-aci-version` | ACI version, for example `aci/1`. |
+| `x-e2ee-applied`, `x-e2ee-version`, `x-e2ee-algo` | Encryption hints when E2EE is applied. See [E2EE](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption). |
+
+To select a model, set the `model` field in the request body. For end-to-end encryption, send the
+`X-E2EE-*` request headers from the [E2EE guide](/phala-cloud/confidential-ai/confidential-model/e2ee-encryption).
+
+## Errors
+
+Errors return a JSON body with an appropriate HTTP status. `/v1/messages` uses the Anthropic error
+envelope, with top-level `type: "error"`, an `error` object, and a `request_id`. Other endpoints use
+the OpenAI-compatible shape shown here:
+
+```json
+{
+  "error": {
+    "message": "Invalid API key provided",
+    "type": "authentication_error",
+    "code": null,
+    "param": null
+  }
+}
+```
+
+| Code | Meaning |
+| --- | --- |
+| 200 | Success |
+| 400 | Bad request (invalid parameters) |
+| 401 | Unauthorized (invalid API key) |
+| 402 | Account quota or API key budget exhausted (`insufficient_quota`) |
+| 404 | Endpoint or model not found |
+| 412 | None of the pinned attested sessions could serve the request (`session_not_accepted`) |
+| 429 | Rate limit exceeded; see [Rate limits](/phala-cloud/confidential-ai/confidential-model/error-handling) |
+| 500 | Server error |
+| 503 | Service unavailable, including required upstream verification failure (`upstream_verification_failed`) |
+
+See [Error handling](/phala-cloud/confidential-ai/confidential-model/error-handling).
+
+## Using existing client libraries
+
+The API follows the OpenAI request and response format, so OpenAI client libraries work by pointing
+the base URL at the gateway and using your API key:
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["PHALA_AI_API_KEY"], base_url="https://inference.phala.com/v1")
+resp = client.chat.completions.create(
+    model="z-ai/glm-5.3",
+    messages=[{"role": "user", "content": "Hello"}],
+)
+```
+
+See [OpenAI SDK](/phala-cloud/confidential-ai/confidential-model/integrations/openai-sdk) and the other SDK guides.

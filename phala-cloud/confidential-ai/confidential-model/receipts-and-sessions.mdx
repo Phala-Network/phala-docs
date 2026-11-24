@@ -3,72 +3,16 @@ title: Receipts and Sessions
 description: Learn how per-response receipts and attested sessions prove what happened to a Private AI request.
 ---
 
-Receipts and sessions are the two response-level artifacts you use after verifying the gateway attestation report.
+import SharedContent from "/snippets/aci/receipts.mdx";
+import { site } from "/snippets/site.jsx";
 
-- A **receipt** is the signed record for one response.
-- A **session** is the immutable verified security context for a confidential upstream channel.
+On Phala's TEE-only endpoint, require `upstream.verified.result: verified` and `required: true`; failed verification refuses forwarding.
 
-## Receipt Lifecycle
-
-A completed inference response identifies its receipt with `x-receipt-id`. A stream whose headers were committed before the id was allocated may instead require lookup by response id after completion. Fetch it with [Get Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts):
-
-```bash
-curl "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer $PHALA_AI_API_KEY"
-```
-
-The receipt records ordered events with hashes and facts, not prompt text.
-
-| Event | What it records |
-| --- | --- |
-| `request.received` | Hash of the request body observed by the gateway. |
-| `route.selected` | Selected backend route. |
-| `request.forwarded` | Hash of the provider-facing request. |
-| `upstream.verified` | `model_id`, `result`, `required`, and the `session_id` for verification details. |
-| `response.received` | Hash of the provider response before post-processing. |
-| `response.returned` | Hash of the final wire response. |
-
-## What a Receipt Proves
-
-A verified receipt proves:
-
-1. The receipt was signed by a key in the attested gateway keyset.
-2. `workload_keyset_digest` matches the verified attestation report.
-3. The exact request bytes match `request.received.body_hash`, and the returned response bytes match `response.returned.body_hash`.
-4. The required upstream verification result is recorded. On this TEE-only endpoint `required` is `true`; a failed check refuses forwarding.
-
-Receipt signatures cover the JCS form of the full receipt with `signature` removed. Resolve `key_id` in the verified keyset's `receipt_signing_keys`; the Phala key is `dstack-kms-receipt-ed25519-v1` (`ed25519`). Hash comparisons alone do not verify the signature or attestation. Use the [TypeScript SDK](/phala-cloud/confidential-ai/verify/typescript-sdk) or [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy).
-
-## Streaming Responses
-
-For streaming, `x-receipt-id` can arrive before the stream ends. Fetch the receipt after the stream completes because `response.returned.body_hash` covers the full response body.
-
-## Attested Sessions
-
-When the gateway verifies a confidential upstream, it records an attested session. A receipt references it from `upstream.verified.session_id`.
-
-A session captures:
-
-- Verified upstream identity and endpoint.
-- Enforced channel binding.
-- Typed claims and reasons.
-- Evidence digest and evidence payload.
-
-The `session_id` is the bare 64-character lowercase SHA-256 digest of the complete session document in JCS form, with no prefix. It is not a field in the full document. If the material changes, the id changes. The list endpoint returns `{ "api_version": "aci/1", "sessions": [...] }`; entries include `session_id` but omit `evidence.data`. Fetch the full record before checking the content address. Filter the list with `?upstream_name=chutes` or `?model=z-ai/glm-5.3`.
-
-## Trace a Response
-
-```text
-response -> x-receipt-id
-receipt  -> upstream.verified.session_id
-session  -> provider identity, binding, claims, evidence
-```
-
-The receipt records the attested gateway's assertion about the upstream. Independent upstream auditing also verifies the cited session's evidence and binding. Coverage varies by provider; apply the claims your policy requires.
+<SharedContent site={site} />
 
 ## Related
 
 <CardGroup cols={2}>
   <Card title="Verify a Response" icon="circle-check" href="/phala-cloud/confidential-ai/verify/verify-signature" />
-  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/tcb-and-claims" />
+  <Card title="TCB and Claims" icon="list-check" href="/phala-cloud/confidential-ai/confidential-model/verified-upstreams#claims" />
 </CardGroup>

@@ -38,15 +38,15 @@ This path does not verify attestation locally; use [Private AI Proxy](/phala-clo
 
 ## Check the Connection
 
-Use Cline's **Verify** action, then run a read-only request in a disposable repository and confirm the selected provider and model.
+Send a short read-only request in a disposable repository and confirm the selected provider and model.
 
 ## Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
-| Verify fails with the Proxy | Protected must be on; copy the client key again. |
-| Verify fails without the Proxy | Keep `/v1` in the base URL and check the API key. |
-| Tool calls fail | Choose a model that declares `tools` in the live catalog and repeat Verify. |
+| Requests fail with the Proxy | Protected must be on; copy the client key again. |
+| Requests fail without the Proxy | Keep `/v1` in the base URL and check the API key. |
+| Tool calls fail | Choose a model that declares `tools` in the live catalog and send the request again. |
 
 ## Related
 

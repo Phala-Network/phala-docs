@@ -43,6 +43,9 @@ jobs:
           echo "::endgroup::"
 
 
+      - name: 🔒 Validate shared ACI docs and Private AI invariants
+        run: python3 .scripts/check_private_ai.py
+
       - name: 🔗 Check internal links
         run: |
           echo "::group::🔗 Checking internal links"

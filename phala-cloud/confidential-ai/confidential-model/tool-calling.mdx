@@ -198,3 +198,13 @@ curl -s -X POST  'https://inference.phala.com/v1/chat/completions' \
 curl -s https://inference.phala.com/v1/models \
   | jq -r '.data[] | select((.supported_features // []) | index("tools")) | .id'
 ```
+
+## Model Context Protocol (MCP)
+
+[MCP](https://modelcontextprotocol.io/) clients work with this API out of the box. Convert each MCP
+tool definition to an OpenAI `tools` entry (the MCP `name`, `description`, and `inputSchema` map
+directly to `function.name`, `function.description`, and `function.parameters`), send the request, and
+execute the returned `tool_calls` against your MCP server. No special endpoint is required: MCP runs on
+the standard tool-calling shown above.
+
+Tool execution, MCP servers, and their logs are outside the inference boundary. Validate arguments, enforce tool permissions, and bound execution before returning results to the model.

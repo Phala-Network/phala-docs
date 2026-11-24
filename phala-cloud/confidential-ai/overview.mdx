@@ -1,78 +1,27 @@
 ---
-description: Use Private AI through an OpenAI-compatible API, or rent GPU TEE servers for your own confidential AI, with attestation reports and signed receipts you can verify.
 title: Overview
+description: Use Phala's TEE-only inference API and verify the gateway, response receipts, and upstream evidence.
 ---
 
-<img
-  src="/images/confidential-ai/confidential-ai-overview.jpeg"
-  alt="Private AI overview - run AI models with hardware-level privacy in GPU TEEs"
-/>
+Phala Private AI serves OpenAI-compatible inference at `https://inference.phala.com/v1` through an Attested Confidential Inference (ACI) gateway. The gateway runs inside an Intel TDX trusted execution environment (TEE), verifies upstream providers before forwarding, and signs a receipt for each completed response.
 
-## Why Private AI?
+The [live catalog](/phala-cloud/confidential-ai/confidential-model/api-reference/models) lists available models, pricing, and capabilities. This endpoint requires TEE-capable models and attested serving for every request. See [Endpoint policy](/phala-cloud/confidential-ai/confidential-model/endpoint-policy) for routing and refusal behavior.
 
-Traditional cloud AI deployments ask you to trust the platform operator and the upstream model provider. Phala Private AI runs inference through an attested gateway and verified TEE providers, then gives you cryptographic evidence for each response.
-
-The on-demand API is OpenAI-compatible and served through an Attested Confidential Inference (ACI) gateway. Every response includes a signed receipt, and the gateway publishes an attestation report that proves which TEE workload served the request. Confidential model responses additionally show, in the receipt, that the upstream provider was verified and channel-bound before your prompt was forwarded.
-
-Phala Cloud offers pre-deployed **Models** through an API for quick integration, and **GPU TEE** for custom infrastructure. See [available models](https://phala.com/confidential-ai-models) for supported models, use cases, and deployment options.
-
-<Columns cols={2}>
-  <Card
-    icon="webhook"
-    href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api"
-    title="API Access"
-    arrow="true"
-  >
-    **Pre-deployed models, pay per request**
-
-    Best for quick integration. 5 minute setup with OpenAI-compatible API and no infrastructure management.
+<CardGroup cols={2}>
+  <Card title="Start with the API" icon="webhook" href="/phala-cloud/confidential-ai/confidential-model/confidential-ai-api">
+    Create a Phala API key and make an OpenAI-compatible request.
   </Card>
-
-  <Card
-    icon="microchip"
-    title="GPU TEE"
-    href="/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify"
-    arrow="true"
-  >
-    **Custom infrastructure, full control**
-
-    Best for custom models. Rent dedicated GPU TEE servers for training, fine-tuning, or any custom workload.
+  <Card title="Use in agents" icon="terminal" href="/phala-cloud/confidential-ai/agents/private-ai-proxy">
+    Connect an agent through a locally verified API with Private AI Proxy.
   </Card>
-</Columns>
+  <Card title="How it works" icon="shield-check" href="/phala-cloud/confidential-ai/confidential-model/how-it-works">
+    Understand the gateway attestation, signed receipt, and upstream session.
+  </Card>
+  <Card title="Verify a response" icon="receipt" href="/phala-cloud/confidential-ai/verify/typescript-sdk">
+    Verify before traffic, pin the TLS channel, and audit a receipt.
+  </Card>
+</CardGroup>
 
-## Quick Tour of Private AI
+Attestation identifies the measured workload and its keys. A receipt binds one exchange to that keyset. Provider sessions describe the upstream evidence boundary, which varies between model CVMs, routers, and brokers. Read [Trust Boundary](/phala-cloud/confidential-ai/confidential-model/trust-boundary) before deciding which claims meet your policy.
 
-### Models: API Access
-
-**API Access** provides pre-deployed models through an OpenAI-compatible API at `https://inference.phala.com/v1`. Pay per request with no infrastructure to manage. Start with [API Access](/phala-cloud/confidential-ai/confidential-model/confidential-ai-api).
-
-For advanced API features, explore [Tool Calling](/phala-cloud/confidential-ai/confidential-model/tool-calling) to enable LLMs to interact with external tools and APIs securely within TEE.
-
-### GPU TEE: Custom Infrastructure
-
-For complete infrastructure control beyond pre-deployed models, use [GPU TEE](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) to rent dedicated GPU servers. Run any workload including custom models for inference, training, or fine-tuning. Configure GPU, CPU, RAM, and storage to match your exact needs.
-
-
-### Verify Attestation and Receipts
-
-To verify the API path, fetch a fresh [Attestation Report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation) from `GET /v1/aci/attestation`. It proves the gateway workload identity, TEE quote, source provenance, and public keyset used to sign receipts.
-
-Then use the response `x-receipt-id` header to fetch the [Receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). The receipt binds request and response hashes to the attested workload and records whether the upstream provider was verified. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature) for the full flow.
-
-### Benchmark
-
-Our [benchmark](/phala-cloud/confidential-ai/benchmark) shows GPU TEE mode achieves 99% of native performance on H100/H200 GPUs.
-
-### FAQs
-
-Check [FAQs](/phala-cloud/confidential-ai/faqs) for frequently asked questions about Private AI.
-
-## What makes Phala Cloud Private AI Different?
-
-- **Drop-in compatibility**: OpenAI-compatible API with popular models (DeepSeek, Llama, GPT-OSS, Qwen) ready for immediate use
-- **Verifiable security**: Gateway attestation, signed per-response receipts, and upstream verification events you can check yourself
-- **Flexible deployment**: Choose from API access (pay per request) or GPU TEE (full infrastructure control)
-
-## Open Source Foundation
-
-Our underlying technology is open source. Check out the [dstack](https://github.com/Dstack-TEE/dstack) repository to see how LLMs run securely in GPU TEEs.
+To run your own workload on dedicated hardware, use [GPU CVM](/phala-cloud/confidential-ai/confidential-gpu/deploy-and-verify) in the Phala Cloud section. [GPU benchmarks](/phala-cloud/confidential-ai/benchmark) and [GPU CVM FAQs](/phala-cloud/confidential-ai/confidential-gpu/faqs) cover that deployment path.

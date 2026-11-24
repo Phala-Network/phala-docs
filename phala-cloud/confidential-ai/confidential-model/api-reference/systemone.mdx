@@ -1,13 +1,14 @@
 ---
 title: System One
 description: "Ask a model typed questions about a state and get structured decisions."
-api: "POST /systemone"
+api: "POST https://inference.phala.com/v1/systemone"
 ---
 
 System One models answer typed questions about a piece of content instead of generating text. Each
 answer is a calibrated probability, a choice among options, or a level on a scale, so software can
 act on it directly. The endpoint follows the TypeSafe System One protocol, so the official TypeSafe
-SDKs work with Phala by changing the base URL.
+SDKs work with Phala by changing the base URL and disabling request compression. The gateway
+does not accept compressed request bodies.
 
 System One models list `decisions` in `output_modalities` in [`GET /v1/models`](/phala-cloud/confidential-ai/confidential-model/api-reference/models).
 They do not serve chat: a chat completion request to one returns `404 model_not_found`. Responses are
@@ -106,6 +107,7 @@ client = TypeSafeClient(
     api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com",
     model="jaredpalmer/kev-4b",
+    compression=False,
 )
 
 result = client.system_one(
@@ -125,6 +127,7 @@ import { TypeSafeClient, choice, noul, score } from "@typesafe-ai/sdk";
 const client = new TypeSafeClient({
   baseURL: "https://inference.phala.com",
   apiKey: process.env.PHALA_AI_API_KEY,
+  compression: false,
 });
 
 const result = await client.systemOne({

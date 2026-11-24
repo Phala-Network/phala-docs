@@ -1,101 +1,14 @@
 ---
 title: "Attestation report"
 description: "The gateway TEE attestation report, bound to a caller-supplied nonce."
-api: "GET /aci/attestation"
+api: "GET https://inference.phala.com/v1/aci/attestation"
 ---
 
-Returns the gateway's attestation report: the hardware-backed proof of which TEE workload is serving
-the API, plus the public keys it signs with. Verify this report before trusting any
-[receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts). For what each field proves, see
-[Attestation report](/phala-cloud/confidential-ai/verify/verify-attestation).
+import SharedContent from "/snippets/aci/api-attestation.mdx";
+import { site } from "/snippets/site.jsx";
 
-```http
-GET /v1/aci/attestation?nonce={nonce}
-```
 
-## Request
-
-<ParamField query="nonce" type="string">
-  Exactly 64 lowercase hex characters (32 random bytes). The gateway binds it into the quote's
-  `report_data` so you can prove the report is not a replay.
-</ParamField>
-
-## Response
-
-`200 OK`, `application/json`. The bare attestation report.
-
-### Top-level fields
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `api_version` | string | ACI version token, for example `aci/1`. |
-| `workload_keyset_digest` | string | `sha256:…` digest over the published keyset. |
-| `attestation` | object | The attestation evidence and keyset (below). |
-| `service_capabilities` | object | `supported_e2ee_versions` and the `serving` mode. |
-
-### `attestation` object
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `tee_type` | string | TEE technology, for example `tdx`. |
-| `report_data` | string | Value bound into the quote. Commits to your `nonce` and the keyset. |
-| `source_provenance` | object | Workload-declared `repo_url`, `repo_commit`, `image_digest`, and `image_provenance` labels. |
-| `workload_keyset` | object | `subject`, `not_after`, `receipt_signing_keys`, `e2ee_public_keys`, and `tls_public_keys`. |
-| `evidence` | object | `quote`, `quote_report_data`, `event_log`, `vm_config`, `app_compose`, `key_custody`, and `downstream_tls_binding`. |
-
-### Example (long values truncated)
-
-For brevity, the example shows a subset of the E2EE/TLS keys and omits custody entries. Recompute digests over the complete report returned by the service.
-
-```json
-{
-  "api_version": "aci/1",
-  "workload_keyset_digest": "sha256:3eff0836cd104d8cb5f8e8ee361789cf9…",
-  "attestation": {
-    "tee_type": "tdx",
-    "report_data": "7b7daf62d7e9e31f5d17e70d32c010bda9ead273…",
-    "source_provenance": {
-      "repo_url": "https://github.com/Dstack-TEE/private-ai-gateway.git",
-      "repo_commit": "<gateway-commit>",
-      "image_digest": null,
-      "image_provenance": null
-    },
-    "workload_keyset": {
-      "subject": null,
-      "not_after": 1795221116,
-      "receipt_signing_keys": [ { "key_id": "dstack-kms-receipt-ed25519-v1", "algo": "ed25519", "public_key": "211c…" } ],
-      "e2ee_public_keys": [ { "key_id": "dstack-kms-e2ee-v1", "algo": "secp256k1-aes-256-gcm-hkdf-sha256", "public_key": "0494…" } ],
-      "tls_public_keys": [ { "spki_sha256": "943c…", "domain": "inference.phala.com" } ]
-    },
-    "evidence": { "quote": "040002008100…", "quote_report_data": "7b7daf…", "event_log": "[{…}]", "vm_config": "{…}", "app_compose": "{…}", "downstream_tls_binding": { "domain": "inference.phala.com", "spki_sha256": "943c…" }, "key_custody": { "provider": "dstack-kms", "keys": [] } }
-  },
-  "service_capabilities": { "supported_e2ee_versions": ["2"], "serving": "aggregator" }
-}
-```
-
-## Verifying the report
-
-1. Verify `attestation.evidence.quote` against Intel DCAP collateral, and confirm its report data
-   binds your `nonce` and the `workload_keyset`.
-2. Recompute the JCS digest of `workload_keyset` and compare it with `workload_keyset_digest`.
-3. Confirm `workload_keyset_digest` matches the receipts you verify.
-4. Confirm `workload_keyset.not_after` is in the future.
-5. Replay the event log to RTMR3 and confirm the measured compose hash equals
-   `sha256(app_compose)`.
-6. For reviewed-release enforcement, require that compose hash in an independently obtained
-   allowlist. Do not treat `source_provenance` as the trust anchor.
-
-The full verification procedure is in [Verify a response](/phala-cloud/confidential-ai/verify/verify-signature).
-
-## Legacy alias
-
-`GET /v1/attestation/report?nonce=…` returns the same gateway attestation for clients written
-against earlier API versions, with two differences: top-level `signing_address`, `signing_algo`, and
-`signing_public_key` derived from the gateway keyset (`?signing_algo=ecdsa`, the default, or
-`ed25519` selects the key), and `all_attestations` collapsed to a single entry. Earlier API versions
-returned the upstream model's attestation here; the upstream verification for a response is now in
-the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) and the [attested session](/phala-cloud/confidential-ai/confidential-model/api-reference/sessions). New
-integrations should use `/v1/aci/attestation`.
+<SharedContent site={site} />
 
 ## Related
 

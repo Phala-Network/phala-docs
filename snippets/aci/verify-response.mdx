@@ -1,0 +1,178 @@
+export const VerifyResponseExample4 = ({ site }) => <CodeBlock language="bash">{`NONCE=$(openssl rand -hex 32)
+curl -fsS "$BASE_URL/v1/aci/attestation?nonce=$NONCE" \\
+  -H "Authorization: Bearer $${site.keyEnv}" > attestation.json`}</CodeBlock>;
+
+export const VerifyResponseExample5 = ({ site }) => <CodeBlock language="bash">{`cat > request.json <<'JSON'
+{
+  "model": "qwen/qwen3.8-27b",
+  "messages": [{"role": "user", "content": "Reply with exactly one word: hello"}],
+  "provider": {"aci_verified": true},
+  "max_tokens": 12
+}
+JSON
+
+curl -fsS -D headers.txt -o response.json "$BASE_URL/v1/chat/completions" \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  -H "Content-Type: application/json" \\
+  --data-binary @request.json
+
+jq '.choices[0].message.content' response.json
+RECEIPT_ID=$(awk 'tolower($1) == "x-receipt-id:" {gsub("\\r", "", $2); print $2}' headers.txt)
+printf '%s\\n' "$RECEIPT_ID"`}</CodeBlock>;
+
+export const VerifyResponseExample6 = ({ site }) => <CodeBlock language="bash">{`curl -fsS "$BASE_URL/v1/aci/receipts/$RECEIPT_ID" \\
+  -H "Authorization: Bearer $${site.keyEnv}" > receipt.json
+jq . receipt.json`}</CodeBlock>;
+
+export const VerifyResponseExample7 = ({ site }) => <CodeBlock language="bash">{`if SID=$(jq -er '.event_log[] | select(.type == "upstream.verified" and .result == "verified") | .session_id' receipt.json); then
+  curl -fsS "$BASE_URL/v1/aci/sessions/$SID" \\
+    -H "Authorization: Bearer $${site.keyEnv}" > session.json
+  jq '{upstream_name, channel_binding, evidence_digest: .evidence.digest, claims}' session.json
+else
+  echo "no verified upstream session" >&2
+fi`}</CodeBlock>;
+
+export const VerifyResponseExample1 = ({ site }) => <CodeBlock language="typescript">{`import OpenAI from "openai";
+import { connectAci } from "@phala/aci-verifier/runtime";
+
+const apiKey = process.env.${site.keyEnv};
+if (!apiKey) throw new Error("${site.keyEnv} is required");
+
+const aci = await connectAci({
+  baseURL: "${site.baseUrl}",
+  serving: { requireVerified: true, requireReceipt: true },
+});
+
+try {
+  if (!aci.identity.transcript.verdict.verified) {
+    throw new Error(aci.identity.transcript.verdict.line);
+  }
+
+  const client = new OpenAI({ apiKey, baseURL: aci.baseURL, fetch: aci.fetch });
+  const response = await client.responses.create({
+    model: "z-ai/glm-5.3",
+    input: "Reply with exactly: verified",
+  });
+
+  const audit = await aci.verifyReceipt();
+  if (!audit.transcript.verdict.verified) {
+    throw new Error(audit.transcript.verdict.line);
+  }
+  console.log(response.output_text);
+} finally {
+  await aci.close();
+}`}</CodeBlock>;
+
+export const VerifyResponseExample2 = ({ site }) => <CodeBlock language="typescript">{`const aci = await connectAci({
+  baseURL: "${site.baseUrl}",
+  policy: {
+    acceptedComposeHashes: ["<reviewed-compose-sha256>"],
+  },
+});`}</CodeBlock>;
+
+export const VerifyResponseExample3 = ({ site }) => <CodeBlock language="bash">{`export ${site.keyEnv}=YOUR_API_KEY
+export BASE_URL=https://${new URL(site.baseUrl).hostname}`}</CodeBlock>;
+
+## Node and Bun
+
+```bash
+npm install @phala/aci-verifier openai
+```
+
+Node 20.18.1+ and Bun 1.4.0+ share the same API; the `/runtime` export selects the pinned transport.
+
+<VerifyResponseExample1 site={site} />
+
+
+`connectAci()` verifies the attestation before sending model traffic and pins TLS to a key in the
+attested workload keyset. Pass `aci.fetch` only to the client that uses this gateway; it records the
+exact request and response wire digests. `verifyReceipt()` fetches the matching signed receipt,
+verifies those digests, and verifies the cited upstream session. Audit a response before treating
+its serving path as verified.
+
+## Browser use
+
+The browser export can verify attestation and receipt documents, but browser JavaScript cannot
+observe the server certificate SPKI. Use the Node.js or Bun runtime when model traffic must be
+bound to the attested TLS key.
+
+## Release policy
+
+The SDK does not check whether the gateway runs a production or development dstack OS image.
+The deprecated `requireProductionOs` option is ignored. For OS-image assurance, verify the same
+quote, event log, and VM configuration with an independent
+[dstack verifier](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier) and require
+`is_valid: true`.
+
+Without `acceptedComposeHashes`, the client verifies that the measured compose ran in a genuine
+TDX workload; it does not claim that your organization reviewed that release.
+
+| Value | Meaning |
+| --- | --- |
+| `sha256(app_compose)` | Bound into RTMR3; suitable for a reviewed-release allowlist |
+| `source_provenance.repo_url` and `repo_commit` | Workload-declared labels, useful for inspection but not a trust anchor |
+
+For reviewed-release enforcement, load accepted hashes from authenticated release metadata and pair
+compose appraisal with the independent OS verification above.
+<a href={site.paths.measurements}>Release measurements</a> lists the current values, the GitHub release that
+publishes each one, and the notice you get before they change. Never copy a compose hash from the
+endpoint and trust it on first use.
+
+<VerifyResponseExample2 site={site} />
+
+
+## What a passing audit proves
+
+- the TDX quote binds the fresh challenge, workload keyset, and measured compose;
+- the model request used hostname-validated TLS bound to an attested SPKI;
+- the signed receipt binds the exact request and response bytes to that workload; and
+- a required confidential upstream was verified and its cited session is valid.
+
+It does not prove that a release was reviewed unless an independently obtained compose allowlist was
+enforced.
+
+## Inspect the artifacts by hand
+
+The `curl` and `jq` commands inspect artifacts; they do not verify hardware quotes, receipt signatures,
+or the actual TLS channel. Before sending sensitive data, use `connectAci()` above or
+<a href={site.paths.proxy}>Private AI Proxy</a>, with the [release policy](#release-policy) your
+application requires.
+
+Get your API key from the <a href={site.paths.dashboard}>dashboard</a>. These examples use plain TLS
+and save the exact request and response bytes before formatting them with `jq`.
+
+<VerifyResponseExample3 site={site} />
+
+
+<Steps>
+  <Step title="Fetch the attestation with your own nonce">
+    Fetch the gateway's <a href={site.paths.apiAttestation}>attestation report</a> before sending a request.
+    Generate a fresh 64-character lowercase hex nonce:
+
+    <VerifyResponseExample4 site={site} />
+  </Step>
+  <Step title="Send a request and save the receipt id">
+    Choose a current model from the <a href={site.paths.routing + "#list-the-models-you-can-use"}>catalog</a>.
+    Set `provider.aci_verified` to require verified, channel-bound serving.
+
+    <VerifyResponseExample5 site={site} />
+  </Step>
+  <Step title="Fetch the receipt">
+    <VerifyResponseExample6 site={site} />
+
+    See the <a href={site.paths.apiReceipts + "#response"}>receipt fields</a> and
+    <a href={site.paths.receipts + "#the-transparency-event-log"}>transparency events</a> for how to read it.
+  </Step>
+  <Step title="Follow the receipt to its session">
+    Extract the successful `upstream.verified` event's `session_id`, then fetch the full record:
+
+    <VerifyResponseExample7 site={site} />
+
+    Keep the full `session.json` for verification; the printed summary omits fields. See the
+    <a href={site.paths.apiSessions + "#get-one-session"}>session reference</a> for field meanings and
+    <a href={site.paths.upstreams + "#claims"}>claims</a> for how to appraise the evidence.
+  </Step>
+</Steps>
+
+The <a href={site.paths.apiReceipts + "#verifying-the-receipt"}>verification checklist</a> covers the checks a verifier
+must perform on these artifacts.

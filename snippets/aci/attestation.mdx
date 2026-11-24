@@ -1,0 +1,89 @@
+export const AttestationExample1 = ({ site }) => <CodeBlock language="bash">{`curl "${site.baseUrl}/aci/attestation?nonce=$(openssl rand -hex 32)" \\
+  -H "Authorization: Bearer $${site.keyEnv}"`}</CodeBlock>;
+
+The attestation report establishes a measured workload running inside an Intel TDX TEE and publishes
+the keys used for receipts, TLS, and end-to-end encryption. A reviewed-release allowlist is required
+to turn that measurement into a claim about approved software.
+
+This report covers the gateway. Upstream evidence is in the attested session cited by the receipt,
+and its coverage varies by provider. The endpoint is public.
+
+Fetch it with a fresh nonce:
+
+<AttestationExample1 site={site} />
+
+
+See <a href={site.paths.apiAttestation}><code>GET /v1/aci/attestation</code></a> for the full field reference. This
+page explains what each part proves.
+
+## What the report contains
+
+| Field | What it proves |
+| --- | --- |
+| `workload_keyset_digest` | A SHA-256 digest over the published keyset. Receipts cite this digest. |
+| `attestation.tee_type` | The TEE technology, for example `tdx`. |
+| `attestation.evidence.quote` | The hardware-signed TDX quote. This is the root of trust for everything else in the report. |
+| `attestation.report_data` | The value bound into the quote. It commits to your `nonce` and the published keyset, which is how you prove the quote is fresh and matches these keys. |
+| `attestation.workload_keyset` | The keyset subject, expiry, receipt-signing keys, E2EE keys, and TLS SPKI pins. |
+| `attestation.workload_keyset.not_after` | Unix timestamp after which verifiers reject the keyset. |
+| `attestation.source_provenance` | Workload-declared source labels: `repo_url`, `repo_commit`, and optional image fields. These are not a release trust anchor. |
+| `service_capabilities` | Runtime facts, including `supported_e2ee_versions` and `serving`. |
+
+The receipt-signing keys live in `attestation.workload_keyset.receipt_signing_keys`, and the E2EE keys
+in `attestation.workload_keyset.e2ee_public_keys`. The legacy
+<a href={site.paths.apiAttestation + "#legacy-alias"}><code>/v1/attestation/report</code></a> uses a different quote binding
+for a separate legacy signer and the nonce. Its top-level `signing_address`, `signing_algo`, and
+`signing_public_key` are not the ACI receipt-signing keys. Use the canonical `/v1/aci/attestation`
+for the keyset-digest/nonce checks on this page.
+
+## Why the nonce matters
+
+You pass `?nonce=<random>`, using 32 fresh random bytes encoded as 64 lowercase hex characters. The gateway mixes your nonce into `report_data` inside the
+hardware-signed quote. Because the quote is signed by the TEE, a report that commits to a nonce you
+just generated cannot be a replay of an old capture. Generate a new nonce every time you verify, and
+confirm the report's `report_data` is derived from that nonce and the published keyset.
+
+## How verification uses the report
+
+A verifier checks, in order:
+
+1. **Verify the TDX quote.** Verify `attestation.evidence.quote` against Intel DCAP collateral,
+   inspect TCB status, and apply OS and key-custody policy. A local verifier such as
+   [dcap-qvl](https://github.com/Phala-Network/dcap-qvl) can verify Intel evidence. The
+   <a href={site.paths.verify}>ACI TypeScript SDK</a> verifies the quote but does not check whether
+   the dstack OS image is production or development. For that assurance, verify the same quote,
+   event log, and VM configuration with an independent
+   [dstack verifier](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier) and require
+   `is_valid: true`.
+2. **Recompute the keyset digest.** Canonicalize the complete `attestation.workload_keyset` using
+   RFC 8785 JCS, hash those bytes with SHA-256, and prefix the lowercase hex digest with `sha256:`.
+   Require equality with `workload_keyset_digest`. Sorting keys with `jq` or `json.dumps` is not a
+   general JCS implementation. Changing any keyset field, including `not_after`, changes the digest.
+3. **Check nonce binding.** Build these exact UTF-8 statement bytes using the recomputed digest and
+   your nonce, without whitespace and in this field order:
+
+   ```text
+   {"keyset_digest":"sha256:<hex>","nonce":"<64 lowercase hex>","purpose":"aci.report_data.v1"}
+   ```
+
+   Require SHA-256 of that statement to equal `attestation.report_data` and bytes 0 through 31 of
+   the quote's report-data slot. Bytes 32 through 63 must be zero. An absent nonce is represented
+   by JSON `null` in the statement and does not establish freshness. See the
+   [binding implementation](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/crates/aci-protocol/src/identity.rs).
+4. **Check expiry.** Require `workload_keyset.not_after` to be in the future under your policy.
+   Reject implausibly distant expiry.
+   Later receipts must cite this verified keyset digest and a signing key in that keyset.
+5. **Replay measured evidence.** Replay the boot event log to the quote's RTMR3 and require the
+   measured `compose-hash` to equal `sha256(app_compose)`.
+6. **Apply release policy.** For reviewed-release enforcement, require the measured compose hash
+   in an independently obtained, authenticated allowlist. `source_provenance` helps locate source,
+   but the workload declares it; it is not a release trust anchor. Pair compose appraisal with
+   independent OS verification in step 1.
+7. **Bind the client channel.** Before sending traffic, pin hostname-validated TLS to the SPKI
+   listed for the host in the attested keyset. The SDK's Node/Bun transport and Private AI Proxy
+   implement this step; a browser cannot observe the server certificate directly.
+
+<Note>
+The gateway loads its identity and signing keys from dstack KMS inside the TEE. There is no
+ephemeral-key or stub-quote mode: a report always carries a real hardware quote.
+</Note>

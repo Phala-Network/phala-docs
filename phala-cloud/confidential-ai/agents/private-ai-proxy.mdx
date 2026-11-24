@@ -15,6 +15,13 @@ your agent  →  Local API on 127.0.0.1:4180 (agent-scoped token)
             →  Phala gateway (attested), signed receipt per response
 ```
 
+<Frame>
+  <img className="block dark:hidden" src="/phala-cloud/confidential-ai/agents/images/private-ai-proxy-overview-light.png" alt="Private AI Proxy overview in the light theme" />
+  <img className="hidden dark:block" src="/phala-cloud/confidential-ai/agents/images/private-ai-proxy-overview-dark.png" alt="Private AI Proxy overview in the dark theme" />
+</Frame>
+
+The shared app supports both Phala and RedPill profiles; choose Phala when adding your account.
+
 The sections below follow the app's screens: Profiles, Privacy, Agents, Local API, Usage, and
 Settings, then the CLI.
 
@@ -32,9 +39,17 @@ Linux requires glibc 2.35 or newer. Windows Desktop is currently Preview.
 
 ### Command-Line Tool
 
-Install the CLI with Homebrew or npm:
+Install the CLI with an official script, Homebrew, or npm:
 
 <CodeGroup>
+
+```bash macOS / Linux
+curl -fsSL https://phala.com/private-ai-proxy/install.sh | sh
+```
+
+```powershell Windows
+irm https://phala.com/private-ai-proxy/install.ps1 | iex
+```
 
 ```bash Homebrew
 brew install dstack-tee/private-ai/private-ai-proxy
@@ -48,7 +63,14 @@ npm install --global private-ai-proxy
 
 Do not use `--omit=optional` with npm; it selects the native package through an optional dependency. Standalone packages, release signatures, and checksums are also available from [GitHub Releases](https://github.com/Dstack-TEE/private-ai-gateway/releases).
 
-On Homebrew 6+, the fully qualified commands above automatically tap the repository and trust the item being installed. Homebrew and npm manage their own upgrades and removal.
+On Homebrew 6+, the fully qualified commands above tap the repository and trust only the item being installed. To use short names for installation or upgrades, trust the tap first:
+
+```bash
+brew tap dstack-tee/private-ai
+brew trust dstack-tee/private-ai
+```
+
+Older Homebrew versions do not have tap trust; the fully qualified commands still work. Rerun the official script to update a script-managed installation. Homebrew and npm manage their own upgrades and removal.
 
 Verify the installation:
 
@@ -99,7 +121,7 @@ preserved, and an incomplete restore stays retryable.
 | DeepSeek Harness | Chat Completions | `~/.dsh/cordis.patch.yml` and `.credentials.yaml` | New session; restart headless/ACP processes |
 | OpenCode | Chat Completions | `~/.config/opencode/opencode.json` | Restart OpenCode |
 | Pi | Chat Completions | `~/.pi/agent/models.json` | Restart Pi |
-| Hermes | Chat Completions | `~/.hermes/config.yaml` | Restart Hermes |
+| Hermes | Chat Completions | `~/.hermes/config.yaml` (`%LOCALAPPDATA%\hermes\config.yaml` on Windows) | Restart Hermes |
 | OpenClaw | Chat Completions | Native-host provider with a local token reference | Restart OpenClaw |
 | Oh My Pi | Chat Completions | Local token and models file | Restart `omp` |
 

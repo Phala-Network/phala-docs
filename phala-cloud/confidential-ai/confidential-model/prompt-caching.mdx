@@ -3,7 +3,8 @@ title: "Prompt caching"
 description: "Providers that cache a repeated prompt prefix report cached tokens in usage, and Phala bills them at the model's cache rate."
 ---
 
-Prompt caching happens at the provider and needs nothing in the request. When a provider serves
+Prompt caching happens at the provider. Cache activation depends on the provider; Anthropic caching
+uses client-supplied `cache_control` markers, which the gateway forwards rather than adding. When a provider serves
 part of a prompt from its cache, the response reports it in `usage`, and the cached tokens are billed
 at `pricing.input_cache_read` when the model lists one, otherwise at the normal prompt rate.
 

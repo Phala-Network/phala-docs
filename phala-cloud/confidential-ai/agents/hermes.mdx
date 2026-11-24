@@ -9,9 +9,9 @@ Hermes speaks Chat Completions. Private AI Proxy configures it automatically.
 
 1. Install [Private AI Proxy](/phala-cloud/confidential-ai/agents/private-ai-proxy), choose a **Phala** profile, sign in, and turn on **Protected**.
 2. On the **Agents** screen, connect **Hermes**.
-3. Start a new Hermes session; existing sessions stay on their original provider.
+3. Start a new Hermes session to use the provider.
 
-The app writes the provider into `~/.hermes/config.yaml` with an agent-scoped token for its local
+The app writes the provider into `~/.hermes/config.yaml` (`%LOCALAPPDATA%\hermes\config.yaml` on Windows) with an agent-scoped token for its local
 API, and restores the file when you disconnect or stop Protected.
 
 From the CLI, the same connection is:

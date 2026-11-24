@@ -1,0 +1,87 @@
+export const E2EeGuideExample1 = ({ site }) => <CodeBlock language="bash">{`curl -s "${site.baseUrl}/aci/attestation?nonce=$(openssl rand -hex 32)" \\
+  -H "Authorization: Bearer $${site.keyEnv}" \\
+  | jq -r '.attestation.workload_keyset.e2ee_public_keys[] | select(.key_id=="dstack-kms-e2ee-x25519-v1") | .public_key'`}</CodeBlock>;
+
+E2EE encrypts selected request and response fields between your client and the attested gateway.
+TLS still protects the connection; E2EE adds field-level encryption whose public key comes from the
+gateway's <a href={site.paths.attestation}>attested keyset</a>. This guide shows how to send an
+E2EE request. For the trust model and what E2EE does and does not protect, read
+<a href={site.paths.e2ee}>End-to-end encryption</a>.
+
+<Note>
+E2EE is decrypted inside the attested gateway so it can process your request. It proves the
+decryption key belongs to the attested workload; it does not hide the request from that workload. For
+the upstream to be attested too, use a <a href={site.paths.models}>confidential model</a>.
+</Note>
+
+## When to use it
+
+Use E2EE when you want field-level encryption bound to a key you can trace to the attestation
+report, in addition to TLS. If TLS is sufficient for your threat model, you can call the API normally
+without these headers.
+
+## Supported endpoints
+
+E2EE v2 is supported only on `/v1/chat/completions` and `/v1/completions` for buffered or streaming
+responses, and on `/v1/embeddings` for buffered responses. Every other inference endpoint rejects
+authenticated E2EE requests with `400` and type `e2ee_unsupported_endpoint`. A missing bearer token
+can be rejected with `401` before the E2EE check. See the
+[gateway endpoint handlers](https://github.com/Dstack-TEE/private-ai-gateway/blob/main/src/http/app/handlers.rs).
+
+## 1. Get the gateway E2EE key
+
+Fetch the attestation report and read the E2EE public key from the attested keyset. Verify the report
+first (see <a href={site.paths.verify}>Verify a response</a>) so you know the key is bound to a genuine
+TEE.
+
+<E2EeGuideExample1 site={site} />
+
+
+This selects `x25519-aes-256-gcm-hkdf-sha256`, recommended for browser-native clients. Existing
+secp256k1 clients can instead select `dstack-kms-e2ee-v1`, whose algorithm is
+`secp256k1-aes-256-gcm-hkdf-sha256`. Generate your client key on the same curve as the selected key.
+
+## 2. Send E2EE headers
+
+Include these headers on your request. Do not send `X-Signing-Algo`; that selects the legacy path.
+
+| Header | Value |
+| --- | --- |
+| `X-E2EE-Version` | `2` |
+| `X-Client-Pub-Key` | Your public key for the selected suite, hex encoded. |
+| `X-Model-Pub-Key` | The gateway E2EE public key from step 1. |
+| `X-E2EE-Nonce` | 32 fresh random bytes encoded as 64 hexadecimal characters, without `0x`. |
+| `X-E2EE-Timestamp` | Current Unix seconds, within 300 seconds of gateway time. |
+
+## 3. Encrypt the selected fields
+
+Each encrypted field is the lowercase hex encoding of:
+
+```text
+ephemeral_public_key || aes_gcm_nonce (12 bytes) || ciphertext || tag (16 bytes)
+```
+
+The ephemeral public key is 32 raw bytes for X25519 or 65 uncompressed SEC1 bytes for secp256k1.
+Use a fresh ephemeral key and AES-GCM nonce per field.
+
+The AEAD associated data binds the ciphertext to the protocol version, direction, algorithm, model,
+field path, nonce, and timestamp. Any mismatch fails decryption.
+
+<Warning>
+Assembling the ciphertext and AAD by hand is error-prone. Use the official client or verifier
+helpers, which implement the key exchange, AAD construction, and field selection for you.
+</Warning>
+
+## Receipts with E2EE
+
+An encrypted response carries `X-E2EE-Applied: true`, `X-E2EE-Version: 2`, and `X-E2EE-Algo` set to
+the selected key's algorithm, alongside `x-receipt-id`. These headers are hints, not cryptographic
+proof.
+
+Reproduce `request.received.body_hash` by replacing encrypted request fields with their decrypted,
+restored values and compactly serializing the JSON body. Hash this serialization, not the encrypted
+request bytes.
+
+For `response.returned.body_hash`, hash the exact JSON or SSE wire bytes, including ciphertext and
+streaming framing, before decrypting response fields. Separately verify each field's AEAD tag and
+associated data. See <a href={site.paths.e2ee + "#receipts-with-e2ee"}>Receipts with E2EE</a>.

@@ -1,0 +1,25 @@
+// Shared ACI text is synced from redpill-ai/redpill-docs; edit site-specific values here.
+export const site = {
+  brand: "Phala",
+  baseUrl: "https://inference.phala.com/v1",
+  keyEnv: "PHALA_AI_API_KEY",
+  paths: {
+    attestation: "/phala-cloud/confidential-ai/verify/verify-attestation",
+    receipts: "/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions",
+    upstreams: "/phala-cloud/confidential-ai/confidential-model/verified-upstreams",
+    providers: "/phala-cloud/confidential-ai/confidential-model/providers",
+    e2ee: "/phala-cloud/confidential-ai/confidential-model/e2ee-encryption",
+    e2eeGuide: "/phala-cloud/confidential-ai/confidential-model/e2ee-guide",
+    trust: "/phala-cloud/confidential-ai/confidential-model/trust-boundary",
+    verify: "/phala-cloud/confidential-ai/verify/verify-signature",
+    routing: "/phala-cloud/confidential-ai/confidential-model/attested-routing",
+    models: "/phala-cloud/confidential-ai/confidential-model/api-reference/models",
+    zdr: "/phala-cloud/confidential-ai/confidential-model/zero-data-retention",
+    apiAttestation: "/phala-cloud/confidential-ai/confidential-model/api-reference/attestation",
+    apiReceipts: "/phala-cloud/confidential-ai/confidential-model/api-reference/receipts",
+    apiSessions: "/phala-cloud/confidential-ai/confidential-model/api-reference/sessions",
+    measurements: "https://docs.redpill.ai/guides/release-measurements",
+    dashboard: "https://cloud.phala.com/dashboard",
+    proxy: "/phala-cloud/confidential-ai/agents/private-ai-proxy",
+  },
+};

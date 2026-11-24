@@ -37,6 +37,8 @@ For regulated data, use confidential responses and verify `upstream.verified.res
 
 Every gateway attestation report includes `attestation.source_provenance`:
 
+Example only; these labels change with each release.
+
 ```json
 {
   "repo_url": "https://github.com/Dstack-TEE/private-ai-gateway.git",
@@ -46,7 +48,7 @@ Every gateway attestation report includes `attestation.source_provenance`:
 }
 ```
 
-These are workload-declared inspection labels, not a trust root. Replay the measured event log to RTMR3, match `sha256(app_compose)` to the measured compose hash, and require an independently obtained compose allowlist for reviewed-release enforcement. See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
+These are workload-declared inspection labels, not a trust root. Replay the measured event log to RTMR3, match `sha256(app_compose)` to the measured compose hash, and require an independently obtained compose allowlist for reviewed-release enforcement. Each production compose hash is published in [`gateway-prod-<date>` releases](https://github.com/Dstack-TEE/private-ai-gateway/releases) in `Dstack-TEE/private-ai-gateway`; see the [release policy](/phala-cloud/confidential-ai/verify/verify-signature#release-policy). See [Verify Attestation](/phala-cloud/confidential-ai/verify/verify-attestation).
 
 ## Relevant Repositories
 
@@ -71,6 +73,10 @@ These are workload-declared inspection labels, not a trust root. Replay the meas
 ## Enterprise Documentation
 
 Compliance reports, enterprise security reviews, DPAs, BAAs, and certification scope can change over time. Request current documents from Phala through your account or enterprise support channel.
+
+## Report a vulnerability
+
+Report security vulnerabilities privately to [security@phala.network](mailto:security@phala.network). Include the affected component or endpoint, the version or commit when known, reproduction steps, and the expected impact. Do not include API keys or sensitive prompts. See [Phala security and compliance](/phala-cloud/security-and-privacy/compliance) for the existing security contact.
 
 ## Related
 

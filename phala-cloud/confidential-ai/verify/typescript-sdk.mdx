@@ -9,51 +9,9 @@ instance-scoped, SPKI-pinned connection before sending model traffic. The
 package is ESM-only and supports Node.js 20.18.1 or newer and Bun 1.4.0 or
 newer.
 
-## Install
-
-```bash
-npm install @phala/aci-verifier openai
-```
-
 ## Create a verified connection
 
-```typescript
-import OpenAI from "openai";
-import { connectAci } from "@phala/aci-verifier/runtime";
-
-const apiKey = process.env.PHALA_AI_API_KEY;
-if (!apiKey) throw new Error("PHALA_AI_API_KEY is required");
-
-const aci = await connectAci({
-  baseURL: "https://inference.phala.com/v1",
-  serving: {
-    requireVerified: true,
-    requireReceipt: true,
-  },
-});
-
-try {
-  const client = new OpenAI({
-    baseURL: aci.baseURL,
-    apiKey,
-    fetch: aci.fetch,
-  });
-
-  const response = await client.chat.completions.create({
-    model: "z-ai/glm-5.3",
-    messages: [{ role: "user", content: "Explain attestation." }],
-  });
-
-  const audit = await aci.verifyReceipt();
-  if (!audit.transcript.verdict.verified) {
-    throw new Error(audit.transcript.verdict.line);
-  }
-
-  console.log(response.choices[0].message.content);
-} finally {
-  await aci.close();
-}
-```
+Follow [Node and Bun setup](/phala-cloud/confidential-ai/verify/verify-signature#node-and-bun) for installation and a complete connection and receipt-audit example.
 
 `connectAci()` verifies a fresh nonce-bound workload report and creates a
 hostname-validated TLS transport pinned to the attested SPKI. Its scoped
@@ -88,33 +46,7 @@ export when the application must bind model traffic to the attested TLS key.
 
 ## Release policy
 
-The SDK does not check whether the gateway runs a production or development
-dstack OS image. For OS-image assurance, verify the same quote, event log, and
-VM configuration with an independent [dstack verifier](https://github.com/Dstack-TEE/dstack/tree/next/dstack/verifier)
-and require `is_valid: true`.
-
-Attestation proves which compose hash was measured, but not that your
-organization reviewed that release. When you have an authenticated allowlist,
-pass its hashes as `policy.acceptedComposeHashes`. Never copy a hash from the
-endpoint and trust it on first use.
-
-Each production release of the gateway at `inference.phala.com` is published as a
-`gateway-prod-<date>` release in
-[`Dstack-TEE/private-ai-gateway`](https://github.com/Dstack-TEE/private-ai-gateway/releases).
-It lists the compose hash, OS and KMS values, and TLS keys, and attaches the exact
-measured `app_compose.json` so you can recompute the compose hash yourself. A change
-to these values is published as a prerelease at least 3 days before the rollout,
-or sooner for an urgent change, with the reason in the release.
-KMS values are the exception: `mr-kms` is recorded when a replica boots and can
-change without notice, so pin the KMS root key instead. The
-[release measurements page](https://docs.redpill.ai/guides/release-measurements)
-lists the current values and the full notice policy.
-
-Without a compose allowlist, the client verifies that the measured compose ran
-in a genuine TDX workload. It does not claim that Phala reviewed that release.
-For a production security decision, pair compose appraisal with a dstack
-verifier result for the same quote, event log, and VM configuration, and require
-`is_valid: true`.
+See the canonical [release policy](/phala-cloud/confidential-ai/verify/verify-signature#release-policy) for `policy.acceptedComposeHashes` and independent OS verification. See [release measurements](https://docs.redpill.ai/guides/release-measurements) for published values and notice policy.
 
 For the complete API and security limits, see the
 [`@phala/aci-verifier` package documentation](https://github.com/Dstack-TEE/private-ai-gateway/tree/main/clients/verifier-ts).

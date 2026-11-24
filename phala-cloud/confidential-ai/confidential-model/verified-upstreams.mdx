@@ -1,0 +1,28 @@
+---
+title: "Verified upstreams"
+description: "How the gateway verifies a confidential provider before forwarding: the channel binding it enforces, the attested session it records, and the typed claims you read."
+---
+
+import SharedContent from "/snippets/aci/verified-upstreams.mdx";
+import { site } from "/snippets/site.jsx";
+
+Every model on `https://inference.phala.com/v1` requires verified upstream serving.
+
+<SharedContent site={site} />
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Confidential providers" icon="server" href="/phala-cloud/confidential-ai/confidential-model/providers">
+    Binding type and asserted claims per provider.
+  </Card>
+  <Card title="Receipts" icon="receipt" href="/phala-cloud/confidential-ai/confidential-model/receipts-and-sessions">
+    The `upstream.verified` event that cites a session.
+  </Card>
+  <Card title="Session endpoint" icon="link" href="/phala-cloud/confidential-ai/confidential-model/api-reference/sessions">
+    Fetch a session by id, or list current sessions.
+  </Card>
+  <Card title="Trust boundary" icon="shield-halved" href="/phala-cloud/confidential-ai/confidential-model/trust-boundary">
+    What the gateway does and does not protect.
+  </Card>
+</CardGroup>

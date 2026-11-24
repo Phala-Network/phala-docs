@@ -1,0 +1,52 @@
+---
+title: Endpoint policy
+description: The model catalog and verified-serving constraints enforced at inference.phala.com.
+---
+
+Use `https://inference.phala.com/v1` as your SDK base URL. This host serves TEE-capable models and requires verified, channel-bound upstream serving on every inference request. Account access and billing use your Phala API key.
+
+## Enforced constraints
+
+| Request | Behavior |
+| --- | --- |
+| `GET /v1/models` or `GET /v1/embeddings/models` | Returns only `is_tee: true` models |
+| `?tee=false` or `?tee=1` on either catalog | Host overrides the query and still returns only TEE-capable models |
+| `?zdr=true` | Additionally filters to routes with zero data retention |
+| Other `zdr` query values, including `false` | `400` |
+| Request for an unknown or non-TEE model | `404` |
+| TEE-capable model with a live verified provider | Served over a bound channel |
+| No eligible attested provider | `503` (`upstream_verification_failed`); no prompt is forwarded |
+| `provider: {"aci_verified": false}` | Adds no request constraint; the host still requires verified serving |
+| `X-Upstream-Verification` header | `400`; this header is no longer supported |
+
+The catalog's `is_tee` flag describes capability. A listed model can still return `503` if no eligible provider is currently verified. The host policy applies across failover candidates and cannot be relaxed by a client.
+
+## Make a request
+
+```bash
+curl https://inference.phala.com/v1/chat/completions \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"z-ai/glm-5.3","messages":[{"role":"user","content":"Explain attestation."}]}'
+```
+
+List current model ids before choosing one:
+
+```bash
+curl -fsS https://inference.phala.com/v1/models | jq -r '.data[].id'
+```
+
+## Apply additional policy
+
+Use `provider.aci_session_ids` to restrict the request to sessions you have independently appraised. Use `provider.zdr` to require zero data retention. These constraints apply together with the host policy; see [Attested Routing](/phala-cloud/confidential-ai/confidential-model/attested-routing) and [Zero Data Retention](/phala-cloud/confidential-ai/confidential-model/zero-data-retention).
+
+## Verify the exchange
+
+Fetch the receipt using `x-receipt-id` and require the `upstream.verified` event to record `result: "verified"` and `required: true`. Verify the gateway attestation, receipt signature, exact body hashes, and cited session. Inspecting JSON alone is not verification. The [TypeScript ACI Verifier](/phala-cloud/confidential-ai/verify/typescript-sdk) supplies a verified transport and receipt checks.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API overview" icon="code" href="/phala-cloud/confidential-ai/confidential-model/api-reference/overview" />
+  <Card title="Attested routing" icon="shield-check" href="/phala-cloud/confidential-ai/confidential-model/attested-routing" />
+</CardGroup>

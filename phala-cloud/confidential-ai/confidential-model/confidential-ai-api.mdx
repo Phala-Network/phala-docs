@@ -22,16 +22,17 @@ Once you get the API Key, you can start making requests to the Private AI API.
 
 ## Make Your First Request
 
-Replace `<API_KEY>` with your actual API key. The examples below use `z-ai/glm-5.3`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
+Set `PHALA_AI_API_KEY` in your environment. The examples below use `z-ai/glm-5.3`; use [List Models](/phala-cloud/confidential-ai/confidential-model/api-reference/models) to choose a model for your workload.
 
 <CodeGroup>
 ```python Python
+import os
 # Install OpenAI SDK: `pip3 install openai`
 
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="<API_KEY>",
+    api_key=os.environ["PHALA_AI_API_KEY"],
     base_url="https://inference.phala.com/v1",
 )
 
@@ -51,7 +52,7 @@ import OpenAI from 'openai';
 
 const client = new OpenAI({
   baseURL: 'https://inference.phala.com/v1',
-  apiKey: '<API_KEY>',
+  apiKey: process.env.PHALA_AI_API_KEY,
 });
 
 async function main() {
@@ -75,7 +76,7 @@ curl -X 'POST' \
   'https://inference.phala.com/v1/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer <API_KEY>' \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" \
   -d '{
   "messages": [
     {
@@ -105,7 +106,7 @@ Fetch the receipt with the `x-receipt-id` header:
 
 ```bash
 curl -s "https://inference.phala.com/v1/aci/receipts/$RECEIPT_ID" \
-  -H "Authorization: Bearer <API_KEY>" | \
+  -H "Authorization: Bearer $PHALA_AI_API_KEY" | \
   jq '.event_log[] | select(.type=="upstream.verified") | {model_id, result, required, session_id}'
 ```
 
@@ -134,7 +135,7 @@ Confidential inference and zero data retention are separate properties. `is_tee`
 
 The verification client checks a fresh [attestation report](/phala-cloud/confidential-ai/confidential-model/api-reference/attestation), recomputes the JCS keyset digest, checks its expiry and measured compose, and pins TLS before traffic. After the response it checks the [receipt](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts) signature, `workload_keyset_digest`, exact request/response `body_hash` values, and cited upstream session. See [Verify a Response](/phala-cloud/confidential-ai/verify/verify-signature).
 
-The legacy [Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/signature) endpoint remains available for older clients, but new integrations should use `GET /v1/aci/receipts/{id}`.
+The legacy [Signature](/phala-cloud/confidential-ai/confidential-model/api-reference/receipts#legacy-alias) endpoint remains available for older clients, but new integrations should use `GET /v1/aci/receipts/{id}`.
 
 ## Billing
 

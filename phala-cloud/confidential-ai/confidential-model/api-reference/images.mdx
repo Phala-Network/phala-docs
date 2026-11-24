@@ -1,7 +1,7 @@
 ---
 title: Images
 description: Generate images with inline base64 output and per-image billing through the attested gateway.
-api: "POST /images/generations"
+api: "POST https://inference.phala.com/v1/images/generations"
 ---
 
 ## Endpoint
@@ -31,19 +31,19 @@ The live [model catalog](/phala-cloud/confidential-ai/confidential-model/api-ref
 </ParamField>
 
 <ParamField body="size" type="string">
-  Image dimensions, for example `512x512`, or `auto` if supported by the model.
+  Image dimensions, for example `512x512`. `auto` is accepted and removed before forwarding, so the provider’s default applies.
 </ParamField>
 
 <ParamField body="quality" type="string">
-  Model-specific quality setting.
+  Model-specific quality setting. `auto` is removed before forwarding, so the provider’s default applies.
 </ParamField>
 
 <ParamField body="background" type="string">
-  Model-specific background setting.
+  Model-specific background setting. `auto` is removed before forwarding, so the provider’s default applies.
 </ParamField>
 
 <ParamField body="output_format" type="string">
-  Requested image encoding, subject to model support. The current FLUX route returns JPEG bytes even when `png` is requested. Save its output as `.jpg`; do not infer the encoding from this parameter.
+  Requested image encoding, forwarded to the provider. The gateway does not transcode the returned image; inspect its bytes before choosing a file extension rather than inferring the encoding from this parameter.
 </ParamField>
 
 <ParamField body="output_compression" type="integer">
@@ -70,7 +70,7 @@ The gateway validates option types; supported values and defaults depend on the 
 
 ## Examples
 
-Both examples save the first FLUX image as `image.jpg`. The cURL example also saves the raw response and headers, including the receipt ID.
+Both examples save the first FLUX image as `image.bin`. The cURL example also saves the raw response and headers, including the receipt ID.
 
 <CodeGroup>
 
@@ -92,7 +92,7 @@ from pathlib import Path
 
 response = json.loads(Path("image-response.json").read_text())
 image = base64.b64decode(response["data"][0]["b64_json"], validate=True)
-Path("image.jpg").write_bytes(image)
+Path("image.bin").write_bytes(image)
 PY
 ```
 
@@ -115,14 +115,14 @@ response = client.images.generate(
 if not response.data or not response.data[0].b64_json:
     raise ValueError("The response did not contain an inline image")
 image = base64.b64decode(response.data[0].b64_json, validate=True)
-Path("image.jpg").write_bytes(image)
+Path("image.bin").write_bytes(image)
 ```
 
 </CodeGroup>
 
 ## Response
 
-Example for one FLUX image at the current rate. The base64 data is shortened.
+Illustrative example for one FLUX image at the current rate. The base64 data is shortened.
 
 ```json
 {
@@ -143,9 +143,9 @@ Example for one FLUX image at the current rate. The base64 data is shortened.
 }
 ```
 
-`created` is a Unix timestamp in seconds. `data` is a nonempty array of images with `b64_json`; an item may also contain `revised_prompt` as a string or `null`. The current FLUX response does not include top-level `size` or `output_format` fields.
+`created` is a Unix timestamp in seconds. `data` is a nonempty array of images with `b64_json`; an item may also contain `revised_prompt` as a string or `null`. Top-level `size` and `output_format` are preserved only when the upstream returns them as strings.
 
-When present, `usage` includes integer token counts, with missing counts filled with `0`. The gateway adds `usage.cost` in USD when pricing is available: returned image count times the per-image rate, plus token charges if token usage and rates are available. Zero token counts do not imply free image generation.
+Every successful response includes `usage` with integer token counts, with missing counts filled with `0`. The gateway adds `usage.cost` in USD when pricing is available: returned image count times the per-image rate, plus token charges if token usage and rates are available. Zero token counts do not imply free image generation.
 
 ## Verification
 
