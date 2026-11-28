@@ -22,6 +22,8 @@ When creating a CVM, the SSH Authorization section lets you add one more public 
 
 Your keys are copied into the CVM when it starts for the first time. Adding a key to your account later does not reach a CVM that is already running. To add a key to a running CVM, use **Code Update** and set the `DSTACK_ROOT_PUBLIC_KEY` environment variable.
 
+If you restrict the gateway to certain ports, keep port `22` in the policy. Closing it can cut off SSH through the gateway. See [Gateway Port Policy](/phala-cloud/networking/gateway-port-policy#what-happens-when-i-close-port-22).
+
 ### Why can't I sign in with a password?
 
 Since dstack 0.5.6, the SSH server rejects password logins. Only keys work. `DSTACK_ROOT_PASSWORD` still sets the Linux root password inside the CVM, but SSH will turn it down no matter what you set it to. Add a public key instead.

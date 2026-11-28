@@ -1,0 +1,161 @@
+---
+title: Gateway Port Policy
+description: Choose which ports of your CVM the gateway forwards, and which get a PROXY protocol header
+---
+
+The gateway is how traffic from the internet reaches your CVM. A port policy tells the gateway which ports of the CVM it may forward to. It also says which of those ports get a PROXY protocol header.
+
+## Which port does the policy control?
+
+The guest port. That is the left side of a Docker Compose port mapping.
+
+1. Your container listens on a container port. For example, Nginx listens on `80`.
+2. Docker Compose publishes it on a guest port. In `ports: ["8080:80"]`, the guest port is `8080`. A port bound only to loopback, such as `127.0.0.1:8080:80`, cannot be reached from the gateway.
+3. The gateway forwards traffic to the guest port. So the policy lists `8080`, not `80`.
+
+The policy does not publish container ports for you. It does not change ports mapped directly on the host. It does nothing while the gateway is turned off for the CVM.
+
+## What does each setting do?
+
+A policy has two parts: **Restrict mode** and a list of ports.
+
+| Policy | What the gateway does |
+| --- | --- |
+| Restrict mode on | Forwards only the ports in the list. |
+| Restrict mode on, empty list | Forwards no ports at all. |
+| Restrict mode off | Forwards every port. The list only picks which ports get a PROXY protocol header. |
+| No policy declared | Forwards every port, without PROXY protocol. |
+
+## What policy does a new CVM get?
+
+If you do not declare a policy, Phala Cloud normally sets one when it creates the CVM. It turns on restrict mode and allows:
+
+- every static TCP guest port that Docker Compose publishes,
+- port `8090`, for the guest agent,
+- port `22`, when the CVM has SSH access. That means a dev OS image, SSH keys, or the SSH dev box.
+
+Phala Cloud cannot always tell which ports your app listens on. In these cases it sets no default, so the gateway forwards every port:
+
+- the OS image is older than dstack OS 0.5.9,
+- the CVM uses the Bash runner,
+- a service uses host networking or another non-default network mode.
+
+A port set by an environment variable, such as `"${PORT}:80"`, cannot be read ahead of time. It is not in the default, so it stays closed. Add it to the policy yourself.
+
+## Which dstack OS version do I need?
+
+dstack OS 0.5.9 or later. A policy that restricts ports or turns on PROXY protocol is rejected on an older image. Upgrade the OS image first.
+
+## What happens when I close port 8090?
+
+Phala Cloud can no longer read logs, status, or attestation data from the CVM.
+
+Port `8090` is the guest agent. It is how Phala Cloud reads those things. You can set access to it in three ways:
+
+| Access | How to set it | What happens |
+| --- | --- | --- |
+| Open to everyone | Keep `8090` in the policy and open the guest agent. | Anyone who can reach the gateway can reach the guest agent. |
+| Phala Cloud only | Use the guest agent access setting in the console. The policy keeps `8090`. | The public is blocked. Logs, status, and attestation keep working. |
+| Closed to everyone | Leave `8090` out of a restricted policy. | No one can reach the guest agent, not even Phala Cloud. |
+
+If you only want to keep the public out, use the console setting. See [Guest Agent Access](/phala-cloud/networking/guest-agent-access). Close port `8090` only if you mean to cut off Phala Cloud too.
+
+Closing `8090` needs an explicit confirmation in the console, the CLI, and the API. Without it, Phala Cloud keeps port `8090` open by adding it back to the list.
+
+## What happens when I close port 22?
+
+SSH through the gateway can stop working. If you reach the CVM over SSH this way, keep port `22` in the policy. See [Enable SSH Access](/phala-cloud/networking/enable-ssh-access).
+
+## When should I turn on PROXY protocol?
+
+Only when the program listening on that port expects a PROXY header before the application data.
+
+- The gateway writes PROXY protocol v2 headers.
+- When a load balancer sits in front of the gateway, the gateway may pass on that balancer's header instead. That header can be v1. Accept both versions.
+- A listener that expects plain HTTP, TLS, or SSH may reject a connection that starts with a PROXY header.
+
+Change the listener and the policy in the same deployment, so they always agree.
+
+## Will my CVM restart?
+
+A running CVM restarts. A stopped CVM stays stopped and uses the new policy when you start it.
+
+If the new policy behaves the same as the current one, nothing changes and the CVM does not restart. Two policies behave the same when they forward the same ports with the same PROXY settings.
+
+A CVM that uses on-chain KMS needs the new compose hash registered on-chain first. See [Updating with Onchain KMS](/phala-cloud/key-management/updating-with-onchain-kms).
+
+## How do policies work in an app with several instances?
+
+Each instance has its own policy. For a request on a port, the gateway sends traffic only to instances whose policy allows that port. If you change the policy of one instance, change the others too, or traffic on that port goes only to the instances that allow it.
+
+## How do I set the policy?
+
+### In the console
+
+Open the CVM's networking page and find the port policy card. Turn **Restrict mode** on or off, select **Add port** to add a guest port, and use the **Proxy Protocol** switch on a row to turn PROXY protocol on for that port. Saving restarts a running CVM.
+
+The GPU rental launch form has a **Gateway port policy** field. It allows every port by default. It asks you to confirm before you close port `8090`.
+
+### With the CLI
+
+Add a `[port_policy]` table to `phala.toml` and run `phala deploy`:
+
+```toml
+[port_policy]
+restrict_mode = true
+ports = [
+  { port = 8090 },
+  { port = 8080 },
+  { port = 8443, pp = true },
+]
+```
+
+`pp = true` turns on PROXY protocol for that port. `phala deploy` sends the whole table and does not merge it with the policy the CVM already has. If you leave the table out, an existing CVM keeps its policy and a new CVM gets the default above.
+
+To change one CVM directly, use `phala port-policy`:
+
+```bash
+phala port-policy show --cvm-id 550e8400-e29b-41d4-a716-446655440000
+phala port-policy allow 8080 --cvm-id 550e8400-e29b-41d4-a716-446655440000
+phala port-policy deny 8080 --cvm-id 550e8400-e29b-41d4-a716-446655440000
+phala port-policy replace --restrict --port 8090 --port 8080 --proxy-protocol-port 8443 --cvm-id 550e8400-e29b-41d4-a716-446655440000
+```
+
+In a script, closing port `8090`, port `22`, or every port needs the matching `--confirm-close` flag: `--confirm-close 8090`, `--confirm-close 22`, or `--confirm-close all`. `phala port-policy` changes the CVM only. It does not edit `phala.toml`, so the next `phala deploy` sends the table in the file again.
+
+See the [`phala.toml` reference](/phala-cloud/phala-cloud-cli/phala-toml) for the other keys.
+
+### With the API
+
+Send `port_policy` inside `compose` in `PATCH /cvms/{cvm_id}`:
+
+```json
+{
+  "compose": {
+    "port_policy": {
+      "restrict_mode": true,
+      "ports": [{ "port": 8090 }, { "port": 8080 }, { "port": 8443, "pp": true }]
+    }
+  }
+}
+```
+
+The update merges the policy by key. If you send `ports`, the new list replaces the old one. If you leave `ports` out, the old list stays.
+
+To keep from overwriting another change, send `expected_compose_hash` at the top level of the request body, next to `compose`, with the compose hash you read. If the CVM changed since you read it, the API rejects the update with `409`.
+
+A `202` response lists `port_policy_unlisted_ports`. These are TCP ports that Docker Compose publishes but a restrictive policy leaves out. The gateway does not forward traffic to them. If you left a port out on purpose, ignore it. Ports set through environment variables may not show up in this list.
+
+To close port `8090`, leave it out of a restricted policy and send `"guest_agent_gateway_access": "closed"` at the top level of the same request. Without it, Phala Cloud adds port `8090` back to the list. Sending it while the policy still allows `8090` is rejected.
+
+See [Update a CVM](/phala-cloud/update/update-cvm-configuration) for the rest of the update API.
+
+## Why can't I reach a port?
+
+Check these in order:
+
+1. The port is published in Docker Compose, and the policy lists its guest port (the left side of the mapping).
+2. Restrict mode is on and the port is not in the list. Add it.
+3. The port is set by an environment variable, such as `"${PORT}:80"`. Add it to the policy yourself.
+4. The CVM runs an OS image older than dstack OS 0.5.9. Then the gateway forwards every port, and the cause is elsewhere. See [Troubleshooting](/phala-cloud/networking/troubleshooting).
+5. PROXY protocol is on for the port, but the listener does not expect a header. Or the reverse.

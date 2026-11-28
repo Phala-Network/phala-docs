@@ -433,6 +433,7 @@
                   "/phala-cloud/networking/expose-http-service",
                   "/phala-cloud/networking/setup-custom-domain",
                   "/phala-cloud/networking/expose-tcp-service",
+                  "/phala-cloud/networking/gateway-port-policy",
                   "/phala-cloud/networking/guest-agent-access",
                   "/phala-cloud/networking/enable-ssh-access",
                   "/phala-cloud/networking/tls-passthrough",
