@@ -21,6 +21,8 @@ When you expose a TCP port, the gateway automatically wraps your traffic in TLS:
 
 This gives you encrypted connections without configuring certificates in your service.
 
+The gateway forwards only the ports its port policy allows. A new CVM allows the TCP ports Docker Compose publishes. See [Gateway Port Policy](/phala-cloud/networking/gateway-port-policy).
+
 ## Example: PostgreSQL Database
 
 ```yaml

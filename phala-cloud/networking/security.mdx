@@ -50,6 +50,10 @@ The security model shifts trust from people and organizations to hardware and ve
 
 **You still need to trust three things.** First, your own application code—application vulnerabilities are your responsibility. Second, the TDX hardware security itself, as Intel's hardware implementation forms the root of trust. Third, the certificate authorities like Let's Encrypt must be trustworthy, though this risk is mitigated by CAA records and CT monitoring.
 
+### Which ports the gateway forwards
+
+You choose which guest ports the gateway forwards to your CVM. A new CVM allows only the ports it publishes, plus the guest agent port and SSH when they apply. See [Gateway Port Policy](/phala-cloud/networking/gateway-port-policy).
+
 ### Out of Scope
 
 **Application security**: Network security doesn't protect against application vulnerabilities. Your code must handle input validation, authentication, and authorization correctly.

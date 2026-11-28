@@ -27,6 +27,9 @@ curl http://localhost:8080
 
 ### Common Causes
 
+**Port not allowed by the gateway port policy:**
+When restrict mode is on, the gateway forwards only the ports in the policy. A published port the policy leaves out is listed in `port_policy_unlisted_ports` in the update response, and the CLI warns about it. Add the guest port to the policy. See [Gateway Port Policy](/phala-cloud/networking/gateway-port-policy#why-cant-i-reach-a-port).
+
 **Port not exposed in docker-compose.yml:**
 ```yaml
 services:
